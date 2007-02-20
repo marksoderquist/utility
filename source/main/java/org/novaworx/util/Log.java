@@ -38,18 +38,46 @@ public class Log {
 
 	private static Formatter formatter;
 
+	public static final Level DEFAULT_MAIN_LOG_LEVEL = ALL;
+
+	public static final Level DEFAULT_LOG_LEVEL = INFO;
+
 	static {
 		formatter = new CustomFormatter();
-		
+
 		handler = new CustomHandler( System.out, formatter );
-		handler.setLevel( Level.ALL );
 
 		Logger.getLogger( name ).setUseParentHandlers( false );
 		Logger.getLogger( name ).addHandler( handler );
+
+		setMainLevel( DEFAULT_MAIN_LOG_LEVEL );
+		setLevel( DEFAULT_LOG_LEVEL );
 	}
 
+	/**
+	 * This log level affects all handlers.
+	 * 
+	 * @param level
+	 */
+	public static final void setMainLevel( Level level ) {
+		if( level == null ) {
+			Logger.getLogger( name ).setLevel( DEFAULT_MAIN_LOG_LEVEL );
+		} else {
+			Logger.getLogger( name ).setLevel( level );
+		}
+	}
+
+	/**
+	 * This log level affects only the embedded handler.
+	 * 
+	 * @param level
+	 */
 	public static final void setLevel( Level level ) {
-		Logger.getLogger( name ).setLevel( Level.ALL );
+		if( level == null ) {
+			handler.setLevel( DEFAULT_LOG_LEVEL );
+		} else {
+			handler.setLevel( level );
+		}
 	}
 
 	public static final void addHandler( Handler handler ) {
