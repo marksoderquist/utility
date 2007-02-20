@@ -8,7 +8,7 @@
 	
 	<groupId>org.novaworx</groupId>
 	<artifactId>utility</artifactId>
-	<version>1.0</version>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
 	<name>Novaworx Utility Library</name>
@@ -160,14 +160,14 @@
 		<repository>
 			<id>novaworx</id>
 			<name>Novaworx Maven Repository</name>
-			<url>scpexe://www.novaworx.org/var/www/html/maven/release</url>
+			<url>scp://mvn.novaworx.org//var/www/html/maven/release</url>
 		</repository>
 		
 		<!-- use the following if you ARE using a snapshot version. -->
 		<snapshotRepository>
 			<id>novaworx-snapshot</id>
 			<name>Novaworx Maven Snapshot Repository</name>
-			<url>scpexe://www.novaworx.org/var/www/html/maven/snapshot</url>
+			<url>scp://mvn.novaworx.org//var/www/html/maven/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
