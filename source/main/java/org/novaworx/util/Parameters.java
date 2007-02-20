@@ -88,4 +88,8 @@ public class Parameters {
 		return Collections.unmodifiableList( files );
 	}
 
+	public int size() {
+		return values.size();
+	}
+
 }

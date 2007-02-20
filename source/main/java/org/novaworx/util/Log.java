@@ -32,22 +32,32 @@ public class Log {
 
 	public static final Level ALL = Level.ALL;
 
-	private static final String name = "clearview";
+	private static final String name = Logger.GLOBAL_LOGGER_NAME;
+
+	private static Handler handler;
+
+	private static Formatter formatter;
 
 	static {
-		Logger.getLogger( name ).setUseParentHandlers( false );
-
-		Handler handler = new CustomHandler( System.out, new CustomFormatter() );
+		formatter = new CustomFormatter();
+		
+		handler = new CustomHandler( System.out, formatter );
 		handler.setLevel( Level.ALL );
+
+		Logger.getLogger( name ).setUseParentHandlers( false );
 		Logger.getLogger( name ).addHandler( handler );
 	}
 
 	public static final void setLevel( Level level ) {
-		Logger.getLogger( name ).setLevel( level );
+		Logger.getLogger( name ).setLevel( Level.ALL );
 	}
 
 	public static final void addHandler( Handler handler ) {
 		Logger.getLogger( name ).addHandler( handler );
+	}
+
+	public static final void removeHandler( Handler handler ) {
+		Logger.getLogger( name ).removeHandler( handler );
 	}
 
 	public static final void write() {
