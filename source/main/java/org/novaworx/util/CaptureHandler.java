@@ -26,7 +26,7 @@ public class CaptureHandler extends StreamHandler {
 	}
 
 	public String toString() {
-		return output.toString().trim();
+		return output.toString();
 	}
 
 	private static class CaptureFormatter extends Formatter {
