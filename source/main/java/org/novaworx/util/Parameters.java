@@ -18,74 +18,74 @@ public class Parameters {
 
 	private List<String> files;
 
-	private Parameters(String[] commands, Map<String, String> values, List<String> files) {
+	private Parameters( String[] commands, Map<String, String> values, List<String> files ) {
 		this.commands = commands;
 		this.values = values;
 		this.files = files;
 	}
 
-	public static final Parameters parse(String[] commands) {
-		return parse(commands);
+	public static final Parameters parse( String[] commands ) {
+		return parse( commands, new String[ 0 ] );
 	}
 
-	public static final Parameters parse(String[] commands, String... flags) {
+	public static final Parameters parse( String[] commands, String... flags ) {
 		Map<String, String> values = new HashMap<String, String>();
 		List<String> files = new ArrayList<String>();
-		for (int index = 0; index < flags.length; index++) {
-			if (!flags[index].startsWith("-")) {
-				flags[index] = "-" + flags[index];
+		for( int index = 0; index < flags.length; index++ ) {
+			if( !flags[ index ].startsWith( "-" ) ) {
+				flags[ index ] = "-" + flags[ index ];
 			}
 		}
-		Arrays.sort(flags);
+		Arrays.sort( flags );
 
 		int index = 0;
 		boolean flagTerminatorFound = false;
-		for (; index < commands.length; index++) {
-			String parameter = commands[index];
-			String next = index + 1 < commands.length ? commands[index + 1] : null;
-			if (parameter.startsWith("-")) {
-				if ("--".equals(parameter)) {
+		for( ; index < commands.length; index++ ) {
+			String parameter = commands[ index ];
+			String next = index + 1 < commands.length ? commands[ index + 1 ] : null;
+			if( parameter.startsWith( "-" ) ) {
+				if( "--".equals( parameter ) ) {
 					flagTerminatorFound = true;
 					index++;
 					break;
-				} else if (Arrays.binarySearch(flags, parameter) >= 0 || next == null || next.startsWith("-")) {
+				} else if( Arrays.binarySearch( flags, parameter ) >= 0 || next == null || next.startsWith( "-" ) ) {
 					// Flag
-					values.put(parameter.substring(1), "true");
+					values.put( parameter.substring( 1 ), "true" );
 				} else {
 					// Value
-					values.put(parameter.substring(1), next);
+					values.put( parameter.substring( 1 ), next );
 					index++;
 				}
 			} else {
 				// File
-				files.add(parameter);
+				files.add( parameter );
 			}
 		}
 
-		if (flagTerminatorFound) {
-			for (; index < commands.length; index++) {
-				String parameter = commands[index];
-				files.add(parameter);
+		if( flagTerminatorFound ) {
+			for( ; index < commands.length; index++ ) {
+				String parameter = commands[ index ];
+				files.add( parameter );
 			}
 		}
 
-		return new Parameters(Arrays.copyOf(commands, commands.length), values, files);
+		return new Parameters( Arrays.copyOf( commands, commands.length ), values, files );
 	}
 
 	public String[] getCommands() {
 		return commands;
 	}
 
-	public boolean isSet(String key) {
-		return get(key) != null;
+	public boolean isSet( String key ) {
+		return get( key ) != null;
 	}
 
-	public String get(String key) {
-		return values.get(key);
+	public String get( String key ) {
+		return values.get( key );
 	}
 
 	public List<String> getFiles() {
-		return Collections.unmodifiableList(files);
+		return Collections.unmodifiableList( files );
 	}
 
 }
