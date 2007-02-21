@@ -12,6 +12,14 @@ public class TextFormat {
 
 	private static final char SPACE = ' ';
 	
+	public static String toPrintableString( char data ) {
+		if( data >= 32 && data <= 127 ) {
+			return String.valueOf( data );
+		} else {
+			return "[" + String.valueOf( (int)data ) + "]";
+		}
+	}
+
 	/**
 	 * @param bytes The bytes to convert to hex.
 	 */
