@@ -11,6 +11,36 @@ public class TextFormat {
 	public static final int RIGHT = 3;
 
 	private static final char SPACE = ' ';
+	
+	/**
+	 * @param bytes The bytes to convert to hex.
+	 */
+	public static final String toHexEncodedString( byte[] bytes ) {
+		int value = 0;
+		int count = bytes.length;
+		String string = null;
+		StringBuffer buffer = new StringBuffer();
+		for( int index = 0; index < count; index++ ) {
+			value = bytes[ index ];
+			string = Integer.toHexString( value < 0 ? value + 256 : value );
+			if( string.length() == 1 ) buffer.append( "0" );
+			buffer.append( string );
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * @param string
+	 * @return
+	 */
+	public static final String toHexEncodedString( String string ) {
+		int count = string.length();
+		StringBuffer buffer = new StringBuffer();
+		for( int index = 0; index < count; index++ ) {
+			buffer.append( Integer.toHexString( string.charAt( index ) ) );
+		}
+		return buffer.toString();
+	}
 
 	public static final String justify( int alignment, String text, int width ) {
 		return justify( alignment, text, width, SPACE );

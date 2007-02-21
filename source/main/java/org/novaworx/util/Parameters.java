@@ -81,7 +81,12 @@ public class Parameters {
 	}
 
 	public String get( String key ) {
-		return values.get( key );
+		return get( key, null );
+	}
+
+	public String get( String key, String defaultValue ) {
+		if( values.containsKey( key ) ) return values.get( key );
+		return defaultValue;
 	}
 
 	public List<String> getFiles() {
