@@ -2,7 +2,7 @@ package org.novaworx.util;
 
 public class Convenience {
 	
-	public void pause( long duration ) {
+	public static final void pause( long duration ) {
 		try {
 			Thread.sleep( duration );
 		} catch( InterruptedException exception ) {

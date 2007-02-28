@@ -122,6 +122,10 @@ public class Log {
 		StackTraceElement caller = getCaller();
 		record.setSourceClassName( caller.getClassName() );
 		record.setSourceMethodName( caller.getMethodName() );
+		write( record );
+	}
+
+	public static final void write( LogRecord record ) {
 		Logger.getLogger( name ).log( record );
 	}
 
