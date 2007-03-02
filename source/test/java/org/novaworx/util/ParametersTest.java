@@ -54,7 +54,9 @@ public class ParametersTest extends TestCase {
 	@Test
 	public void testParseWithFlags() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-one", "-two", "-three" } );
-		assertEquals( "true", parameters.get( "help" ) );
+		assertEquals( "true", parameters.get( "one" ) );
+		assertEquals( "true", parameters.get( "two" ) );
+		assertEquals( "true", parameters.get( "three" ) );
 	}
 
 	@Test
