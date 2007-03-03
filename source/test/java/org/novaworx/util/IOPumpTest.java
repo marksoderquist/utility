@@ -13,9 +13,11 @@ import junit.framework.TestCase;
 
 public class IOPumpTest extends TestCase {
 
-	private String longString = "qpweiofhpqiweufhiqerufgipqegbqeiprgbvipqer ipg qperibqiwepf qipwevqipweriqgpeigqeripgqeipgqipegviqpgpiqegipg";
+	private int[] bufferSizes = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 16, 32, 64, IOPump.DEFAULT_BUFFER_SIZE };
 
-	private String[] testStrings = new String[] { "test string", "test\nstring", longString };
+	private String longString = "qpweiofhpqiweuf\n\n\n\n\r\r\r\rhiqerufgipq\tegbqeiprgbvipqer ipg qper\u0000ibqiwepf qipwevqipweriqgpeig\u0002qeripgqeipgqipegviqpgpiqegipg";
+
+	private String[] testStrings = new String[] { "", "test string", "test\nstring", longString };
 
 	@Override
 	public void setUp() {
@@ -24,7 +26,9 @@ public class IOPumpTest extends TestCase {
 
 	public void testWithInputAndOutputStreams() throws Exception {
 		for( String string : testStrings ) {
-			testInputToOutput( string );
+			for( int bufferSize : bufferSizes ) {
+				testInputToOutput( string, bufferSize );
+			}
 		}
 	}
 
@@ -32,7 +36,9 @@ public class IOPumpTest extends TestCase {
 		for( String string : testStrings ) {
 			Map<String, Charset> charsets = Charset.availableCharsets();
 			for( Charset charset : charsets.values() ) {
-				testInputToWriter( string, charset );
+				for( int bufferSize : bufferSizes ) {
+					testInputToWriter( string, charset, bufferSize );
+				}
 			}
 		}
 	}
@@ -41,18 +47,22 @@ public class IOPumpTest extends TestCase {
 		for( String string : testStrings ) {
 			Map<String, Charset> charsets = Charset.availableCharsets();
 			for( Charset charset : charsets.values() ) {
-				testReaderToOutput( string, charset );
+				for( int bufferSize : bufferSizes ) {
+					testReaderToOutput( string, charset, bufferSize );
+				}
 			}
 		}
 	}
 
 	public void testWithReaderAndWriter() throws Exception {
 		for( String string : testStrings ) {
-			testReaderToWriter( string );
+			for( int bufferSize : bufferSizes ) {
+				testReaderToWriter( string, bufferSize );
+			}
 		}
 	}
 
-	private void testInputToOutput( String string ) throws Exception {
+	private void testInputToOutput( String string, int bufferSize ) throws Exception {
 		InputStream input = new ByteArrayInputStream( string.getBytes() );
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -61,7 +71,7 @@ public class IOPumpTest extends TestCase {
 		assertEquals( string, new String( output.toByteArray() ) );
 	}
 
-	private void testInputToWriter( String string, Charset charset ) throws Exception {
+	private void testInputToWriter( String string, Charset charset, int bufferSize ) throws Exception {
 		if( !charset.canEncode() ) return;
 
 		String comparator = new String( string.getBytes( charset ), charset );
@@ -70,16 +80,11 @@ public class IOPumpTest extends TestCase {
 		InputStream input = new ByteArrayInputStream( string.getBytes( charset ) );
 		CharArrayWriter writer = new CharArrayWriter();
 		IOPump pump = new IOPump( input, writer, charset );
-		if( "UTF-16".equals( charset.name() ) ) {
-			Log.setLevel( Log.ALL );
-			pump.setLogEnabled( true );
-			pump.setLogContent( true );
-		}
 		pump.startAndWait();
 		assertEquals( "charset: " + charset, string, new String( writer.toCharArray() ) );
 	}
 
-	private void testReaderToOutput( String string, Charset charset ) throws Exception {
+	private void testReaderToOutput( String string, Charset charset, int bufferSize ) throws Exception {
 		if( !charset.canEncode() ) return;
 
 		String comparator = new String( string.getBytes( charset ), charset );
@@ -89,16 +94,11 @@ public class IOPumpTest extends TestCase {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		IOPump pump = new IOPump( reader, output, charset );
-		if( "UTF-16".equals( charset.name() ) ) {
-			Log.setLevel( Log.ALL );
-			pump.setLogEnabled( true );
-			pump.setLogContent( true );
-		}
 		pump.startAndWait();
 		assertEquals( "charset: " + charset, string, new String( output.toByteArray(), charset ) );
 	}
 
-	private void testReaderToWriter( String string ) {
+	private void testReaderToWriter( String string, int bufferSize ) {
 		Reader reader = new CharArrayReader( string.toCharArray() );
 		CharArrayWriter writer = new CharArrayWriter();
 

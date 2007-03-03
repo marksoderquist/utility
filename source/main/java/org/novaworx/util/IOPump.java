@@ -1,5 +1,9 @@
 package org.novaworx.util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,7 +22,7 @@ import java.util.logging.Level;
  */
 public class IOPump implements Runnable {
 
-	public static final int DEFAULT_BUFFER_SIZE = 11;
+	public static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	private String name;
 
@@ -56,8 +60,8 @@ public class IOPump implements Runnable {
 
 	public IOPump( String name, InputStream input, OutputStream output, int bufferSize ) {
 		this.name = name;
-		this.input = input;
-		this.output = output;
+		this.input = new BufferedInputStream( input );
+		this.output = new BufferedOutputStream( output );
 		this.bufferSize = bufferSize;
 	}
 
@@ -91,8 +95,8 @@ public class IOPump implements Runnable {
 
 	public IOPump( String name, InputStream input, Writer writer, Charset charset, int bufferSize ) {
 		this.name = name;
-		this.reader = new InputStreamReader( input, charset );
-		this.writer = writer;
+		this.reader = new BufferedReader( new InputStreamReader( input, charset ) );
+		this.writer = new BufferedWriter( writer );
 		this.bufferSize = bufferSize;
 	}
 
@@ -126,8 +130,8 @@ public class IOPump implements Runnable {
 
 	public IOPump( String name, Reader reader, OutputStream output, Charset charset, int bufferSize ) {
 		this.name = name;
-		this.reader = reader;
-		this.writer = new OutputStreamWriter( output, charset );
+		this.reader = new BufferedReader( reader );
+		this.writer = new BufferedWriter( new OutputStreamWriter( output, charset ) );
 		this.bufferSize = bufferSize;
 	}
 
@@ -145,8 +149,8 @@ public class IOPump implements Runnable {
 
 	public IOPump( String name, Reader reader, Writer writer, int bufferSize ) {
 		this.name = name;
-		this.reader = reader;
-		this.writer = writer;
+		this.reader = new BufferedReader( reader );
+		this.writer = new BufferedWriter( writer );
 		this.bufferSize = bufferSize;
 	}
 
@@ -235,9 +239,6 @@ public class IOPump implements Runnable {
 	}
 
 	public final void run() {
-		boolean newline = false;
-		StringBuilder builder = new StringBuilder();
-
 		// Check for bad parameters.
 		if( input == null & reader == null || output == null & writer == null ) return;
 
@@ -254,6 +255,8 @@ public class IOPump implements Runnable {
 
 		try {
 			int read = 0;
+			boolean lineTerminator = false;
+			StringBuilder builder = new StringBuilder();
 
 			while( execute ) {
 				// Read data.
@@ -279,33 +282,28 @@ public class IOPump implements Runnable {
 						}
 
 						if( datum == 10 || datum == 13 ) {
-							if( newline ) {
-								continue;
-							} else {
+							builder.append( TextUtil.toPrintableString( (char)datum ) );
+							lineTerminator = true;
+						} else {
+							if( lineTerminator ) {
 								Log.write( logAtLevel, builder.toString() );
 								builder.delete( 0, builder.length() );
-								newline = true;
 							}
-						} else {
 							builder.append( TextUtil.toPrintableString( (char)datum ) );
-							newline = false;
+							lineTerminator = false;
 						}
 					}
 				}
 
 				// Write data.
 				if( writer == null ) {
-					if( reader == null ) {
-						writeToOutputStream( bytearray, read );
-					}
+					writeToOutputStream( bytearray, read );
 				} else {
-					if( input == null ) {
-						writeToWriter( chararray, read );
-					}
+					writeToWriter( chararray, read );
 				}
 			}
 		} catch( IOException exception ) {
-			exception.printStackTrace();
+			if( logEnabled ) Log.write( exception );
 		} finally {
 			if( logEnabled ) Log.write( logAtLevel, "IOPump finished." );
 		}
