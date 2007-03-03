@@ -32,6 +32,30 @@ public class TextUtil {
 		}
 	}
 
+	public static String toPrintableString( byte[] data ) {
+		if( data == null ) return null;
+		StringBuilder builder = new StringBuilder();
+		int count = data.length;
+		for( int index = 0; index < count; index++ ) {
+			builder.append( toPrintableString( (char)data[ index ] ) );
+		}
+		return builder.toString();
+	}
+
+	public static String toPrintableString( char[] data ) {
+		if( data == null ) return null;
+		StringBuilder builder = new StringBuilder();
+		int count = data.length;
+		for( int index = 0; index < count; index++ ) {
+			builder.append( toPrintableString( data[ index ] ) );
+		}
+		return builder.toString();
+	}
+
+	public static String toPrintableString( String data ) {
+		return toPrintableString( data.toCharArray() );
+	}
+
 	/**
 	 * Convert an array of bytes to a HEX encoded string.
 	 * 

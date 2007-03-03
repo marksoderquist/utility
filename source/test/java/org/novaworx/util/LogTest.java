@@ -5,7 +5,7 @@ import java.util.logging.LogRecord;
 
 import junit.framework.TestCase;
 
-public class TestLog extends TestCase {
+public class LogTest extends TestCase {
 
 	private TestLogHandler handler;
 
