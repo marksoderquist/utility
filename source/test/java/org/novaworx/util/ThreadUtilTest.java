@@ -2,7 +2,7 @@ package org.novaworx.util;
 
 import junit.framework.TestCase;
 
-public class ConvenienceTest extends TestCase {
+public class ThreadUtilTest extends TestCase {
 
 	public void testPause() {
 		long length = 100;
@@ -10,10 +10,6 @@ public class ConvenienceTest extends TestCase {
 		ThreadUtil.pause( length );
 		long stop = System.currentTimeMillis();
 		assertTrue( stop - start >= length );
-	}
-
-	public void testGetClassNameOnly() {
-		assertEquals( "Object", ClassUtil.getClassNameOnly( Object.class ) );
 	}
 
 }

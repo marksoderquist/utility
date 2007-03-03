@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
-public class TextFormatTest extends TestCase {
+public class TextUtilTest extends TestCase {
 
 	public void testToPrintableString() {
 		assertEquals( "Bad conversion.", "[0]", TextUtil.toPrintableString( (char)0 ) );
