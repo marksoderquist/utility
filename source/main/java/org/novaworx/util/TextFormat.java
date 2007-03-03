@@ -1,5 +1,6 @@
 package org.novaworx.util;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 public class TextFormat {
@@ -11,9 +12,21 @@ public class TextFormat {
 	public static final int RIGHT = 3;
 
 	private static final char SPACE = ' ';
-	
+
+	/**
+	 * Returns a printable string representation of a character by converting char
+	 * values less than or equal to 32 or greater than or equal to 126 to the
+	 * integer value surrounded by brackets.
+	 * <p>
+	 * Example: An escape char (27) would be returned as: [27]
+	 * <p>
+	 * Example: The letter A would be returned as: A
+	 * 
+	 * @param data The character to convert.
+	 * @return A printable string representation of the character.
+	 */
 	public static String toPrintableString( char data ) {
-		if( data >= 32 && data <= 127 ) {
+		if( data >= 32 && data <= 126 ) {
 			return String.valueOf( data );
 		} else {
 			return "[" + String.valueOf( (int)data ) + "]";
@@ -21,7 +34,10 @@ public class TextFormat {
 	}
 
 	/**
+	 * Convert an array of bytes to a HEX encoded string.
+	 * 
 	 * @param bytes The bytes to convert to hex.
+	 * @return A hex encoded string of the byte array.
 	 */
 	public static final String toHexEncodedString( byte[] bytes ) {
 		int value = 0;
@@ -60,8 +76,6 @@ public class TextFormat {
 
 	public static final String justify( int alignment, String text, int width, char chr, int pad ) {
 		switch( alignment ) {
-			case LEFT:
-				return leftJustify( text, width, chr, pad );
 			case CENTER:
 				return centerJustify( text, width, chr, pad );
 			case RIGHT:
