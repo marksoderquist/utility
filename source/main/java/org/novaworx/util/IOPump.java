@@ -145,7 +145,7 @@ public class IOPump implements Runnable {
 							newline = true;
 						}
 
-						System.out.print( TextFormat.toPrintableString( (char)byteBuffer[ index ] ) );
+						System.out.print( TextUtil.toPrintableString( (char)byteBuffer[ index ] ) );
 					}
 				}
 

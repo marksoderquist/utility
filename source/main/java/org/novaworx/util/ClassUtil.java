@@ -1,15 +1,7 @@
 package org.novaworx.util;
 
-public class Convenience {
+public class ClassUtil {
 	
-	public static final void pause( long duration ) {
-		try {
-			Thread.sleep( duration );
-		} catch( InterruptedException exception ) {
-			// Intentionally ignore exception.
-		}
-	}
-
 	public static final String getClassNameOnly( Class<?> clazz ) {
 		String className = clazz.getName();
 		int index = className.lastIndexOf( '.' );

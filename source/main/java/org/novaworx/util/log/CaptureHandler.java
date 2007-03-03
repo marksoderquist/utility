@@ -1,4 +1,4 @@
-package org.novaworx.util;
+package org.novaworx.util.log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;

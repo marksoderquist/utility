@@ -1,9 +1,8 @@
 package org.novaworx.util;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 
-public class TextFormat {
+public class TextUtil {
 
 	public static final int LEFT = 1;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.novaworx.util;
+package org.novaworx.util.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
