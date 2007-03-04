@@ -1,7 +1,7 @@
 package org.novaworx.util;
 
 public class TripLock {
-	
+
 	private volatile boolean tripped;
 
 	public synchronized void hold() {
@@ -17,11 +17,6 @@ public class TripLock {
 	public synchronized void trip() {
 		tripped = true;
 		notifyAll();
-	}
-	
-	public synchronized void reset() {
-		trip();
-		tripped = false;
 	}
 
 }
