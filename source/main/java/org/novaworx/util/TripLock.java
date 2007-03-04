@@ -37,5 +37,12 @@ public class TripLock {
 		tripped = true;
 		notifyAll();
 	}
+	
+	/**
+	 * Reset the tripped flag.
+	 */
+	public synchronized void reset() {
+		tripped = false;
+	}
 
 }
