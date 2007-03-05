@@ -209,7 +209,6 @@ public class IOPump implements Runnable {
 
 	public final void stop() {
 		execute = false;
-		worker.interrupt();
 	}
 
 	public final void stopAndWait() {

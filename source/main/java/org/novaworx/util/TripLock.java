@@ -19,9 +19,19 @@ public class TripLock {
 	 * immediately if the lock has already been tripped.
 	 */
 	public synchronized void hold() {
-		while( !tripped ) {
+		if( !tripped ) {
 			try {
 				wait();
+			} catch( InterruptedException exception ) {
+				// Allow thread to exit.
+			}
+		}
+	}
+	
+	public synchronized void hold( int timeout ) {
+		if( !tripped ) {
+			try {
+				wait(timeout);
 			} catch( InterruptedException exception ) {
 				// Allow thread to exit.
 			}
