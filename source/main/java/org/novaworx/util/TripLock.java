@@ -14,6 +14,14 @@ public class TripLock {
 
 	private volatile boolean tripped;
 
+	public TripLock() {
+		this( false );
+	}
+
+	public TripLock( boolean tripped ) {
+		this.tripped = tripped;
+	}
+
 	/**
 	 * Block the calling thread if the lock has not been tripped or return
 	 * immediately if the lock has already been tripped.
@@ -27,11 +35,11 @@ public class TripLock {
 			}
 		}
 	}
-	
+
 	public synchronized void hold( int timeout ) {
 		if( !tripped ) {
 			try {
-				wait(timeout);
+				wait( timeout );
 			} catch( InterruptedException exception ) {
 				// Allow thread to exit.
 			}
@@ -47,7 +55,7 @@ public class TripLock {
 		tripped = true;
 		notifyAll();
 	}
-	
+
 	/**
 	 * Reset the tripped flag.
 	 */
