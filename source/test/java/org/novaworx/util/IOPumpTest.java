@@ -7,13 +7,12 @@ import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import junit.framework.TestCase;
 
 public class IOPumpTest extends TestCase {
 
-	private int[] bufferSizes = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 16, 32, 64, IOPump.DEFAULT_BUFFER_SIZE };
+	private String[] charsets = new String[] { "US-ASCII", "ISO-8859-1", "UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE" };
 
 	private String longString = "qpweiofhpqiweuf\n\n\n\n\r\r\r\rhiqerufgipq\tegbqeiprgbvipqer ipg qper\u0000ibqiwepf qipwevqipweriqgpeig\u0002qeripgqeipgqipegviqpgpiqegipg";
 
@@ -24,41 +23,143 @@ public class IOPumpTest extends TestCase {
 		Log.setLevel( Log.NONE );
 	}
 
-	public void testWithInputAndOutputStreams() throws Exception {
+	public void testWithInputAndOutputStreamsBuffer1() throws Exception {
+		testWithInputAndOutputStreams( 1 );
+	}
+
+	public void testWithInputAndOutputStreamsBuffer2() throws Exception {
+		testWithInputAndOutputStreams( 2 );
+	}
+
+	public void testWithInputAndOutputStreamsBuffer3() throws Exception {
+		testWithInputAndOutputStreams( 3 );
+	}
+
+	public void testWithInputAndOutputStreamsBuffer4() throws Exception {
+		testWithInputAndOutputStreams( 4 );
+	}
+
+	public void testWithInputAndOutputStreamsBuffer5() throws Exception {
+		testWithInputAndOutputStreams( 5 );
+	}
+
+	public void testWithInputAndOutputStreamsBuffer32() throws Exception {
+		testWithInputAndOutputStreams( 32 );
+	}
+
+	public void testWithInputAndOutputStreamsBufferDefault() throws Exception {
+		testWithInputAndOutputStreams( IOPump.DEFAULT_BUFFER_SIZE );
+	}
+
+	public void testWithInputStreamAndWriterBuffer1() throws Exception {
+		testWithInputStreamAndWriter( 1 );
+	}
+
+	public void testWithInputStreamAndWriterBuffer2() throws Exception {
+		testWithInputStreamAndWriter( 2 );
+	}
+
+	public void testWithInputStreamAndWriterBuffer3() throws Exception {
+		testWithInputStreamAndWriter( 3 );
+	}
+
+	public void testWithInputStreamAndWriterBuffer4() throws Exception {
+		testWithInputStreamAndWriter( 4 );
+	}
+
+	public void testWithInputStreamAndWriterBuffer5() throws Exception {
+		testWithInputStreamAndWriter( 5 );
+	}
+
+	public void testWithInputStreamAndWriterBuffer32() throws Exception {
+		testWithInputStreamAndWriter( 32 );
+	}
+
+	public void testWithInputStreamAndWriterBufferDefault() throws Exception {
+		testWithInputStreamAndWriter( IOPump.DEFAULT_BUFFER_SIZE );
+	}
+
+	public void testWithReaderAndOutputStreamBuffer1() throws Exception {
+		testWithReaderAndOutputStream( 1 );
+	}
+
+	public void testWithReaderAndOutputStreamBuffer2() throws Exception {
+		testWithReaderAndOutputStream( 2 );
+	}
+
+	public void testWithReaderAndOutputStreamBuffer3() throws Exception {
+		testWithReaderAndOutputStream( 3 );
+	}
+
+	public void testWithReaderAndOutputStreamBuffer4() throws Exception {
+		testWithReaderAndOutputStream( 4 );
+	}
+
+	public void testWithReaderAndOutputStreamBuffer5() throws Exception {
+		testWithReaderAndOutputStream( 5 );
+	}
+
+	public void testWithReaderAndOutputStreamBuffer32() throws Exception {
+		testWithReaderAndOutputStream( 32 );
+	}
+
+	public void testWithReaderAndOutputStreamBufferDefault() throws Exception {
+		testWithReaderAndOutputStream( IOPump.DEFAULT_BUFFER_SIZE );
+	}
+
+	public void testWithReaderAndWriterBuffer1() throws Exception {
+		testWithReaderAndWriter( 1 );
+	}
+
+	public void testWithReaderAndWriterBuffer2() throws Exception {
+		testWithReaderAndWriter( 2 );
+	}
+
+	public void testWithReaderAndWriterBuffer3() throws Exception {
+		testWithReaderAndWriter( 3 );
+	}
+
+	public void testWithReaderAndWriterBuffer4() throws Exception {
+		testWithReaderAndWriter( 4 );
+	}
+
+	public void testWithReaderAndWriterBuffer5() throws Exception {
+		testWithReaderAndWriter( 5 );
+	}
+
+	public void testWithReaderAndWriterBuffer32() throws Exception {
+		testWithReaderAndWriter( 32 );
+	}
+
+	public void testWithReaderAndWriterBufferDefault() throws Exception {
+		testWithReaderAndWriter( IOPump.DEFAULT_BUFFER_SIZE );
+	}
+
+	private void testWithInputAndOutputStreams( int bufferSize ) throws Exception {
 		for( String string : testStrings ) {
-			for( int bufferSize : bufferSizes ) {
-				testInputToOutput( string, bufferSize );
+			testInputToOutput( string, bufferSize );
+		}
+	}
+
+	private void testWithInputStreamAndWriter( int bufferSize ) throws Exception {
+		for( String string : testStrings ) {
+			for( String charset : charsets ) {
+				testInputToWriter( string, Charset.forName( charset ), bufferSize );
 			}
 		}
 	}
 
-	public void testWithInputStreamAndWriter() throws Exception {
+	private void testWithReaderAndOutputStream( int bufferSize ) throws Exception {
 		for( String string : testStrings ) {
-			Map<String, Charset> charsets = Charset.availableCharsets();
-			for( Charset charset : charsets.values() ) {
-				for( int bufferSize : bufferSizes ) {
-					testInputToWriter( string, charset, bufferSize );
-				}
+			for( String charset : charsets ) {
+				testReaderToOutput( string, Charset.forName( charset ), bufferSize );
 			}
 		}
 	}
 
-	public void testWithReaderAndOutputStream() throws Exception {
+	private void testWithReaderAndWriter( int bufferSize ) throws Exception {
 		for( String string : testStrings ) {
-			Map<String, Charset> charsets = Charset.availableCharsets();
-			for( Charset charset : charsets.values() ) {
-				for( int bufferSize : bufferSizes ) {
-					testReaderToOutput( string, charset, bufferSize );
-				}
-			}
-		}
-	}
-
-	public void testWithReaderAndWriter() throws Exception {
-		for( String string : testStrings ) {
-			for( int bufferSize : bufferSizes ) {
-				testReaderToWriter( string, bufferSize );
-			}
+			testReaderToWriter( string, bufferSize );
 		}
 	}
 

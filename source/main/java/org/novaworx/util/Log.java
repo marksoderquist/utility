@@ -36,16 +36,12 @@ public class Log {
 
 	private static Handler handler;
 
-	private static Formatter formatter;
-
 	public static final Level DEFAULT_MAIN_LOG_LEVEL = ALL;
 
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
 	static {
-		formatter = new CustomFormatter();
-
-		handler = new CustomHandler( System.out, formatter );
+		handler = new DefaultHandler( System.out );
 
 		Logger.getLogger( name ).setUseParentHandlers( false );
 		Logger.getLogger( name ).addHandler( handler );
@@ -88,6 +84,14 @@ public class Log {
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
+	public static final void addHandlerToLogger( String name, Handler handler ) {
+		Logger.getLogger( name ).addHandler( handler );
+	}
+
+	public static final void removeHandlerFromLogger( String name, Handler handler ) {
+		Logger.getLogger( name ).removeHandler( handler );
+	}
+
 	public static final void write() {
 		write( INFO, "", null );
 	}
@@ -126,6 +130,10 @@ public class Log {
 	}
 
 	public static final void write( LogRecord record ) {
+		Logger.getLogger( name ).log( record );
+	}
+
+	public static final void writeToLogger( String name, LogRecord record ) {
 		Logger.getLogger( name ).log( record );
 	}
 
@@ -187,10 +195,10 @@ public class Log {
 
 	}
 
-	private static class CustomHandler extends StreamHandler {
+	private static class DefaultHandler extends StreamHandler {
 
-		public CustomHandler( OutputStream stream, Formatter formatter ) {
-			super( stream, formatter );
+		public DefaultHandler( OutputStream stream ) {
+			super( stream, new DefaultFormatter() );
 		}
 
 		public void publish( LogRecord record ) {
@@ -203,7 +211,7 @@ public class Log {
 		}
 	}
 
-	private static class CustomFormatter extends Formatter {
+	private static class DefaultFormatter extends Formatter {
 
 		@Override
 		public String format( LogRecord record ) {
