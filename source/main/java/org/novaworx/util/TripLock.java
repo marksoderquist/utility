@@ -63,4 +63,12 @@ public class TripLock {
 		tripped = false;
 	}
 
+	/**
+	 * Reset the tripped flag and wait for it to be tripped again..
+	 */
+	public synchronized void resetAndHold() {
+		reset();
+		hold();
+	}
+
 }
