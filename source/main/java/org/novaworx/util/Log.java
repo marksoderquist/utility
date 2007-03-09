@@ -3,7 +3,9 @@ package org.novaworx.util;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -34,8 +36,6 @@ public class Log {
 
 	public static final Level ALL = Level.ALL;
 
-	public static final Level DEFAULT_MAIN_LOG_LEVEL = ALL;
-
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
 	private static final String name = Logger.GLOBAL_LOGGER_NAME;
@@ -44,41 +44,31 @@ public class Log {
 
 	private static Set<Logger> namedLoggers;
 
+	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
+
 	static {
 		handler = new DefaultHandler( System.out );
 		namedLoggers = new HashSet<Logger>();
+		namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
 
 		Logger.getLogger( name ).setUseParentHandlers( false );
 		Logger.getLogger( name ).addHandler( handler );
 
-		setMainLevel( DEFAULT_MAIN_LOG_LEVEL );
+		Logger.getLogger( name ).setLevel( Log.ALL );
 		setLevel( DEFAULT_LOG_LEVEL );
 	}
 
 	/**
-	 * This log level affects all handlers.
-	 * 
-	 * @param level
-	 */
-	public static final void setMainLevel( Level level ) {
-		if( level == null ) {
-			Logger.getLogger( name ).setLevel( DEFAULT_MAIN_LOG_LEVEL );
-		} else {
-			Logger.getLogger( name ).setLevel( level );
-		}
-	}
-
-	/**
-	 * This log level affects only the embedded handler.
+	 * This log level affects only the default handler.
 	 * 
 	 * @param level
 	 */
 	public static final void setLevel( Level level ) {
-		if( level == null ) {
-			handler.setLevel( DEFAULT_LOG_LEVEL );
-		} else {
-			handler.setLevel( level );
-		}
+		handler.setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+	}
+
+	public static final void setLevel( String name, Level level ) {
+		namedLoggerDefaultHandlers.get( getNamedLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
 	public static final void addHandler( Handler handler ) {
@@ -176,9 +166,13 @@ public class Log {
 
 		synchronized( namedLoggers ) {
 			if( !namedLoggers.contains( logger ) ) {
-				namedLoggers.add( logger );
+				Handler handler = new DefaultHandler( System.out );
+				handler.setLevel( DEFAULT_LOG_LEVEL );
+				logger.setLevel( Level.ALL );
+				logger.addHandler( handler );
 				logger.setUseParentHandlers( false );
-				logger.addHandler( new DefaultHandler( System.out ) );
+				namedLoggers.add( logger );
+				namedLoggerDefaultHandlers.put( logger, handler );
 			}
 		}
 

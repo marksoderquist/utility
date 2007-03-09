@@ -16,10 +16,12 @@ public class FlushingObjectHandler extends Handler {
 
 	@Override
 	public void publish( LogRecord record ) {
+		if( record.getLevel().intValue() < getLevel().intValue() ) return;
+
 		try {
 			output.writeObject( record );
 		} catch( Exception e ) {
-			//reportError( record.getMessage(), e, ErrorManager.WRITE_FAILURE );
+			// reportError( record.getMessage(), e, ErrorManager.WRITE_FAILURE );
 		}
 		flush();
 	}
@@ -29,7 +31,7 @@ public class FlushingObjectHandler extends Handler {
 		try {
 			output.flush();
 		} catch( Exception e ) {
-			//reportError( e.getMessage(), e, ErrorManager.FLUSH_FAILURE );
+			// reportError( e.getMessage(), e, ErrorManager.FLUSH_FAILURE );
 		}
 	}
 
@@ -38,7 +40,7 @@ public class FlushingObjectHandler extends Handler {
 		try {
 			output.close();
 		} catch( Exception e ) {
-			//reportError( e.getMessage(), e, ErrorManager.CLOSE_FAILURE );
+			// reportError( e.getMessage(), e, ErrorManager.CLOSE_FAILURE );
 		}
 	}
 

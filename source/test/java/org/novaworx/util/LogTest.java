@@ -92,6 +92,10 @@ public class LogTest extends TestCase {
 
 		private LogRecord record;
 
+		public synchronized void reset() {
+			record = null;
+		}
+
 		public synchronized LogRecord getLogRecord() {
 			while( record == null ) {
 				try {
