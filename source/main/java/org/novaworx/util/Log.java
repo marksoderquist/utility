@@ -174,9 +174,12 @@ public class Log {
 	private static final Logger getNamedLogger( String name ) {
 		Logger logger = Logger.getLogger( name );
 
-		if( !namedLoggers.contains( logger ) ) {
-			logger.setUseParentHandlers( false );
-			logger.addHandler( new DefaultHandler( System.out ) );
+		synchronized( namedLoggers ) {
+			if( !namedLoggers.contains( logger ) ) {
+				namedLoggers.add( logger );
+				logger.setUseParentHandlers( false );
+				logger.addHandler( new DefaultHandler( System.out ) );
+			}
 		}
 
 		return logger;
