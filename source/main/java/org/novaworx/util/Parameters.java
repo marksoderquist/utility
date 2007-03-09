@@ -97,4 +97,12 @@ public class Parameters {
 		return values.size();
 	}
 
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for( String command : commands ) {
+			builder.append( command );
+			builder.append( " " );
+		}
+		return builder.toString().trim();
+	}
 }
