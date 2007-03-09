@@ -3,6 +3,8 @@ package org.novaworx.util;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -32,16 +34,19 @@ public class Log {
 
 	public static final Level ALL = Level.ALL;
 
-	private static final String name = Logger.GLOBAL_LOGGER_NAME;
-
-	private static Handler handler;
-
 	public static final Level DEFAULT_MAIN_LOG_LEVEL = ALL;
 
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
+	private static final String name = Logger.GLOBAL_LOGGER_NAME;
+
+	private static Handler handler;
+
+	private static Set<Logger> namedLoggers;
+
 	static {
 		handler = new DefaultHandler( System.out );
+		namedLoggers = new HashSet<Logger>();
 
 		Logger.getLogger( name ).setUseParentHandlers( false );
 		Logger.getLogger( name ).addHandler( handler );
@@ -133,8 +138,14 @@ public class Log {
 		Logger.getLogger( name ).log( record );
 	}
 
+	/**
+	 * Records written to named loggers are not written to the default logger.
+	 * 
+	 * @param name
+	 * @param record
+	 */
 	public static final void writeToLogger( String name, LogRecord record ) {
-		Logger.getLogger( name ).log( record );
+		getNamedLogger( name ).log( record );
 	}
 
 	public static final Level parseLevel( String string ) {
@@ -158,6 +169,17 @@ public class Log {
 		}
 
 		return INFO;
+	}
+
+	private static final Logger getNamedLogger( String name ) {
+		Logger logger = Logger.getLogger( name );
+
+		if( !namedLoggers.contains( logger ) ) {
+			logger.setUseParentHandlers( false );
+			logger.addHandler( new DefaultHandler( System.out ) );
+		}
+
+		return logger;
 	}
 
 	private static StackTraceElement getCaller() {
