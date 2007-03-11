@@ -168,6 +168,7 @@ public class IOPump implements Runnable {
 
 	public void setLogAtLevel( Level logAtLevel ) {
 		this.logAtLevel = logAtLevel;
+		this.logEnabled = true;
 	}
 
 	public final boolean isLogContent() {
