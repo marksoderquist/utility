@@ -30,7 +30,7 @@ public class Log {
 
 	public static final Level INFO = Level.INFO;
 
-	public static final Level CONFIG = Level.CONFIG;
+	public static final Level TRACE = new CustomLevel( "TRACE", Level.CONFIG.intValue() );
 
 	public static final Level DEBUG = new CustomLevel( "DEBUG", Level.FINE.intValue() );
 
@@ -151,7 +151,7 @@ public class Log {
 		} else if( "info".equals( string ) ) {
 			return INFO;
 		} else if( "config".equals( string ) ) {
-			return CONFIG;
+			return TRACE;
 		} else if( "debug".equals( string ) ) {
 			return DEBUG;
 		} else if( "all".equals( string ) ) {
