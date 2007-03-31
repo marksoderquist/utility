@@ -114,12 +114,14 @@ public class PersistentQueue<E extends Serializable> {
 
 	/**
 	 * Clears the entire queue and forces the underlying file to be rewritten.
-	 * 
-	 * @throws IOException if an I/O error occurs
 	 */
-	public synchronized void clear() throws IOException {
+	public synchronized void clear() {
 		list.clear();
-		defragmentFile();
+		try {
+			defragmentFile();
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
+		}
 		removesSinceDefragment = 0;
 	}
 
@@ -153,6 +155,26 @@ public class PersistentQueue<E extends Serializable> {
 		return null;
 	}
 
+	public synchronized E poll() {
+		while( list.size() == 0 ) {
+			try {
+				wait();
+			} catch( InterruptedException exception ) {
+				return null;
+			}
+		}
+
+		E entry = list.remove( 0 );
+
+		try {
+			removeEntryFromFile( filename, entry );
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
+		}
+
+		return entry;
+	}
+
 	/**
 	 * Removes and returns the head element of the persistent queue.
 	 * 
@@ -160,21 +182,17 @@ public class PersistentQueue<E extends Serializable> {
 	 *         empty.
 	 * @throws IOException if an I/O error occurs
 	 */
-	public synchronized E remove() throws IOException {
+	public synchronized E remove() {
 		if( list.size() == 0 ) {
 			return null;
 		}
 
 		E entry = list.remove( 0 );
 
-		// defragment file if needed
-		removesSinceDefragment++;
-		if( removesSinceDefragment >= defragmentInterval ) {
-			defragmentFile();
-			removesSinceDefragment = 0;
-		} else {
-			// or just append to the file
-			appendEntryToFile( filename, new PersistentQueueDeleteMarker() );
+		try {
+			removeEntryFromFile( filename, entry );
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
 		}
 
 		return entry;
@@ -260,6 +278,18 @@ public class PersistentQueue<E extends Serializable> {
 		fos.close();
 	}
 
+	private synchronized void removeEntryFromFile( String filename, Serializable entry ) throws IOException {
+		// defragment file if needed
+		removesSinceDefragment++;
+		if( removesSinceDefragment >= defragmentInterval ) {
+			defragmentFile();
+			removesSinceDefragment = 0;
+		} else {
+			// or just append to the file
+			appendEntryToFile( filename, new PersistentQueueDeleteMarker() );
+		}
+	}
+
 	/** Writes the current list to a file with given filename */
 	private synchronized void writeListFile( String filename ) throws IOException {
 		FileOutputStream fos = new FileOutputStream( filename );
@@ -300,4 +330,5 @@ public class PersistentQueue<E extends Serializable> {
 			throw new IOException( "Unable to rename " + defragmentedFileName + " to " + filename );
 		}
 	}
+
 }
