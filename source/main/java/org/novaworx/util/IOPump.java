@@ -267,7 +267,7 @@ public class IOPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( builder.length() > 0 ) Log.write( logAtLevel, builder.toString() );
+					if( logEnabled && logContent && builder.length() > 0 ) Log.write( logAtLevel, builder.toString() );
 					execute = false;
 					continue;
 				}
