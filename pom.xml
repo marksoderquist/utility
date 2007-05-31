@@ -58,13 +58,21 @@
 		<repository>
 			<id>novaworx</id>
 			<name>Novaworx</name>
-			<url>http://mvn.novaworx.org</url>
+			<url>http://mvn.novaworx.org/release</url>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>novaworx-snapshot</id>
+			<name>Novaworx Snapshot</name>
+			<url>http://mvn.novaworx.org/snapshot</url>
+			<snapshots>
+				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
 	</repositories>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
