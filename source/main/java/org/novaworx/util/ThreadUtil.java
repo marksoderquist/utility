@@ -8,6 +8,7 @@ public class ThreadUtil {
 		} catch( InterruptedException exception ) {
 			// Intentionally ignore exception.
 		}
+		Thread.yield();
 	}
 
 }
