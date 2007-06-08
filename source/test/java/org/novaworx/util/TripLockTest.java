@@ -4,9 +4,18 @@ import junit.framework.TestCase;
 
 public class TripLockTest extends TestCase {
 
-	public void testHoldAndTrip() throws Exception {
+	public void testHoldAndTripWaitingCaller() throws Exception {
 		TripLock lock = new TripLock();
 		Holder holder = new Holder( lock );
+		holder.start();
+		ThreadUtil.pause( 50 );
+		lock.trip();
+		assertTrue( holder.released() );
+	}
+
+	public void testHoldAndTripWaitingHolder() throws Exception {
+		TripLock lock = new TripLock();
+		Holder holder = new Holder( lock, 50 );
 		holder.start();
 		lock.trip();
 		assertTrue( holder.released() );
@@ -15,6 +24,8 @@ public class TripLockTest extends TestCase {
 	private static class Holder implements Runnable {
 
 		private TripLock lock;
+
+		private int pause;
 
 		private Thread thread;
 
@@ -25,7 +36,12 @@ public class TripLockTest extends TestCase {
 		private TripLock releaseLock = new TripLock();
 
 		public Holder( TripLock lock ) {
+			this( lock, 0 );
+		}
+
+		public Holder( TripLock lock, int pause ) {
 			this.lock = lock;
+			this.pause = pause;
 		}
 
 		public void start() {
@@ -38,6 +54,7 @@ public class TripLockTest extends TestCase {
 
 		public synchronized void run() {
 			startLock.trip();
+			if( pause > 0 ) ThreadUtil.pause( pause );
 			lock.hold();
 			released = true;
 			releaseLock.trip();

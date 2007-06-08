@@ -27,27 +27,27 @@ public class TripLock {
 	 * immediately if the lock has already been tripped.
 	 */
 	public synchronized void hold() {
-		if( !tripped ) {
+		while( !tripped ) {
 			try {
 				wait();
 			} catch( InterruptedException exception ) {
-				// Allow thread to exit.
+				return;
 			}
 		}
 	}
 
 	public synchronized void hold( int timeout ) {
-		if( !tripped ) {
+		while( !tripped ) {
 			try {
 				wait( timeout );
 			} catch( InterruptedException exception ) {
-				// Allow thread to exit.
+				return;
 			}
 		}
 	}
 
 	/**
-	 * Trip the lock. This relases all threads blocked by the hold() method and
+	 * Trip the lock. This releases all threads blocked by the hold() method and
 	 * sets the tripped flag so that no other threads will be blocked by a call to
 	 * hold().
 	 */
