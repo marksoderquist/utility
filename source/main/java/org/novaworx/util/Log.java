@@ -142,19 +142,19 @@ public class Log {
 		if( string == null ) return INFO;
 
 		string = string.toLowerCase();
-		if( "none".equals( string ) ) {
+		if( NONE.getName().toLowerCase().equals( string ) ) {
 			return NONE;
-		} else if( "error".equals( string ) ) {
+		} else if( ERROR.getName().toLowerCase().equals( string ) ) {
 			return ERROR;
-		} else if( "warn".equals( string ) ) {
+		} else if( WARN.getName().toLowerCase().equals( string ) ) {
 			return WARN;
-		} else if( "info".equals( string ) ) {
+		} else if( INFO.getName().toLowerCase().equals( string ) ) {
 			return INFO;
-		} else if( "config".equals( string ) ) {
+		} else if( TRACE.getName().toLowerCase().equals( string ) ) {
 			return TRACE;
-		} else if( "debug".equals( string ) ) {
+		} else if( DEBUG.getName().toLowerCase().equals( string ) ) {
 			return DEBUG;
-		} else if( "all".equals( string ) ) {
+		} else if( ALL.getName().toLowerCase().equals( string ) ) {
 			return ALL;
 		}
 
