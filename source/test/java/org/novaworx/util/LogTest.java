@@ -83,7 +83,7 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log level.", Log.ERROR, Log.parseLevel( "error" ) );
 		assertEquals( "Incorrect log level.", Log.WARN, Log.parseLevel( "warn" ) );
 		assertEquals( "Incorrect log level.", Log.INFO, Log.parseLevel( "info" ) );
-		assertEquals( "Incorrect log level.", Log.TRACE, Log.parseLevel( "config" ) );
+		assertEquals( "Incorrect log level.", Log.TRACE, Log.parseLevel( "trace" ) );
 		assertEquals( "Incorrect log level.", Log.DEBUG, Log.parseLevel( "debug" ) );
 		assertEquals( "Incorrect log level.", Log.ALL, Log.parseLevel( "all" ) );
 	}
