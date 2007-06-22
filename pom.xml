@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
 	<modelVersion>4.0.0</modelVersion>
@@ -21,18 +20,10 @@
 		<url>http://www.novaworx.org</url>
 	</organization>
 	
-	<!--
 	<ciManagement>
-	<system>Continuum</system>
-	<url>http://www.novaworx.org/continuum</url>
-	<notifiers>
-	<notifier>
-	<type>mail</type>
-	<address>mark@novaworx.org</address>
-	</notifier>
-	</notifiers>
+		<system>Continuum</system>
+		<url>http://www.novaworx.org/continuum</url>
 	</ciManagement>
-	-->
 	
 	<developers>
 		<developer>
@@ -50,8 +41,7 @@
 	</developers>
 	
 	<scm>
-		<connection>
-			scm:svn:http://svn.novaworx.org/software/utility/trunk</connection>
+		<connection> scm:svn:http://svn.novaworx.org/software/utility/trunk</connection>
 	</scm>
 	
 	<repositories>
