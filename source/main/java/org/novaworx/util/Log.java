@@ -3,6 +3,7 @@ package org.novaworx.util;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.security.AccessControlException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,22 +41,30 @@ public class Log {
 
 	private static final String name = Logger.GLOBAL_LOGGER_NAME;
 
-	private static Handler handler;
+	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
 
 	private static Set<Logger> namedLoggers;
 
-	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
+	private static Handler handler;
+
+	private static boolean enabled;
 
 	static {
-		handler = new DefaultHandler( System.out );
-		namedLoggers = new HashSet<Logger>();
-		namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
+		try {
+			handler = new DefaultHandler( System.out );
+			namedLoggers = new HashSet<Logger>();
+			namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
 
-		Logger.getLogger( name ).setUseParentHandlers( false );
-		Logger.getLogger( name ).addHandler( handler );
+			Logger.getLogger( name ).setUseParentHandlers( false );
+			Logger.getLogger( name ).addHandler( handler );
+			Logger.getLogger( name ).setLevel( Log.ALL );
 
-		Logger.getLogger( name ).setLevel( Log.ALL );
-		setLevel( DEFAULT_LOG_LEVEL );
+			setLevel( DEFAULT_LOG_LEVEL );
+			enabled = true;
+		} catch( AccessControlException exception ) {
+			enabled = false;
+		}
+
 	}
 
 	/**
@@ -72,18 +81,22 @@ public class Log {
 	}
 
 	public static final void addHandler( Handler handler ) {
+		if( !enabled ) return;
 		Logger.getLogger( name ).addHandler( handler );
 	}
 
 	public static final void removeHandler( Handler handler ) {
+		if( !enabled ) return;
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
 	public static final void addHandlerToLogger( String name, Handler handler ) {
+		if( !enabled ) return;
 		Logger.getLogger( name ).addHandler( handler );
 	}
 
 	public static final void removeHandlerFromLogger( String name, Handler handler ) {
+		if( !enabled ) return;
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
@@ -116,6 +129,7 @@ public class Log {
 	}
 
 	public static final void write( Level level, String message, Throwable throwable ) {
+		if( !enabled ) return;
 		LogRecord record = new LogRecord( level, message );
 		if( throwable != null ) record.setThrown( throwable );
 		StackTraceElement caller = getCaller();
@@ -125,6 +139,7 @@ public class Log {
 	}
 
 	public static final void write( LogRecord record ) {
+		if( !enabled ) return;
 		Logger.getLogger( name ).log( record );
 	}
 
@@ -134,9 +149,10 @@ public class Log {
 	 * @param name
 	 * @param record
 	 */
-	public static final void writeToLogger( String name, LogRecord record ) {
-		getNamedLogger( name ).log( record );
-	}
+//	public static final void writeToLogger( String name, LogRecord record ) {
+//		if( !enabled ) return;
+//		getNamedLogger( name ).log( record );
+//	}
 
 	public static final Level parseLevel( String string ) {
 		if( string == null ) return INFO;
