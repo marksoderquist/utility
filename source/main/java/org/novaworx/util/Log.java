@@ -3,7 +3,6 @@ package org.novaworx.util;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.security.AccessControlException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -42,28 +41,20 @@ public class Log {
 	public static final Handler DEFAULT_HANDLER = new DefaultHandler( System.out );
 
 	private static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
-	
+
 	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
 
 	private static Set<Logger> namedLoggers;
 
-	private static boolean enabled;
-
 	static {
-		try {
-			namedLoggers = new HashSet<Logger>();
-			namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
+		namedLoggers = new HashSet<Logger>();
+		namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
 
-			Logger.getLogger( DEFAULT_LOGGER_NAME ).setUseParentHandlers( false );
-			Logger.getLogger( DEFAULT_LOGGER_NAME ).addHandler( DEFAULT_HANDLER );
-			Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( Log.ALL );
+		Logger.getLogger( DEFAULT_LOGGER_NAME ).setUseParentHandlers( false );
+		Logger.getLogger( DEFAULT_LOGGER_NAME ).addHandler( DEFAULT_HANDLER );
+		Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( Log.ALL );
 
-			setLevel( DEFAULT_LOG_LEVEL );
-			enabled = true;
-		} catch( AccessControlException exception ) {
-			enabled = false;
-		}
-
+		setLevel( DEFAULT_LOG_LEVEL );
 	}
 
 	/**
@@ -72,72 +63,58 @@ public class Log {
 	 * @param level
 	 */
 	public static final void setLevel( Level level ) {
-		if( !enabled ) return;
 		DEFAULT_HANDLER.setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
 	public static final void setLevel( String name, Level level ) {
-		if( !enabled ) return;
 		namedLoggerDefaultHandlers.get( getNamedLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
 	public static final void addHandler( Handler handler ) {
-		if( !enabled ) return;
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).addHandler( handler );
 	}
 
 	public static final void removeHandler( Handler handler ) {
-		if( !enabled ) return;
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).removeHandler( handler );
 	}
 
 	public static final void addHandlerToLogger( String name, Handler handler ) {
-		if( !enabled ) return;
 		Logger.getLogger( name ).addHandler( handler );
 	}
 
 	public static final void removeHandlerFromLogger( String name, Handler handler ) {
-		if( !enabled ) return;
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
 	public static final void write() {
-		if( !enabled ) return;
 		write( INFO, "", null );
 	}
 
 	public static final void write( Level level ) {
-		if( !enabled ) return;
 		write( level, "", null );
 	}
 
 	public static final void write( String message ) {
-		if( !enabled ) return;
 		write( INFO, message, null );
 	}
 
 	public static final void write( Level level, String message ) {
-		if( !enabled ) return;
 		write( level, message, null );
 	}
 
 	public static final void write( Throwable throwable ) {
-		if( !enabled ) return;
 		write( (String)null, throwable );
 	}
 
 	public static final void write( String message, Throwable throwable ) {
-		if( !enabled ) return;
 		write( ERROR, message, throwable );
 	}
 
 	public static final void write( Level level, Throwable throwable ) {
-		if( !enabled ) return;
 		write( level, null, throwable );
 	}
 
 	public static final void write( Level level, String message, Throwable throwable ) {
-		if( !enabled ) return;
 		LogRecord record = new LogRecord( level, message );
 		if( throwable != null ) record.setThrown( throwable );
 		StackTraceElement caller = getCaller();
@@ -147,7 +124,6 @@ public class Log {
 	}
 
 	public static final void write( LogRecord record ) {
-		if( !enabled ) return;
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).log( record );
 	}
 
@@ -158,7 +134,6 @@ public class Log {
 	 * @param record
 	 */
 	public static final void writeToLogger( String name, LogRecord record ) {
-		if( !enabled ) return;
 		getNamedLogger( name ).log( record );
 	}
 
