@@ -72,10 +72,12 @@ public class Log {
 	 * @param level
 	 */
 	public static final void setLevel( Level level ) {
+		if( !enabled ) return;
 		DEFAULT_HANDLER.setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
 	public static final void setLevel( String name, Level level ) {
+		if( !enabled ) return;
 		namedLoggerDefaultHandlers.get( getNamedLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
@@ -100,30 +102,37 @@ public class Log {
 	}
 
 	public static final void write() {
+		if( !enabled ) return;
 		write( INFO, "", null );
 	}
 
 	public static final void write( Level level ) {
+		if( !enabled ) return;
 		write( level, "", null );
 	}
 
 	public static final void write( String message ) {
+		if( !enabled ) return;
 		write( INFO, message, null );
 	}
 
 	public static final void write( Level level, String message ) {
+		if( !enabled ) return;
 		write( level, message, null );
 	}
 
 	public static final void write( Throwable throwable ) {
+		if( !enabled ) return;
 		write( (String)null, throwable );
 	}
 
 	public static final void write( String message, Throwable throwable ) {
+		if( !enabled ) return;
 		write( ERROR, message, throwable );
 	}
 
 	public static final void write( Level level, Throwable throwable ) {
+		if( !enabled ) return;
 		write( level, null, throwable );
 	}
 
