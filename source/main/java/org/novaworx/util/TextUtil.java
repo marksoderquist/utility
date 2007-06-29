@@ -12,6 +12,12 @@ public class TextUtil {
 
 	private static final char SPACE = ' ';
 
+	public static final boolean isEmpty( String string ) {
+		if( string == null ) return true;
+		if( string.trim().length() == 0 ) return true;
+		return false;
+	}
+
 	/**
 	 * Returns a printable string representation of a character by converting char
 	 * values less than or equal to 32 or greater than or equal to 126 to the

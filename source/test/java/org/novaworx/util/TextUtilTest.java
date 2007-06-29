@@ -5,6 +5,13 @@ import java.nio.charset.Charset;
 import junit.framework.TestCase;
 
 public class TextUtilTest extends TestCase {
+	
+	public void testIsEmpty() {
+		assertTrue( TextUtil.isEmpty( null ) );
+		assertTrue( TextUtil.isEmpty( "" ) );
+		assertTrue( TextUtil.isEmpty( " " ) );
+		assertFalse( TextUtil.isEmpty( "." ) );
+	}
 
 	public void testToPrintableString() {
 		assertEquals( "Bad conversion.", "[0]", TextUtil.toPrintableString( (char)0 ) );
