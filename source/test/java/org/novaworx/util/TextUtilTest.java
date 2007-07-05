@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 import junit.framework.TestCase;
 
 public class TextUtilTest extends TestCase {
-	
+
 	public void testIsEmpty() {
 		assertTrue( TextUtil.isEmpty( null ) );
 		assertTrue( TextUtil.isEmpty( "" ) );
@@ -85,6 +85,17 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "x", TextUtil.pad( 1, 'x' ) );
 		assertEquals( "Incorrect pad.", ",,,,,", TextUtil.pad( 5, ',' ) );
 		assertEquals( "Incorrect pad.", "--------", TextUtil.pad( 8, '-' ) );
+	}
+
+	public void testIndent() {
+		assertEquals( null, TextUtil.indent( null ) );
+		assertEquals( "\t", TextUtil.indent( "" ) );
+		assertEquals( "\ta", TextUtil.indent( "a" ) );
+		assertEquals( "\t\n\t\n", TextUtil.indent( "\n\n" ) );
+		// FIXME TextUtil.indent() unit tests.
+		//assertEquals( "\t\r\t\r", TextUtil.indent( "\r\r" ) );
+		//assertEquals( "\t\r\n\t\r\n", TextUtil.indent( "\r\n\r\n" ) );
+		//assertEquals( "\t\n\ta\n", TextUtil.indent( "\na\n" ) );
 	}
 
 }

@@ -1,6 +1,8 @@
 package org.novaworx.util;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class TextUtil {
 
@@ -203,6 +205,46 @@ public class TextUtil {
 		}
 		buffer.append( text );
 		return buffer.toString();
+	}
+
+	public static final String indent( String text ) {
+		return indent( text, "\t" );
+	}
+
+	public static final String indent( String text, String indentation ) {
+		if( text == null ) return null;
+		if( "".equals( text ) ) return indentation;
+
+		boolean line = true;
+		boolean carriageReturn = false;
+		StringBuilder builder = new StringBuilder();
+		StringTokenizer tokenizer = new StringTokenizer( text, "\r\n", true );
+		while( tokenizer.hasMoreTokens() ) {
+			if( line ) builder.append( indentation );
+			String token = tokenizer.nextToken();
+
+			System.out.println( "Token: " + TextUtil.toPrintableString( token ) );
+
+			if( token.equals( "\r" ) ) {
+				if( carriageReturn ) {
+					builder.append( "\r" );
+					line = true;
+				}
+			} else if( token.equals( "\n" ) ) {
+				if( carriageReturn ) builder.append( "\r" );
+				builder.append( token );
+				line = true;
+			} else {
+				builder.append( token );
+				line = false;
+			}
+
+			if( !tokenizer.hasMoreTokens() && carriageReturn ) builder.append( "\r" );
+
+			carriageReturn = token.equals( "\r" );
+		}
+
+		return builder.toString();
 	}
 
 }
