@@ -89,13 +89,12 @@ public class TextUtilTest extends TestCase {
 
 	public void testIndent() {
 		assertEquals( null, TextUtil.indent( null ) );
-		assertEquals( "\t", TextUtil.indent( "" ) );
-		assertEquals( "\ta", TextUtil.indent( "a" ) );
-		assertEquals( "\t\n\t\n", TextUtil.indent( "\n\n" ) );
-		// FIXME TextUtil.indent() unit tests.
-		//assertEquals( "\t\r\t\r", TextUtil.indent( "\r\r" ) );
-		//assertEquals( "\t\r\n\t\r\n", TextUtil.indent( "\r\n\r\n" ) );
-		//assertEquals( "\t\n\ta\n", TextUtil.indent( "\na\n" ) );
+		assertEquals( "  ", TextUtil.indent( "" ) );
+		assertEquals( "  a", TextUtil.indent( "a" ) );
+		assertEquals( "  \n  \n  ", TextUtil.indent( "\n\n" ) );
+		assertEquals( "  \r  \r  ", TextUtil.indent( "\r\r" ) );
+		assertEquals( "  \r\n  \r\n  ", TextUtil.indent( "\r\n\r\n" ) );
+		assertEquals( "  \n  a\n  ", TextUtil.indent( "\na\n" ) );
 	}
 
 }
