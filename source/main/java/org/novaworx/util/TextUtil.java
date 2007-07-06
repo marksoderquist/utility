@@ -72,14 +72,14 @@ public class TextUtil {
 		int value = 0;
 		int count = bytes.length;
 		String string = null;
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder builder = new StringBuilder();
 		for( int index = 0; index < count; index++ ) {
 			value = bytes[ index ];
 			string = Integer.toHexString( value < 0 ? value + 256 : value );
-			if( string.length() == 1 ) buffer.append( "0" );
-			buffer.append( string );
+			if( string.length() == 1 ) builder.append( "0" );
+			builder.append( string );
 		}
-		return buffer.toString();
+		return builder.toString();
 	}
 
 	/**
@@ -88,11 +88,11 @@ public class TextUtil {
 	 */
 	public static final String toHexEncodedString( String string ) {
 		int count = string.length();
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder builder = new StringBuilder();
 		for( int index = 0; index < count; index++ ) {
-			buffer.append( Integer.toHexString( string.charAt( index ) ) );
+			builder.append( Integer.toHexString( string.charAt( index ) ) );
 		}
-		return buffer.toString();
+		return builder.toString();
 	}
 
 	public static final String justify( int alignment, String text, int width ) {
@@ -138,15 +138,15 @@ public class TextUtil {
 		if( text.length() > width ) return text.substring( 0, width );
 
 		int right = width - text.length();
-		StringBuffer buffer = new StringBuffer( width );
-		buffer.append( text );
+		StringBuilder builder = new StringBuilder( width );
+		builder.append( text );
 		if( right <= pad ) {
-			buffer.append( pad( right ) );
+			builder.append( pad( right ) );
 		} else {
-			buffer.append( pad( pad ) );
-			buffer.append( pad( right - pad, chr ) );
+			builder.append( pad( pad ) );
+			builder.append( pad( right - pad, chr ) );
 		}
-		return buffer.toString();
+		return builder.toString();
 	}
 
 	public static final String centerJustify( String text, int width ) {
@@ -164,21 +164,21 @@ public class TextUtil {
 		int left = ( width - text.length() ) / 2;
 		int right = ( width - text.length() ) - left;
 
-		StringBuffer buffer = new StringBuffer( width );
+		StringBuilder builder = new StringBuilder( width );
 		if( left <= pad ) {
-			buffer.append( pad( left ) );
+			builder.append( pad( left ) );
 		} else {
-			buffer.append( pad( left - pad, chr ) );
-			buffer.append( pad( pad ) );
+			builder.append( pad( left - pad, chr ) );
+			builder.append( pad( pad ) );
 		}
-		buffer.append( text );
+		builder.append( text );
 		if( right <= pad ) {
-			buffer.append( pad( right ) );
+			builder.append( pad( right ) );
 		} else {
-			buffer.append( pad( pad ) );
-			buffer.append( pad( right - pad, chr ) );
+			builder.append( pad( pad ) );
+			builder.append( pad( right - pad, chr ) );
 		}
-		return buffer.toString();
+		return builder.toString();
 	}
 
 	public static final String rightJustify( String text, int width ) {
@@ -194,15 +194,15 @@ public class TextUtil {
 		if( text.length() > width ) return text.substring( 0, width );
 
 		int left = width - text.length();
-		StringBuffer buffer = new StringBuffer( width );
+		StringBuilder builder = new StringBuilder( width );
 		if( left <= pad ) {
-			buffer.append( pad( left ) );
+			builder.append( pad( left ) );
 		} else {
-			buffer.append( pad( left - pad, chr ) );
-			buffer.append( pad( pad ) );
+			builder.append( pad( left - pad, chr ) );
+			builder.append( pad( pad ) );
 		}
-		buffer.append( text );
-		return buffer.toString();
+		builder.append( text );
+		return builder.toString();
 	}
 
 	public static final String indent( String text ) {

@@ -24,7 +24,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "[255]", TextUtil.toPrintableString( (char)255 ) );
 	}
 
-	public void testToHexEncodedString() {
+	public void testToHexEncodedStringWithBytes() {
 		Charset ascii = Charset.forName( "ASCII" );
 		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "".getBytes( ascii ) ) );
 		assertEquals( "Bad conversion.", "00", TextUtil.toHexEncodedString( "\u0000".getBytes( ascii ) ) );
