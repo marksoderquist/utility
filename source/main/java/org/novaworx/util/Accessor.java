@@ -1,10 +1,33 @@
 package org.novaworx.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class Accessor {
+
+	@SuppressWarnings( "unchecked" )
+	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, InvocationTargetException {
+		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
+
+		Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
+		for( int index = 0; index < parameters.length; index++ ) {
+			parameterTypes[ index ] = parameters[ index ].getClass();
+		}
+
+		Class< ? > clazz = Class.forName( name );
+		Constructor< ? > constructor = clazz.getDeclaredConstructor( parameterTypes );
+		constructor.setAccessible( true );
+
+		try {
+			return (T)constructor.newInstance( parameters );
+		} catch( IllegalAccessException exception ) {
+			assert false;
+		}
+
+		return null;
+	}
 
 	@SuppressWarnings( "unchecked" )
 	public static <T> T getField( Object object, String name ) throws NoSuchFieldException {
