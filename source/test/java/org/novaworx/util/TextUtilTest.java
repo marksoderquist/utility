@@ -87,6 +87,15 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "--------", TextUtil.pad( 8, '-' ) );
 	}
 
+	public void testGetLineCount() {
+		assertEquals( 0, TextUtil.getLineCount( null ) );
+		assertEquals( 1, TextUtil.getLineCount( "" ) );
+		assertEquals( 1, TextUtil.getLineCount( " " ) );
+		assertEquals( 2, TextUtil.getLineCount( " \n " ) );
+		assertEquals( 2, TextUtil.getLineCount( " \r " ) );
+		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
+	}
+
 	public void testIndent() {
 		assertEquals( null, TextUtil.indent( null ) );
 		assertEquals( "  ", TextUtil.indent( "" ) );

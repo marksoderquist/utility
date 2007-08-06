@@ -205,6 +205,18 @@ public class TextUtil {
 		return builder.toString();
 	}
 
+	public static int getLineCount( String text ) {
+		if( text == null ) return 0;
+
+		int count = 0;
+		LineParser parser = new LineParser( text );
+		while( parser.next() != null ) {
+			count++;
+		}
+
+		return count;
+	}
+
 	public static final String indent( String text ) {
 		return indent( text, "  " );
 	}
