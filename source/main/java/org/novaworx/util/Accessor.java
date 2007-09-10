@@ -11,13 +11,13 @@ public class Accessor {
 	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
 
-		Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
+		Class<?>[] parameterTypes = new Class<?>[parameters.length];
 		for( int index = 0; index < parameters.length; index++ ) {
-			parameterTypes[ index ] = parameters[ index ].getClass();
+			parameterTypes[index] = parameters[index].getClass();
 		}
 
-		Class< ? > clazz = Class.forName( name );
-		Constructor< ? > constructor = clazz.getDeclaredConstructor( parameterTypes );
+		Class<?> clazz = Class.forName( name );
+		Constructor<?> constructor = clazz.getDeclaredConstructor( parameterTypes );
 		constructor.setAccessible( true );
 
 		try {
@@ -52,12 +52,26 @@ public class Accessor {
 	}
 
 	@SuppressWarnings( "unchecked" )
+	public static <T> T getField( Class clazz, String name ) throws NoSuchFieldException {
+		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
+
+		Field field = clazz.getDeclaredField( name );
+		field.setAccessible( true );
+		try {
+			return (T)field.get( null );
+		} catch( IllegalAccessException exception ) {
+			assert false;
+		}
+		return null;
+	}
+
+	@SuppressWarnings( "unchecked" )
 	public static <T> T callMethod( Object object, String name, Object... parameters ) throws NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 		if( object == null ) throw new NullPointerException( "Object cannot be null." );
 
-		Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
+		Class<?>[] parameterTypes = new Class<?>[parameters.length];
 		for( int index = 0; index < parameters.length; index++ ) {
-			parameterTypes[ index ] = parameters[ index ].getClass();
+			parameterTypes[index] = parameters[index].getClass();
 		}
 
 		Method method = null;
@@ -79,12 +93,12 @@ public class Accessor {
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T callStaticMethod( Class clazz, String name, Object... parameters ) throws NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+	public static <T> T callMethod( Class clazz, String name, Object... parameters ) throws NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
 		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
 
-		Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
+		Class<?>[] parameterTypes = new Class<?>[parameters.length];
 		for( int index = 0; index < parameters.length; index++ ) {
-			parameterTypes[ index ] = parameters[ index ].getClass();
+			parameterTypes[index] = parameters[index].getClass();
 		}
 
 		Method method = clazz.getDeclaredMethod( name, parameterTypes );
