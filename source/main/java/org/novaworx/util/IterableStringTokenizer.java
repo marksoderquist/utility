@@ -16,13 +16,12 @@ public class IterableStringTokenizer extends StringTokenizer implements Iterable
 	public IterableStringTokenizer( String str, String delim, boolean returnDelims ) {
 		super( str, delim, returnDelims );
 	}
-	
+
 	@Override
 	public Iterator<String> iterator() {
 		return new TokenizerIterator();
 	}
 
-	
 	private class TokenizerIterator implements Iterator<String> {
 
 		@Override
@@ -37,8 +36,7 @@ public class IterableStringTokenizer extends StringTokenizer implements Iterable
 
 		@Override
 		public void remove() {}
-		
+
 	}
 
 }
-

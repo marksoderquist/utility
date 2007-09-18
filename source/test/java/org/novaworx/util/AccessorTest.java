@@ -8,7 +8,7 @@ public class AccessorTest extends TestCase {
 		Object object1 = Accessor.create( "org.novaworx.util.AccessorTest$PrivateClass$NestedClass" );
 		assertNotNull( object1 );
 		assertEquals( "org.novaworx.util.AccessorTest$PrivateClass$NestedClass", object1.getClass().getName() );
-		
+
 		Object object2 = Accessor.create( "org.novaworx.util.AccessorTest$PrivateClass$NestedClass", new Object() );
 		assertNotNull( object2 );
 		assertEquals( "org.novaworx.util.AccessorTest$PrivateClass$NestedClass", object2.getClass().getName() );
@@ -75,7 +75,7 @@ public class AccessorTest extends TestCase {
 			return object;
 		}
 
-		@SuppressWarnings("unused")
+		@SuppressWarnings( "unused" )
 		private static class NestedClass {
 
 			private Object object;
@@ -87,7 +87,7 @@ public class AccessorTest extends TestCase {
 			public NestedClass( Object object ) {
 				this.object = object;
 			}
-			
+
 			public Object getObject() {
 				return object;
 			}

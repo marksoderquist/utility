@@ -25,15 +25,15 @@ public class Parameters {
 	}
 
 	public static final Parameters parse( String[] commands ) {
-		return parse( commands, new String[ 0 ] );
+		return parse( commands, new String[0] );
 	}
 
 	public static final Parameters parse( String[] commands, String... flags ) {
 		Map<String, String> values = new HashMap<String, String>();
 		List<String> files = new ArrayList<String>();
 		for( int index = 0; index < flags.length; index++ ) {
-			if( !flags[ index ].startsWith( "-" ) ) {
-				flags[ index ] = "-" + flags[ index ];
+			if( !flags[index].startsWith( "-" ) ) {
+				flags[index] = "-" + flags[index];
 			}
 		}
 		Arrays.sort( flags );
@@ -41,8 +41,8 @@ public class Parameters {
 		int index = 0;
 		boolean flagTerminatorFound = false;
 		for( ; index < commands.length; index++ ) {
-			String parameter = commands[ index ];
-			String next = index + 1 < commands.length ? commands[ index + 1 ] : null;
+			String parameter = commands[index];
+			String next = index + 1 < commands.length ? commands[index + 1] : null;
 			if( parameter.startsWith( "-" ) ) {
 				if( "--".equals( parameter ) ) {
 					flagTerminatorFound = true;
@@ -64,7 +64,7 @@ public class Parameters {
 
 		if( flagTerminatorFound ) {
 			for( ; index < commands.length; index++ ) {
-				String parameter = commands[ index ];
+				String parameter = commands[index];
 				files.add( parameter );
 			}
 		}

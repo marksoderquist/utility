@@ -43,7 +43,7 @@ public class TextUtil {
 		StringBuilder builder = new StringBuilder();
 		int count = data.length;
 		for( int index = 0; index < count; index++ ) {
-			builder.append( toPrintableString( (char)data[ index ] ) );
+			builder.append( toPrintableString( (char)data[index] ) );
 		}
 		return builder.toString();
 	}
@@ -53,7 +53,7 @@ public class TextUtil {
 		StringBuilder builder = new StringBuilder();
 		int count = data.length;
 		for( int index = 0; index < count; index++ ) {
-			builder.append( toPrintableString( data[ index ] ) );
+			builder.append( toPrintableString( data[index] ) );
 		}
 		return builder.toString();
 	}
@@ -74,7 +74,7 @@ public class TextUtil {
 		String string = null;
 		StringBuilder builder = new StringBuilder();
 		for( int index = 0; index < count; index++ ) {
-			value = bytes[ index ];
+			value = bytes[index];
 			string = Integer.toHexString( value < 0 ? value + 256 : value );
 			if( string.length() == 1 ) builder.append( "0" );
 			builder.append( string );
@@ -120,7 +120,7 @@ public class TextUtil {
 
 	public static final String pad( int width, char chr ) {
 		if( width <= 0 ) return "";
-		char[] pad = new char[ width ];
+		char[] pad = new char[width];
 		Arrays.fill( pad, chr );
 		return new String( pad );
 	}

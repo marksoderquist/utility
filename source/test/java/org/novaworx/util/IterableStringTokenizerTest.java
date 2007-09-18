@@ -21,5 +21,5 @@ public class IterableStringTokenizerTest extends TestCase {
 			assertEquals( String.valueOf( index++ ), token );
 		}
 	}
-	
+
 }
