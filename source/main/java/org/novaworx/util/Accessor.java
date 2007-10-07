@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 public class Accessor {
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException, InvocationTargetException {
+	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
 
 		Class<?>[] parameterTypes = new Class<?>[parameters.length];
@@ -19,18 +19,11 @@ public class Accessor {
 		Class<?> clazz = Class.forName( name );
 		Constructor<?> constructor = clazz.getDeclaredConstructor( parameterTypes );
 		constructor.setAccessible( true );
-
-		try {
-			return (T)constructor.newInstance( parameters );
-		} catch( IllegalAccessException exception ) {
-			assert false;
-		}
-
-		return null;
+		return (T)constructor.newInstance( parameters );
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T getField( Object object, String name ) throws NoSuchFieldException {
+	public static <T> T getField( Object object, String name ) throws NoSuchFieldException, IllegalAccessException {
 		if( object == null ) throw new NullPointerException( "Object cannot be null." );
 
 		Field field = null;
@@ -43,30 +36,20 @@ public class Accessor {
 		}
 		if( field == null ) throw new NoSuchFieldException( name );
 		field.setAccessible( true );
-		try {
-			return (T)field.get( object );
-		} catch( IllegalAccessException exception ) {
-			assert false;
-		}
-		return null;
+		return (T)field.get( object );
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T getField( Class clazz, String name ) throws NoSuchFieldException {
+	public static <T> T getField( Class clazz, String name ) throws NoSuchFieldException, IllegalAccessException {
 		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
 
 		Field field = clazz.getDeclaredField( name );
 		field.setAccessible( true );
-		try {
-			return (T)field.get( null );
-		} catch( IllegalAccessException exception ) {
-			assert false;
-		}
-		return null;
+		return (T)field.get( null );
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T callMethod( Object object, String name, Object... parameters ) throws NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+	public static <T> T callMethod( Object object, String name, Object... parameters ) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		if( object == null ) throw new NullPointerException( "Object cannot be null." );
 
 		Class<?>[] parameterTypes = new Class<?>[parameters.length];
@@ -84,16 +67,11 @@ public class Accessor {
 		}
 		if( method == null ) throw new NoSuchMethodException( name );
 		method.setAccessible( true );
-		try {
-			return (T)method.invoke( object, parameters );
-		} catch( IllegalAccessException exception ) {
-			assert false;
-		}
-		return null;
+		return (T)method.invoke( object, parameters );
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T callMethod( Class clazz, String name, Object... parameters ) throws NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+	public static <T> T callMethod( Class clazz, String name, Object... parameters ) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
 
 		Class<?>[] parameterTypes = new Class<?>[parameters.length];
@@ -103,12 +81,7 @@ public class Accessor {
 
 		Method method = clazz.getDeclaredMethod( name, parameterTypes );
 		method.setAccessible( true );
-		try {
-			return (T)method.invoke( null, parameters );
-		} catch( IllegalAccessException exception ) {
-			assert false;
-		}
-		return null;
+		return (T)method.invoke( null, parameters );
 	}
 
 }

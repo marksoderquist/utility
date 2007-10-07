@@ -3,8 +3,11 @@ package org.novaworx.util;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Formatter;
@@ -158,6 +161,16 @@ public class Log {
 		}
 
 		return INFO;
+	}
+
+	public static final void writeSystemProperties() {
+		Set<String> keySet = System.getProperties().stringPropertyNames();
+		List<String> keys = new ArrayList<String>( keySet.size() );
+		keys.addAll( keySet );
+		Collections.sort( keys );
+		for( String key : keys ) {
+			write( key + " = " + System.getProperty( key ) );
+		}
 	}
 
 	private static final Logger getNamedLogger( String name ) {
