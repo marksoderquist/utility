@@ -24,10 +24,14 @@ public class Accessor {
 
 	@SuppressWarnings( "unchecked" )
 	public static <T> T getField( Object object, String name ) throws NoSuchFieldException, IllegalAccessException {
+		return getField( object.getClass(), object, name );
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public static <T> T getField( Class clazz, Object object, String name ) throws NoSuchFieldException, IllegalAccessException {
 		if( object == null ) throw new NullPointerException( "Object cannot be null." );
 
 		Field field = null;
-		Class clazz = object.getClass();
 		while( field == null & clazz != null ) {
 			try {
 				field = clazz.getDeclaredField( name );
