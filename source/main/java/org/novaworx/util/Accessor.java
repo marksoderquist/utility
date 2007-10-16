@@ -24,7 +24,7 @@ public class Accessor {
 
 	@SuppressWarnings( "unchecked" )
 	public static <T> T getField( Object object, String name ) throws NoSuchFieldException, IllegalAccessException {
-		return getField( object.getClass(), object, name );
+		return (T)getField( object.getClass(), object, name );
 	}
 
 	@SuppressWarnings( "unchecked" )
