@@ -142,18 +142,19 @@
 	</reporting>
 	
 	<distributionManagement>
-		<!-- use the following if you're not using a snapshot version. -->
+		<!-- Use the following if you're not using a snapshot version. -->
 		<repository>
 			<id>parallelsymmetry</id>
 			<name>ParallelSymmetry Maven Repository</name>
 			<url>file:///home/parasymm/mvn/release</url>
 		</repository>
 		
-		<!-- use the following if you ARE using a snapshot version. -->
+		<!-- Use the following if you ARE using a snapshot version. -->
 		<snapshotRepository>
 			<id>parallelsymmetry-snapshot</id>
 			<name>ParallelSymmetry Maven Snapshot Repository</name>
 			<url>file:///home/parasymm/mvn/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
+	
 </project>
