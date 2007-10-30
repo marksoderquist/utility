@@ -2,58 +2,58 @@
 	
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>org.novaworx</groupId>
+	<groupId>com.parallelsymmetry</groupId>
 	<artifactId>utility</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 	
-	<name>Novaworx Utility Library</name>
+	<name>ParallelSymmetry Utility Library</name>
 	<description />
-	<url>http://www.novaworx.org</url>
+	<url>http://www.parallelsymmetry.com</url>
 	<inceptionYear>2007</inceptionYear>
 	
 	<organization>
-		<name>Novaworx</name>
-		<url>http://www.novaworx.org</url>
+		<name>ParallelSymmetry</name>
+		<url>http://www.parallelsymmetry.com</url>
 	</organization>
 	
 	<ciManagement>
 		<system>Continuum</system>
-		<url>http://www.novaworx.org/continuum</url>
+		<url>http://www.parallelsymmetry.com/continuum</url>
 	</ciManagement>
 	
 	<developers>
 		<developer>
 			<id>mvsoder</id>
 			<name>Mark Soderquist</name>
-			<email>mark@southbranchcontrols.com</email>
+			<email>mark@soderquist.net</email>
 			<roles>
 				<role>Manager</role>
 				<role>Architect</role>
 				<role>Engineer</role>
 			</roles>
-			<organization>Novaworx</organization>
+			<organization>ParallelSymmetry</organization>
 			<timezone>-7</timezone>
 		</developer>
 	</developers>
 	
 	<scm>
-		<connection>scm:svn:http://svn.novaworx.org/software/utility/trunk</connection>
+		<connection>scm:svn:http://svn.parallelsymmetry.com/software/utility/trunk</connection>
 	</scm>
 	
 	<repositories>
 		<repository>
-			<id>novaworx</id>
-			<name>Novaworx</name>
-			<url>http://mvn.novaworx.org/release</url>
+			<id>parallelsymmetry</id>
+			<name>ParallelSymmetry</name>
+			<url>http://mvn.parallelsymmetry.com/release</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 		<repository>
-			<id>novaworx-snapshot</id>
-			<name>Novaworx Snapshot</name>
-			<url>http://mvn.novaworx.org/snapshot</url>
+			<id>parallelsymmetry-snapshot</id>
+			<name>ParallelSymmetry Snapshot</name>
+			<url>http://mvn.parallelsymmetry.com/snapshot</url>
 			<snapshots>
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
@@ -138,42 +138,22 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>taglist-maven-plugin</artifactId>
 			</plugin>
-			<!--
-			<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-pmd-plugin</artifactId>
-			
-			<configuration>
-			<sourcejdk>1.6</sourcejdk>
-			<targetjdk>1.6</targetjdk>
-			<rulesets>
-			<ruleset>/rulesets/basic.xml</ruleset>
-			<ruleset>/rulesets/controversial.xml</ruleset>
-			</rulesets>
-			<format>xml</format>
-			<linkXref>true</linkXref>
-			<sourceEncoding>utf-8</sourceEncoding>
-			
-			<minimumTokens>100</minimumTokens>
-			</configuration>
-			</plugin>
-			-->
 		</plugins>
 	</reporting>
 	
 	<distributionManagement>
 		<!-- use the following if you're not using a snapshot version. -->
 		<repository>
-			<id>novaworx</id>
-			<name>Novaworx Maven Repository</name>
-			<url>file:///home/novaworx/mvn/release</url>
+			<id>parallelsymmetry</id>
+			<name>ParallelSymmetry Maven Repository</name>
+			<url>file:///home/parasymm/mvn/release</url>
 		</repository>
 		
 		<!-- use the following if you ARE using a snapshot version. -->
 		<snapshotRepository>
-			<id>novaworx-snapshot</id>
-			<name>Novaworx Maven Snapshot Repository</name>
-			<url>file:///home/novaworx/mvn/snapshot</url>
+			<id>parallelsymmetry-snapshot</id>
+			<name>ParallelSymmetry Maven Snapshot Repository</name>
+			<url>file:///home/parasymm/mvn/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 </project>
