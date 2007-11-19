@@ -61,12 +61,25 @@ public class Log {
 	}
 
 	/**
+	 * Get the log level of the default handler.
+	 * 
+	 * @return The default handler log level.
+	 */
+	public static final Level getLevel() {
+		return DEFAULT_HANDLER.getLevel();
+	}
+
+	/**
 	 * This log level affects only the default handler.
 	 * 
 	 * @param level
 	 */
 	public static final void setLevel( Level level ) {
 		DEFAULT_HANDLER.setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+	}
+
+	public static final Level getLevel( String name ) {
+		return namedLoggerDefaultHandlers.get( getNamedLogger( name ) ).getLevel();
 	}
 
 	public static final void setLevel( String name, Level level ) {
