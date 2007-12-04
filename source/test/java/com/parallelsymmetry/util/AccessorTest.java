@@ -28,20 +28,43 @@ public class AccessorTest extends TestCase {
 
 	public void testCallMethodWithParameter() throws Exception {
 		Object object = new Object();
-		PrivateClass privateClass = new PrivateClass( object );
+		PrivateClass privateClass = new PrivateClass();
 		assertEquals( object, Accessor.callMethod( privateClass, "loopback", object ) );
+	}
+
+	public void testCallMethodWithTypeAndParameter() throws Exception {
+		String string = new String();
+		PrivateClass privateClass = new PrivateClass();
+
+		try {
+			Accessor.callMethod( privateClass, "loopback", string );
+			fail( "Method should not be found with String parameter." );
+		} catch( NoSuchMethodException exception ) {}
+
+		assertEquals( string, Accessor.callMethod( privateClass, "loopback", Object.class, string ) );
 	}
 
 	public void testCallStaticMethod() throws Exception {
 		Object object = new Object();
-		PrivateClass privateClass = new PrivateClass( object );
-		assertEquals( object, Accessor.callMethod( privateClass, "staticMethod" ) );
+		PrivateClass.staticField = object;
+		assertEquals( object, Accessor.callMethod( PrivateClass.class, "staticMethod" ) );
 	}
 
 	public void testCallStaticMethodWithParameter() throws Exception {
 		Object object = new Object();
-		PrivateClass privateClass = new PrivateClass( object );
-		assertEquals( object, Accessor.callMethod( privateClass, "staticLoopback", object ) );
+		assertEquals( object, Accessor.callMethod( PrivateClass.class, "staticLoopback", object ) );
+	}
+
+	public void testCallStaticMethodWithTypeAndParameter() throws Exception {
+		String string = new String();
+		PrivateClass privateClass = new PrivateClass( string );
+
+		try {
+			Accessor.callMethod( privateClass, "staticLoopback", string );
+			fail( "Method should not be found with String parameter." );
+		} catch( NoSuchMethodException exception ) {}
+
+		assertEquals( string, Accessor.callMethod( PrivateClass.class, "staticLoopback", Object.class, string ) );
 	}
 
 	private static class PrivateClass {
@@ -49,6 +72,10 @@ public class AccessorTest extends TestCase {
 		private Object field;
 
 		private static Object staticField;
+
+		public PrivateClass() {
+			this( null );
+		}
 
 		public PrivateClass( Object object ) {
 			field = object;

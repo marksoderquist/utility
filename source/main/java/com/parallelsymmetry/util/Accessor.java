@@ -52,23 +52,68 @@ public class Accessor {
 		return (T)field.get( null );
 	}
 
+	/**
+	 * Parameters can be specified in two ways:
+	 * <ol>
+	 * <li>Values only. The value types must exactly match the method parameter
+	 * types.</li>
+	 * <li>Type/value pairs. The type must exactly match the method parameter
+	 * type and be compatible with the value.</li>
+	 * </ol>
+	 * 
+	 * @param <T>
+	 * @param object
+	 * @param name
+	 * @param parameters
+	 * @return
+	 * @throws NoSuchMethodException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
+	 * @throws InvocationTargetException
+	 */
 	@SuppressWarnings( "unchecked" )
 	public static <T> T callMethod( Object object, String name, Object... parameters ) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		if( object == null ) throw new NullPointerException( "Object cannot be null." );
 
-		Class<?>[] parameterTypes = new Class<?>[parameters.length];
-		for( int index = 0; index < parameters.length; index++ ) {
-			parameterTypes[index] = parameters[index].getClass();
+		Method method = null;
+		if( method == null ) {
+			Class clazz = object.getClass();
+			Class<?>[] parameterTypes = new Class<?>[parameters.length];
+			for( int index = 0; index < parameters.length; index++ ) {
+				parameterTypes[index] = parameters[index].getClass();
+			}
+
+			while( method == null & clazz != null ) {
+				try {
+					method = clazz.getDeclaredMethod( name, parameterTypes );
+				} catch( NoSuchMethodException exception ) {}
+				clazz = clazz.getSuperclass();
+			}
 		}
 
-		Method method = null;
-		Class clazz = object.getClass();
-		while( method == null & clazz != null ) {
-			try {
-				method = clazz.getDeclaredMethod( name, parameterTypes );
-			} catch( NoSuchMethodException exception ) {}
-			clazz = clazz.getSuperclass();
+		if( method == null ) {
+			Class clazz = object.getClass();
+			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
+			for( int index = 0; index < parameters.length / 2; index++ ) {
+				parameterTypes[index] = (Class<?>)parameters[index * 2];
+			}
+
+			while( method == null & clazz != null ) {
+				try {
+					method = clazz.getDeclaredMethod( name, parameterTypes );
+				} catch( NoSuchMethodException exception ) {}
+				clazz = clazz.getSuperclass();
+			}
+
+			if( method != null ) {
+				Object[] incomming = parameters;
+				parameters = new Object[parameters.length / 2];
+				for( int index = 0; index < parameters.length; index++ ) {
+					parameters[index] = incomming[index * 2 + 1];
+				}
+			}
 		}
+
 		if( method == null ) throw new NoSuchMethodException( name );
 		method.setAccessible( true );
 		return (T)method.invoke( object, parameters );
@@ -78,12 +123,38 @@ public class Accessor {
 	public static <T> T callMethod( Class clazz, String name, Object... parameters ) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
 
-		Class<?>[] parameterTypes = new Class<?>[parameters.length];
-		for( int index = 0; index < parameters.length; index++ ) {
-			parameterTypes[index] = parameters[index].getClass();
+		Method method = null;
+		if( method == null ) {
+			Class<?>[] parameterTypes = new Class<?>[parameters.length];
+			for( int index = 0; index < parameters.length; index++ ) {
+				parameterTypes[index] = parameters[index].getClass();
+			}
+
+			try {
+				method = clazz.getDeclaredMethod( name, parameterTypes );
+			} catch( NoSuchMethodException exception ) {}
 		}
 
-		Method method = clazz.getDeclaredMethod( name, parameterTypes );
+		if( method == null ) {
+			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
+			for( int index = 0; index < parameters.length / 2; index++ ) {
+				parameterTypes[index] = (Class<?>)parameters[index * 2];
+			}
+
+			try {
+				method = clazz.getDeclaredMethod( name, parameterTypes );
+			} catch( NoSuchMethodException exception ) {}
+
+			if( method != null ) {
+				Object[] incomming = parameters;
+				parameters = new Object[parameters.length / 2];
+				for( int index = 0; index < parameters.length; index++ ) {
+					parameters[index] = incomming[index * 2 + 1];
+				}
+			}
+		}
+
+		if( method == null ) throw new NoSuchMethodException( name );
 		method.setAccessible( true );
 		return (T)method.invoke( null, parameters );
 	}
