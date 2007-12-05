@@ -127,7 +127,7 @@ public class Accessor {
 		if( method == null ) {
 			Class<?>[] parameterTypes = new Class<?>[parameters.length];
 			for( int index = 0; index < parameters.length; index++ ) {
-				parameterTypes[index] = parameters[index].getClass();
+				if( parameters[index] != null ) parameterTypes[index] = parameters[index].getClass();
 			}
 
 			try {
