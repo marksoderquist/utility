@@ -80,7 +80,7 @@ public class Accessor {
 			Class clazz = object.getClass();
 			Class<?>[] parameterTypes = new Class<?>[parameters.length];
 			for( int index = 0; index < parameters.length; index++ ) {
-				parameterTypes[index] = parameters[index].getClass();
+				if( parameters[index] != null ) parameterTypes[index] = parameters[index].getClass();
 			}
 
 			while( method == null & clazz != null ) {
