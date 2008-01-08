@@ -49,6 +49,8 @@ public class Log {
 
 	private static Set<Logger> namedLoggers;
 
+	private static int counter;
+
 	static {
 		namedLoggers = new HashSet<Logger>();
 		namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
@@ -100,6 +102,15 @@ public class Log {
 
 	public static final void removeHandlerFromLogger( String name, Handler handler ) {
 		Logger.getLogger( name ).removeHandler( handler );
+	}
+
+	/**
+	 * Get log counter. Every time this method is called the counter is increased.
+	 * 
+	 * @return The log counter.
+	 */
+	public static final int getCounter() {
+		return counter++;
 	}
 
 	public static final void write() {
