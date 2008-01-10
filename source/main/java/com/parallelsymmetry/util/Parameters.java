@@ -3,6 +3,7 @@
  */
 package com.parallelsymmetry.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Parameters {
+public class Parameters implements Serializable {
+
+	private static final long serialVersionUID = 5833853466601282168L;
 
 	private String[] commands;
 
