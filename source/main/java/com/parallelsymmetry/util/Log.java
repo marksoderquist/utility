@@ -43,6 +43,8 @@ public class Log {
 
 	public static final Handler DEFAULT_HANDLER = new DefaultHandler( System.out );
 
+	public static final Formatter DEFAULT_FORMATTER = new DefaultFormatter();
+
 	private static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
 
 	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
