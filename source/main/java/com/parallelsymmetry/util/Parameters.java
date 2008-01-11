@@ -46,6 +46,7 @@ public class Parameters implements Serializable {
 		for( ; index < commands.length; index++ ) {
 			String parameter = commands[index];
 			String next = index + 1 < commands.length ? commands[index + 1] : null;
+			if( parameter == null ) continue;
 			if( parameter.startsWith( "-" ) ) {
 				if( "--".equals( parameter ) ) {
 					flagTerminatorFound = true;

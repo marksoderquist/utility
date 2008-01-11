@@ -7,8 +7,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.util.Parameters;
-
 public class ParametersTest extends TestCase {
 
 	@Test
@@ -214,6 +212,13 @@ public class ParametersTest extends TestCase {
 		assertTrue( "Flag not set.", parameters.isSet( "flag" ) );
 		assertEquals( "Number of files incorrect.", 1, files.size() );
 		assertEquals( "File name incorrect.", "file", files.get( 0 ) );
+	}
+
+	@Test
+	public void testParseWithNullEntry() {
+		String[] args = new String[1];
+		Parameters parameters = Parameters.parse( args );
+		assertEquals( 0, parameters.size() );
 	}
 
 	private long sumHashCode( Object[] objects ) {
