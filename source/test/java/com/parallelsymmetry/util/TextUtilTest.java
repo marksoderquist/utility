@@ -2,8 +2,6 @@ package com.parallelsymmetry.util;
 
 import java.nio.charset.Charset;
 
-import com.parallelsymmetry.util.TextUtil;
-
 import junit.framework.TestCase;
 
 public class TextUtilTest extends TestCase {
@@ -13,6 +11,31 @@ public class TextUtilTest extends TestCase {
 		assertTrue( TextUtil.isEmpty( "" ) );
 		assertTrue( TextUtil.isEmpty( " " ) );
 		assertFalse( TextUtil.isEmpty( "." ) );
+	}
+
+	public void testAreEqual() {
+		assertTrue( TextUtil.areEqual( null, null ) );
+		assertTrue( TextUtil.areEqual( "", "" ) );
+		assertTrue( TextUtil.areEqual( " ", " " ) );
+		assertTrue( TextUtil.areEqual( "a", "a" ) );
+
+		assertFalse( TextUtil.areEqual( null, "" ) );
+		assertFalse( TextUtil.areEqual( "", null ) );
+	}
+
+	public void testAreSame() {
+		assertTrue( TextUtil.areSame( null, null ) );
+		assertTrue( TextUtil.areSame( "", "" ) );
+		assertTrue( TextUtil.areSame( " ", " " ) );
+		assertTrue( TextUtil.areSame( "a", "a" ) );
+
+		assertTrue( TextUtil.areSame( null, "" ) );
+		assertTrue( TextUtil.areSame( "", null ) );
+		assertTrue( TextUtil.areSame( null, " " ) );
+
+		assertFalse( TextUtil.areSame( null, "a" ) );
+		assertFalse( TextUtil.areSame( "", "a" ) );
+		assertFalse( TextUtil.areSame( " ", "a" ) );
 	}
 
 	public void testToPrintableString() {

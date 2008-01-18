@@ -18,6 +18,20 @@ public class TextUtil {
 		return false;
 	}
 
+	public static final boolean areEqual( String string1, String string2 ) {
+		if( string1 == null && string2 == null ) return true;
+		if( string1 == null && string2 != null ) return false;
+		if( string1 != null && string2 == null ) return false;
+		return string1.equals( string2 );
+	}
+
+	public static final boolean areSame( String string1, String string2 ) {
+		if( isEmpty( string1 ) && isEmpty( string2 ) ) return true;
+		if( string1 == null && string2 != null ) return false;
+		if( string1 != null && string2 == null ) return false;
+		return string1.equals( string2 );
+	}
+
 	/**
 	 * Returns a printable string representation of a character by converting char
 	 * values less than or equal to 32 or greater than or equal to 126 to the
