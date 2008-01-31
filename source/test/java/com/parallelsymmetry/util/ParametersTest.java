@@ -38,6 +38,12 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
+	public void testParseWithValueUsingEquals() throws Exception {
+		Parameters parameters = Parameters.parse( new String[] { "-locale=spa" } );
+		assertEquals( "spa", parameters.get( "locale" ) );
+	}
+
+	@Test
 	public void testParseWithValueAndFile() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );

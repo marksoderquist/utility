@@ -52,6 +52,8 @@ public class Parameters implements Serializable {
 					flagTerminatorFound = true;
 					index++;
 					break;
+				} else if( parameter.indexOf( "=" ) >= 0 ) {
+					values.put( parameter.substring( 1, parameter.indexOf( "=" ) ), parameter.substring( parameter.indexOf( "=" ) + 1 ) );
 				} else if( Arrays.binarySearch( flags, parameter ) >= 0 || next == null || next.startsWith( "-" ) ) {
 					// Flag
 					values.put( parameter.substring( 1 ), "true" );
