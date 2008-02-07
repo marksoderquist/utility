@@ -33,6 +33,22 @@ public class TextUtil {
 	}
 
 	/**
+	 * Concatenate multiple objects together using a fast string building object.
+	 * 
+	 * @param objects
+	 * @return
+	 */
+	public static String concatenate( Object... objects ) {
+		StringBuilder builder = new StringBuilder();
+
+		for( Object object : objects ) {
+			builder.append( object == null ? "null" : object.toString() );
+		}
+
+		return builder.toString();
+	}
+
+	/**
 	 * Returns a printable string representation of a character by converting char
 	 * values less than or equal to 32 or greater than or equal to 126 to the
 	 * integer value surrounded by brackets.
@@ -219,7 +235,7 @@ public class TextUtil {
 		return builder.toString();
 	}
 
-	public static int getLineCount( String text ) {
+	public static final int getLineCount( String text ) {
 		if( text == null ) return 0;
 
 		int count = 0;

@@ -38,6 +38,12 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areSame( " ", "a" ) );
 	}
 
+	public void testConcatenate() {
+		assertEquals( "Count: 10", TextUtil.concatenate( "Count: ", 10 ) );
+		assertEquals( "Flag: false", TextUtil.concatenate( "Flag: ", false ) );
+		assertEquals( "Test String", TextUtil.concatenate( "Test", " ", "String" ) );
+	}
+
 	public void testToPrintableString() {
 		assertEquals( "Bad conversion.", "[0]", TextUtil.toPrintableString( (char)0 ) );
 		assertEquals( "Bad conversion.", "[27]", TextUtil.toPrintableString( (char)27 ) );
