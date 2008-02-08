@@ -98,6 +98,23 @@
 					<siteDirectory>source/site</siteDirectory>
 				</configuration>
 			</plugin>
+			
+			<!--plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+          <execution>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <keystore>/path/to/your/keystore</keystore>
+          <alias>youralias</alias>
+          <storepass>yourstorepassword</storepass>
+          <verify>true</verify>
+        </configuration>
+			</plugin-->
 		</plugins>
 	</build>
 	<reporting>
