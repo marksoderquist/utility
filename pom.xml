@@ -99,7 +99,7 @@
 				</configuration>
 			</plugin>
 			
-			<!--plugin>
+			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<executions>
           <execution>
@@ -109,12 +109,12 @@
           </execution>
         </executions>
         <configuration>
-          <keystore>/path/to/your/keystore</keystore>
-          <alias>youralias</alias>
-          <storepass>yourstorepassword</storepass>
+          <keystore>/home/parasymm/parallelsymmetry.keystore</keystore>
+          <alias>software</alias>
+          <storepass>parallelsymmetry</storepass>
           <verify>true</verify>
         </configuration>
-			</plugin-->
+			</plugin>
 		</plugins>
 	</build>
 	<reporting>
