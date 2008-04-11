@@ -127,6 +127,9 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
 				<configuration>
+					<excludes>
+						<exclude>Test*.class</exclude>
+					</excludes>
 					<formats>
 						<format>xml</format>
 						<format>html</format>
