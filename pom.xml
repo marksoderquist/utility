@@ -125,6 +125,7 @@
 
 		</plugins>
 	</build>
+	
 	<reporting>
 		<plugins>
 
