@@ -11,13 +11,41 @@ public class Accessor {
 	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
 
-		Class<?>[] parameterTypes = new Class<?>[parameters.length];
-		for( int index = 0; index < parameters.length; index++ ) {
-			parameterTypes[index] = parameters[index].getClass();
+		Constructor<?> constructor = null;
+		Class<?> clazz = Class.forName( name );
+
+		if( constructor == null ) {
+			Class<?>[] parameterTypes = new Class<?>[parameters.length];
+			for( int index = 0; index < parameters.length; index++ ) {
+				parameterTypes[index] = parameters[index].getClass();
+			}
+			try {
+				clazz.getDeclaredConstructor( parameterTypes );
+			} catch( NoSuchMethodException exception ) {}
 		}
 
-		Class<?> clazz = Class.forName( name );
-		Constructor<?> constructor = clazz.getDeclaredConstructor( parameterTypes );
+		if( constructor == null ) {
+			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
+			for( int index = 0; index < parameters.length / 2; index++ ) {
+				parameterTypes[index] = (Class<?>)parameters[index * 2];
+			}
+
+			while( constructor == null & clazz != null ) {
+				try {
+					constructor = clazz.getDeclaredConstructor( parameterTypes );
+				} catch( NoSuchMethodException exception ) {}
+				clazz = clazz.getSuperclass();
+			}
+
+			if( constructor != null ) {
+				Object[] incomming = parameters;
+				parameters = new Object[parameters.length / 2];
+				for( int index = 0; index < parameters.length; index++ ) {
+					parameters[index] = incomming[index * 2 + 1];
+				}
+			}
+		}
+
 		constructor.setAccessible( true );
 		return (T)constructor.newInstance( parameters );
 	}

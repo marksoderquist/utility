@@ -14,6 +14,15 @@ public class AccessorTest extends TestCase {
 		assertEquals( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass", object2.getClass().getName() );
 	}
 
+	public void testCreateWithTypeAndParameter() throws Exception {
+		PrivateClass privateClass = null;
+		privateClass = Accessor.create( PrivateClass.class.getName(), new Object() );
+		assertNotNull( privateClass );
+
+		privateClass = Accessor.create( PrivateClass.class.getName(), Object.class, "loopback" );
+		assertNotNull( privateClass );
+	}
+
 	public void testGetField() throws Exception {
 		Object object = new Object();
 		PrivateClass privateClass = new PrivateClass( object );
