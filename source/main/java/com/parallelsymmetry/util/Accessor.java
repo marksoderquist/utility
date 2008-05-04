@@ -46,6 +46,7 @@ public class Accessor {
 			}
 		}
 
+		if( constructor == null ) throw new NoSuchMethodException( name );
 		constructor.setAccessible( true );
 		return (T)constructor.newInstance( parameters );
 	}
