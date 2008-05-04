@@ -16,9 +16,10 @@ public class AccessorTest extends TestCase {
 
 	public void testCreateWithTypeAndParameter() throws Exception {
 		PrivateClass privateClass = null;
-		privateClass = Accessor.create( PrivateClass.class.getName(), new Object() );
+		privateClass = Accessor.create( PrivateClass.class.getName(), "" );
 		assertNotNull( privateClass );
 
+		privateClass = null;
 		privateClass = Accessor.create( PrivateClass.class.getName(), Object.class, "loopback" );
 		assertNotNull( privateClass );
 	}

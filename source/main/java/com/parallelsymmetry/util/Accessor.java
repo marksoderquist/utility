@@ -20,7 +20,7 @@ public class Accessor {
 				parameterTypes[index] = parameters[index].getClass();
 			}
 			try {
-				clazz.getDeclaredConstructor( parameterTypes );
+				constructor = clazz.getDeclaredConstructor( parameterTypes );
 			} catch( NoSuchMethodException exception ) {}
 		}
 
