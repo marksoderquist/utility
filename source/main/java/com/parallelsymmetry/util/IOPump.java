@@ -42,7 +42,7 @@ public class IOPump implements Runnable {
 
 	private boolean logContent;
 
-	private Level logAtLevel = Log.DEBUG;
+	private Level logLevel = Log.DEBUG;
 
 	private int bufferSize;
 
@@ -162,12 +162,12 @@ public class IOPump implements Runnable {
 		this.logEnabled = logEnabled;
 	}
 
-	public Level getLogAtLevel() {
-		return logAtLevel;
+	public Level getLogLevel() {
+		return logLevel;
 	}
 
-	public void setLogAtLevel( Level logAtLevel ) {
-		this.logAtLevel = logAtLevel;
+	public void setLogLevel( Level logAtLevel ) {
+		this.logLevel = logAtLevel;
 		this.logEnabled = true;
 	}
 
@@ -251,7 +251,7 @@ public class IOPump implements Runnable {
 			chararray = new char[bufferSize];
 		}
 
-		if( logEnabled ) Log.write( logAtLevel, "IOPump started." );
+		if( logEnabled ) Log.write( logLevel, "IOPump started." );
 
 		try {
 			int read = 0;
@@ -267,7 +267,7 @@ public class IOPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( logEnabled && logContent && builder.length() > 0 ) Log.write( logAtLevel, builder.toString() );
+					if( logEnabled && logContent && builder.length() > 0 ) Log.write( logLevel, builder.toString() );
 					execute = false;
 					continue;
 				}
@@ -286,7 +286,7 @@ public class IOPump implements Runnable {
 							lineTerminator = true;
 						} else {
 							if( lineTerminator ) {
-								Log.write( logAtLevel, builder.toString() );
+								Log.write( logLevel, builder.toString() );
 								builder.delete( 0, builder.length() );
 							}
 							builder.append( TextUtil.toPrintableString( (char)datum ) );
@@ -305,7 +305,7 @@ public class IOPump implements Runnable {
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception );
 		} finally {
-			if( logEnabled ) Log.write( logAtLevel, "IOPump finished." );
+			if( logEnabled ) Log.write( logLevel, "IOPump finished." );
 		}
 	}
 
