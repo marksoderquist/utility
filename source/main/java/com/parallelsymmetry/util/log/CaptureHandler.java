@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
+import com.parallelsymmetry.util.Log;
+
 public class CaptureHandler extends StreamHandler {
 
 	private OutputStream output;
@@ -18,8 +20,10 @@ public class CaptureHandler extends StreamHandler {
 
 	@Override
 	public void publish( LogRecord record ) {
-		super.publish( record );
-		flush();
+		if( record.getLevel().intValue() <= Log.INFO.intValue() ) {
+			super.publish( record );
+			flush();
+		}
 	}
 
 	public String toString() {

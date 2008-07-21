@@ -41,7 +41,7 @@ public class Log {
 
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
-	public static final Handler DEFAULT_HANDLER = new DefaultHandler( System.out );
+	public static final Handler DEFAULT_HANDLER = new DefaultHandler( System.out, System.err );
 
 	public static final Formatter DEFAULT_FORMATTER = new DefaultFormatter();
 
@@ -91,18 +91,18 @@ public class Log {
 	}
 
 	public static final void addHandler( Handler handler ) {
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).addHandler( handler );
+		addHandler( DEFAULT_LOGGER_NAME, handler );
 	}
 
 	public static final void removeHandler( Handler handler ) {
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).removeHandler( handler );
+		removeHandler( DEFAULT_LOGGER_NAME, handler );
 	}
 
-	public static final void addHandlerToLogger( String name, Handler handler ) {
+	public static final void addHandler( String name, Handler handler ) {
 		Logger.getLogger( name ).addHandler( handler );
 	}
 
-	public static final void removeHandlerFromLogger( String name, Handler handler ) {
+	public static final void removeHandler( String name, Handler handler ) {
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
@@ -204,7 +204,7 @@ public class Log {
 
 		synchronized( namedLoggers ) {
 			if( !namedLoggers.contains( logger ) ) {
-				Handler handler = new DefaultHandler( System.out );
+				Handler handler = new DefaultHandler( System.out, System.err );
 				handler.setLevel( DEFAULT_LOG_LEVEL );
 				logger.setLevel( Level.ALL );
 				logger.addHandler( handler );
@@ -252,19 +252,40 @@ public class Log {
 
 	}
 
-	private static class DefaultHandler extends StreamHandler {
+	private static class DefaultHandler extends Handler {
+
+		private StreamHandler outputHandler;
+
+		private StreamHandler errorHandler;
 
 		public DefaultHandler( OutputStream stream ) {
-			super( stream, new DefaultFormatter() );
+			this( stream, stream );
+		}
+
+		public DefaultHandler( OutputStream stream, OutputStream error ) {
+			outputHandler = new StreamHandler( stream, new DefaultFormatter() );
+			errorHandler = new StreamHandler( error, new DefaultFormatter() );
+			//			super( stream, new DefaultFormatter() );
 		}
 
 		public void publish( LogRecord record ) {
-			super.publish( record );
+			if( record.getLevel().intValue() > Log.INFO.intValue() ) {
+				errorHandler.publish( record );
+			} else {
+				outputHandler.publish( record );
+			}
+			//super.publish( record );
 			flush();
 		}
 
 		public void close() {
 			flush();
+		}
+
+		@Override
+		public void flush() {
+			outputHandler.flush();
+			errorHandler.flush();
 		}
 	}
 
