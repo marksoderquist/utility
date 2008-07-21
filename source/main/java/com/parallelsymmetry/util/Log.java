@@ -218,7 +218,7 @@ public class Log {
 	}
 
 	private static StackTraceElement getCaller() {
-		StackTraceElement elements[] = ( new Throwable() ).getStackTrace();
+		StackTraceElement elements[] = Thread.currentThread().getStackTrace();
 
 		int index = 0;
 		while( index < elements.length ) {
