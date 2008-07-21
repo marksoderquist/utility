@@ -3,6 +3,7 @@ package com.parallelsymmetry.util;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.ErrorManager;
+import java.util.logging.Filter;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -265,21 +268,34 @@ public class Log {
 		public DefaultHandler( OutputStream stream, OutputStream error ) {
 			outputHandler = new StreamHandler( stream, new DefaultFormatter() );
 			errorHandler = new StreamHandler( error, new DefaultFormatter() );
-			//			super( stream, new DefaultFormatter() );
 		}
 
+		@Override
+		public void setLevel( Level level ) {
+			outputHandler.setLevel( level );
+			errorHandler.setLevel( level );
+			super.setLevel( level );
+		}
+
+		@Override
+		public synchronized Level getLevel() {
+			return super.getLevel();
+		}
+
+		@Override
 		public void publish( LogRecord record ) {
 			if( record.getLevel().intValue() > Log.INFO.intValue() ) {
 				errorHandler.publish( record );
 			} else {
 				outputHandler.publish( record );
 			}
-			//super.publish( record );
 			flush();
 		}
 
+		@Override
 		public void close() {
-			flush();
+			outputHandler.close();
+			errorHandler.close();
 		}
 
 		@Override
@@ -287,6 +303,65 @@ public class Log {
 			outputHandler.flush();
 			errorHandler.flush();
 		}
+
+		@Override
+		public void setEncoding( String encoding ) throws SecurityException, UnsupportedEncodingException {
+			outputHandler.setEncoding( encoding );
+			errorHandler.setEncoding( encoding );
+			super.setEncoding( encoding );
+		}
+
+		@Override
+		public String getEncoding() {
+			return super.getEncoding();
+		}
+
+		@Override
+		public void setErrorManager( ErrorManager manager ) {
+			outputHandler.setErrorManager( manager );
+			errorHandler.setErrorManager( manager );
+			super.setErrorManager( manager );
+		}
+
+		@Override
+		public ErrorManager getErrorManager() {
+			return super.getErrorManager();
+		}
+
+		@Override
+		public void setFilter( Filter filter ) throws SecurityException {
+			outputHandler.setFilter( filter );
+			errorHandler.setFilter( filter );
+			super.setFilter( filter );
+		}
+
+		@Override
+		public Filter getFilter() {
+			return super.getFilter();
+		}
+
+		@Override
+		public void setFormatter( Formatter formatter ) throws SecurityException {
+			outputHandler.setFormatter( formatter );
+			errorHandler.setFormatter( formatter );
+			super.setFormatter( formatter );
+		}
+
+		@Override
+		public Formatter getFormatter() {
+			return super.getFormatter();
+		}
+
+		@Override
+		public boolean isLoggable( LogRecord record ) {
+			return super.isLoggable( record );
+		}
+
+		@Override
+		protected void reportError( String message, Exception exception, int code ) {
+			super.reportError( message, exception, code );
+		}
+
 	}
 
 	private static class DefaultFormatter extends Formatter {

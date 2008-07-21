@@ -20,8 +20,9 @@ public class FlushingObjectHandler extends Handler {
 
 		try {
 			output.writeObject( record );
-		} catch( Exception e ) {
-			// reportError( record.getMessage(), e, ErrorManager.WRITE_FAILURE );
+			output.flush();
+		} catch( Exception exception ) {
+			exception.printStackTrace();
 		}
 		flush();
 	}
@@ -30,8 +31,8 @@ public class FlushingObjectHandler extends Handler {
 	public void flush() {
 		try {
 			output.flush();
-		} catch( Exception e ) {
-			// reportError( e.getMessage(), e, ErrorManager.FLUSH_FAILURE );
+		} catch( Exception exception ) {
+			exception.printStackTrace();
 		}
 	}
 
@@ -39,8 +40,8 @@ public class FlushingObjectHandler extends Handler {
 	public void close() throws SecurityException {
 		try {
 			output.close();
-		} catch( Exception e ) {
-			// reportError( e.getMessage(), e, ErrorManager.CLOSE_FAILURE );
+		} catch( Exception exception ) {
+			exception.printStackTrace();
 		}
 	}
 
