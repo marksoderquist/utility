@@ -21,7 +21,7 @@ public class ThreadUtilTest extends TestCase {
 	public void testAppendStackTraceWithNullParent() throws Exception {
 		Throwable throwable1 = new Throwable();
 		StackTraceElement[] stack1 = throwable1.getStackTrace();
-		assertEquals( stack1, ThreadUtil.appendStackTrace( throwable1, null ).getStackTrace() );
+		assertEquals( stack1, ThreadUtil.appendStackTrace( throwable1, (Throwable)null ).getStackTrace() );
 	}
 
 	public void testAppendStackTrace() throws Exception {
