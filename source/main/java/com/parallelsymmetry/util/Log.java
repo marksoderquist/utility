@@ -284,7 +284,8 @@ public class Log {
 
 		@Override
 		public void publish( LogRecord record ) {
-			if( record.getLevel().intValue() > Log.INFO.intValue() ) {
+			int recordLevel = record.getLevel().intValue();
+			if( recordLevel < Log.NONE.intValue() && recordLevel > Log.INFO.intValue() ) {
 				errorHandler.publish( record );
 			} else {
 				outputHandler.publish( record );
