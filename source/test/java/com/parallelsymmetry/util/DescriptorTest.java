@@ -8,6 +8,47 @@ import junit.framework.TestCase;
 public class DescriptorTest extends TestCase {
 
 	public void testConstructor() throws Exception {
+		Descriptor descriptor = new Descriptor();
+		assertNotNull( descriptor );
+
+		assertNotNull( descriptor.getPaths() );
+		assertEquals( 0, descriptor.getPaths().size() );
+	}
+
+	public void testGetPathsWithEmptyDescriptor() throws Exception {
+		Descriptor descriptor = new Descriptor();
+
+		List<String> paths = descriptor.getPaths();
+		assertNotNull( paths );
+		assertEquals( 0, paths.size() );
+	}
+
+	public void testGetValueWithEmptyDescriptor() throws Exception {
+		Descriptor descriptor = new Descriptor();
+		assertEquals( null, descriptor.getValue( null ) );
+		assertEquals( null, descriptor.getValue( "" ) );
+		assertEquals( null, descriptor.getValue( "test/name" ) );
+	}
+
+	public void testGetValueWithDefaultWithEmptyDescriptor() throws Exception {
+		Descriptor descriptor = new Descriptor();
+		assertEquals( null, descriptor.getValue( null, null ) );
+		assertEquals( "default", descriptor.getValue( null, "default" ) );
+		assertEquals( null, descriptor.getValue( "test/name", null ) );
+		assertEquals( null, descriptor.getValue( "", null ) );
+		assertEquals( null, descriptor.getValue( "notfound", null ) );
+		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
+	}
+
+	public void testConstructorWithNullStream() throws Exception {
+		Descriptor descriptor = new Descriptor( null );
+		assertNotNull( descriptor );
+
+		assertNotNull( descriptor.getPaths() );
+		assertEquals( 0, descriptor.getPaths().size() );
+	}
+
+	public void testConstructorWithStream() throws Exception {
 		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
 		assertNotNull( input );
 		Descriptor descriptor = new Descriptor( input );

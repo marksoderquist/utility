@@ -21,26 +21,30 @@ public class Descriptor {
 
 	private XPath xpath = XPathFactory.newInstance().newXPath();
 
-	private Document descriptor;
+	private Document document;
 
 	private List<String> paths;
 
+	public Descriptor() throws SAXException, IOException, ParserConfigurationException {
+		this( null );
+	}
+
 	public Descriptor( InputStream input ) throws SAXException, IOException, ParserConfigurationException {
-		descriptor = XmlUtil.loadXmlDocument( input );
+		if( input != null ) document = XmlUtil.loadXmlDocument( input );
 	}
 
 	public List<String> getPaths() {
-		if( paths == null ) paths = listPaths( descriptor );
+		if( paths == null ) paths = listPaths( document );
 		return paths;
 	}
 
 	public String getValue( String path ) {
-		if( path == null ) return null;
+		if( path == null || document == null ) return null;
 
 		String value = null;
 
 		try {
-			value = (String)xpath.evaluate( path, descriptor, XPathConstants.STRING );
+			value = (String)xpath.evaluate( path, document, XPathConstants.STRING );
 		} catch( XPathExpressionException exception ) {
 			// Intentionally ignore exception.
 		}
@@ -57,10 +61,11 @@ public class Descriptor {
 	}
 
 	private List<String> listPaths( Node parent ) {
-		NodeList list = parent.getChildNodes();
 		List<String> paths = new ArrayList<String>();
+		if( parent == null ) return paths;
 
 		Node node = null;
+		NodeList list = parent.getChildNodes();
 		int count = list.getLength();
 		for( int index = 0; index < count; index++ ) {
 			node = list.item( index );
@@ -70,13 +75,14 @@ public class Descriptor {
 			}
 			paths.addAll( listPaths( node ) );
 		}
+
 		return paths;
 	}
 
 	private String getPath( Node node ) {
 		StringBuilder builder = new StringBuilder();
 		Node parent = node.getParentNode();
-		while( parent != descriptor ) {
+		while( parent != document ) {
 			builder.insert( 0, parent.getNodeName() );
 			builder.insert( 0, "/" );
 			parent = parent.getParentNode();
