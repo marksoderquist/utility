@@ -17,8 +17,8 @@ public class CaptureFormatter extends Formatter {
 
 		if( record.getMessage() != null ) {
 			buffer.append( record.getMessage() );
-			buffer.append( "\n" );
 		}
+		buffer.append( "\n" );
 
 		if( thrown != null ) {
 			StringWriter stringWriter = new StringWriter();

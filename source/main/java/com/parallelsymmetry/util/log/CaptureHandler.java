@@ -21,7 +21,7 @@ public class CaptureHandler extends StreamHandler {
 	@Override
 	public void publish( LogRecord record ) {
 		// Don't capture trace and debug messages.
-		if( record.getLevel().intValue() >= Log.INFO.intValue() ) {
+		if( record.getLevel().intValue() >= Log.INFO.intValue() || record.getLevel().intValue() <= Log.NONE.intValue() ) {
 			super.publish( record );
 			flush();
 		}
