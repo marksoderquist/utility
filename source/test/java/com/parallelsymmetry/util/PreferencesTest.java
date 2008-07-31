@@ -10,8 +10,6 @@ import java.util.prefs.PreferenceChangeListener;
 
 import junit.framework.TestCase;
 
-import com.parallelsymmetry.util.Accessor;
-
 /**
  * This test case requires the existence of a specific preferences.xml file
  * accessible as a system resource in the default package.
@@ -26,53 +24,53 @@ public class PreferencesTest extends TestCase {
 
 	private static final int EVENT_WAIT_TIME = 1000;
 
+	private Preferences preferences;
+
 	public void setUp() {
-		Preferences.setNamespaceAndIdentifier( NAMESPACE, IDENTIFIER );
 		try {
 			Preferences.loadDefaults( PreferencesTest.class.getResourceAsStream( "/test.preferences.xml" ) );
 		} catch( IOException exception ) {
 			throw new RuntimeException( exception );
 		}
+		preferences = Preferences.getApplicationRoot( NAMESPACE, IDENTIFIER );
 	}
 
 	public void testRoot() throws Exception {
-		Preferences preferences = Preferences.root();
 		assertNotNull( "Root node is null.", preferences.name() );
 		assertEquals( "Root node name is incorrect.", IDENTIFIER, preferences.name() );
 
-		assertEquals( "/", Preferences.root().absolutePath() );
-		assertEquals( "/" + NAMESPACE.replace( '.', '/' ) + "/" + IDENTIFIER, Preferences.root().realPath() );
+		assertEquals( "/", preferences.absolutePath() );
+		assertEquals( "/" + NAMESPACE.replace( '.', '/' ) + "/" + IDENTIFIER, preferences.realPath() );
 	}
 
 	public void testName() throws Exception {
-		Preferences preferences = Preferences.root();
 		assertNotNull( "Root node is null.", preferences.name() );
 		assertEquals( "Root node name is incorrect.", IDENTIFIER, preferences.name() );
 	}
 
 	public void testNode() throws Exception {
 		String nodeName = "test";
-		Preferences preferences = Preferences.root().node( nodeName );
+		Preferences preferences = this.preferences.node( nodeName );
 		assertNotNull( "Test node", preferences );
 		assertEquals( "Test node name", nodeName, preferences.name() );
 		assertEquals( "/" + NAMESPACE.replace( '.', '/' ) + "/" + IDENTIFIER + "/" + nodeName, preferences.realPath() );
 
 		nodeName = "test";
-		preferences = Preferences.root().node( "/" + nodeName );
+		preferences = this.preferences.node( "/" + nodeName );
 		assertNotNull( "Test node", preferences );
 		assertEquals( "Test node name", nodeName, preferences.name() );
 		assertEquals( "/" + NAMESPACE.replace( '.', '/' ) + "/" + IDENTIFIER + "/" + nodeName, preferences.realPath() );
 	}
 
 	public void testAbsolutePath() throws Exception {
-		assertEquals( "Node absolute path is incorrect.", "/test", Preferences.root().node( "test" ).absolutePath() );
-		assertEquals( "Node absolute path is incorrect.", "/test", Preferences.root().node( "/test" ).absolutePath() );
+		assertEquals( "Node absolute path is incorrect.", "/test", preferences.node( "test" ).absolutePath() );
+		assertEquals( "Node absolute path is incorrect.", "/test", preferences.node( "/test" ).absolutePath() );
 	}
 
 	public void testGet() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "string";
 
 		assertEquals( "String parameter default value is incorrect.", "parameter-default", preferences.get( key, "parameter-default" ) );
@@ -84,8 +82,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testGetInt() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "int";
 
 		assertEquals( "Int parameter default value is incorrect", 123, preferences.getInt( key, 123 ) );
@@ -99,8 +97,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testGetLong() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "long";
 
 		assertEquals( "Long parameter default value is incorrect.", 123, preferences.getLong( key, 123 ) );
@@ -114,8 +112,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testGetFloat() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "float";
 
 		assertEquals( "Float parameter default value is incorrect.", 123.0f, preferences.getFloat( key, 123 ) );
@@ -129,8 +127,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testGetDouble() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "double";
 
 		assertEquals( "Double parameter default value is incorrect.", 123.0, preferences.getDouble( key, 123 ) );
@@ -144,8 +142,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testGetBoolean() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "boolean";
 
 		assertEquals( "Boolean parameter default value is incorrect.", false, preferences.getBoolean( key, false ) );
@@ -159,8 +157,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testGetByteArray() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		String key = "byte-array";
 
 		assertEquals( "Byte array parameter default value is incorrect.", "parameter-default", new String( preferences.getByteArray( key, "parameter-default".getBytes() ) ) );
@@ -172,8 +170,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testChildrenNames() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		assertEquals( "Wrong number of child names.", 0, preferences.childrenNames().length );
 		putDefaultValue( "/test/child1", "key", "value" );
 		assertEquals( "Wrong number of child names.", 1, preferences.childrenNames().length );
@@ -183,8 +181,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testKeys() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 		assertEquals( "Wrong number of keys.", 0, preferences.keys().length );
 		putDefaultValue( "/test", "key1", "value1" );
 		assertEquals( "Wrong number of keys.", 1, preferences.keys().length );
@@ -194,8 +192,8 @@ public class PreferencesTest extends TestCase {
 
 	public void testNodeExists() throws Exception {
 		resetDefaults();
-		Preferences.root().reset();
-		Preferences preferences = Preferences.root().node( "test" );
+		preferences.reset();
+		Preferences preferences = this.preferences.node( "test" );
 
 		assertFalse( preferences.nodeExists( "default" ) );
 		putDefaultValue( "/test/default", "key", "value" );
@@ -207,7 +205,7 @@ public class PreferencesTest extends TestCase {
 	}
 
 	public void testGetNodePath() throws Exception {
-		Preferences preferences = Preferences.root().node( "test" );
+		Preferences preferences = this.preferences.node( "test" );
 
 		assertEquals( "Node path is incorrect.", "/", Accessor.callMethod( preferences, "getNodePath", "/" ) );
 		assertEquals( "Node path is incorrect.", "/child", Accessor.callMethod( preferences, "getNodePath", "/child" ) );
@@ -216,7 +214,7 @@ public class PreferencesTest extends TestCase {
 	}
 
 	public void testGetRealPath() throws Exception {
-		Preferences preferences = Preferences.root().node( "test" );
+		Preferences preferences = this.preferences.node( "test" );
 
 		String prefix = "/" + NAMESPACE.replace( '.', '/' ) + "/" + IDENTIFIER;
 		assertEquals( "Real path is incorrect.", prefix, Accessor.callMethod( preferences, "getRealPath", "/" ) );
@@ -227,7 +225,7 @@ public class PreferencesTest extends TestCase {
 
 	public void testPreferenceChangeListener() throws Exception {
 		String nodeKey = "listener";
-		Preferences preferences = Preferences.root().node( nodeKey );
+		Preferences preferences = this.preferences.node( nodeKey );
 
 		String key = "attribute";
 		preferences.remove( key );
@@ -244,7 +242,7 @@ public class PreferencesTest extends TestCase {
 
 	public void testPathForPreferenceChangeListener() throws Exception {
 		String nodeKey = "listener";
-		Preferences preferences = Preferences.root().node( nodeKey );
+		Preferences preferences = this.preferences.node( nodeKey );
 
 		String key = "listener";
 		preferences.remove( key );

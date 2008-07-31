@@ -18,51 +18,38 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import com.parallelsymmetry.util.Descriptor;
-import com.parallelsymmetry.util.TextUtil;
-
 public class Preferences extends java.util.prefs.Preferences {
 
 	private static final String SEPARATOR = "-";
 
 	private static final Map<String, Map<String, String>> defaults = new ConcurrentHashMap<String, Map<String, String>>();
 
-	private static String PREFERENCE_ROOT;
-
-	private static Preferences root;
+	private String rootPath;
 
 	private java.util.prefs.Preferences preferences;
+
+	private static final Map<String, Preferences> preferencesMap = new ConcurrentHashMap<String, Preferences>();
 
 	private Map<NodeChangeListener, NodeChangeWrapper> nodeChangeWrappers = new ConcurrentHashMap<NodeChangeListener, NodeChangeWrapper>();
 
 	private Map<PreferenceChangeListener, PreferenceChangeWrapper> preferenceChangeWrappers = new ConcurrentHashMap<PreferenceChangeListener, PreferenceChangeWrapper>();
 
-	private Preferences( java.util.prefs.Preferences preferences ) {
+	private Preferences( String rootPath, java.util.prefs.Preferences preferences ) {
+		this.rootPath = rootPath;
 		this.preferences = preferences;
 	}
 
-	public static void setNamespaceAndIdentifier( String namespace, String identifier ) {
-		PREFERENCE_ROOT = "/" + namespace.replace( '.', '/' ) + "/" + identifier;
-		defaults.clear();
-		root = null;
-	}
+	public static Preferences getApplicationRoot( String namespace, String identifier ) {
+		String path = "/" + namespace.replace( '.', '/' ) + "/" + identifier;
 
-	public static Preferences root() {
-		if( PREFERENCE_ROOT == null ) throw new RuntimeException( "Namespace and identifier must be set before using Preferences." );
-
-		if( root == null ) {
-			root = new Preferences( java.util.prefs.Preferences.userRoot().node( PREFERENCE_ROOT ) );
+		Preferences preferences = preferencesMap.get( path );
+		if( preferences == null ) {
+			preferences = new Preferences( path, java.util.prefs.Preferences.userRoot().node( path ) );
+			preferencesMap.put( path, preferences );
+			defaults.clear();
 		}
 
-		return root;
-	}
-
-	public static Preferences getNode( String path ) {
-		return root().node( path );
-	}
-
-	public static Preferences getNode( String path, int index ) {
-		return root().node( path, index );
+		return preferences;
 	}
 
 	public static void loadDefaults( InputStream input ) throws IOException {
@@ -96,7 +83,7 @@ public class Preferences extends java.util.prefs.Preferences {
 	@Override
 	public String absolutePath() {
 		String path = preferences.absolutePath();
-		if( path.startsWith( PREFERENCE_ROOT ) ) path = path.substring( PREFERENCE_ROOT.length() );
+		if( path.startsWith( rootPath ) ) path = path.substring( rootPath.length() );
 		if( "".equals( path ) ) path = "/";
 		return path;
 	}
@@ -211,7 +198,7 @@ public class Preferences extends java.util.prefs.Preferences {
 	@Override
 	public Preferences node( String path ) {
 		if( path.startsWith( "/" ) ) path = path.substring( 1 );
-		return new Preferences( preferences.node( path ) );
+		return new Preferences( rootPath, preferences.node( path ) );
 	}
 
 	public Preferences node( String path, int index ) {
@@ -225,7 +212,7 @@ public class Preferences extends java.util.prefs.Preferences {
 
 	@Override
 	public Preferences parent() {
-		return new Preferences( preferences.parent() );
+		return new Preferences( rootPath, preferences.parent() );
 	}
 
 	@Override
@@ -358,8 +345,8 @@ public class Preferences extends java.util.prefs.Preferences {
 	 */
 	@SuppressWarnings( "unused" )
 	private String getRealPath( String path ) {
-		if( "/".equals( path ) ) return PREFERENCE_ROOT;
-		return PREFERENCE_ROOT + getNodePath( path );
+		if( "/".equals( path ) ) return rootPath;
+		return rootPath + getNodePath( path );
 	}
 
 	private String getDefaultValue( String key ) {
