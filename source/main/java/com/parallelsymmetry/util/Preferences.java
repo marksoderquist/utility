@@ -20,15 +20,15 @@ import org.xml.sax.SAXException;
 
 public class Preferences extends java.util.prefs.Preferences {
 
-	private static final String SEPARATOR = "-";
+	private static final String INDEX_SEPARATOR = "-";
+
+	private static final Map<String, Preferences> applicationRoots = new ConcurrentHashMap<String, Preferences>();
 
 	private static final Map<String, Map<String, String>> defaults = new ConcurrentHashMap<String, Map<String, String>>();
 
 	private String rootPath;
 
 	private java.util.prefs.Preferences preferences;
-
-	private static final Map<String, Preferences> preferencesMap = new ConcurrentHashMap<String, Preferences>();
 
 	private Map<NodeChangeListener, NodeChangeWrapper> nodeChangeWrappers = new ConcurrentHashMap<NodeChangeListener, NodeChangeWrapper>();
 
@@ -42,17 +42,16 @@ public class Preferences extends java.util.prefs.Preferences {
 	public static Preferences getApplicationRoot( String namespace, String identifier ) {
 		String path = "/" + namespace.replace( '.', '/' ) + "/" + identifier;
 
-		Preferences preferences = preferencesMap.get( path );
+		Preferences preferences = applicationRoots.get( path );
 		if( preferences == null ) {
 			preferences = new Preferences( path, java.util.prefs.Preferences.userRoot().node( path ) );
-			preferencesMap.put( path, preferences );
-			defaults.clear();
+			applicationRoots.put( path, preferences );
 		}
 
 		return preferences;
 	}
 
-	public static void loadDefaults( InputStream input ) throws IOException {
+	public void loadDefaults( InputStream input ) throws IOException {
 		if( input == null ) return;
 
 		Descriptor descriptor = null;
@@ -66,7 +65,7 @@ public class Preferences extends java.util.prefs.Preferences {
 				String preferencePath = path.substring( prefixSize, slash );
 				String key = path.substring( slash + 1 );
 				String value = descriptor.getValue( path );
-				if( TextUtil.isEmpty( preferencePath ) ) preferencePath = "/";
+				preferencePath = rootPath + preferencePath + "/";
 				putDefaultValue( preferencePath, key, value );
 			}
 		} catch( SAXException e ) {
@@ -92,10 +91,10 @@ public class Preferences extends java.util.prefs.Preferences {
 	public String[] childrenNames() throws BackingStoreException {
 		List<String> names = new ArrayList<String>( Arrays.asList( preferences.childrenNames() ) );
 
-		String prefix = absolutePath();
+		String prefix = getDefaultPath( absolutePath() );
 		int prefixLength = prefix.length();
 		for( String key : defaults.keySet() ) {
-			if( key.length() > prefixLength && key.startsWith( prefix ) && key.indexOf( '/', prefixLength + 1 ) < 0 ) {
+			if( key.length() > prefixLength && key.startsWith( prefix ) ) {
 				names.add( key );
 			}
 		}
@@ -181,8 +180,9 @@ public class Preferences extends java.util.prefs.Preferences {
 	public String[] keys() throws BackingStoreException {
 		List<String> keys = new ArrayList<String>( Arrays.asList( preferences.keys() ) );
 
-		if( defaults.containsKey( absolutePath() ) ) {
-			for( String key : defaults.get( absolutePath() ).keySet() ) {
+		String path = getDefaultPath( absolutePath() );
+		if( defaults.containsKey( path ) ) {
+			for( String key : defaults.get( path ).keySet() ) {
 				keys.add( key );
 			}
 		}
@@ -202,12 +202,12 @@ public class Preferences extends java.util.prefs.Preferences {
 	}
 
 	public Preferences node( String path, int index ) {
-		return node( path + SEPARATOR + index );
+		return node( path + INDEX_SEPARATOR + index );
 	}
 
 	@Override
 	public boolean nodeExists( String path ) throws BackingStoreException {
-		return preferences.nodeExists( path ) || defaults.containsKey( getNodePath( path ) );
+		return preferences.nodeExists( path ) || defaults.containsKey( getDefaultPath( getNodePath( path ) ) );
 	}
 
 	@Override
@@ -321,8 +321,11 @@ public class Preferences extends java.util.prefs.Preferences {
 	}
 
 	private boolean defaultExists( String key ) {
-		Map<String, String> values = defaults.get( absolutePath() );
-		return values != null && values.get( key ) != null;
+		String path = getDefaultPath( absolutePath() );
+		Map<String, String> values = defaults.get( path );
+		boolean result = values != null && values.get( key ) != null;
+		//Log.write( "Exists:      " + path + key + " = " + result );
+		return result;
 	}
 
 	/**
@@ -349,16 +352,25 @@ public class Preferences extends java.util.prefs.Preferences {
 		return rootPath + getNodePath( path );
 	}
 
+	private String getDefaultPath( String path ) {
+		if( !path.endsWith( "/" ) ) path += "/";
+		return rootPath + path;
+	}
+
 	private String getDefaultValue( String key ) {
 		String value = null;
-		Map<String, String> values = defaults.get( absolutePath() );
+		String path = getDefaultPath( absolutePath() );
+		//Log.write( "Get default: " + path + key );
+		Map<String, String> values = defaults.get( path );
 		if( values != null ) value = values.get( key );
 		return value;
 	}
 
 	private static void putDefaultValue( String path, String name, String value ) {
 		if( !path.startsWith( "/" ) ) throw new RuntimeException( "Path must begin with a slash: " + path );
-		if( !"/".equals( path ) && path.endsWith( "/" ) ) throw new RuntimeException( "Path must not end with a slash: " + path );
+		if( !path.endsWith( "/" ) ) throw new RuntimeException( "Path must end with a slash: " + path );
+
+		//Log.write( "Put default: " + path + name + " = " + value );
 
 		Map<String, String> values = defaults.get( path );
 		if( values == null ) {

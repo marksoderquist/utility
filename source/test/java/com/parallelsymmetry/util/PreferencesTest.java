@@ -2,7 +2,6 @@ package com.parallelsymmetry.util;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.NodeChangeEvent;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.PreferenceChangeEvent;
@@ -27,20 +26,28 @@ public class PreferencesTest extends TestCase {
 	private Preferences preferences;
 
 	public void setUp() {
+		//Log.setLevel( Log.NONE );
+		preferences = Preferences.getApplicationRoot( NAMESPACE, IDENTIFIER );
 		try {
-			Preferences.loadDefaults( PreferencesTest.class.getResourceAsStream( "/test.preferences.xml" ) );
+			preferences.loadDefaults( PreferencesTest.class.getResourceAsStream( "/test.preferences.xml" ) );
 		} catch( IOException exception ) {
 			throw new RuntimeException( exception );
 		}
-		preferences = Preferences.getApplicationRoot( NAMESPACE, IDENTIFIER );
+		assertEquals( "value", preferences.get( "key", "default" ) );
 	}
 
-	public void testRoot() throws Exception {
+	public void testApplicationRoot() throws Exception {
 		assertNotNull( "Root node is null.", preferences.name() );
 		assertEquals( "Root node name is incorrect.", IDENTIFIER, preferences.name() );
 
 		assertEquals( "/", preferences.absolutePath() );
 		assertEquals( "/" + NAMESPACE.replace( '.', '/' ) + "/" + IDENTIFIER, preferences.realPath() );
+	}
+
+	public void testMultipleApplicationRoots() throws Exception {
+		Preferences other = Preferences.getApplicationRoot( NAMESPACE, IDENTIFIER + "1" );
+		assertEquals( "value", preferences.get( "key", "default" ) );
+		assertEquals( "Default value from one application root in another.", "default", other.get( "key", "default" ) );
 	}
 
 	public void testName() throws Exception {
@@ -257,19 +264,25 @@ public class PreferencesTest extends TestCase {
 	}
 
 	private void resetDefaults() throws Exception {
-		Map<String, Map<String, String>> defaults = Accessor.getField( Preferences.class, "defaults" );
+		Map<String, Map<String, String>> defaults = Accessor.getField( preferences, "defaults" );
 		defaults.clear();
 	}
 
 	private void putDefaultValue( String path, String name, String value ) throws Exception {
-		if( !path.startsWith( "/" ) ) throw new RuntimeException( "Path must begin with a slash." );
-		Map<String, Map<String, String>> defaults = Accessor.getField( Preferences.class, "defaults" );
-		Map<String, String> values = defaults.get( path );
-		if( values == null ) {
-			values = new ConcurrentHashMap<String, String>();
-			defaults.put( path, values );
-		}
-		values.put( name, value );
+		String rootpath = Accessor.getField( preferences, "rootPath" );
+		String nodePath = rootpath + path;
+		if( !path.endsWith( "/" ) ) nodePath += "/";
+		Accessor.callMethod( Preferences.class, "putDefaultValue", nodePath, name, value );
+
+		//		if( !path.startsWith( "/" ) ) throw new RuntimeException( "Path must begin with a slash." );
+		//		Map<String, Map<String, String>> defaults = Accessor.getField( preferences, "defaults" );
+		//		Log.write( "put default: " + nodePath + name + " = " + value );
+		//		Map<String, String> values = defaults.get( nodePath );
+		//		if( values == null ) {
+		//			values = new ConcurrentHashMap<String, String>();
+		//			defaults.put( path, values );
+		//		}
+		//		values.put( name, value );
 	}
 
 	private static class MockListener implements NodeChangeListener, PreferenceChangeListener {
