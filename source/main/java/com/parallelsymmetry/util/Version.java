@@ -145,7 +145,12 @@ public class Version {
 	}
 
 	public final String getDateString() {
-		return DATE_FORMAT.format( date );
+		return date == null ? "Unknown" : DATE_FORMAT.format( date );
+	}
+
+	@Override
+	public String toString() {
+		return getFullVersion();
 	}
 
 	/**

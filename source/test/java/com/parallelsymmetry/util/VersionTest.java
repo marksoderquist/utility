@@ -71,7 +71,13 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testGetDateString() throws Exception {
+		assertEquals( "Unknown", Version.parse( "1-2-U-3-456" ).getDateString() );
 		assertEquals( "2000-01-01 00:00:00 -0700", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).getDateString() );
+	}
+
+	@Test
+	public void testToString() throws Exception {
+		assertEquals( "1.2 Update 3", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).toString() );
 	}
 
 }
