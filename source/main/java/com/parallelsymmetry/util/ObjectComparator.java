@@ -2,7 +2,6 @@ package com.parallelsymmetry.util;
 
 import java.util.Comparator;
 
-// FIXME Need unit tests.
 public class ObjectComparator implements Comparator<Object> {
 
 	@Override
