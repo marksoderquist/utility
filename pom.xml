@@ -9,19 +9,19 @@
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>ParallelSymmetry Utility Library</name>
-	<description />
-	<url>http://www.parallelsymmetry.com</url>
+	<name>Parallel Symmetry Utility Library</name>
+	<description>This utility library contains useful classes that are generally useful for all types of applications.</description>
+	<url>http://www.parallelsymmetry.com/projects/utility</url>
 	<inceptionYear>2007</inceptionYear>
 
 	<organization>
-		<name>ParallelSymmetry</name>
+		<name>Parallel Symmetry</name>
 		<url>http://www.parallelsymmetry.com</url>
 	</organization>
 
 	<ciManagement>
-		<system>Continuum</system>
-		<url>http://www.parallelsymmetry.com/continuum</url>
+		<system>Hudson</system>
+		<url>http://www.parallelsymmetry.com/hudson</url>
 	</ciManagement>
 
 	<developers>
@@ -34,8 +34,8 @@
 				<role>Architect</role>
 				<role>Engineer</role>
 			</roles>
-			<organization>ParallelSymmetry</organization>
-			<timezone>-7</timezone>
+			<organization>Parallel Symmetry</organization>
+			<timezone>MDT</timezone>
 		</developer>
 	</developers>
 
@@ -48,7 +48,7 @@
 	<repositories>
 		<repository>
 			<id>parallelsymmetry</id>
-			<name>ParallelSymmetry</name>
+			<name>Parallel Symmetry</name>
 			<url>http://mvn.parallelsymmetry.com/release</url>
 			<snapshots>
 				<enabled>false</enabled>
@@ -56,7 +56,7 @@
 		</repository>
 		<repository>
 			<id>parallelsymmetry-snapshot</id>
-			<name>ParallelSymmetry Snapshot</name>
+			<name>Parallel Symmetry Snapshot</name>
 			<url>http://mvn.parallelsymmetry.com/snapshot</url>
 			<snapshots>
 				<updatePolicy>always</updatePolicy>
