@@ -13,6 +13,11 @@ public class CaptureHandler extends StreamHandler {
 
 	public CaptureHandler() {
 		super();
+		try {
+			setEncoding( "UTF-8" );
+		} catch( Exception exception ) {
+			exception.printStackTrace();
+		}
 		output = new ByteArrayOutputStream();
 		setOutputStream( output );
 		setFormatter( new CaptureFormatter() );
