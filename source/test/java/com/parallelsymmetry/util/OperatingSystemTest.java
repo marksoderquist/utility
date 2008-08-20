@@ -31,13 +31,13 @@ public class OperatingSystemTest extends TestCase {
 	}
 
 	@Test
-	public void testUnix() {
-		OperatingSystem.init( "Unix", System.getProperty( "os.arch" ) );
-		assertEquals( OperatingSystem.Family.UNIX, OperatingSystem.getFamily() );
-
+	public void testLinux() {
 		OperatingSystem.init( "Linux", System.getProperty( "os.arch" ) );
-		assertEquals( OperatingSystem.Family.UNIX, OperatingSystem.getFamily() );
+		assertEquals( OperatingSystem.Family.LINUX, OperatingSystem.getFamily() );
+	}
 
+	@Test
+	public void testUnix() {
 		OperatingSystem.init( "SunOS", System.getProperty( "os.arch" ) );
 		assertEquals( OperatingSystem.Family.UNIX, OperatingSystem.getFamily() );
 

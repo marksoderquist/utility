@@ -8,7 +8,7 @@ package com.parallelsymmetry.util;
 public class OperatingSystem {
 
 	public enum Family {
-		UNKNOWN, UNIX, WINDOWS, OS2, MAC, OSX
+		UNKNOWN, LINUX, UNIX, WINDOWS, OS2, MAC, OSX
 	};
 
 	public enum Architecture {
@@ -23,17 +23,18 @@ public class OperatingSystem {
 	 * Initialize the class.
 	 */
 	static {
-		// FIXME Use a map to map between os names and architectures.
 		init( System.getProperty( "os.name" ), System.getProperty( "os.arch" ) );
 	}
 
 	public static final void init( String name, String arch ) {
 		// Determine the OS type.
-		if( name.contains( "Windows" ) ) {
+		if( name.contains( "Linux" ) ) {
+			family = Family.LINUX;
+		} else if( name.contains( "Windows" ) ) {
 			family = Family.WINDOWS;
 		} else if( name.contains( "OS/2" ) ) {
 			family = Family.OS2;
-		} else if( name.contains( "Linux" ) | name.contains( "Unix" ) | name.contains( "SunOS" ) | name.contains( "Solaris" ) ) {
+		} else if( name.contains( "Linux" ) | name.contains( "SunOS" ) | name.contains( "Solaris" ) | name.contains( "HP-UX" ) | name.contains( "AIX" ) | name.contains( "FreeBSD" ) ) {
 			family = Family.UNIX;
 		} else if( name.contains( "Mac OS" ) ) {
 			if( name.contains( "Mac OS X" ) ) {
