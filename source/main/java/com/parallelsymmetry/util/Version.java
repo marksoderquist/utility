@@ -160,4 +160,12 @@ public class Version {
 		return getFullVersion();
 	}
 
+	@Override
+	public boolean equals( Object object ) {
+		if( !( object instanceof Version ) ) return false;
+		Version that = (Version)object;
+
+		return this.micro == that.micro && TextUtil.areEqual( this.state, that.state ) && this.minor == that.minor && this.major == that.major && this.snapshot == that.snapshot && ObjectUtil.areEqual( this.date, that.date );
+	}
+
 }

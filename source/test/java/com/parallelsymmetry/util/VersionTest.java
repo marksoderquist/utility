@@ -97,4 +97,15 @@ public class VersionTest extends TestCase {
 		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" ).toString() );
 	}
 
+	@Test
+	public void testEquals() throws Exception {
+		assertEquals( Version.parse( null ), Version.parse( null ) );
+		assertEquals( Version.parse( "" ), Version.parse( "" ) );
+		assertEquals( Version.parse( null ), Version.parse( "" ) );
+		assertEquals( Version.parse( "" ), Version.parse( null ) );
+
+		assertEquals( Version.parse( "1-2-Update-3" ), Version.parse( "1-2-Update-3" ) );
+		assertEquals( Version.parse( "1-2-Update-3-SNAPSHOT" ), Version.parse( "1-2-Update-3-SNAPSHOT" ) );
+	}
+
 }
