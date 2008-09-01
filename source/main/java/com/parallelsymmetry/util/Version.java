@@ -9,29 +9,47 @@ public class Version {
 
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
 
+	private static final Version UNKNOWN = new Version( true );
+
+	private boolean unknown;
+
 	private int major;
 
 	private int minor;
 
-	private int state;
+	private String state;
 
 	private int micro;
 
-	private int build;
+	private boolean snapshot;
 
 	private Date date;
 
+	private Version( boolean unknown ) {
+		this.unknown = unknown;
+	}
+
 	public static final Version parse( String string ) {
-		if( TextUtil.isEmpty( string ) ) return null;
+		if( TextUtil.isEmpty( string ) ) return UNKNOWN;
+
+		// TODO Write a multi-pass parser.
 
 		StringTokenizer tokenizer = new StringTokenizer( string, "" );
-		Version version = new Version();
+		Version version = new Version( false );
 		try {
-			version.major = Integer.parseInt( tokenizer.nextToken( "-" ) );
-			version.minor = Integer.parseInt( tokenizer.nextToken( "-" ) );
-			version.state = ( (int)tokenizer.nextToken( "-" ).charAt( 0 ) ) - 65;
-			version.micro = Integer.parseInt( tokenizer.nextToken( "-" ) );
-			version.build = Integer.parseInt( tokenizer.nextToken( "- " ) );
+			version.major = Integer.parseInt( tokenizer.nextToken( ".-" ) );
+			version.minor = Integer.parseInt( tokenizer.nextToken( ".-" ) );
+			version.state = tokenizer.nextToken( ".-" );
+			version.micro = Integer.parseInt( tokenizer.nextToken( " .-" ) );
+
+			if( string.contains( "SNAPSHOT" ) ) {
+				try {
+					version.snapshot = true;
+					tokenizer.nextToken( " " );
+				} catch( Exception exception ) {
+					// Intentionally ignore the exception.
+				}
+			}
 
 			if( tokenizer.hasMoreTokens() ) {
 				String date = tokenizer.nextToken( " " );
@@ -59,12 +77,12 @@ public class Version {
 		return micro;
 	}
 
-	public int getState() {
+	public String getState() {
 		return state;
 	}
 
-	public int getBuild() {
-		return build;
+	public boolean isSnapshot() {
+		return snapshot;
 	}
 
 	public Date getDate() {
@@ -79,9 +97,13 @@ public class Version {
 	public final String getVersion() {
 		StringBuffer buffer = new StringBuffer();
 
-		buffer.append( major );
-		buffer.append( "." );
-		buffer.append( minor );
+		if( unknown ) {
+			buffer.append( "Unknown" );
+		} else {
+			buffer.append( major );
+			buffer.append( "." );
+			buffer.append( minor );
+		}
 
 		return buffer.toString();
 	}
@@ -94,34 +116,17 @@ public class Version {
 	public final String getFullVersion() {
 		StringBuffer buffer = new StringBuffer();
 
-		buffer.append( major );
-		buffer.append( "." );
-		buffer.append( minor );
-		buffer.append( " " );
-		buffer.append( getStateDescription() );
-		buffer.append( " " );
-		buffer.append( micro );
-
-		return buffer.toString();
-	}
-
-	/**
-	 * Get the version information.
-	 * 
-	 * @return A string representation of the version.
-	 */
-	public final String getBuildVersion() {
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append( major );
-		buffer.append( "." );
-		buffer.append( minor );
-		buffer.append( " " );
-		buffer.append( getStateDescription() );
-		buffer.append( " " );
-		buffer.append( micro );
-		buffer.append( " Build " );
-		buffer.append( build );
+		if( unknown ) {
+			buffer.append( "Unknown" );
+		} else {
+			buffer.append( major );
+			buffer.append( "." );
+			buffer.append( minor );
+			buffer.append( " " );
+			buffer.append( state );
+			buffer.append( " " );
+			buffer.append( micro );
+		}
 
 		return buffer.toString();
 	}
@@ -129,17 +134,19 @@ public class Version {
 	public final String getCodedVersion() {
 		StringBuffer buffer = new StringBuffer();
 
-		buffer.append( major );
-		buffer.append( "-" );
-		buffer.append( minor );
-		buffer.append( "-" );
-		buffer.append( (char)( state + 65 ) );
-		buffer.append( "-" );
-		buffer.append( micro );
-		buffer.append( "-" );
-		buffer.append( build );
-		buffer.append( " " );
-		buffer.append( getDateString() );
+		if( unknown ) {
+			buffer.append( "Unknown" );
+		} else {
+			buffer.append( major );
+			buffer.append( "-" );
+			buffer.append( minor );
+			buffer.append( "-" );
+			buffer.append( state );
+			buffer.append( "-" );
+			buffer.append( micro );
+			buffer.append( " " );
+			buffer.append( getDateString() );
+		}
 
 		return buffer.toString();
 	}
@@ -151,22 +158,6 @@ public class Version {
 	@Override
 	public String toString() {
 		return getFullVersion();
-	}
-
-	/**
-	 * Get the state as a string.
-	 * 
-	 * @return The state as a string.
-	 */
-	private final String getStateDescription() {
-		switch( state ) {
-			case 0:
-				return "Alpha";
-			case 1:
-				return "Beta";
-			default:
-				return "Update";
-		}
 	}
 
 }

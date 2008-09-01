@@ -18,66 +18,83 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testConstructorWithNull() throws Exception {
-		assertNull( Version.parse( null ) );
+		assertEquals( "Unknown", Version.parse( null ).toString() );
 	}
 
 	@Test
 	public void testConstructorWithEmpty() throws Exception {
-		assertNull( Version.parse( "" ) );
+		assertEquals( "Unknown", Version.parse( "" ).toString() );
 	}
 
 	@Test
 	public void testConstructorWithVersionString() throws Exception {
-		Version version = Version.parse( "1-2-A-3-456" );
+		Version version = Version.parse( "1.2-test-3" );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
-		assertEquals( 0, version.getState() );
+		assertEquals( "test", version.getState() );
 		assertEquals( 3, version.getMicro() );
-		assertEquals( 456, version.getBuild() );
+		assertEquals( false, version.isSnapshot() );
+		assertEquals( null, version.getDate() );
+	}
+
+	@Test
+	public void testConstructorWithSnapshotVersionString() throws Exception {
+		Version version = Version.parse( "1-2-test-3-SNAPSHOT" );
+		assertEquals( 1, version.getMajor() );
+		assertEquals( 2, version.getMinor() );
+		assertEquals( "test", version.getState() );
+		assertEquals( 3, version.getMicro() );
+		assertEquals( true, version.isSnapshot() );
 		assertEquals( null, version.getDate() );
 	}
 
 	@Test
 	public void testConstructorWithVersionDateString() throws Exception {
-		Version version = Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" );
+		Version version = Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
-		assertEquals( 20, version.getState() );
+		assertEquals( "Update", version.getState() );
 		assertEquals( 3, version.getMicro() );
-		assertEquals( 456, version.getBuild() );
+		assertEquals( false, version.isSnapshot() );
+		assertEquals( DATE_FORMAT.parse( "2000-01-01 07:00:00" ), version.getDate() );
+	}
+
+	@Test
+	public void testConstructorWithSnapshotVersionDateString() throws Exception {
+		Version version = Version.parse( "1-2-Update-3-SNAPSHOT 2000-01-01 00:00:00 MST" );
+		assertEquals( 1, version.getMajor() );
+		assertEquals( 2, version.getMinor() );
+		assertEquals( "Update", version.getState() );
+		assertEquals( 3, version.getMicro() );
+		assertEquals( true, version.isSnapshot() );
 		assertEquals( DATE_FORMAT.parse( "2000-01-01 07:00:00" ), version.getDate() );
 	}
 
 	@Test
 	public void testGetVersion() throws Exception {
-		assertEquals( "1.2", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).getVersion() );
+		assertEquals( "1.2", Version.parse( "1-2-U-3 2000-01-01 00:00:00 MST" ).getVersion() );
 	}
 
 	@Test
 	public void testGetFullVersion() throws Exception {
-		assertEquals( "1.2 Update 3", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).getFullVersion() );
-	}
-
-	@Test
-	public void testGetBuildVersion() throws Exception {
-		assertEquals( "1.2 Update 3 Build 456", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).getBuildVersion() );
+		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" ).getFullVersion() );
 	}
 
 	@Test
 	public void testGetCodedVersion() throws Exception {
-		String code = "1-2-U-3-456 2000-01-01 00:00:00 -0700";
+		String code = "1-2-U-3 2000-01-01 00:00:00 -0700";
 		assertEquals( code, Version.parse( code ).getCodedVersion() );
 	}
 
 	@Test
 	public void testGetDateString() throws Exception {
-		assertEquals( "Unknown", Version.parse( "1-2-U-3-456" ).getDateString() );
-		assertEquals( "2000-01-01 00:00:00 -0700", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).getDateString() );
+		assertEquals( "Unknown", Version.parse( "1-2-U-3" ).getDateString() );
+		assertEquals( "2000-01-01 00:00:00 -0700", Version.parse( "1-2-U-3 2000-01-01 00:00:00 MST" ).getDateString() );
 	}
 
 	@Test
 	public void testToString() throws Exception {
-		assertEquals( "1.2 Update 3", Version.parse( "1-2-U-3-456 2000-01-01 00:00:00 MST" ).toString() );
+		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" ).toString() );
 	}
 
 }
