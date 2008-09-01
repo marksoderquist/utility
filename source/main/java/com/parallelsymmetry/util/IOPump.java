@@ -246,12 +246,12 @@ public class IOPump implements Runnable {
 		byte[] bytearray = null;
 		char[] chararray = null;
 		if( reader == null ) {
-			bytearray = new byte[bufferSize];
+			bytearray = new byte[ bufferSize ];
 		} else {
-			chararray = new char[bufferSize];
+			chararray = new char[ bufferSize ];
 		}
 
-		if( logEnabled ) Log.write( logLevel, "IOPump started." );
+		if( logEnabled ) Log.write( logLevel, "IOPump " + name + " started." );
 
 		try {
 			int read = 0;
@@ -276,9 +276,9 @@ public class IOPump implements Runnable {
 					int datum = 0;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
-							datum = bytearray[index];
+							datum = bytearray[ index ];
 						} else {
-							datum = chararray[index];
+							datum = chararray[ index ];
 						}
 
 						if( datum == 10 || datum == 13 ) {
@@ -305,7 +305,7 @@ public class IOPump implements Runnable {
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception );
 		} finally {
-			if( logEnabled ) Log.write( logLevel, "IOPump finished." );
+			if( logEnabled ) Log.write( logLevel, "IOPump " + name + " finished." );
 		}
 	}
 
