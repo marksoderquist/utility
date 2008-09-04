@@ -15,6 +15,12 @@ public class DescriptorTest extends TestCase {
 		assertEquals( 0, descriptor.getPaths().size() );
 	}
 
+	public void testGetDocument() throws Exception {
+		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
+		Descriptor descriptor = new Descriptor( input );
+		assertNotNull( descriptor.getDocument() );
+	}
+
 	public void testGetPathsWithEmptyDescriptor() throws Exception {
 		Descriptor descriptor = new Descriptor();
 

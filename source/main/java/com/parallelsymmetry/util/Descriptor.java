@@ -33,6 +33,10 @@ public class Descriptor {
 		if( input != null ) document = XmlUtil.loadXmlDocument( input );
 	}
 
+	public Document getDocument() {
+		return document;
+	}
+
 	public List<String> getPaths() {
 		if( paths == null ) paths = listPaths( document );
 		return paths;
