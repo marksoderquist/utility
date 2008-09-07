@@ -126,6 +126,7 @@ public class Version {
 			buffer.append( state );
 			buffer.append( " " );
 			buffer.append( micro );
+			if( isSnapshot() ) buffer.append( " SNAPSHOT" );
 		}
 
 		return buffer.toString();
@@ -144,6 +145,7 @@ public class Version {
 			buffer.append( state );
 			buffer.append( "-" );
 			buffer.append( micro );
+			if( isSnapshot() ) buffer.append( "-SNAPSHOT" );
 			buffer.append( " " );
 			buffer.append( getDateString() );
 		}

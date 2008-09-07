@@ -77,12 +77,12 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testGetFullVersion() throws Exception {
-		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" ).getFullVersion() );
+		assertEquals( "1.2 Update 3 SNAPSHOT", Version.parse( "1-2-Update-3-SNAPSHOT 2000-01-01 00:00:00 MST" ).getFullVersion() );
 	}
 
 	@Test
 	public void testGetCodedVersion() throws Exception {
-		String code = "1-2-U-3 2000-01-01 00:00:00 -0700";
+		String code = "1-2-U-3-SNAPSHOT 2000-01-01 00:00:00 -0700";
 		assertEquals( code, Version.parse( code ).getCodedVersion() );
 	}
 
