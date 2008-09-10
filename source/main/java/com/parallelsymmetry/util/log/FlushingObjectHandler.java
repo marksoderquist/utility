@@ -23,6 +23,7 @@ public class FlushingObjectHandler extends Handler {
 			output.flush();
 		} catch( Exception exception ) {
 			exception.printStackTrace();
+			//Log.removeHandler( this );
 		}
 		flush();
 	}
@@ -33,6 +34,7 @@ public class FlushingObjectHandler extends Handler {
 			output.flush();
 		} catch( Exception exception ) {
 			exception.printStackTrace();
+			//Log.removeHandler( this );
 		}
 	}
 
@@ -42,6 +44,7 @@ public class FlushingObjectHandler extends Handler {
 			output.close();
 		} catch( Exception exception ) {
 			exception.printStackTrace();
+			//Log.removeHandler( this );
 		}
 	}
 
