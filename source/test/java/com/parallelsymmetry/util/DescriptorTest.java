@@ -68,7 +68,7 @@ public class DescriptorTest extends TestCase {
 
 		List<String> paths = descriptor.getPaths();
 		assertNotNull( paths );
-		assertEquals( 7, paths.size() );
+		assertEquals( 9, paths.size() );
 		assertEquals( "/test/name", paths.get( 0 ) );
 		assertEquals( "/test/alias", paths.get( 1 ) );
 		assertEquals( "/test/path/value", paths.get( 2 ) );

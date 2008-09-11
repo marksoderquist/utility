@@ -73,18 +73,19 @@ public class Descriptor {
 	public String[] getValues( String path ) {
 		if( path == null || document == null ) return null;
 
-		Node node = null;
+		NodeList nodes = null;
 
 		try {
-			node = (Node)xpath.evaluate( path, document, XPathConstants.NODE );
+			nodes = (NodeList)xpath.evaluate( path, document, XPathConstants.NODESET );
 		} catch( XPathExpressionException exception ) {
 			// Intentionally ignore exception.
 		}
 
 		ArrayList<String> values = new ArrayList<String>();
-		while( node != null ) {
-			if( node.getNodeType() == Node.ELEMENT_NODE ) values.add( node.getTextContent() );
-			node = node.getNextSibling();
+		int count = nodes.getLength();
+		for( int index = 0; index < count; index++ ) {
+			Node node = nodes.item( index );
+			values.add( node.getTextContent() );
 		}
 
 		return values.toArray( new String[values.size()] );

@@ -17,7 +17,9 @@
 	</list>
 	<nodes>
 		<node>one</node>
+		<notthisone>notone</notthisone>
 		<node>two</node>
+		<notthisone>nottwo</notthisone>
 		<node>three</node>
 	</nodes>
 </test>
