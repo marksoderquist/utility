@@ -64,6 +64,32 @@ public class Descriptor {
 		return value;
 	}
 
+	/**
+	 * Get an array of all the values that have the same path.
+	 * 
+	 * @param path
+	 * @return An array of values with the same path.
+	 */
+	public String[] getValues( String path ) {
+		if( path == null || document == null ) return null;
+
+		Node node = null;
+
+		try {
+			node = (Node)xpath.evaluate( path, document, XPathConstants.NODE );
+		} catch( XPathExpressionException exception ) {
+			// Intentionally ignore exception.
+		}
+
+		ArrayList<String> values = new ArrayList<String>();
+		while( node != null ) {
+			if( node.getNodeType() == Node.ELEMENT_NODE ) values.add( node.getTextContent() );
+			node = node.getNextSibling();
+		}
+
+		return values.toArray( new String[values.size()] );
+	}
+
 	private List<String> listPaths( Node parent ) {
 		List<String> paths = new ArrayList<String>();
 		if( parent == null ) return paths;

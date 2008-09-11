@@ -68,7 +68,7 @@ public class DescriptorTest extends TestCase {
 
 		List<String> paths = descriptor.getPaths();
 		assertNotNull( paths );
-		assertEquals( 4, paths.size() );
+		assertEquals( 7, paths.size() );
 		assertEquals( "/test/name", paths.get( 0 ) );
 		assertEquals( "/test/alias", paths.get( 1 ) );
 		assertEquals( "/test/path/value", paths.get( 2 ) );
@@ -97,6 +97,18 @@ public class DescriptorTest extends TestCase {
 		assertEquals( null, descriptor.getValue( "", null ) );
 		assertEquals( null, descriptor.getValue( "notfound", null ) );
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
+	}
+
+	public void testGetValues() throws Exception {
+		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
+		assertNotNull( input );
+		Descriptor descriptor = new Descriptor( input );
+
+		String[] values = descriptor.getValues( "/test/nodes/node" );
+		assertEquals( 3, values.length );
+		assertEquals( "one", values[0] );
+		assertEquals( "two", values[1] );
+		assertEquals( "three", values[2] );
 	}
 
 }
