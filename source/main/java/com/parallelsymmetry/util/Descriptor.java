@@ -21,34 +21,56 @@ public class Descriptor {
 
 	private XPath xpath = XPathFactory.newInstance().newXPath();
 
-	private Document document;
+	private Node node;
 
 	private List<String> paths;
 
-	public Descriptor() throws SAXException, IOException, ParserConfigurationException {
-		this( null );
-	}
+	public Descriptor() throws SAXException, IOException, ParserConfigurationException {}
 
 	public Descriptor( InputStream input ) throws SAXException, IOException, ParserConfigurationException {
-		if( input != null ) document = XmlUtil.loadXmlDocument( input );
+		if( input == null ) return;
+		node = XmlUtil.loadXmlDocument( input );
+	}
+
+	public Descriptor( Node node ) {
+		this.node = node;
 	}
 
 	public Document getDocument() {
-		return document;
+		return ( node instanceof Document ) ? (Document)node : node.getOwnerDocument();
+	}
+
+	public Node getNode() {
+		return node;
 	}
 
 	public List<String> getPaths() {
-		if( paths == null ) paths = listPaths( document );
+		if( paths == null ) paths = listPaths( node );
 		return paths;
 	}
 
-	public String getValue( String path ) {
-		if( path == null || document == null ) return null;
+	public Node getNode( String path ) {
+		if( path == null || node == null ) return null;
 
-		String value = null;
+		Node value = null;
 
 		try {
-			value = (String)xpath.evaluate( path, document, XPathConstants.STRING );
+			value = (Node)xpath.evaluate( path, node, XPathConstants.NODE );
+		} catch( XPathExpressionException exception ) {
+			// Intentionally ignore exception.
+		}
+
+		return value;
+	}
+
+	public String getValue( String path ) {
+		if( path == null || node == null ) return null;
+
+		String value = null;
+		if( path.startsWith( "/" ) ) path = path.substring( 1 );
+
+		try {
+			value = (String)xpath.evaluate( path, node, XPathConstants.STRING );
 		} catch( XPathExpressionException exception ) {
 			// Intentionally ignore exception.
 		}
@@ -71,12 +93,12 @@ public class Descriptor {
 	 * @return An array of values with the same path.
 	 */
 	public String[] getValues( String path ) {
-		if( path == null || document == null ) return null;
+		if( path == null || node == null ) return null;
 
 		NodeList nodes = null;
 
 		try {
-			nodes = (NodeList)xpath.evaluate( path, document, XPathConstants.NODESET );
+			nodes = (NodeList)xpath.evaluate( path, node, XPathConstants.NODESET );
 		} catch( XPathExpressionException exception ) {
 			// Intentionally ignore exception.
 		}
@@ -113,7 +135,7 @@ public class Descriptor {
 	private String getPath( Node node ) {
 		StringBuilder builder = new StringBuilder();
 		Node parent = node.getParentNode();
-		while( parent != document ) {
+		while( parent != this.node ) {
 			builder.insert( 0, parent.getNodeName() );
 			builder.insert( 0, "/" );
 			parent = parent.getParentNode();
