@@ -32,6 +32,13 @@ public class TextUtil {
 		return string1.equals( string2 );
 	}
 
+	public static final int compare( String string1, String string2 ) {
+		if( string1 == null && string2 == null ) return 0;
+		if( string1 == null && string2 != null ) return -1;
+		if( string1 != null && string2 == null ) return 1;
+		return string1.compareTo( string2 );
+	}
+
 	/**
 	 * Concatenate multiple objects together using a fast string building object.
 	 * 

@@ -38,6 +38,17 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areSame( " ", "a" ) );
 	}
 
+	public void testCompare() {
+		assertEquals( 0, TextUtil.compare( null, null ) );
+		assertEquals( -1, TextUtil.compare( null, "" ) );
+		assertEquals( 1, TextUtil.compare( "", null ) );
+		assertEquals( 0, TextUtil.compare( "", "" ) );
+
+		assertEquals( 0, TextUtil.compare( "a", "a" ) );
+		assertEquals( -1, TextUtil.compare( "a", "b" ) );
+		assertEquals( 1, TextUtil.compare( "b", "a" ) );
+	}
+
 	public void testConcatenate() {
 		assertEquals( "Count: 10", TextUtil.concatenate( "Count: ", 10 ) );
 		assertEquals( "Flag: false", TextUtil.concatenate( "Flag: ", false ) );
