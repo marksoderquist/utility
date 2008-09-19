@@ -12,7 +12,7 @@ import org.xml.sax.SAXException;
 public class XmlUtil {
 
 	public static final Document loadXmlDocument( InputStream stream ) throws SAXException, IOException, ParserConfigurationException {
-		//if( stream == null ) return null;
+		if( stream == null ) return null;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		return factory.newDocumentBuilder().parse( stream );
 	}

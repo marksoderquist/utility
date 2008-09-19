@@ -16,4 +16,10 @@ public class XmlUtilTest extends TestCase {
 		assertNotNull( document );
 	}
 
+	@Test
+	public void testLoadXmlDocumentWithNullStream() throws Exception {
+		Document document = XmlUtil.loadXmlDocument( null );
+		assertNull( document );
+	}
+
 }
