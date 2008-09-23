@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.CharBuffer;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class CountingReader extends Reader {
@@ -14,6 +15,7 @@ public class CountingReader extends Reader {
 
 	public CountingReader( Reader reader ) {
 		this.reader = reader;
+		listeners = new CopyOnWriteArraySet<CountingListener>();
 	}
 
 	public long getCount() {

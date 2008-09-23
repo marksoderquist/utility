@@ -3,6 +3,7 @@ package com.parallelsymmetry.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class CountingInputStream extends InputStream {
@@ -13,6 +14,7 @@ public class CountingInputStream extends InputStream {
 
 	public CountingInputStream( InputStream input ) {
 		this.input = input;
+		listeners = new CopyOnWriteArraySet<CountingListener>();
 	}
 
 	public long getCount() {
