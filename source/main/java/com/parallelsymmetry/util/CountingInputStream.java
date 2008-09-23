@@ -2,6 +2,7 @@ package com.parallelsymmetry.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class CountingInputStream extends InputStream {
@@ -16,6 +17,16 @@ public class CountingInputStream extends InputStream {
 
 	public long getCount() {
 		return count.get();
+	}
+
+	private Set<CountingListener> listeners;
+
+	public void addCountingListener( CountingListener listener ) {
+		listeners.add( listener );
+	}
+
+	public void removeCountingListener( CountingListener listener ) {
+		listeners.remove( listener );
 	}
 
 	public int available() throws IOException {
@@ -43,23 +54,20 @@ public class CountingInputStream extends InputStream {
 	}
 
 	public int read() throws IOException {
-		// FIXME Add event handling.
 		int read = input.read();
-		if( read > 0 ) count.incrementAndGet();
+		if( read > 0 ) triggerCountingEvent( count.incrementAndGet() );
 		return read;
 	}
 
 	public int read( byte[] b, int off, int len ) throws IOException {
-		// FIXME Add event handling.
 		int read = input.read( b, off, len );
-		if( read > 0 ) count.addAndGet( read );
+		if( read > 0 ) triggerCountingEvent( count.addAndGet( read ) );
 		return read;
 	}
 
 	public int read( byte[] b ) throws IOException {
-		// FIXME Add event handling.
 		int read = input.read( b );
-		if( read > 0 ) count.addAndGet( read );
+		if( read > 0 ) triggerCountingEvent( count.addAndGet( read ) );
 		return read;
 	}
 
@@ -73,6 +81,16 @@ public class CountingInputStream extends InputStream {
 
 	public String toString() {
 		return input.toString();
+	}
+
+	protected void triggerCountingEvent( long count ) {
+		fireCountingEvent( new CountingEvent( count ) );
+	}
+
+	protected void fireCountingEvent( CountingEvent event ) {
+		for( CountingListener listener : listeners ) {
+			listener.countUpdated( event );
+		}
 	}
 
 }
