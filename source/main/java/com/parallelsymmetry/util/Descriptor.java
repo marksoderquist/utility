@@ -19,8 +19,6 @@ import org.xml.sax.SAXException;
 
 public class Descriptor {
 
-	//private XPath xpath = XPathFactory.newInstance().newXPath();
-
 	private Node node;
 
 	private List<String> paths;
@@ -69,7 +67,6 @@ public class Descriptor {
 
 		String value = null;
 		XPath xpath = XPathFactory.newInstance().newXPath();
-		if( path.startsWith( "/" ) ) path = path.substring( 1 );
 
 		try {
 			value = (String)xpath.evaluate( path, node, XPathConstants.STRING );

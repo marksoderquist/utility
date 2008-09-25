@@ -43,7 +43,6 @@ public class DescriptorTest extends TestCase {
 		Descriptor descriptor2 = new Descriptor( descriptor.getNode( "/test" ) );
 		assertNotNull( descriptor2 );
 		assertEquals( "test.name", descriptor2.getValue( "name" ) );
-		assertEquals( "test.name", descriptor2.getValue( "/name" ) );
 	}
 
 	public void testConstructorWithStream() throws Exception {
