@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 public class Descriptor {
 
-	private XPath xpath = XPathFactory.newInstance().newXPath();
+	//private XPath xpath = XPathFactory.newInstance().newXPath();
 
 	private Node node;
 
@@ -53,6 +53,7 @@ public class Descriptor {
 		if( path == null || node == null ) return null;
 
 		Node value = null;
+		XPath xpath = XPathFactory.newInstance().newXPath();
 
 		try {
 			value = (Node)xpath.evaluate( path, node, XPathConstants.NODE );
@@ -67,6 +68,7 @@ public class Descriptor {
 		if( path == null || node == null ) return null;
 
 		String value = null;
+		XPath xpath = XPathFactory.newInstance().newXPath();
 		if( path.startsWith( "/" ) ) path = path.substring( 1 );
 
 		try {
@@ -96,6 +98,7 @@ public class Descriptor {
 		if( path == null || node == null ) return null;
 
 		NodeList nodes = null;
+		XPath xpath = XPathFactory.newInstance().newXPath();
 
 		try {
 			nodes = (NodeList)xpath.evaluate( path, node, XPathConstants.NODESET );
