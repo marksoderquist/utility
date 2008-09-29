@@ -56,7 +56,7 @@ public class Descriptor {
 		try {
 			value = (Node)xpath.evaluate( path, node, XPathConstants.NODE );
 		} catch( XPathExpressionException exception ) {
-			// Intentionally ignore exception.
+			Log.write( exception );
 		}
 
 		return value;
@@ -71,7 +71,7 @@ public class Descriptor {
 		try {
 			value = (String)xpath.evaluate( path, node, XPathConstants.STRING );
 		} catch( XPathExpressionException exception ) {
-			// Intentionally ignore exception.
+			Log.write( exception );
 		}
 
 		if( TextUtil.isEmpty( value ) ) return null;
@@ -100,8 +100,9 @@ public class Descriptor {
 		try {
 			nodes = (NodeList)xpath.evaluate( path, node, XPathConstants.NODESET );
 		} catch( XPathExpressionException exception ) {
-			// Intentionally ignore exception.
+			Log.write( exception );
 		}
+		if( nodes == null ) return null;
 
 		ArrayList<String> values = new ArrayList<String>();
 		int count = nodes.getLength();
