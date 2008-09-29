@@ -16,4 +16,14 @@ public class FileUtil {
 		return name.substring( index + 1 );
 	}
 
+	public static final boolean deleteTree( File file ) {
+		if( !file.exists() ) return true;
+		if( file.isDirectory() ) {
+			for( File child : file.listFiles() ) {
+				deleteTree( child );
+			}
+		}
+		return file.delete();
+	}
+
 }
