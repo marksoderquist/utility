@@ -12,10 +12,10 @@ public class IterableEnumeration<T> implements Iterable<T> {
 	}
 
 	public Iterator<T> iterator() {
-		return new EnumerationItorator();
+		return new EnumerationIterator();
 	}
 
-	private final class EnumerationItorator implements Iterator<T> {
+	private final class EnumerationIterator implements Iterator<T> {
 
 		public boolean hasNext() {
 			return enumeration.hasMoreElements();
