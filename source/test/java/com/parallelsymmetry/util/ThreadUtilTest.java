@@ -38,6 +38,11 @@ public class ThreadUtilTest extends TestCase {
 		assertEquals( elements, ThreadUtil.appendStackTrace( throwable1, throwable2 ).getStackTrace() );
 	}
 
+	public void testGetStackClasses() throws Exception {
+		Class<?>[] frame = ThreadUtil.getStackClasses();
+		assertEquals( ThreadUtilTest.class, frame[0] );
+	}
+
 	private void assertEquals( Object[] array1, Object[] array2 ) {
 		for( int index = 0; index < array1.length; index++ ) {
 			assertEquals( array1[index], array2[index] );
