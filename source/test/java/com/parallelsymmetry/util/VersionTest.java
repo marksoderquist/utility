@@ -18,17 +18,17 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testConstructorWithNull() throws Exception {
-		assertEquals( "Unknown", Version.parse( null ).toString() );
+		assertEquals( "Unknown", Version.parse( null, null ).toString() );
 	}
 
 	@Test
 	public void testConstructorWithEmpty() throws Exception {
-		assertEquals( "Unknown", Version.parse( "" ).toString() );
+		assertEquals( "Unknown", Version.parse( "", "" ).toString() );
 	}
 
 	@Test
 	public void testConstructorWithVersionString() throws Exception {
-		Version version = Version.parse( "1.2-test-3" );
+		Version version = Version.parse( "1.2-test-3", null );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
 		assertEquals( "test", version.getState() );
@@ -39,7 +39,7 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testConstructorWithSnapshotVersionString() throws Exception {
-		Version version = Version.parse( "1-2-test-3-SNAPSHOT" );
+		Version version = Version.parse( "1-2-test-3-SNAPSHOT", null );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
 		assertEquals( "test", version.getState() );
@@ -50,7 +50,7 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testConstructorWithVersionDateString() throws Exception {
-		Version version = Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" );
+		Version version = Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
 		assertEquals( "Update", version.getState() );
@@ -61,7 +61,7 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testConstructorWithSnapshotVersionDateString() throws Exception {
-		Version version = Version.parse( "1-2-Update-3-SNAPSHOT 2000-01-01 00:00:00 MST" );
+		Version version = Version.parse( "1-2-Update-3-SNAPSHOT", "2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
 		assertEquals( "Update", version.getState() );
@@ -72,40 +72,41 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testGetVersion() throws Exception {
-		assertEquals( "1.2", Version.parse( "1-2-U-3 2000-01-01 00:00:00 MST" ).getVersion() );
+		assertEquals( "1.2", Version.parse( "1-2-U-3", "2000-01-01 00:00:00 MST" ).getVersion() );
 	}
 
 	@Test
 	public void testGetFullVersion() throws Exception {
-		assertEquals( "1.2 Update 3 SNAPSHOT", Version.parse( "1-2-Update-3-SNAPSHOT 2000-01-01 00:00:00 MST" ).getFullVersion() );
+		assertEquals( "1.2 Update 3 SNAPSHOT", Version.parse( "1-2-Update-3-SNAPSHOT", "2000-01-01 00:00:00 MST" ).getFullVersion() );
 	}
 
 	@Test
 	public void testGetCodedVersion() throws Exception {
-		String code = "1-2-U-3-SNAPSHOT 2000-01-01 00:00:00 -0700";
-		assertEquals( code, Version.parse( code ).getCodedVersion() );
+		String code = "1-2-U-3-SNAPSHOT";
+		String time = "2000-01-01 00:00:00 -0700";
+		assertEquals( code, Version.parse( code, time ).getCodedVersion() );
 	}
 
 	@Test
 	public void testGetDateString() throws Exception {
-		assertEquals( "Unknown", Version.parse( "1-2-U-3" ).getDateString() );
-		assertEquals( "2000-01-01 00:00:00 -0700", Version.parse( "1-2-U-3 2000-01-01 00:00:00 MST" ).getDateString() );
+		assertEquals( "Unknown", Version.parse( "1-2-U-3", null ).getDateString() );
+		assertEquals( "2000-01-01 00:00:00 -0700", Version.parse( "1-2-U-3", "2000-01-01 00:00:00 MST" ).getDateString() );
 	}
 
 	@Test
 	public void testToString() throws Exception {
-		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" ).toString() );
+		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" ).toString() );
 	}
 
 	@Test
 	public void testEquals() throws Exception {
-		assertEquals( Version.parse( null ), Version.parse( null ) );
-		assertEquals( Version.parse( "" ), Version.parse( "" ) );
-		assertEquals( Version.parse( null ), Version.parse( "" ) );
-		assertEquals( Version.parse( "" ), Version.parse( null ) );
+		assertEquals( Version.parse( null, null ), Version.parse( null, null ) );
+		assertEquals( Version.parse( "", null ), Version.parse( "", null ) );
+		assertEquals( Version.parse( null, null ), Version.parse( "", null ) );
+		assertEquals( Version.parse( "", null ), Version.parse( null, null ) );
 
-		assertEquals( Version.parse( "1-2-Update-3" ), Version.parse( "1-2-Update-3" ) );
-		assertEquals( Version.parse( "1-2-Update-3-SNAPSHOT" ), Version.parse( "1-2-Update-3-SNAPSHOT" ) );
+		assertEquals( Version.parse( "1-2-Update-3", null ), Version.parse( "1-2-Update-3", null ) );
+		assertEquals( Version.parse( "1-2-Update-3-SNAPSHOT", null ), Version.parse( "1-2-Update-3-SNAPSHOT", null ) );
 	}
 
 }

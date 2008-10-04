@@ -29,13 +29,13 @@ public class Version {
 		this.unknown = unknown;
 	}
 
-	public static final Version parse( String string ) {
+	public static final Version parse( String string, String timestamp ) {
 		if( TextUtil.isEmpty( string ) ) return UNKNOWN;
 
 		// TODO Write a multi-pass parser.
 
-		StringTokenizer tokenizer = new StringTokenizer( string, "" );
 		Version version = new Version( false );
+		StringTokenizer tokenizer = new StringTokenizer( string, "" );
 		try {
 			version.major = Integer.parseInt( tokenizer.nextToken( ".-" ) );
 			version.minor = Integer.parseInt( tokenizer.nextToken( ".-" ) );
@@ -50,16 +50,23 @@ public class Version {
 					// Intentionally ignore the exception.
 				}
 			}
-
-			if( tokenizer.hasMoreTokens() ) {
-				String date = tokenizer.nextToken( " " );
-				String time = tokenizer.nextToken( " " );
-				String zone = tokenizer.nextToken( " " );
-
-				version.date = DATE_FORMAT.parse( date + " " + time + " " + zone );
-			}
 		} catch( Exception exception ) {
 			throw new RuntimeException( "Exception parsing version string: " + string, exception );
+		}
+
+		if( timestamp != null ) {
+			StringTokenizer timestampTokenizer = new StringTokenizer( timestamp, "" );
+			try {
+				if( timestampTokenizer.hasMoreTokens() ) {
+					String date = timestampTokenizer.nextToken( " " );
+					String time = timestampTokenizer.nextToken( " " );
+					String zone = timestampTokenizer.nextToken( " " );
+
+					version.date = DATE_FORMAT.parse( date + " " + time + " " + zone );
+				}
+			} catch( Exception exception ) {
+				throw new RuntimeException( "Exception parsing version timestamp: " + timestamp, exception );
+			}
 		}
 
 		return version;
@@ -146,8 +153,6 @@ public class Version {
 			buffer.append( "-" );
 			buffer.append( micro );
 			if( isSnapshot() ) buffer.append( "-SNAPSHOT" );
-			buffer.append( " " );
-			buffer.append( getDateString() );
 		}
 
 		return buffer.toString();
