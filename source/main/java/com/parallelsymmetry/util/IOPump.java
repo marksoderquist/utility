@@ -282,13 +282,12 @@ public class IOPump implements Runnable {
 						}
 
 						if( datum == 10 || datum == 13 ) {
-							builder.append( TextUtil.toPrintableString( (char)datum ) );
-							lineTerminator = true;
-						} else {
-							if( lineTerminator ) {
+							if( !lineTerminator ) {
 								Log.write( logLevel, builder.toString() );
 								builder.delete( 0, builder.length() );
 							}
+							lineTerminator = true;
+						} else {
 							builder.append( TextUtil.toPrintableString( (char)datum ) );
 							lineTerminator = false;
 						}
