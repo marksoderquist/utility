@@ -110,6 +110,20 @@ public class DescriptorTest extends TestCase {
 		assertEquals( document.getDocumentElement(), descriptor.getNode( "/test" ) );
 	}
 
+	public void testGetNodes() throws Exception {
+		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
+		assertNotNull( input );
+		Descriptor descriptor = new Descriptor( input );
+
+		assertEquals( null, descriptor.getNodes( null ) );
+		assertEquals( null, descriptor.getNodes( "" ) );
+
+		Node[] values = descriptor.getNodes( "/test/nodes/node" );
+		assertEquals( "one", values[0].getTextContent() );
+		assertEquals( "two", values[1].getTextContent() );
+		assertEquals( "three", values[2].getTextContent() );
+	}
+
 	public void testGetValue() throws Exception {
 		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
 		assertNotNull( input );
@@ -138,6 +152,9 @@ public class DescriptorTest extends TestCase {
 		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
 		assertNotNull( input );
 		Descriptor descriptor = new Descriptor( input );
+
+		assertEquals( null, descriptor.getNodes( null ) );
+		assertEquals( null, descriptor.getNodes( "" ) );
 
 		String[] values = descriptor.getValues( "/test/nodes/node" );
 		assertEquals( 3, values.length );

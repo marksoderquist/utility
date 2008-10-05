@@ -48,7 +48,7 @@ public class Descriptor {
 	}
 
 	public Node getNode( String path ) {
-		if( path == null || node == null ) return null;
+		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		Node value = null;
 		XPath xpath = XPathFactory.newInstance().newXPath();
@@ -62,8 +62,30 @@ public class Descriptor {
 		return value;
 	}
 
+	public Node[] getNodes( String path ) {
+		if( node == null || TextUtil.isEmpty( path ) ) return null;
+
+		NodeList nodes = null;
+		XPath xpath = XPathFactory.newInstance().newXPath();
+
+		try {
+			nodes = (NodeList)xpath.evaluate( path, node, XPathConstants.NODESET );
+		} catch( XPathExpressionException exception ) {
+			Log.write( exception );
+		}
+		if( nodes == null ) return null;
+
+		ArrayList<Node> values = new ArrayList<Node>();
+		int count = nodes.getLength();
+		for( int index = 0; index < count; index++ ) {
+			values.add( nodes.item( index ) );
+		}
+
+		return values.toArray( new Node[values.size()] );
+	}
+
 	public String getValue( String path ) {
-		if( path == null || node == null ) return null;
+		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		String value = null;
 		XPath xpath = XPathFactory.newInstance().newXPath();
@@ -92,7 +114,7 @@ public class Descriptor {
 	 * @return An array of values with the same path.
 	 */
 	public String[] getValues( String path ) {
-		if( path == null || node == null ) return null;
+		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		NodeList nodes = null;
 		XPath xpath = XPathFactory.newInstance().newXPath();
