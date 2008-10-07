@@ -15,4 +15,13 @@ public class ObjectUtilTest extends TestCase {
 		assertFalse( ObjectUtil.areEqual( new Object(), new Object() ) );
 		assertFalse( ObjectUtil.areEqual( "test1", "test2" ) );
 	}
+
+	@Test
+	public void testCompare() throws Exception {
+		assertEquals( 0, ObjectUtil.compare( (String)null, (String)null ) );
+		assertEquals( 1, ObjectUtil.compare( "", null ) );
+		assertEquals( -1, ObjectUtil.compare( null, "" ) );
+		assertEquals( 0, ObjectUtil.compare( "", "" ) );
+	}
+
 }

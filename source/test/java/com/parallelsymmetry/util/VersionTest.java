@@ -17,17 +17,42 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
-	public void testConstructorWithNull() throws Exception {
+	public void testParseWithNull() throws Exception {
 		assertEquals( "Unknown", Version.parse( null, null ).toString() );
 	}
 
 	@Test
-	public void testConstructorWithEmpty() throws Exception {
+	public void testParseWithEmpty() throws Exception {
+		assertEquals( "Unknown", Version.parse( "" ).toString() );
 		assertEquals( "Unknown", Version.parse( "", "" ).toString() );
 	}
 
 	@Test
-	public void testConstructorWithVersionString() throws Exception {
+	public void testParseWithMajorOnly() throws Exception {
+		Version version = Version.parse( "1" );
+		assertEquals( 1, version.getMajor() );
+		assertEquals( 0, version.getMinor() );
+		assertEquals( null, version.getState() );
+		assertEquals( 0, version.getMicro() );
+		assertEquals( false, version.isSnapshot() );
+		assertEquals( null, version.getDate() );
+		assertEquals( "1.0", version.toString() );
+	}
+
+	@Test
+	public void testParseWithMajorAndMinor() throws Exception {
+		Version version = Version.parse( "1.2" );
+		assertEquals( 1, version.getMajor() );
+		assertEquals( 2, version.getMinor() );
+		assertEquals( null, version.getState() );
+		assertEquals( 0, version.getMicro() );
+		assertEquals( false, version.isSnapshot() );
+		assertEquals( null, version.getDate() );
+		assertEquals( "1.2", version.toString() );
+	}
+
+	@Test
+	public void testParseWithVersionString() throws Exception {
 		Version version = Version.parse( "1.2-test-3", null );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
@@ -38,7 +63,7 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
-	public void testConstructorWithSnapshotVersionString() throws Exception {
+	public void testParseWithSnapshotVersionString() throws Exception {
 		Version version = Version.parse( "1-2-test-3-SNAPSHOT", null );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
@@ -49,7 +74,7 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
-	public void testConstructorWithVersionDateString() throws Exception {
+	public void testParseWithVersionDateString() throws Exception {
 		Version version = Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
@@ -60,7 +85,7 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
-	public void testConstructorWithSnapshotVersionDateString() throws Exception {
+	public void testParseWithSnapshotVersionDateString() throws Exception {
 		Version version = Version.parse( "1-2-Update-3-SNAPSHOT", "2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
@@ -109,4 +134,17 @@ public class VersionTest extends TestCase {
 		assertEquals( Version.parse( "1-2-Update-3-SNAPSHOT", null ), Version.parse( "1-2-Update-3-SNAPSHOT", null ) );
 	}
 
+	@Test
+	public void testCompare() throws Exception {
+		assertTrue( Version.parse( null ).compareTo( Version.parse( null ) ) == 0 );
+		assertTrue( Version.parse( null ).compareTo( Version.parse( "" ) ) == 0 );
+		assertTrue( Version.parse( "" ).compareTo( Version.parse( null ) ) == 0 );
+		assertTrue( Version.parse( "" ).compareTo( Version.parse( "" ) ) == 0 );
+
+		assertTrue( Version.parse( "1" ).compareTo( Version.parse( "1" ) ) == 0 );
+		assertTrue( Version.parse( "1" ).compareTo( Version.parse( "2" ) ) < 0 );
+		assertTrue( Version.parse( "2" ).compareTo( Version.parse( "1" ) ) > 0 );
+
+		assertTrue( Version.parse( "1-0-Alpha-10-SNAPSHOT" ).compareTo( Version.parse( "1-0-Alpha-9-SNAPSHOT" ) ) > 0 );
+	}
 }

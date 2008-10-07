@@ -8,4 +8,11 @@ public class ObjectUtil {
 		return false;
 	}
 
+	public static final <T extends Comparable<T>> int compare( T object1, T object2 ) {
+		if( object1 == null && object2 == null ) return 0;
+		if( object1 == null && object2 != null ) return -1;
+		if( object1 != null && object2 == null ) return 1;
+		return object1.compareTo( object2 );
+	}
+
 }

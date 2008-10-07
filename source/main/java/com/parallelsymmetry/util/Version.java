@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-public class Version {
+public class Version implements Comparable<Version> {
 
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
 
@@ -29,6 +29,10 @@ public class Version {
 		this.unknown = unknown;
 	}
 
+	public static final Version parse( String string ) {
+		return parse( string, null );
+	}
+
 	public static final Version parse( String string, String timestamp ) {
 		if( TextUtil.isEmpty( string ) ) return UNKNOWN;
 
@@ -38,9 +42,9 @@ public class Version {
 		StringTokenizer tokenizer = new StringTokenizer( string, "" );
 		try {
 			version.major = Integer.parseInt( tokenizer.nextToken( ".-" ) );
-			version.minor = Integer.parseInt( tokenizer.nextToken( ".-" ) );
-			version.state = tokenizer.nextToken( ".-" );
-			version.micro = Integer.parseInt( tokenizer.nextToken( " .-" ) );
+			if( tokenizer.hasMoreTokens() ) version.minor = Integer.parseInt( tokenizer.nextToken( ".-" ) );
+			if( tokenizer.hasMoreTokens() ) version.state = tokenizer.nextToken( ".-" );
+			if( tokenizer.hasMoreTokens() ) version.micro = Integer.parseInt( tokenizer.nextToken( " .-" ) );
 
 			if( string.contains( "SNAPSHOT" ) ) {
 				try {
@@ -129,10 +133,12 @@ public class Version {
 			buffer.append( major );
 			buffer.append( "." );
 			buffer.append( minor );
-			buffer.append( " " );
-			buffer.append( state );
-			buffer.append( " " );
-			buffer.append( micro );
+			if( state != null ) {
+				buffer.append( " " );
+				buffer.append( state );
+				buffer.append( " " );
+				buffer.append( micro );
+			}
 			if( isSnapshot() ) buffer.append( " SNAPSHOT" );
 		}
 
@@ -160,6 +166,18 @@ public class Version {
 
 	public final String getDateString() {
 		return date == null ? "Unknown" : DATE_FORMAT.format( date );
+	}
+
+	@Override
+	public int compareTo( Version that ) {
+		if( this.unknown != that.unknown ) return this.unknown ? 1 : -1;
+		if( this.major != that.major ) return ObjectUtil.compare( this.major, that.major );
+		if( this.minor != that.minor ) return ObjectUtil.compare( this.minor, that.minor );
+		if( !TextUtil.areEqual( this.state, that.state ) ) return ObjectUtil.compare( this.state, that.state );
+		if( this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
+		if( this.snapshot != that.snapshot ) return this.snapshot ? -1 : 1;
+
+		return 0;
 	}
 
 	@Override
