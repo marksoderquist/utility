@@ -199,7 +199,7 @@ public class IOPump implements Runnable {
 		waitFor();
 	}
 
-	public final void startAndWait( int timeout ) {
+	public final void startAndWait( long timeout ) {
 		start();
 		waitFor( timeout );
 	}
@@ -217,7 +217,7 @@ public class IOPump implements Runnable {
 		waitFor();
 	}
 
-	public final void stopAndWait( int timeout ) {
+	public final void stopAndWait( long timeout ) {
 		stop();
 		waitFor( timeout );
 	}
@@ -230,7 +230,7 @@ public class IOPump implements Runnable {
 		}
 	}
 
-	public final void waitFor( int timeout ) {
+	public final void waitFor( long timeout ) {
 		try {
 			worker.join( timeout );
 		} catch( InterruptedException aoException ) {
@@ -246,9 +246,9 @@ public class IOPump implements Runnable {
 		byte[] bytearray = null;
 		char[] chararray = null;
 		if( reader == null ) {
-			bytearray = new byte[ bufferSize ];
+			bytearray = new byte[bufferSize];
 		} else {
-			chararray = new char[ bufferSize ];
+			chararray = new char[bufferSize];
 		}
 
 		if( logEnabled ) Log.write( logLevel, "IOPump " + name + " started." );
@@ -276,9 +276,9 @@ public class IOPump implements Runnable {
 					int datum = 0;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
-							datum = bytearray[ index ];
+							datum = bytearray[index];
 						} else {
-							datum = chararray[ index ];
+							datum = chararray[index];
 						}
 
 						if( datum == 10 || datum == 13 ) {
