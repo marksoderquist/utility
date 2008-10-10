@@ -57,15 +57,11 @@ public class FileUtil {
 	}
 
 	public static final boolean copy( File source, File target, boolean keepSourceFolder ) throws IOException {
-		// Cannot copy sources or targets that don't exist.
-		if( !source.exists() || !target.exists() ) return false;
-
 		// Cannot copy a folder to a file.
 		if( source.isDirectory() && target.isFile() ) return false;
 
 		// Copy file sources to file targets.
 		if( source.isFile() && target.isFile() ) {
-			System.out.println( "copy: " + source + " to " + target );
 			FileInputStream input = new FileInputStream( source );
 			FileOutputStream output = new FileOutputStream( target );
 			IOPump pump = new IOPump( input, output );

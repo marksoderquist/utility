@@ -45,6 +45,10 @@ public class FileUtilTest extends TestCase {
 		folder.delete();
 	}
 
+	public void testCopyWithNonExistantFiles() throws Exception {
+		assertFalse( FileUtil.copy( new File( "" ), new File( "" ) ) );
+	}
+
 	public void testCopyFileToFile() throws Exception {
 		long time = System.currentTimeMillis();
 		File source = File.createTempFile( PREFIX, "copyFileToFileSource" );
@@ -139,6 +143,7 @@ public class FileUtilTest extends TestCase {
 	}
 
 	public void testDeleteTree() throws Exception {
+		assertTrue( FileUtil.deleteTree( new File( "" ) ) );
 		File file = File.createTempFile( PREFIX, "deleteTree" );
 		File temp = file.getParentFile();
 		File parent = new File( temp, "parent" );
@@ -154,6 +159,21 @@ public class FileUtilTest extends TestCase {
 		assertFalse( child.exists() );
 
 		assertTrue( file.delete() );
+	}
+
+	public void testDeleteTreeOnExit() throws Exception {
+		FileUtil.deleteTreeOnExit( new File( "" ) );
+
+		File parent0 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent0" );
+		File parent1 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent1", parent0 );
+		File.createTempFile( PREFIX, "copyFolderToFolderLeaf0", parent0 );
+		File.createTempFile( PREFIX, "copyFolderToFolderLeaf1", parent0 );
+		File.createTempFile( PREFIX, "copyFolderToFolderLeaf2", parent1 );
+		File.createTempFile( PREFIX, "copyFolderToFolderLeaf3", parent1 );
+		assertEquals( 3, parent0.listFiles().length );
+		assertEquals( 2, parent1.listFiles().length );
+
+		FileUtil.deleteTreeOnExit( parent0 );
 	}
 
 	private static final class TestFilenameFilter implements FilenameFilter {
