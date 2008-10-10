@@ -11,11 +11,13 @@ public class Version implements Comparable<Version> {
 
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
 
-	public static final int INVALID = -1;
+	public static final String UNKNOWN = "Unknown";
 
-	private static final Version UNKNOWN = new Version( true );
+	private static final Version UNKNOWN_VERSION = new Version( true );
 
 	private static final String SNAPSHOT = "SNAPSHOT";
+
+	private static final int INVALID = -1;
 
 	private String original;
 
@@ -42,8 +44,9 @@ public class Version implements Comparable<Version> {
 	}
 
 	public static final Version parse( String string, String timestamp ) {
-		if( TextUtil.isEmpty( string ) ) return UNKNOWN;
+		if( TextUtil.isEmpty( string ) ) return UNKNOWN_VERSION;
 
+		// Parse the version elements.
 		List<String> elements = new ArrayList<String>();
 		StringTokenizer tokenizer = new StringTokenizer( string, ".- " );
 		while( tokenizer.hasMoreTokens() ) {
@@ -52,8 +55,10 @@ public class Version implements Comparable<Version> {
 
 		Version version = new Version( false );
 
+		// Set the original version string. 
 		version.original = string;
 
+		// Check each element for use.
 		for( String element : elements ) {
 			checkElement( version, element );
 		}
@@ -74,15 +79,15 @@ public class Version implements Comparable<Version> {
 	}
 
 	public int getMajor() {
-		return major;
+		return major == INVALID ? 0 : major;
 	}
 
 	public int getMinor() {
-		return minor;
+		return minor == INVALID ? 0 : minor;
 	}
 
 	public int getMicro() {
-		return micro;
+		return micro == INVALID ? 0 : micro;
 	}
 
 	public String getState() {
@@ -106,7 +111,7 @@ public class Version implements Comparable<Version> {
 		StringBuffer buffer = new StringBuffer();
 
 		if( unknown ) {
-			buffer.append( "Unknown" );
+			buffer.append( UNKNOWN );
 		} else {
 			buffer.append( major );
 			if( minor != INVALID ) {
@@ -124,7 +129,7 @@ public class Version implements Comparable<Version> {
 	 * @return A string representation of the version.
 	 */
 	public final String getFullVersion() {
-		if( unknown ) return "Unknown";
+		if( unknown ) return UNKNOWN;
 		return original;
 	}
 
@@ -132,7 +137,7 @@ public class Version implements Comparable<Version> {
 		StringBuffer buffer = new StringBuffer();
 
 		if( unknown ) {
-			buffer.append( "Unknown" );
+			buffer.append( UNKNOWN );
 		} else {
 			buffer.append( major );
 			buffer.append( "-" );
@@ -148,16 +153,18 @@ public class Version implements Comparable<Version> {
 	}
 
 	public final String getDateString() {
-		return date == null ? "Unknown" : DATE_FORMAT.format( date );
+		return date == null ? UNKNOWN : DATE_FORMAT.format( date );
 	}
 
 	@Override
 	public int compareTo( Version that ) {
 		if( this.unknown != that.unknown ) return this.unknown ? 1 : -1;
-		if( this.major != that.major ) return ObjectUtil.compare( this.major, that.major );
-		if( this.minor != that.minor ) return ObjectUtil.compare( this.minor, that.minor );
-		if( !TextUtil.areEqual( this.state, that.state ) ) return ObjectUtil.compare( this.state, that.state );
-		if( this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
+		if( this.major != INVALID && this.major != that.major ) return ObjectUtil.compare( this.major, that.major );
+		if( this.minor != INVALID && this.minor != that.minor ) return ObjectUtil.compare( this.minor, that.minor );
+		if( this.state != null ) {
+			if( !TextUtil.areEqual( this.state, that.state ) ) return ObjectUtil.compare( this.state, that.state );
+			if( this.micro != INVALID && this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
+		}
 		if( this.snapshot != that.snapshot ) return this.snapshot ? -1 : 1;
 
 		return 0;
@@ -167,8 +174,7 @@ public class Version implements Comparable<Version> {
 	public boolean equals( Object object ) {
 		if( !( object instanceof Version ) ) return false;
 		Version that = (Version)object;
-
-		return this.micro == that.micro && TextUtil.areEqual( this.state, that.state ) && this.minor == that.minor && this.major == that.major && this.snapshot == that.snapshot && ObjectUtil.areEqual( this.date, that.date );
+		return this.micro == that.micro && TextUtil.areEqual( this.state, that.state ) && this.minor == that.minor && this.major == that.major && this.snapshot == that.snapshot;
 	}
 
 	@Override
@@ -177,16 +183,12 @@ public class Version implements Comparable<Version> {
 	}
 
 	private static final void checkElement( Version version, String element ) {
-		System.out.println( "Checking element: " + element );
 		if( TextUtil.isInteger( element ) ) {
 			if( version.major == INVALID ) {
-				System.out.println( "Setting major version: " + element );
 				version.major = Integer.parseInt( element );
 			} else if( version.minor == INVALID ) {
-				System.out.println( "Setting minor version: " + element );
 				version.minor = Integer.parseInt( element );
 			} else if( version.micro == INVALID ) {
-				System.out.println( "Setting micro version: " + element );
 				version.micro = Integer.parseInt( element );
 			}
 		} else if( SNAPSHOT.equals( element ) ) {

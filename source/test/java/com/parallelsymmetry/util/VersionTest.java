@@ -34,9 +34,9 @@ public class VersionTest extends TestCase {
 	public void testParseWithMajorOnly() throws Exception {
 		Version version = Version.parse( "1" );
 		assertEquals( 1, version.getMajor() );
-		assertEquals( Version.INVALID, version.getMinor() );
+		assertEquals( 0, version.getMinor() );
 		assertEquals( null, version.getState() );
-		assertEquals( Version.INVALID, version.getMicro() );
+		assertEquals( 0, version.getMicro() );
 		assertEquals( false, version.isSnapshot() );
 		assertEquals( null, version.getDate() );
 		assertEquals( "1", version.toString() );
@@ -48,7 +48,7 @@ public class VersionTest extends TestCase {
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
 		assertEquals( null, version.getState() );
-		assertEquals( Version.INVALID, version.getMicro() );
+		assertEquals( 0, version.getMicro() );
 		assertEquals( false, version.isSnapshot() );
 		assertEquals( null, version.getDate() );
 		assertEquals( "1.2", version.toString() );
@@ -133,17 +133,22 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testGetVersion() throws Exception {
+		assertEquals( Version.UNKNOWN, Version.parse( null ).getVersion() );
 		assertEquals( "1.2", Version.parse( "1-2-U-3", "2000-01-01 00:00:00 MST" ).getVersion() );
 	}
 
 	@Test
 	public void testGetFullVersion() throws Exception {
+		assertEquals( Version.UNKNOWN, Version.parse( null ).getFullVersion() );
+
 		String text = "1-2-Update-3-SNAPSHOT";
 		assertEquals( text, Version.parse( text, "2000-01-01 00:00:00 MST" ).getFullVersion() );
 	}
 
 	@Test
 	public void testGetCodedVersion() throws Exception {
+		assertEquals( Version.UNKNOWN, Version.parse( null ).getCodedVersion() );
+
 		String code = "1-2-U-3-SNAPSHOT";
 		String time = "2000-01-01 00:00:00 -0700";
 		assertEquals( code, Version.parse( code, time ).getCodedVersion() );
@@ -172,16 +177,38 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
-	public void testCompare() throws Exception {
+	public void testCompareEmptyVersions() throws Exception {
 		assertTrue( Version.parse( null ).compareTo( Version.parse( null ) ) == 0 );
 		assertTrue( Version.parse( null ).compareTo( Version.parse( "" ) ) == 0 );
 		assertTrue( Version.parse( "" ).compareTo( Version.parse( null ) ) == 0 );
 		assertTrue( Version.parse( "" ).compareTo( Version.parse( "" ) ) == 0 );
+	}
 
+	@Test
+	public void testCompareSimpleVersions() throws Exception {
 		assertTrue( Version.parse( "1" ).compareTo( Version.parse( "1" ) ) == 0 );
 		assertTrue( Version.parse( "1" ).compareTo( Version.parse( "2" ) ) < 0 );
 		assertTrue( Version.parse( "2" ).compareTo( Version.parse( "1" ) ) > 0 );
+	}
 
+	@Test
+	public void testCompareComplexVersions() throws Exception {
 		assertTrue( Version.parse( "1-0-Alpha-10-SNAPSHOT" ).compareTo( Version.parse( "1-0-Alpha-9-SNAPSHOT" ) ) > 0 );
 	}
+
+	@Test
+	public void testCompareMixedVersions() throws Exception {
+		// Equals tests.
+		assertTrue( Version.parse( "1" ).compareTo( Version.parse( "1-0" ) ) == 0 );
+		assertTrue( Version.parse( "1" ).compareTo( Version.parse( "1-0-0" ) ) == 0 );
+
+		// Greater than tests.
+		assertTrue( Version.parse( "1-0-0" ).compareTo( Version.parse( "1-0-0-SNAPSHOT" ) ) > 0 );
+		assertTrue( Version.parse( "1-0-0" ).compareTo( Version.parse( "1-0-Alpha-0-SNAPSHOT" ) ) > 0 );
+		assertTrue( Version.parse( "1-0-0" ).compareTo( Version.parse( "1-0-Beta-0-SNAPSHOT" ) ) > 0 );
+
+		// Less than tests.
+		assertTrue( Version.parse( "1-0-Alpha-0-SNAPSHOT" ).compareTo( Version.parse( "1-0-Beta-0-SNAPSHOT" ) ) < 0 );
+	}
+
 }
