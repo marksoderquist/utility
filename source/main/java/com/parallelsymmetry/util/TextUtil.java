@@ -132,6 +132,50 @@ public class TextUtil {
 		return builder.toString();
 	}
 
+	public static final boolean isInteger( String text ) {
+		if( text == null ) return false;
+
+		try {
+			Integer.parseInt( text );
+		} catch( NumberFormatException exception ) {
+			return false;
+		}
+		return true;
+	}
+
+	public static final boolean isLong( String text ) {
+		if( text == null ) return false;
+
+		try {
+			Long.parseLong( text );
+		} catch( NumberFormatException exception ) {
+			return false;
+		}
+		return true;
+	}
+
+	public static final boolean isFloat( String text ) {
+		if( text == null ) return false;
+
+		try {
+			Float.parseFloat( text );
+		} catch( NumberFormatException exception ) {
+			return false;
+		}
+		return true;
+	}
+
+	public static final boolean isDouble( String text ) {
+		if( text == null ) return false;
+
+		try {
+			Double.parseDouble( text );
+		} catch( NumberFormatException exception ) {
+			return false;
+		}
+		return true;
+	}
+
 	public static final String justify( int alignment, String text, int width ) {
 		return justify( alignment, text, width, SPACE );
 	}

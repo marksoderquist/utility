@@ -18,25 +18,28 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testParseWithNull() throws Exception {
-		assertEquals( "Unknown", Version.parse( null, null ).toString() );
+		assertEquals( true, Version.parse( null ).isUnknown() );
+		assertEquals( true, Version.parse( null, null ).isUnknown() );
 	}
 
 	@Test
 	public void testParseWithEmpty() throws Exception {
-		assertEquals( "Unknown", Version.parse( "" ).toString() );
-		assertEquals( "Unknown", Version.parse( "", "" ).toString() );
+		assertEquals( true, Version.parse( "" ).isUnknown() );
+		assertEquals( true, Version.parse( "", null ).isUnknown() );
+		assertEquals( true, Version.parse( null, "" ).isUnknown() );
+		assertEquals( true, Version.parse( "", "" ).isUnknown() );
 	}
 
 	@Test
 	public void testParseWithMajorOnly() throws Exception {
 		Version version = Version.parse( "1" );
 		assertEquals( 1, version.getMajor() );
-		assertEquals( 0, version.getMinor() );
+		assertEquals( Version.INVALID, version.getMinor() );
 		assertEquals( null, version.getState() );
-		assertEquals( 0, version.getMicro() );
+		assertEquals( Version.INVALID, version.getMicro() );
 		assertEquals( false, version.isSnapshot() );
 		assertEquals( null, version.getDate() );
-		assertEquals( "1.0", version.toString() );
+		assertEquals( "1", version.toString() );
 	}
 
 	@Test
@@ -45,7 +48,7 @@ public class VersionTest extends TestCase {
 		assertEquals( 1, version.getMajor() );
 		assertEquals( 2, version.getMinor() );
 		assertEquals( null, version.getState() );
-		assertEquals( 0, version.getMicro() );
+		assertEquals( Version.INVALID, version.getMicro() );
 		assertEquals( false, version.isSnapshot() );
 		assertEquals( null, version.getDate() );
 		assertEquals( "1.2", version.toString() );
@@ -96,13 +99,47 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
+	public void testParseExample1() throws Exception {
+		String text = "0.0.1-SNAPSHOT";
+		Version version = Version.parse( text );
+		assertEquals( 0, version.getMajor() );
+		assertEquals( 0, version.getMinor() );
+		assertEquals( null, version.getState() );
+		assertEquals( 1, version.getMicro() );
+		assertEquals( true, version.isSnapshot() );
+		assertEquals( "0.0", version.getVersion() );
+		assertEquals( text, version.getFullVersion() );
+	}
+
+	@Test
+	public void testParseWithStateDeclaredTwice() throws Exception {
+		try {
+			Version.parse( "1.0-Alpha-Beta-7" );
+			fail( "Runtime exception should be thrown." );
+		} catch( RuntimeException exception ) {
+			// Test passes.
+		}
+	}
+
+	@Test
+	public void testParseWithSnapshotDeclaredTwice() throws Exception {
+		try {
+			Version.parse( "SNAPSHOT-SNAPSHOT" );
+			fail( "Runtime exception should be thrown." );
+		} catch( RuntimeException exception ) {
+			// Test passes.
+		}
+	}
+
+	@Test
 	public void testGetVersion() throws Exception {
 		assertEquals( "1.2", Version.parse( "1-2-U-3", "2000-01-01 00:00:00 MST" ).getVersion() );
 	}
 
 	@Test
 	public void testGetFullVersion() throws Exception {
-		assertEquals( "1.2 Update 3 SNAPSHOT", Version.parse( "1-2-Update-3-SNAPSHOT", "2000-01-01 00:00:00 MST" ).getFullVersion() );
+		String text = "1-2-Update-3-SNAPSHOT";
+		assertEquals( text, Version.parse( text, "2000-01-01 00:00:00 MST" ).getFullVersion() );
 	}
 
 	@Test
@@ -120,7 +157,7 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testToString() throws Exception {
-		assertEquals( "1.2 Update 3", Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" ).toString() );
+		assertEquals( "1.2", Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" ).toString() );
 	}
 
 	@Test

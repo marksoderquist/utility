@@ -83,6 +83,58 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test" ) );
 	}
 
+	public void testIsInteger() throws Exception {
+		assertEquals( false, TextUtil.isInteger( null ) );
+		assertEquals( false, TextUtil.isInteger( "" ) );
+
+		assertEquals( false, TextUtil.isInteger( "1e-10" ) );
+		assertEquals( false, TextUtil.isInteger( "1.0" ) );
+		assertEquals( false, TextUtil.isInteger( "2147483648" ) );
+		assertEquals( false, TextUtil.isInteger( "-2147483649" ) );
+
+		assertEquals( true, TextUtil.isInteger( "0" ) );
+		assertEquals( true, TextUtil.isInteger( "2147483647" ) );
+		assertEquals( true, TextUtil.isInteger( "-2147483648" ) );
+	}
+
+	public void testIsLong() throws Exception {
+		assertEquals( false, TextUtil.isLong( null ) );
+		assertEquals( false, TextUtil.isLong( "" ) );
+
+		assertEquals( false, TextUtil.isLong( "1e-10" ) );
+		assertEquals( false, TextUtil.isLong( "1.0" ) );
+		assertEquals( false, TextUtil.isLong( "9223372036854775808" ) );
+		assertEquals( false, TextUtil.isLong( "-9223372036854775809" ) );
+
+		assertEquals( true, TextUtil.isLong( "0" ) );
+		assertEquals( true, TextUtil.isLong( "9223372036854775807" ) );
+		assertEquals( true, TextUtil.isLong( "-9223372036854775808" ) );
+	}
+
+	public void testIsFloat() throws Exception {
+		assertEquals( false, TextUtil.isFloat( null ) );
+		assertEquals( false, TextUtil.isFloat( "" ) );
+
+		assertEquals( true, TextUtil.isFloat( "0" ) );
+		assertEquals( true, TextUtil.isFloat( "1.0" ) );
+		assertEquals( true, TextUtil.isFloat( "1e10" ) );
+		assertEquals( true, TextUtil.isFloat( "1e-10" ) );
+		assertEquals( true, TextUtil.isFloat( "-1e10" ) );
+		assertEquals( true, TextUtil.isFloat( "-1e-10" ) );
+	}
+
+	public void testIsDouble() throws Exception {
+		assertEquals( false, TextUtil.isDouble( null ) );
+		assertEquals( false, TextUtil.isDouble( "" ) );
+
+		assertEquals( true, TextUtil.isDouble( "0" ) );
+		assertEquals( true, TextUtil.isDouble( "1.0" ) );
+		assertEquals( true, TextUtil.isDouble( "1e10" ) );
+		assertEquals( true, TextUtil.isDouble( "1e-10" ) );
+		assertEquals( true, TextUtil.isDouble( "-1e10" ) );
+		assertEquals( true, TextUtil.isDouble( "-1e-10" ) );
+	}
+
 	public void testJustify() {
 		assertEquals( "Incorrect format.", "        ", TextUtil.justify( TextUtil.LEFT, "", 8 ) );
 		assertEquals( "Incorrect format.", "X       ", TextUtil.justify( TextUtil.LEFT, "X", 8 ) );

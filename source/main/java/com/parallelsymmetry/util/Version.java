@@ -2,24 +2,32 @@ package com.parallelsymmetry.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Version implements Comparable<Version> {
 
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
 
+	public static final int INVALID = -1;
+
 	private static final Version UNKNOWN = new Version( true );
+
+	private static final String SNAPSHOT = "SNAPSHOT";
+
+	private String original;
 
 	private boolean unknown;
 
-	private int major;
+	private int major = INVALID;
 
-	private int minor;
+	private int minor = INVALID;
+
+	private int micro = INVALID;
 
 	private String state;
-
-	private int micro;
 
 	private boolean snapshot;
 
@@ -36,44 +44,33 @@ public class Version implements Comparable<Version> {
 	public static final Version parse( String string, String timestamp ) {
 		if( TextUtil.isEmpty( string ) ) return UNKNOWN;
 
-		// TODO Write a multi-pass parser.
+		List<String> elements = new ArrayList<String>();
+		StringTokenizer tokenizer = new StringTokenizer( string, ".- " );
+		while( tokenizer.hasMoreTokens() ) {
+			elements.add( tokenizer.nextToken() );
+		}
 
 		Version version = new Version( false );
-		StringTokenizer tokenizer = new StringTokenizer( string, "" );
-		try {
-			version.major = Integer.parseInt( tokenizer.nextToken( ".-" ) );
-			if( tokenizer.hasMoreTokens() ) version.minor = Integer.parseInt( tokenizer.nextToken( ".-" ) );
-			if( tokenizer.hasMoreTokens() ) version.state = tokenizer.nextToken( ".-" );
-			if( tokenizer.hasMoreTokens() ) version.micro = Integer.parseInt( tokenizer.nextToken( " .-" ) );
 
-			if( string.contains( "SNAPSHOT" ) ) {
-				try {
-					version.snapshot = true;
-					tokenizer.nextToken( " " );
-				} catch( Exception exception ) {
-					// Intentionally ignore the exception.
-				}
-			}
-		} catch( Exception exception ) {
-			throw new RuntimeException( "Exception parsing version string: " + string, exception );
+		version.original = string;
+
+		for( String element : elements ) {
+			checkElement( version, element );
 		}
 
 		if( timestamp != null ) {
-			StringTokenizer timestampTokenizer = new StringTokenizer( timestamp, "" );
 			try {
-				if( timestampTokenizer.hasMoreTokens() ) {
-					String date = timestampTokenizer.nextToken( " " );
-					String time = timestampTokenizer.nextToken( " " );
-					String zone = timestampTokenizer.nextToken( " " );
-
-					version.date = DATE_FORMAT.parse( date + " " + time + " " + zone );
-				}
+				version.date = DATE_FORMAT.parse( timestamp );
 			} catch( Exception exception ) {
 				throw new RuntimeException( "Exception parsing version timestamp: " + timestamp, exception );
 			}
 		}
 
 		return version;
+	}
+
+	public boolean isUnknown() {
+		return unknown;
 	}
 
 	public int getMajor() {
@@ -112,8 +109,10 @@ public class Version implements Comparable<Version> {
 			buffer.append( "Unknown" );
 		} else {
 			buffer.append( major );
-			buffer.append( "." );
-			buffer.append( minor );
+			if( minor != INVALID ) {
+				buffer.append( "." );
+				buffer.append( minor );
+			}
 		}
 
 		return buffer.toString();
@@ -125,24 +124,8 @@ public class Version implements Comparable<Version> {
 	 * @return A string representation of the version.
 	 */
 	public final String getFullVersion() {
-		StringBuffer buffer = new StringBuffer();
-
-		if( unknown ) {
-			buffer.append( "Unknown" );
-		} else {
-			buffer.append( major );
-			buffer.append( "." );
-			buffer.append( minor );
-			if( state != null ) {
-				buffer.append( " " );
-				buffer.append( state );
-				buffer.append( " " );
-				buffer.append( micro );
-			}
-			if( isSnapshot() ) buffer.append( " SNAPSHOT" );
-		}
-
-		return buffer.toString();
+		if( unknown ) return "Unknown";
+		return original;
 	}
 
 	public final String getCodedVersion() {
@@ -181,16 +164,39 @@ public class Version implements Comparable<Version> {
 	}
 
 	@Override
-	public String toString() {
-		return getFullVersion();
-	}
-
-	@Override
 	public boolean equals( Object object ) {
 		if( !( object instanceof Version ) ) return false;
 		Version that = (Version)object;
 
 		return this.micro == that.micro && TextUtil.areEqual( this.state, that.state ) && this.minor == that.minor && this.major == that.major && this.snapshot == that.snapshot && ObjectUtil.areEqual( this.date, that.date );
+	}
+
+	@Override
+	public String toString() {
+		return getVersion();
+	}
+
+	private static final void checkElement( Version version, String element ) {
+		System.out.println( "Checking element: " + element );
+		if( TextUtil.isInteger( element ) ) {
+			if( version.major == INVALID ) {
+				System.out.println( "Setting major version: " + element );
+				version.major = Integer.parseInt( element );
+			} else if( version.minor == INVALID ) {
+				System.out.println( "Setting minor version: " + element );
+				version.minor = Integer.parseInt( element );
+			} else if( version.micro == INVALID ) {
+				System.out.println( "Setting micro version: " + element );
+				version.micro = Integer.parseInt( element );
+			}
+		} else if( SNAPSHOT.equals( element ) ) {
+			if( version.snapshot ) throw new RuntimeException( "SNAPSHOT should only be declared once." );
+			version.snapshot = true;
+		} else if( version.state != null ) {
+			throw new RuntimeException( "State should only be declared once." );
+		} else {
+			version.state = element;
+		}
 	}
 
 }
