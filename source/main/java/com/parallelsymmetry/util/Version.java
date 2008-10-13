@@ -29,9 +29,9 @@ public class Version implements Comparable<Version> {
 
 	private int micro = INVALID;
 
-	private String state;
+	private int build = INVALID;
 
-	private boolean snapshot;
+	private String state;
 
 	private Date date;
 
@@ -94,8 +94,12 @@ public class Version implements Comparable<Version> {
 		return state;
 	}
 
+	public int getBuild() {
+		return build == INVALID ? 0 : build;
+	}
+
 	public boolean isSnapshot() {
-		return snapshot;
+		return SNAPSHOT.equalsIgnoreCase( state );
 	}
 
 	public Date getDate() {
@@ -117,6 +121,10 @@ public class Version implements Comparable<Version> {
 			if( minor != INVALID ) {
 				buffer.append( "." );
 				buffer.append( minor );
+				if( micro != INVALID ) {
+					buffer.append( "." );
+					buffer.append( micro );
+				}
 			}
 		}
 
@@ -140,13 +148,22 @@ public class Version implements Comparable<Version> {
 			buffer.append( UNKNOWN );
 		} else {
 			buffer.append( major );
-			buffer.append( "-" );
-			buffer.append( minor );
-			buffer.append( "-" );
-			buffer.append( state );
-			buffer.append( "-" );
-			buffer.append( micro );
-			if( isSnapshot() ) buffer.append( "-SNAPSHOT" );
+			if( minor != INVALID ) {
+				buffer.append( "-" );
+				buffer.append( minor );
+				if( micro != INVALID ) {
+					buffer.append( "-" );
+					buffer.append( micro );
+				}
+			}
+			if( state != null ) {
+				buffer.append( "-" );
+				buffer.append( state );
+				if( build != INVALID ) {
+					buffer.append( "-" );
+					buffer.append( build );
+				}
+			}
 		}
 
 		return buffer.toString();
@@ -158,14 +175,16 @@ public class Version implements Comparable<Version> {
 
 	@Override
 	public int compareTo( Version that ) {
-		if( this.unknown != that.unknown ) return this.unknown ? 1 : -1;
+		if( this.unknown != that.unknown ) return this.unknown ? -1 : 1;
 		if( this.major != INVALID && this.major != that.major ) return ObjectUtil.compare( this.major, that.major );
 		if( this.minor != INVALID && this.minor != that.minor ) return ObjectUtil.compare( this.minor, that.minor );
+		if( this.micro != INVALID && this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
+		if( this.state == null && that.state != null ) return 1;
+		if( this.state != null && that.state == null ) return -1;
 		if( this.state != null ) {
 			if( !TextUtil.areEqual( this.state, that.state ) ) return ObjectUtil.compare( this.state, that.state );
-			if( this.micro != INVALID && this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
+			if( this.build != that.build ) return ObjectUtil.compare( this.build, that.build );
 		}
-		if( this.snapshot != that.snapshot ) return this.snapshot ? -1 : 1;
 
 		return 0;
 	}
@@ -174,7 +193,7 @@ public class Version implements Comparable<Version> {
 	public boolean equals( Object object ) {
 		if( !( object instanceof Version ) ) return false;
 		Version that = (Version)object;
-		return this.micro == that.micro && TextUtil.areEqual( this.state, that.state ) && this.minor == that.minor && this.major == that.major && this.snapshot == that.snapshot;
+		return this.major == that.major && this.minor == that.minor && this.micro == that.micro && TextUtil.areEqual( this.state, that.state ) && this.build == that.build;
 	}
 
 	@Override
@@ -184,19 +203,19 @@ public class Version implements Comparable<Version> {
 
 	private static final void checkElement( Version version, String element ) {
 		if( TextUtil.isInteger( element ) ) {
-			if( version.major == INVALID ) {
-				version.major = Integer.parseInt( element );
-			} else if( version.minor == INVALID ) {
-				version.minor = Integer.parseInt( element );
-			} else if( version.micro == INVALID ) {
-				version.micro = Integer.parseInt( element );
+			if( version.state == null ) {
+				if( version.major == INVALID ) {
+					version.major = Integer.parseInt( element );
+				} else if( version.minor == INVALID ) {
+					version.minor = Integer.parseInt( element );
+				} else if( version.micro == INVALID ) {
+					version.micro = Integer.parseInt( element );
+				}
+			} else if( version.build == INVALID ) {
+				version.build = Integer.parseInt( element );
 			}
-		} else if( SNAPSHOT.equals( element ) ) {
-			if( version.snapshot ) throw new RuntimeException( "SNAPSHOT should only be declared once." );
-			version.snapshot = true;
-		} else if( version.state != null ) {
-			throw new RuntimeException( "State should only be declared once." );
 		} else {
+			if( version.state != null ) throw new RuntimeException( "State should only be declared once." );
 			version.state = element;
 		}
 	}
