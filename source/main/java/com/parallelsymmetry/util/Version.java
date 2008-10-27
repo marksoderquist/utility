@@ -9,9 +9,9 @@ import java.util.StringTokenizer;
 
 public class Version implements Comparable<Version> {
 
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
-
 	public static final String UNKNOWN = "Unknown";
+
+	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
 
 	private static final Version UNKNOWN_VERSION = new Version( true );
 
