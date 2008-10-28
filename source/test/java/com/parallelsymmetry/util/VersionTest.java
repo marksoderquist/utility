@@ -79,6 +79,27 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
+	public void testParseWithCaseInsensitiveSnapshotVersionString() throws Exception {
+		Version version1 = Version.parse( "1-2-3-snapshot-4", null );
+		assertEquals( 1, version1.getMajor() );
+		assertEquals( 2, version1.getMinor() );
+		assertEquals( 3, version1.getMicro() );
+		assertEquals( "snapshot", version1.getState() );
+		assertEquals( 4, version1.getBuild() );
+		assertEquals( true, version1.isSnapshot() );
+		assertEquals( null, version1.getDate() );
+
+		Version version2 = Version.parse( "1-2-3-SNAPSHOT-4", null );
+		assertEquals( 1, version2.getMajor() );
+		assertEquals( 2, version2.getMinor() );
+		assertEquals( 3, version2.getMicro() );
+		assertEquals( "SNAPSHOT", version2.getState() );
+		assertEquals( 4, version2.getBuild() );
+		assertEquals( true, version2.isSnapshot() );
+		assertEquals( null, version2.getDate() );
+	}
+
+	@Test
 	public void testParseWithVersionDateString() throws Exception {
 		Version version = Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
@@ -220,6 +241,13 @@ public class VersionTest extends TestCase {
 		assertTrue( Version.parse( "1-0-Alpha-0" ).compareTo( Version.parse( "1-0-Beta-0" ) ) < 0 );
 		assertTrue( Version.parse( "1-0-SNAPSHOT-0" ).compareTo( Version.parse( "1-0-SNAPSHOT-1" ) ) < 0 );
 		assertTrue( Version.parse( "1-beta" ).compareTo( Version.parse( "1-beta-0" ) ) < 0 );
+	}
+
+	@Test
+	public void testCompareWithDates() throws Exception {
+		assertTrue( Version.parse( null, "2007-01-01 00:00:00 UTC" ).compareTo( Version.parse( null, "2008-01-01 00:00:00 UTC" ) ) < 0 );
+		assertTrue( Version.parse( null, "2009-01-01 00:00:00 UTC" ).compareTo( Version.parse( null, "2008-01-01 00:00:00 UTC" ) ) > 0 );
+		assertTrue( Version.parse( null, "2008-01-01 00:00:00 UTC" ).compareTo( Version.parse( null, "2008-01-01 00:00:00 UTC" ) ) == 0 );
 	}
 
 }

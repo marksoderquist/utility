@@ -9,11 +9,9 @@ import java.util.StringTokenizer;
 
 public class Version implements Comparable<Version> {
 
-	public static final String UNKNOWN = "Unknown";
-
 	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
 
-	private static final Version UNKNOWN_VERSION = new Version( true );
+	public static final String UNKNOWN = "Unknown";
 
 	private static final String SNAPSHOT = "SNAPSHOT";
 
@@ -35,8 +33,12 @@ public class Version implements Comparable<Version> {
 
 	private Date date;
 
+	private Version() {
+		this( false );
+	}
+
 	private Version( boolean unknown ) {
-		this.unknown = unknown;
+		if( unknown ) this.unknown = unknown;
 	}
 
 	public static final Version parse( String string ) {
@@ -44,26 +46,26 @@ public class Version implements Comparable<Version> {
 	}
 
 	public static final Version parse( String string, String timestamp ) {
-		if( TextUtil.isEmpty( string ) ) return UNKNOWN_VERSION;
+		Version version = new Version( TextUtil.isEmpty( string ) );
 
-		// Parse the version elements.
-		List<String> elements = new ArrayList<String>();
-		StringTokenizer tokenizer = new StringTokenizer( string, ".- " );
-		while( tokenizer.hasMoreTokens() ) {
-			elements.add( tokenizer.nextToken() );
+		if( !TextUtil.isEmpty( string ) ) {
+			// Parse the version elements.
+			List<String> elements = new ArrayList<String>();
+			StringTokenizer tokenizer = new StringTokenizer( string, ".- " );
+			while( tokenizer.hasMoreTokens() ) {
+				elements.add( tokenizer.nextToken() );
+			}
+
+			// Set the original version string. 
+			version.original = string;
+
+			// Check each element for use.
+			for( String element : elements ) {
+				checkElement( version, element );
+			}
 		}
 
-		Version version = new Version( false );
-
-		// Set the original version string. 
-		version.original = string;
-
-		// Check each element for use.
-		for( String element : elements ) {
-			checkElement( version, element );
-		}
-
-		if( timestamp != null ) {
+		if( !TextUtil.isEmpty( timestamp ) ) {
 			try {
 				version.date = DATE_FORMAT.parse( timestamp );
 			} catch( Exception exception ) {
@@ -176,14 +178,21 @@ public class Version implements Comparable<Version> {
 	@Override
 	public int compareTo( Version that ) {
 		if( this.unknown != that.unknown ) return this.unknown ? -1 : 1;
-		if( this.major != INVALID && this.major != that.major ) return ObjectUtil.compare( this.major, that.major );
-		if( this.minor != INVALID && this.minor != that.minor ) return ObjectUtil.compare( this.minor, that.minor );
-		if( this.micro != INVALID && this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
-		if( this.state == null && that.state != null ) return 1;
-		if( this.state != null && that.state == null ) return -1;
-		if( this.state != null ) {
-			if( !TextUtil.areEqual( this.state, that.state ) ) return ObjectUtil.compare( this.state, that.state );
-			if( this.build != that.build ) return ObjectUtil.compare( this.build, that.build );
+		if( !this.unknown ) {
+			if( this.major != INVALID && this.major != that.major ) return ObjectUtil.compare( this.major, that.major );
+			if( this.minor != INVALID && this.minor != that.minor ) return ObjectUtil.compare( this.minor, that.minor );
+			if( this.micro != INVALID && this.micro != that.micro ) return ObjectUtil.compare( this.micro, that.micro );
+			if( this.state == null && that.state != null ) return 1;
+			if( this.state != null && that.state == null ) return -1;
+			if( this.state != null ) {
+				if( !TextUtil.areEqual( this.state, that.state ) ) return ObjectUtil.compare( this.state, that.state );
+				if( this.build != that.build ) return ObjectUtil.compare( this.build, that.build );
+			}
+		}
+
+		System.out.println( "This: " + this.date + "  that: " + that.date );
+		if( this.date != null ) {
+			if( ObjectUtil.compare( this.date, that.date ) != 0 ) return ObjectUtil.compare( this.date, that.date );
 		}
 
 		return 0;
