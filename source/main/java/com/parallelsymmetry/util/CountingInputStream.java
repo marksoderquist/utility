@@ -63,13 +63,23 @@ public class CountingInputStream extends InputStream {
 
 	public int read( byte[] b, int off, int len ) throws IOException {
 		int read = input.read( b, off, len );
-		if( read > 0 ) triggerCountingEvent( count.addAndGet( read ) );
+		//if( read > 0 ) triggerCountingEvent( count.addAndGet( read ) );
+		if( read > 0 ) {
+			for( int index = 0; index < read; index++ ) {
+				triggerCountingEvent( count.incrementAndGet() );
+			}
+		}
 		return read;
 	}
 
 	public int read( byte[] b ) throws IOException {
 		int read = input.read( b );
-		if( read > 0 ) triggerCountingEvent( count.addAndGet( read ) );
+		//if( read > 0 ) triggerCountingEvent( count.addAndGet( read ) );
+		if( read > 0 ) {
+			for( int index = 0; index < read; index++ ) {
+				triggerCountingEvent( count.incrementAndGet() );
+			}
+		}
 		return read;
 	}
 
@@ -86,6 +96,13 @@ public class CountingInputStream extends InputStream {
 	}
 
 	protected void triggerCountingEvent( long count ) {
+		// FIXME Remove this delay after progress worker functionally is complete.
+		try {
+			Thread.sleep( 10 );
+		} catch( InterruptedException e ) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		fireCountingEvent( new CountingEvent( count ) );
 	}
 
