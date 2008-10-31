@@ -98,7 +98,7 @@ public class CountingInputStream extends InputStream {
 	protected void triggerCountingEvent( long count ) {
 		// FIXME Remove this delay after progress worker functionally is complete.
 		try {
-			Thread.sleep( 10 );
+			Thread.sleep( 1 );
 		} catch( InterruptedException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
