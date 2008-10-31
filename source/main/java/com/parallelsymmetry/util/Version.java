@@ -9,7 +9,9 @@ import java.util.StringTokenizer;
 
 public class Version implements Comparable<Version> {
 
-	public static final DateFormat DATE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
+	public static final DateFormat PARSE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
+
+	public static final DateFormat PRINT_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 
 	public static final String UNKNOWN = "Unknown";
 
@@ -67,7 +69,7 @@ public class Version implements Comparable<Version> {
 
 		if( !TextUtil.isEmpty( timestamp ) ) {
 			try {
-				version.date = DATE_FORMAT.parse( timestamp );
+				version.date = PARSE_FORMAT.parse( timestamp );
 			} catch( Exception exception ) {
 				throw new RuntimeException( "Exception parsing version timestamp: " + timestamp, exception );
 			}
@@ -172,7 +174,7 @@ public class Version implements Comparable<Version> {
 	}
 
 	public final String getDateString() {
-		return date == null ? UNKNOWN : DATE_FORMAT.format( date );
+		return date == null ? UNKNOWN : PRINT_FORMAT.format( date );
 	}
 
 	@Override
