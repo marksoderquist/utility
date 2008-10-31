@@ -181,8 +181,9 @@ public class VersionTest extends TestCase {
 
 	@Test
 	public void testGetDateString() throws Exception {
+		DateFormat format = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 		assertEquals( "Unknown", Version.parse( "1-2-U-3", null ).getDateString() );
-		assertEquals( "2000-01-01 00:00:00 -0700", Version.parse( "1-2-U-3", "2000-01-01 00:00:00 MST" ).getDateString() );
+		assertEquals( format.format( DATE_FORMAT.parse( "2000-01-01 07:00:00 UTC" ) ), Version.parse( "1-2-U-3", "2000-01-01 00:00:00 MST" ).getDateString() );
 	}
 
 	@Test
