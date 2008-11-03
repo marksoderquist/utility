@@ -7,12 +7,12 @@
 	<parent>
 		<groupId>com.parallelsymmetry</groupId>
 		<artifactId>pom-parent-signed</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<groupId>com.parallelsymmetry</groupId>
 	<artifactId>utility</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<name>Parallel Symmetry Utility Library</name>
@@ -21,7 +21,7 @@
 	<inceptionYear>2007</inceptionYear>
 
 	<scm>
-		<connection>scm:svn:http://svn.parallelsymmetry.com/software/utility/trunk</connection>
+		<connection>scm:svn:http://svn.parallelsymmetry.com/software/utility/tags/utility-1.0.1</connection>
 	</scm>
 
 	<repositories>
