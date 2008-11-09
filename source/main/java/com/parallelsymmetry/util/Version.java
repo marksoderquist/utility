@@ -192,7 +192,6 @@ public class Version implements Comparable<Version> {
 			}
 		}
 
-		System.out.println( "This: " + this.date + "  that: " + that.date );
 		if( this.date != null ) {
 			if( ObjectUtil.compare( this.date, that.date ) != 0 ) return ObjectUtil.compare( this.date, that.date );
 		}
