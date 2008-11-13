@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 
-<test xmlns="http://www.parallelsymmetry.com/xml/schema/1.0"
-	xmlns:xsi="http://www.parallelsymmetry.com/xml/schema/2006/XMLSchema-instance"
-	xsi:schemaLocation="http://www.parallelsymmetry.com/xml/schema/1.0 http://www.parallelsymmetry.com/xml/schema/clearview-1.0.xsd">
-	
+<test>
 	<name>test.name</name>
 	<alias>test.alias</alias>
 	<path>
