@@ -122,7 +122,6 @@ public class AccessorTest extends TestCase {
 			return object;
 		}
 
-		@SuppressWarnings( "unused" )
 		private static class NestedClass {
 
 			private Object object;
