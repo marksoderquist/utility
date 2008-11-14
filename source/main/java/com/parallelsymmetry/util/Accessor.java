@@ -7,10 +7,11 @@ import java.lang.reflect.Method;
 
 public class Accessor {
 
+	@SuppressWarnings( "unchecked" )
 	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
 		Class<?> clazz = Class.forName( name );
-		return create( clazz, parameters );
+		return (T)create( clazz, parameters );
 	}
 
 	@SuppressWarnings( "unchecked" )
