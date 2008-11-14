@@ -23,7 +23,7 @@ public class Accessor {
 		if( constructor == null ) {
 			Class<?>[] parameterTypes = new Class<?>[parameters.length];
 			for( int index = 0; index < parameters.length; index++ ) {
-				parameterTypes[index] = parameters[index].getClass();
+				if( parameters[index] != null ) parameterTypes[index] = parameters[index].getClass();
 			}
 			try {
 				constructor = clazz.getDeclaredConstructor( parameterTypes );
