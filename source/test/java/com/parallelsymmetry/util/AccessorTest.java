@@ -5,13 +5,23 @@ import junit.framework.TestCase;
 public class AccessorTest extends TestCase {
 
 	public void testCreate() throws Exception {
+		Object object1 = Accessor.create( PrivateClass.NestedClass.class );
+		assertNotNull( object1 );
+		assertEquals( PrivateClass.NestedClass.class, object1.getClass() );
+
+		Object object2 = Accessor.create( PrivateClass.NestedClass.class, new Object() );
+		assertNotNull( object2 );
+		assertEquals( PrivateClass.NestedClass.class, object2.getClass() );
+	}
+
+	public void testCreateWithString() throws Exception {
 		Object object1 = Accessor.create( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass" );
 		assertNotNull( object1 );
-		assertEquals( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass", object1.getClass().getName() );
+		assertEquals( PrivateClass.NestedClass.class, object1.getClass() );
 
 		Object object2 = Accessor.create( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass", new Object() );
 		assertNotNull( object2 );
-		assertEquals( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass", object2.getClass().getName() );
+		assertEquals( PrivateClass.NestedClass.class, object2.getClass() );
 	}
 
 	public void testCreateWithTypeAndParameter() throws Exception {

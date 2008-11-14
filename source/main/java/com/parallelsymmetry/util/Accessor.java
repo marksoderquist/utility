@@ -7,12 +7,17 @@ import java.lang.reflect.Method;
 
 public class Accessor {
 
-	@SuppressWarnings( "unchecked" )
 	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
+		Class<?> clazz = Class.forName( name );
+		return create( clazz, parameters );
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public static <T> T create( Class clazz, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
+		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
 
 		Constructor<?> constructor = null;
-		Class<?> clazz = Class.forName( name );
 
 		if( constructor == null ) {
 			Class<?>[] parameterTypes = new Class<?>[parameters.length];
@@ -46,7 +51,7 @@ public class Accessor {
 			}
 		}
 
-		if( constructor == null ) throw new NoSuchMethodException( name );
+		if( constructor == null ) throw new NoSuchMethodException( clazz.getName() );
 		constructor.setAccessible( true );
 		return (T)constructor.newInstance( parameters );
 	}
@@ -86,8 +91,8 @@ public class Accessor {
 	 * <ol>
 	 * <li>Values only. The value types must exactly match the method parameter
 	 * types.</li>
-	 * <li>Type/value pairs. The type must exactly match the method parameter
-	 * type and be compatible with the value.</li>
+	 * <li>Type/value pairs. The type must exactly match the method parameter type
+	 * and be compatible with the value.</li>
 	 * </ol>
 	 * 
 	 * @param <T>
