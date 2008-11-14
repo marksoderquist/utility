@@ -3,7 +3,10 @@ package com.parallelsymmetry.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 
 public class FileUtil {
 
@@ -50,6 +53,27 @@ public class FileUtil {
 		if( !file.delete() ) return null;
 		if( !file.mkdir() ) return null;
 		return file;
+	}
+
+	public static final void save( String data, File target ) throws IOException {
+		FileWriter writer = new FileWriter( target );
+		writer.write( data );
+		writer.close();
+	}
+
+	public static final String load( File source ) throws IOException {
+		char[] buffer = new char[4096];
+		FileReader reader = new FileReader( source );
+		StringWriter writer = new StringWriter();
+
+		int read = reader.read( buffer );
+		while( read > -1 ) {
+			writer.write( buffer, 0, read );
+			read = reader.read( buffer );
+		}
+		writer.close();
+
+		return writer.toString();
 	}
 
 	public static final boolean copy( File source, File target ) throws IOException {

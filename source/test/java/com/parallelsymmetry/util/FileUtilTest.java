@@ -45,6 +45,12 @@ public class FileUtilTest extends TestCase {
 		folder.delete();
 	}
 
+	public void testSaveAndLoad() throws Exception {
+		File file = File.createTempFile( "FileUtil", "Test" );
+		FileUtil.save( file.toString(), file );
+		assertEquals( file.toString(), FileUtil.load( file ) );
+	}
+
 	public void testCopyWithNonExistantFiles() throws Exception {
 		assertFalse( FileUtil.copy( new File( "" ), new File( "" ) ) );
 	}
