@@ -30,7 +30,7 @@ public class Accessor {
 			} catch( NoSuchMethodException exception ) {}
 		}
 
-		if( constructor == null ) {
+		if( constructor == null && parameters.length % 2 == 0 ) {
 			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
 			for( int index = 0; index < parameters.length / 2; index++ ) {
 				parameterTypes[index] = (Class<?>)parameters[index * 2];
@@ -126,7 +126,7 @@ public class Accessor {
 			}
 		}
 
-		if( method == null ) {
+		if( method == null && parameters.length % 2 == 0 ) {
 			Class clazz = object.getClass();
 			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
 			for( int index = 0; index < parameters.length / 2; index++ ) {
@@ -170,7 +170,7 @@ public class Accessor {
 			} catch( NoSuchMethodException exception ) {}
 		}
 
-		if( method == null ) {
+		if( method == null && parameters.length % 2 == 0 ) {
 			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
 			for( int index = 0; index < parameters.length / 2; index++ ) {
 				parameterTypes[index] = (Class<?>)parameters[index * 2];
