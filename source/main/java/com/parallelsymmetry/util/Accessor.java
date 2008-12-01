@@ -30,24 +30,44 @@ public class Accessor {
 			} catch( NoSuchMethodException exception ) {}
 		}
 
-		if( constructor == null && parameters.length % 2 == 0 ) {
+		if( constructor == null ) {
 			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
-			for( int index = 0; index < parameters.length / 2; index++ ) {
-				parameterTypes[index] = (Class<?>)parameters[index * 2];
+			if( parameters.length % 2 == 0 ) {
+				int count = parameters.length / 2;
+				parameterTypes = new Class<?>[count];
+				for( int index = 0; index < count; index++ ) {
+					parameterTypes[index] = (Class<?>)parameters[index * 2];
+				}
+			} else {
+				int count = ( parameters.length - 1 ) / 2;
+				parameterTypes = new Class<?>[count + 1];
+				parameterTypes[0] = parameters[0].getClass();
+				for( int index = 0; index < count; index++ ) {
+					parameterTypes[index + 1] = (Class<?>)parameters[( index * 2 ) + 1];
+				}
 			}
 
-			while( constructor == null & clazz != null ) {
+			Class<?> checkClass = clazz;
+			while( constructor == null & checkClass != null ) {
 				try {
-					constructor = clazz.getDeclaredConstructor( parameterTypes );
+					constructor = checkClass.getDeclaredConstructor( parameterTypes );
 				} catch( NoSuchMethodException exception ) {}
-				clazz = clazz.getSuperclass();
+				checkClass = checkClass.getSuperclass();
 			}
 
 			if( constructor != null ) {
-				Object[] incomming = parameters;
-				parameters = new Object[parameters.length / 2];
-				for( int index = 0; index < parameters.length; index++ ) {
-					parameters[index] = incomming[index * 2 + 1];
+				if( parameters.length % 2 == 0 ) {
+					Object[] incomming = parameters;
+					parameters = new Object[parameters.length / 2];
+					for( int index = 0; index < parameters.length; index++ ) {
+						parameters[index] = incomming[index * 2 + 1];
+					}
+				} else {
+					Object[] incomming = parameters;
+					parameters = new Object[parameters.length / 2 + 1];
+					for( int index = 0; index < parameters.length; index++ ) {
+						parameters[index] = incomming[index * 2];
+					}
 				}
 			}
 		}

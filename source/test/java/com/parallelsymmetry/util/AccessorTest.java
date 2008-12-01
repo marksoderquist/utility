@@ -11,21 +11,26 @@ public class AccessorTest extends TestCase {
 		assertEquals( PrivateClass.class, object1.getClass() );
 
 		try {
-			Accessor.create( PrivateClass.class, "loopback" );
+			Accessor.create( PrivateClass.class, "object" );
 			fail( "Constructor should not have been found." );
 		} catch( NoSuchMethodException exception ) {}
 
 		PrivateClass object3 = null;
-		object3 = Accessor.create( PrivateClass.class, Object.class, "loopback" );
+		object3 = Accessor.create( PrivateClass.class, Object.class, "object" );
 		assertNotNull( object3 );
 		assertEquals( PrivateClass.class, object3.getClass() );
-		assertEquals( "loopback", Accessor.getField( object3, "field" ) );
+		assertEquals( "object", Accessor.getField( object3, "field" ) );
 	}
 
 	public void testCreateNestedClass() throws Exception {
 		Object object1 = Accessor.create( PrivateClass.NestedClass.class );
 		assertNotNull( object1 );
 		assertEquals( PrivateClass.NestedClass.class, object1.getClass() );
+
+		try {
+			Accessor.create( PrivateClass.NestedClass.class, "object" );
+			fail( "Constructor should not have been found." );
+		} catch( NoSuchMethodException exception ) {}
 
 		Object checkObject = new Object();
 		Object object2 = Accessor.create( PrivateClass.NestedClass.class, checkObject );
@@ -37,15 +42,45 @@ public class AccessorTest extends TestCase {
 	public void testCreateInnerClass() throws Exception {
 		PrivateClass object = new PrivateClass();
 		PrivateClass.InnerClass object1 = Accessor.create( PrivateClass.InnerClass.class, object );
+		assertNotNull( object1 );
 		assertEquals( PrivateClass.InnerClass.class, object1.getClass() );
+
+		try {
+			Accessor.create( PrivateClass.InnerClass.class.getName(), "loopback" );
+			fail( "Constructor should not have been found." );
+		} catch( NoSuchMethodException exception ) {}
+
+		PrivateClass.InnerClass object2 = Accessor.create( PrivateClass.InnerClass.class, object, Object.class, "object" );
+		assertNotNull( object2 );
+		assertEquals( PrivateClass.InnerClass.class, object2.getClass() );
 	}
 
 	public void testCreateWithString() throws Exception {
-		Object object1 = Accessor.create( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass" );
+		Object object1 = Accessor.create( PrivateClass.class.getName() );
+		assertNotNull( object1 );
+		assertEquals( PrivateClass.class, object1.getClass() );
+
+		try {
+			Accessor.create( PrivateClass.class.getName(), "loopback" );
+			fail( "Constructor should not have been found." );
+		} catch( NoSuchMethodException exception ) {}
+
+		Object object2 = Accessor.create( PrivateClass.class.getName(), new Object() );
+		assertNotNull( object2 );
+		assertEquals( PrivateClass.class, object2.getClass() );
+	}
+
+	public void testCreateNestedClassWithString() throws Exception {
+		Object object1 = Accessor.create( PrivateClass.NestedClass.class.getName() );
 		assertNotNull( object1 );
 		assertEquals( PrivateClass.NestedClass.class, object1.getClass() );
 
-		Object object2 = Accessor.create( "com.parallelsymmetry.util.AccessorTest$PrivateClass$NestedClass", new Object() );
+		try {
+			Accessor.create( PrivateClass.NestedClass.class.getName(), "loopback" );
+			fail( "Constructor should not have been found." );
+		} catch( NoSuchMethodException exception ) {}
+
+		Object object2 = Accessor.create( PrivateClass.NestedClass.class.getName(), new Object() );
 		assertNotNull( object2 );
 		assertEquals( PrivateClass.NestedClass.class, object2.getClass() );
 	}
