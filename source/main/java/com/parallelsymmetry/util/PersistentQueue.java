@@ -30,6 +30,7 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 
 	private int removesSinceLastDefrag;
 
+	// FIXME Need to make a persistent blocking queue.
 	private Queue<E> queue;
 
 	public PersistentQueue( String file ) throws IOException {
