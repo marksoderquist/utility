@@ -121,4 +121,5 @@ public class PersistentQueueTest extends TestCase {
 		store.deleteOnExit();
 		return new PersistentQueue<String>( store, defragInterval );
 	}
+
 }

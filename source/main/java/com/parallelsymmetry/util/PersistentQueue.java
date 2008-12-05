@@ -10,7 +10,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Implements a persistent(stored on disk) FIFO Queue.
@@ -24,14 +25,13 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 
 	public static final String TEMPFILE_SUFFIX = "tmp";
 
-	private final File store;
+	protected final File store;
 
-	private final int defragInterval;
+	protected final int defragInterval;
 
-	private int removesSinceLastDefrag;
+	protected final BlockingQueue<E> queue = new LinkedBlockingQueue<E>();
 
-	// FIXME Need to make a persistent blocking queue.
-	private Queue<E> queue;
+	protected int removesSinceLastDefrag;
 
 	public PersistentQueue( String file ) throws IOException {
 		this( file, DEFAULT_DEFRAG_INTERVAL );
@@ -48,8 +48,6 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	public PersistentQueue( File file, int defragInterval ) throws IOException {
 		this.store = file;
 		this.defragInterval = defragInterval;
-
-		queue = new ConcurrentLinkedQueue<E>();
 
 		if( file.exists() ) {
 			readFromStore( file );
@@ -78,14 +76,12 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	}
 
 	@Override
-	public boolean addAll( Collection< ? extends E> collection ) {
+	public boolean addAll( Collection<? extends E> collection ) {
 		boolean result = queue.addAll( collection );
 
 		if( result == true ) {
 			try {
-				for( E element : collection ) {
-					appendToStore( store, element );
-				}
+				appendToStore( store, collection.toArray( new Serializable[collection.size()] ) );
 			} catch( IOException exception ) {
 				throw new RuntimeException( exception );
 			}
@@ -111,7 +107,7 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	}
 
 	@Override
-	public boolean containsAll( Collection< ? > collection ) {
+	public boolean containsAll( Collection<?> collection ) {
 		return queue.containsAll( collection );
 	}
 
@@ -153,90 +149,52 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	@Override
 	public E poll() {
 		E element = queue.poll();
-
-		// Defragment the store if necessary.
-		if( element != null ) {
-			removesSinceLastDefrag++;
-			try {
-				if( removesSinceLastDefrag >= defragInterval ) {
-					defragStore( store );
-					removesSinceLastDefrag = 0;
-				} else {
-					appendToStore( store, new DeleteMarker() );
-				}
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
-			}
-		}
-
+		if( element != null ) removeDefrag( 1 );
 		return element;
 	}
 
 	@Override
 	public E remove() {
 		E element = queue.remove();
-
-		// Defragment the store if necessary.
-		if( element != null ) {
-			removesSinceLastDefrag++;
-			try {
-				if( removesSinceLastDefrag >= defragInterval ) {
-					defragStore( store );
-					removesSinceLastDefrag = 0;
-				} else {
-					appendToStore( store, new DeleteMarker() );
-				}
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
-			}
-		}
-
+		if( element != null ) removeDefrag( 1 );
 		return element;
 	}
 
 	@Override
 	public boolean remove( Object object ) {
 		boolean result = queue.remove( object );
-
-		if( result == true ) {
-			try {
-				defragStore( store );
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
-			}
-		}
-
-		return true;
+		if( result == true ) removeDefrag( 1 );
+		return result;
 	}
 
 	@Override
-	public boolean removeAll( Collection< ? > collection ) {
+	public boolean removeAll( Collection<?> collection ) {
+		int size = queue.size();
 		boolean result = queue.removeAll( collection );
-
-		if( result == true ) {
-			try {
-				defragStore( store );
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
-			}
-		}
-
-		return true;
+		if( result == true ) removeDefrag( size - queue.size() );
+		return result;
 	}
 
 	@Override
-	public boolean retainAll( Collection< ? > collection ) {
+	public boolean retainAll( Collection<?> collection ) {
+		int size = queue.size();
 		boolean result = queue.retainAll( collection );
+		if( result == true ) removeDefrag( size - queue.size() );
+		return result;
+	}
 
-		if( result == true ) {
-			try {
+	protected void removeDefrag( int count ) {
+		removesSinceLastDefrag += count;
+		try {
+			if( removesSinceLastDefrag >= defragInterval ) {
 				defragStore( store );
-			} catch( IOException exception ) {
-				throw new RuntimeException( exception );
+				removesSinceLastDefrag = 0;
+			} else {
+				appendToStore( store, new DeleteMarker() );
 			}
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
 		}
-
-		return true;
 	}
 
 	@Override
@@ -262,6 +220,39 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	@Override
 	public int hashCode() {
 		return queue.hashCode();
+	}
+
+	protected synchronized void appendToStore( File store, Serializable... elements ) throws IOException {
+		// Create the output streams.
+		FileOutputStream fileOutput = new FileOutputStream( store, true );
+		ObjectOutputStream objectOutput = new ObjectOutputStream( fileOutput );
+
+		for( Serializable element : elements ) {
+			objectOutput.writeObject( element );
+		}
+
+		// Flush the output stream.
+		objectOutput.flush();
+		fileOutput.flush();
+
+		// Close the output streams.
+		objectOutput.close();
+		fileOutput.close();
+	}
+
+	protected synchronized void defragStore( File store ) throws IOException {
+		File defraggedStore = new File( store.getParent(), store.getName() + "." + TEMPFILE_SUFFIX );
+
+		// Write out a new file.
+		writeToStore( defraggedStore );
+
+		// Rename the defragmented file to the original file name.
+		store.delete();
+		if( !defraggedStore.renameTo( store ) ) {
+			throw new IOException( "Unable to rename " + defraggedStore + " to " + store + "." );
+		}
+
+		removesSinceLastDefrag = 0;
 	}
 
 	private void createNewStore( File store ) throws IOException {
@@ -305,22 +296,6 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		}
 	}
 
-	private synchronized void appendToStore( File store, Serializable element ) throws IOException {
-		// Create the output streams.
-		FileOutputStream fileOutput = new FileOutputStream( store, true );
-		ObjectOutputStream objectOutput = new ObjectOutputStream( fileOutput );
-
-		objectOutput.writeObject( element );
-
-		// Flush the output stream.
-		objectOutput.flush();
-		fileOutput.flush();
-
-		// Close the output streams.
-		objectOutput.close();
-		fileOutput.close();
-	}
-
 	private synchronized void writeToStore( File store ) throws IOException {
 		FileOutputStream fileOutput = new FileOutputStream( store );
 
@@ -336,22 +311,7 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		fileOutput.close();
 	}
 
-	private synchronized void defragStore( File store ) throws IOException {
-		File defraggedStore = new File( store.getParent(), store.getName() + "." + TEMPFILE_SUFFIX );
-
-		// Write out a new file.
-		writeToStore( defraggedStore );
-
-		// Rename the defragmented file to the original file name.
-		store.delete();
-		if( !defraggedStore.renameTo( store ) ) {
-			throw new IOException( "Unable to rename " + defraggedStore + " to " + store + "." );
-		}
-
-		removesSinceLastDefrag = 0;
-	}
-
-	private static final class DeleteMarker implements Serializable {
+	protected static final class DeleteMarker implements Serializable {
 		private static final long serialVersionUID = 6656403687908487381L;
 	}
 
