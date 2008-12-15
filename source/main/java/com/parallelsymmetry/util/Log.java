@@ -131,6 +131,8 @@ public class Log {
 		write( INFO, message, null );
 	}
 
+	// TODO Add a log method that takes String var args.
+
 	public static final void write( Level level, String message ) {
 		write( level, message, null );
 	}
