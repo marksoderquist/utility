@@ -20,6 +20,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
+// FIXME Run log publishing on a separate thread.
 /**
  * Provides a facade to the standard Java logging architecture. This facade
  * simply provides convenience methods for the developer.
