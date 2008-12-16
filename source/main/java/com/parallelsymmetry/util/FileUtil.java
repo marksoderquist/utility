@@ -1,6 +1,7 @@
 package com.parallelsymmetry.util;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class FileUtil {
+
+	public static final FileFilter FOLDER_FILTER = new FolderFilter();
 
 	public static final String getExtension( File file ) {
 		if( file == null ) return null;
@@ -135,6 +138,15 @@ public class FileUtil {
 				deleteTreeOnExit( child );
 			}
 		}
+	}
+
+	private static final class FolderFilter implements FileFilter {
+
+		@Override
+		public boolean accept( File file ) {
+			return file.isDirectory();
+		}
+
 	}
 
 }
