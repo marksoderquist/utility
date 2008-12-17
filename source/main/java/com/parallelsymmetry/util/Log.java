@@ -20,7 +20,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 
-// FIXME Run log publishing on a separate thread.
 /**
  * Provides a facade to the standard Java logging architecture. This facade
  * simply provides convenience methods for the developer.
@@ -54,8 +53,6 @@ public class Log {
 	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
 
 	private static Set<Logger> namedLoggers;
-
-	private static int counter;
 
 	static {
 		namedLoggers = new HashSet<Logger>();
@@ -110,47 +107,42 @@ public class Log {
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
-	/**
-	 * Get log counter. Every time this method is called the counter is increased.
-	 * 
-	 * @return The log counter.
-	 */
-	public static final int getCounter() {
-		return counter++;
-	}
-
 	public static final void write() {
-		write( INFO, "", null );
+		write( INFO, "" );
 	}
 
 	public static final void write( Level level ) {
-		write( level, "", null );
+		write( level, "" );
 	}
 
-	public static final void write( String message ) {
-		write( INFO, message, null );
+	public static final void write( String... message ) {
+		write( INFO, message );
 	}
 
-	// TODO Add a log method that takes String var args.
-
-	public static final void write( Level level, String message ) {
-		write( level, message, null );
+	public static final void write( Level level, String... message ) {
+		write( level, null, message );
 	}
 
 	public static final void write( Throwable throwable ) {
-		write( (String)null, throwable );
+		write( throwable, (String[])null );
 	}
 
-	public static final void write( String message, Throwable throwable ) {
-		write( ERROR, message, throwable );
+	public static final void write( Throwable throwable, String... message ) {
+		write( ERROR, throwable, message );
 	}
 
 	public static final void write( Level level, Throwable throwable ) {
-		write( level, null, throwable );
+		write( level, throwable, (String[])null );
 	}
 
-	public static final void write( Level level, String message, Throwable throwable ) {
-		LogRecord record = new LogRecord( level, message );
+	public static final void write( Level level, Throwable throwable, String... message ) {
+		StringBuilder builder = new StringBuilder();
+		if( message != null ) {
+			for( String string : message ) {
+				builder.append( string );
+			}
+		}
+		LogRecord record = new LogRecord( level, message == null ? null : builder.toString() );
 		if( throwable != null ) record.setThrown( throwable );
 		StackTraceElement caller = getCaller();
 		record.setSourceClassName( caller.getClassName() );
@@ -158,6 +150,8 @@ public class Log {
 		write( record );
 	}
 
+	//FIXME Run log publishing on a separate thread.
+	// I may not have done this for a reason. I need to look into it.
 	public static final void write( LogRecord record ) {
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).log( record );
 	}

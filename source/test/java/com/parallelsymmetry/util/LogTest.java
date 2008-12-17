@@ -3,8 +3,6 @@ package com.parallelsymmetry.util;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-import com.parallelsymmetry.util.Log;
-
 import junit.framework.TestCase;
 
 public class LogTest extends TestCase {
@@ -66,7 +64,7 @@ public class LogTest extends TestCase {
 		LogRecord record = null;
 
 		Throwable throwable = new Exception( "Test" );
-		Log.write( "Test", throwable );
+		Log.write( throwable, "Test" );
 		record = handler.getLogRecord();
 		assertEquals( "Incorrect log level.", Log.ERROR, record.getLevel() );
 		assertEquals( "Incorrect log message.", "Test", record.getMessage() );
