@@ -13,6 +13,8 @@ public class FileUtil {
 
 	public static final FileFilter FOLDER_FILTER = new FolderFilter();
 
+	public static final FileFilter JAR_FILE_FILTER = new JarFileFilter();
+
 	public static final String getExtension( File file ) {
 		if( file == null ) return null;
 		return getExtension( file.getName() );
@@ -138,15 +140,6 @@ public class FileUtil {
 				deleteTreeOnExit( child );
 			}
 		}
-	}
-
-	private static final class FolderFilter implements FileFilter {
-
-		@Override
-		public boolean accept( File file ) {
-			return file.isDirectory();
-		}
-
 	}
 
 }
