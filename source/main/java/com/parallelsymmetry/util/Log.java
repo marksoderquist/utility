@@ -150,8 +150,6 @@ public class Log {
 		write( record );
 	}
 
-	//FIXME Run log publishing on a separate thread.
-	// I may not have done this for a reason. I need to look into it.
 	public static final void write( LogRecord record ) {
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).log( record );
 	}
