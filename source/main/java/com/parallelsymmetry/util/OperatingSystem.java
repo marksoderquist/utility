@@ -21,6 +21,10 @@ public class OperatingSystem {
 
 	private static Architecture architecture;
 
+	private static String name;
+
+	private static String arch;
+
 	/**
 	 * Initialize the class.
 	 */
@@ -29,6 +33,10 @@ public class OperatingSystem {
 	}
 
 	public static final void init( String name, String arch ) {
+		OperatingSystem.name = name;
+
+		OperatingSystem.arch = arch;
+
 		// Determine the OS type.
 		if( name.contains( "Linux" ) ) {
 			family = Family.LINUX;
@@ -73,7 +81,11 @@ public class OperatingSystem {
 		switch( family ) {
 			case WINDOWS: {
 				if( name != null ) {
-					return new File( System.getProperty( "user.home" ), "Application Data/" + name );
+					if( "Windows Vista".equals( OperatingSystem.name ) ) {
+						return new File( System.getProperty( "user.home" ), "AppData/Local/" + name );
+					} else {
+						return new File( System.getProperty( "user.home" ), "Application Data/" + name );
+					}
 				}
 			}
 			default: {

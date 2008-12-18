@@ -97,7 +97,10 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystem.init( "Linux", System.getProperty( "os.arch" ) );
 		assertEquals( new File( System.getProperty( "user.home" ), "." + identifier ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
 
-		OperatingSystem.init( "Windows Vista", System.getProperty( "os.arch" ) );
+		OperatingSystem.init( "Windows XP", System.getProperty( "os.arch" ) );
 		assertEquals( new File( System.getProperty( "user.home" ), "Application Data/" + name ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
+
+		OperatingSystem.init( "Windows Vista", System.getProperty( "os.arch" ) );
+		assertEquals( new File( System.getProperty( "user.home" ), "AppData/Local/" + name ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
 	}
 }
