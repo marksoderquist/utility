@@ -1,5 +1,7 @@
 package com.parallelsymmetry.util;
 
+import java.io.File;
+
 /**
  * Operating system detection routines.
  * 
@@ -65,6 +67,19 @@ public class OperatingSystem {
 
 	public static final Architecture getArchitecture() {
 		return architecture;
+	}
+
+	public static final File getApplicationDataFolder( String identifier, String name ) {
+		switch( family ) {
+			case WINDOWS: {
+				if( name != null ) {
+					return new File( System.getProperty( "user.dir" ), "Application Data/" + name );
+				}
+			}
+			default: {
+				return new File( System.getProperty( "user.dir" ), "." + identifier );
+			}
+		}
 	}
 
 }

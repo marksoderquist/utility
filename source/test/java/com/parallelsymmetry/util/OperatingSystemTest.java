@@ -1,5 +1,7 @@
 package com.parallelsymmetry.util;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
@@ -87,4 +89,15 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( OperatingSystem.Architecture.PPC, OperatingSystem.getArchitecture() );
 	}
 
+	@Test
+	public void testGetApplicationDataFolder() {
+		String name = "Test";
+		String identifier = name.toLowerCase();
+
+		OperatingSystem.init( "Linux", System.getProperty( "os.arch" ) );
+		assertEquals( new File( System.getProperty( "user.dir" ), "." + identifier ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
+
+		OperatingSystem.init( "Windows Vista", System.getProperty( "os.arch" ) );
+		assertEquals( new File( System.getProperty( "user.dir" ), "Application Data/" + name ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
+	}
 }
