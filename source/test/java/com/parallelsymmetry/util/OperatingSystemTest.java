@@ -95,9 +95,9 @@ public class OperatingSystemTest extends TestCase {
 		String identifier = name.toLowerCase();
 
 		OperatingSystem.init( "Linux", System.getProperty( "os.arch" ) );
-		assertEquals( new File( System.getProperty( "user.dir" ), "." + identifier ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
+		assertEquals( new File( System.getProperty( "user.home" ), "." + identifier ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
 
 		OperatingSystem.init( "Windows Vista", System.getProperty( "os.arch" ) );
-		assertEquals( new File( System.getProperty( "user.dir" ), "Application Data/" + name ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
+		assertEquals( new File( System.getProperty( "user.home" ), "Application Data/" + name ), OperatingSystem.getApplicationDataFolder( identifier, name ) );
 	}
 }

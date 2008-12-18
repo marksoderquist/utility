@@ -73,11 +73,11 @@ public class OperatingSystem {
 		switch( family ) {
 			case WINDOWS: {
 				if( name != null ) {
-					return new File( System.getProperty( "user.dir" ), "Application Data/" + name );
+					return new File( System.getProperty( "user.home" ), "Application Data/" + name );
 				}
 			}
 			default: {
-				return new File( System.getProperty( "user.dir" ), "." + identifier );
+				return new File( System.getProperty( "user.home" ), "." + identifier );
 			}
 		}
 	}
