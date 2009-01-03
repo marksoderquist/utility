@@ -23,6 +23,7 @@ public class OperatingSystem {
 
 	private static String name;
 
+	@SuppressWarnings( "unused" )
 	private static String arch;
 
 	/**
