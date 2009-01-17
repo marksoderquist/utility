@@ -52,7 +52,7 @@ public class Preferences extends java.util.prefs.Preferences {
 	}
 
 	public void loadDefaults( InputStream input ) throws IOException {
-		if( input == null ) return;
+		if( input == null ) throw new NullPointerException();
 
 		Descriptor descriptor = null;
 		try {
