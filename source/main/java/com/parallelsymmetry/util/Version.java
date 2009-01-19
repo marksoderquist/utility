@@ -44,7 +44,14 @@ public class Version implements Comparable<Version> {
 	}
 
 	public static final Version parse( String string ) {
-		return parse( string, null );
+		if( string == null ) return parse( null, null );
+
+		int index = string.indexOf( ' ' );
+		if( index < 0 ) return parse( string, null );
+
+		String version = string.substring( 0, index );
+		String date = string.substring( index + 1 );
+		return parse( version, date );
 	}
 
 	public static final Version parse( String string, String timestamp ) {

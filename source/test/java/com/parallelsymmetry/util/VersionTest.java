@@ -100,6 +100,18 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
+	public void testParseWithVersionDateTogether() throws Exception {
+		Version version = Version.parse( "1-2-Update-3 2000-01-01 00:00:00 MST" );
+		assertEquals( 1, version.getMajor() );
+		assertEquals( 2, version.getMinor() );
+		assertEquals( 0, version.getMicro() );
+		assertEquals( "Update", version.getState() );
+		assertEquals( 3, version.getBuild() );
+		assertEquals( false, version.isSnapshot() );
+		assertEquals( DATE_FORMAT.parse( "2000-01-01 07:00:00" ), version.getDate() );
+	}
+
+	@Test
 	public void testParseWithVersionDateString() throws Exception {
 		Version version = Version.parse( "1-2-Update-3", "2000-01-01 00:00:00 MST" );
 		assertEquals( 1, version.getMajor() );
