@@ -23,6 +23,14 @@ public class FileUtilTest extends TestCase {
 		}
 	}
 
+	public void testConstants() throws Exception {
+		assertEquals( 1024L, FileUtil.KILOBYTE );
+		assertEquals( 1048576L, FileUtil.MEGABYTE );
+		assertEquals( 1073741824L, FileUtil.GIGABYTE );
+		assertEquals( 1099511627776L, FileUtil.TERABYTE );
+		assertEquals( 1125899906842624L, FileUtil.PETABYTE );
+	}
+
 	public void testGetExtensionWithFile() throws Exception {
 		assertEquals( "Incorrect extension.", null, FileUtil.getExtension( (File)null ) );
 		assertEquals( "Incorrect extension.", "", FileUtil.getExtension( new File( "test" ) ) );

@@ -11,6 +11,16 @@ import java.io.StringWriter;
 
 public class FileUtil {
 
+	public static final long KILOBYTE = 1L << 10;
+
+	public static final long MEGABYTE = 1L << 20;
+
+	public static final long GIGABYTE = 1L << 30;
+
+	public static final long TERABYTE = 1L << 40;
+
+	public static final long PETABYTE = 1L << 50;
+
 	public static final FileFilter FOLDER_FILTER = new FolderFilter();
 
 	public static final FileFilter JAR_FILE_FILTER = new JarFileFilter();
