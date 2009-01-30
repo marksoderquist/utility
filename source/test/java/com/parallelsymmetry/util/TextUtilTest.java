@@ -4,8 +4,11 @@ import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
+
 public class TextUtilTest extends TestCase {
 
+	@Test
 	public void testIsEmpty() {
 		assertTrue( TextUtil.isEmpty( null ) );
 		assertTrue( TextUtil.isEmpty( "" ) );
@@ -13,6 +16,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.isEmpty( "." ) );
 	}
 
+	@Test
 	public void testAreEqual() {
 		assertTrue( TextUtil.areEqual( null, null ) );
 		assertTrue( TextUtil.areEqual( "", "" ) );
@@ -23,6 +27,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areEqual( "", null ) );
 	}
 
+	@Test
 	public void testAreSame() {
 		assertTrue( TextUtil.areSame( null, null ) );
 		assertTrue( TextUtil.areSame( "", "" ) );
@@ -38,6 +43,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areSame( " ", "a" ) );
 	}
 
+	@Test
 	public void testCompare() {
 		assertEquals( 0, TextUtil.compare( null, null ) );
 		assertEquals( -1, TextUtil.compare( null, "" ) );
@@ -49,12 +55,14 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, TextUtil.compare( "b", "a" ) );
 	}
 
+	@Test
 	public void testConcatenate() {
 		assertEquals( "Count: 10", TextUtil.concatenate( "Count: ", 10 ) );
 		assertEquals( "Flag: false", TextUtil.concatenate( "Flag: ", false ) );
 		assertEquals( "Test String", TextUtil.concatenate( "Test", " ", "String" ) );
 	}
 
+	@Test
 	public void testToPrintableString() {
 		assertEquals( "Bad conversion.", "[0]", TextUtil.toPrintableString( (char)0 ) );
 		assertEquals( "Bad conversion.", "[27]", TextUtil.toPrintableString( (char)27 ) );
@@ -66,6 +74,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "[255]", TextUtil.toPrintableString( (char)255 ) );
 	}
 
+	@Test
 	public void testToHexEncodedStringWithBytes() {
 		Charset ascii = Charset.forName( "ASCII" );
 		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "".getBytes( ascii ) ) );
@@ -75,6 +84,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test".getBytes( ascii ) ) );
 	}
 
+	@Test
 	public void testToHexEncodedStringWithString() {
 		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "" ) );
 		assertEquals( "Bad conversion.", "0", TextUtil.toHexEncodedString( "\u0000" ) );
@@ -83,6 +93,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test" ) );
 	}
 
+	@Test
 	public void testIsInteger() throws Exception {
 		assertEquals( false, TextUtil.isInteger( null ) );
 		assertEquals( false, TextUtil.isInteger( "" ) );
@@ -97,6 +108,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isInteger( "-2147483648" ) );
 	}
 
+	@Test
 	public void testIsLong() throws Exception {
 		assertEquals( false, TextUtil.isLong( null ) );
 		assertEquals( false, TextUtil.isLong( "" ) );
@@ -111,6 +123,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isLong( "-9223372036854775808" ) );
 	}
 
+	@Test
 	public void testIsFloat() throws Exception {
 		assertEquals( false, TextUtil.isFloat( null ) );
 		assertEquals( false, TextUtil.isFloat( "" ) );
@@ -123,6 +136,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isFloat( "-1e-10" ) );
 	}
 
+	@Test
 	public void testIsDouble() throws Exception {
 		assertEquals( false, TextUtil.isDouble( null ) );
 		assertEquals( false, TextUtil.isDouble( "" ) );
@@ -135,6 +149,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isDouble( "-1e-10" ) );
 	}
 
+	@Test
 	public void testJustify() {
 		assertEquals( "Incorrect format.", "        ", TextUtil.justify( TextUtil.LEFT, "", 8 ) );
 		assertEquals( "Incorrect format.", "X       ", TextUtil.justify( TextUtil.LEFT, "X", 8 ) );
@@ -145,6 +160,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect format.", "       X", TextUtil.justify( TextUtil.RIGHT, "X", 8 ) );
 	}
 
+	@Test
 	public void testJustifyWithChar() {
 		assertEquals( "Incorrect format.", "........", TextUtil.justify( TextUtil.LEFT, "", 8, '.' ) );
 		assertEquals( "Incorrect format.", "X.......", TextUtil.justify( TextUtil.LEFT, "X", 8, '.' ) );
@@ -155,6 +171,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect format.", ".......X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.' ) );
 	}
 
+	@Test
 	public void testJustifyWithCharAndPad() {
 		assertEquals( "Incorrect format.", "  ......", TextUtil.justify( TextUtil.LEFT, "", 8, '.', 2 ) );
 		assertEquals( "Incorrect format.", "X  .....", TextUtil.justify( TextUtil.LEFT, "X", 8, '.', 2 ) );
@@ -165,6 +182,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect format.", ".....  X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.', 2 ) );
 	}
 
+	@Test
 	public void testPad() {
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( -1 ) );
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( 0 ) );
@@ -173,6 +191,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "        ", TextUtil.pad( 8 ) );
 	}
 
+	@Test
 	public void testPadWithChar() {
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( -1, '.' ) );
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( 0, '.' ) );
@@ -181,6 +200,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "--------", TextUtil.pad( 8, '-' ) );
 	}
 
+	@Test
 	public void testGetLineCount() {
 		assertEquals( 0, TextUtil.getLineCount( null ) );
 		assertEquals( 1, TextUtil.getLineCount( "" ) );
@@ -190,6 +210,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
 	}
 
+	@Test
 	public void testIndent() {
 		assertEquals( null, TextUtil.indent( null ) );
 		assertEquals( "  ", TextUtil.indent( "" ) );
