@@ -1,30 +1,32 @@
 package com.parallelsymmetry.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 import junit.framework.TestCase;
 
 public class JavaUtilTest extends TestCase {
 
-	public void testParseSystemClasspath() {
+	public void testParseSystemClasspath() throws IOException {
 		String classpath = "test1.jar" + File.pathSeparator + "test2.jar";
-		String[] entries = JavaUtil.parseSystemClasspath( classpath );
+		List<File> entries = JavaUtil.parseSystemClasspath( classpath );
 
-		assertEquals( "test1.jar", entries[0] );
-		assertEquals( "test2.jar", entries[1] );
+		assertEquals( new File( "test1.jar" ).getAbsoluteFile(), entries.get( 0 ) );
+		assertEquals( new File( "test2.jar" ).getAbsoluteFile(), entries.get( 1 ) );
 	}
 
 	public void testParseManifestClasspath() throws Exception {
 		File home = new File( "" );
 		URI base = new File( "" ).toURI();
 		String classpath = "test1.jar test2.jar test%203.jar";
-		URL[] entries = JavaUtil.parseManifestClasspath( base, classpath );
+		List<URL> entries = JavaUtil.parseManifestClasspath( base, classpath );
 
-		assertEquals( new File( home.getCanonicalFile(), "test1.jar" ).toURI().toURL(), entries[0] );
-		assertEquals( new File( home.getCanonicalFile(), "test2.jar" ).toURI().toURL(), entries[1] );
-		assertEquals( new File( home.getCanonicalFile(), "test 3.jar" ).toURI().toURL(), entries[2] );
+		assertEquals( new File( home.getCanonicalFile(), "test1.jar" ).toURI().toURL(), entries.get( 0 ) );
+		assertEquals( new File( home.getCanonicalFile(), "test2.jar" ).toURI().toURL(), entries.get( 1 ) );
+		assertEquals( new File( home.getCanonicalFile(), "test 3.jar" ).toURI().toURL(), entries.get( 2 ) );
 	}
 
 }

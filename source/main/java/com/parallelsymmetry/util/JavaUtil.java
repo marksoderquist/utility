@@ -20,15 +20,14 @@ public class JavaUtil {
 	 * "http://java.sun.com/javase/6/docs/technotes/tools/solaris/classpath.html"
 	 * >Setting the Unix Classpath</a>
 	 */
-	public static String[] parseSystemClasspath( String classpath ) {
-		List<String> entries = new ArrayList<String>();
-
+	public static List<File> parseSystemClasspath( String classpath ) throws IOException {
 		StringTokenizer tokenizer = new StringTokenizer( classpath, File.pathSeparator );
+		ArrayList<File> list = new ArrayList<File>();
 		while( tokenizer.hasMoreTokens() ) {
-			entries.add( tokenizer.nextToken() );
+			File file = new File( tokenizer.nextToken() ).getCanonicalFile();
+			list.add( file );
 		}
-
-		return entries.toArray( new String[entries.size()] );
+		return list;
 	}
 
 	/**
@@ -36,7 +35,7 @@ public class JavaUtil {
 	 * format. See <a href="http://java.sun.com/javase/6/docs/technotes/guides/jar/jar.html#Main%20Attributes"
 	 * >Setting the JAR Manifest Class-Path Attribute</a>
 	 */
-	public static URL[] parseManifestClasspath( URI base, String classpath ) throws IOException, MalformedURLException, URISyntaxException {
+	public static List<URL> parseManifestClasspath( URI base, String classpath ) throws IOException, MalformedURLException, URISyntaxException {
 		List<URL> urls = new ArrayList<URL>();
 
 		StringTokenizer tokenizer = new StringTokenizer( classpath, " " );
@@ -47,7 +46,7 @@ public class JavaUtil {
 			urls.add( url );
 		}
 
-		return urls.toArray( new URL[urls.size()] );
+		return urls;
 	}
 
 }
