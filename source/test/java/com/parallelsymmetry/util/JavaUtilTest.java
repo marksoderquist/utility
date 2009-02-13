@@ -11,8 +11,11 @@ import junit.framework.TestCase;
 public class JavaUtilTest extends TestCase {
 
 	public void testParseSystemClasspath() throws IOException {
+		List<File> entries = JavaUtil.parseSystemClasspath( null );
+		assertEquals( 0, entries.size() );
+
 		String classpath = "test1.jar" + File.pathSeparator + "test2.jar";
-		List<File> entries = JavaUtil.parseSystemClasspath( classpath );
+		entries = JavaUtil.parseSystemClasspath( classpath );
 
 		assertEquals( new File( "test1.jar" ).getAbsoluteFile(), entries.get( 0 ) );
 		assertEquals( new File( "test2.jar" ).getAbsoluteFile(), entries.get( 1 ) );
@@ -22,7 +25,14 @@ public class JavaUtilTest extends TestCase {
 		File home = new File( "" );
 		URI base = new File( "" ).toURI();
 		String classpath = "test1.jar test2.jar test%203.jar";
-		List<URL> entries = JavaUtil.parseManifestClasspath( base, classpath );
+
+		List<URL> entries = JavaUtil.parseManifestClasspath( base, null );
+		assertEquals( 0, entries.size() );
+
+		entries = JavaUtil.parseManifestClasspath( null, classpath );
+		assertEquals( 0, entries.size() );
+
+		entries = JavaUtil.parseManifestClasspath( base, classpath );
 
 		assertEquals( new File( home.getCanonicalFile(), "test1.jar" ).toURI().toURL(), entries.get( 0 ) );
 		assertEquals( new File( home.getCanonicalFile(), "test2.jar" ).toURI().toURL(), entries.get( 1 ) );
