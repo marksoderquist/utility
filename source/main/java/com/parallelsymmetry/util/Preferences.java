@@ -68,10 +68,10 @@ public class Preferences extends java.util.prefs.Preferences {
 				preferencePath = rootPath + preferencePath + "/";
 				putDefaultValue( preferencePath, key, value );
 			}
-		} catch( SAXException e ) {
-			throw new IOException( e );
-		} catch( ParserConfigurationException e ) {
-			throw new IOException( e );
+		} catch( SAXException exception ) {
+			throw new IOException( exception );
+		} catch( ParserConfigurationException exception ) {
+			throw new IOException( exception );
 		}
 	}
 
