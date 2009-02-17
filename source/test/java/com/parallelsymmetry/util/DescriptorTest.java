@@ -148,13 +148,17 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
 	}
 
+	public void testGetValuesWithNull() {
+
+	}
+
 	public void testGetValues() throws Exception {
 		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
 		assertNotNull( input );
 		Descriptor descriptor = new Descriptor( input );
 
-		assertEquals( null, descriptor.getNodes( null ) );
-		assertEquals( null, descriptor.getNodes( "" ) );
+		assertEquals( 0, descriptor.getValues( null ).length );
+		assertEquals( 0, descriptor.getValues( "" ).length );
 
 		String[] values = descriptor.getValues( "/test/nodes/node" );
 		assertEquals( 3, values.length );
