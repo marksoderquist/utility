@@ -114,7 +114,7 @@ public class Descriptor {
 	 * @return An array of values with the same path.
 	 */
 	public String[] getValues( String path ) {
-		if( node == null || TextUtil.isEmpty( path ) ) return new String[0];
+		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		NodeList nodes = null;
 		XPath xpath = XPathFactory.newInstance().newXPath();
