@@ -6,6 +6,13 @@ import java.io.OutputStream;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+/**
+ * This class is somewhat dangerous because it hides any exceptions while
+ * publishing. It is strong recommended that this class not be used for any
+ * streams that come from network sockets.
+ * 
+ * @author mvsoder
+ */
 public class FlushingObjectHandler extends Handler {
 
 	private ObjectOutputStream output;
@@ -21,11 +28,10 @@ public class FlushingObjectHandler extends Handler {
 		try {
 			output.writeObject( record );
 			output.flush();
-		} catch( Exception exception ) {
+		} catch( IOException exception ) {
 			exception.printStackTrace();
 			//Log.removeHandler( this );
 		}
-		flush();
 	}
 
 	@Override
