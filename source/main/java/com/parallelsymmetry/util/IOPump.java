@@ -12,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
 
 /**
  * The IOPump class reads data from an InputStream writes it to an OutputStream.
@@ -41,8 +40,6 @@ public class IOPump implements Runnable {
 	private boolean logEnabled;
 
 	private boolean logContent;
-
-	private Level logLevel = Log.DEBUG;
 
 	private int bufferSize;
 
@@ -162,15 +159,6 @@ public class IOPump implements Runnable {
 		this.logEnabled = logEnabled;
 	}
 
-	public Level getLogLevel() {
-		return logLevel;
-	}
-
-	public void setLogLevel( Level logAtLevel ) {
-		this.logLevel = logAtLevel;
-		this.logEnabled = true;
-	}
-
 	public final boolean isLogContent() {
 		return logContent;
 	}
@@ -246,12 +234,12 @@ public class IOPump implements Runnable {
 		byte[] bytearray = null;
 		char[] chararray = null;
 		if( reader == null ) {
-			bytearray = new byte[bufferSize];
+			bytearray = new byte[ bufferSize ];
 		} else {
-			chararray = new char[bufferSize];
+			chararray = new char[ bufferSize ];
 		}
 
-		if( logEnabled ) Log.write( logLevel, "IOPump " + name + " started." );
+		if( logEnabled ) Log.write( Log.TRACE, "IOPump " + name + " started." );
 
 		try {
 			int read = 0;
@@ -267,7 +255,7 @@ public class IOPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( logEnabled && logContent && builder.length() > 0 ) Log.write( logLevel, builder.toString() );
+					if( logEnabled && logContent && builder.length() > 0 ) Log.write( Log.TRACE, builder.toString() );
 					execute = false;
 					continue;
 				}
@@ -276,14 +264,14 @@ public class IOPump implements Runnable {
 					int datum = 0;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
-							datum = bytearray[index];
+							datum = bytearray[ index ];
 						} else {
-							datum = chararray[index];
+							datum = chararray[ index ];
 						}
 
 						if( datum == 10 || datum == 13 ) {
 							if( !lineTerminator ) {
-								Log.write( logLevel, builder.toString() );
+								Log.write( Log.TRACE, builder.toString() );
 								builder.delete( 0, builder.length() );
 							}
 							lineTerminator = true;
@@ -304,7 +292,7 @@ public class IOPump implements Runnable {
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception );
 		} finally {
-			if( logEnabled ) Log.write( logLevel, "IOPump " + name + " finished." );
+			if( logEnabled ) Log.write( Log.TRACE, "IOPump " + name + " finished." );
 		}
 	}
 
