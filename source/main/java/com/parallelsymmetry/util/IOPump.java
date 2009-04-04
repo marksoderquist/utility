@@ -239,7 +239,7 @@ public class IOPump implements Runnable {
 			chararray = new char[ bufferSize ];
 		}
 
-		if( logEnabled ) Log.write( Log.TRACE, "IOPump " + name + " started." );
+		if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " started." );
 
 		try {
 			int read = 0;
@@ -255,7 +255,7 @@ public class IOPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( logEnabled && logContent && builder.length() > 0 ) Log.write( Log.TRACE, builder.toString() );
+					if( logEnabled && logContent && builder.length() > 0 ) Log.write( Log.TRACE, name, ": ", builder.toString() );
 					execute = false;
 					continue;
 				}
@@ -269,9 +269,9 @@ public class IOPump implements Runnable {
 							datum = chararray[ index ];
 						}
 
-						if( datum == 10 || datum == 13 ) {
+						if( datum == 10 || datum == 13 || builder.length() > 160 ) {
 							if( !lineTerminator ) {
-								Log.write( Log.TRACE, builder.toString() );
+								Log.write( Log.TRACE, name, ": ", builder.toString() );
 								builder.delete( 0, builder.length() );
 							}
 							lineTerminator = true;
@@ -292,7 +292,7 @@ public class IOPump implements Runnable {
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception );
 		} finally {
-			if( logEnabled ) Log.write( Log.TRACE, "IOPump " + name + " finished." );
+			if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " finished." );
 		}
 	}
 
