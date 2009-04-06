@@ -50,8 +50,10 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		this.defragInterval = defragInterval;
 
 		if( file.exists() ) {
+			Log.write( "Reading existing store..." );
 			readFromStore( file );
 		} else {
+			Log.write( "Creating new store..." );
 			createNewStore( file );
 		}
 	}
@@ -76,12 +78,12 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	}
 
 	@Override
-	public boolean addAll( Collection<? extends E> collection ) {
+	public boolean addAll( Collection< ? extends E> collection ) {
 		boolean result = queue.addAll( collection );
 
 		if( result == true ) {
 			try {
-				appendToStore( store, collection.toArray( new Serializable[collection.size()] ) );
+				appendToStore( store, collection.toArray( new Serializable[ collection.size() ] ) );
 			} catch( IOException exception ) {
 				throw new RuntimeException( exception );
 			}
@@ -107,7 +109,7 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	}
 
 	@Override
-	public boolean containsAll( Collection<?> collection ) {
+	public boolean containsAll( Collection< ? > collection ) {
 		return queue.containsAll( collection );
 	}
 
@@ -168,7 +170,7 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	}
 
 	@Override
-	public boolean removeAll( Collection<?> collection ) {
+	public boolean removeAll( Collection< ? > collection ) {
 		int size = queue.size();
 		boolean result = queue.removeAll( collection );
 		if( result == true ) removeDefrag( size - queue.size() );
@@ -176,7 +178,7 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 	}
 
 	@Override
-	public boolean retainAll( Collection<?> collection ) {
+	public boolean retainAll( Collection< ? > collection ) {
 		int size = queue.size();
 		boolean result = queue.retainAll( collection );
 		if( result == true ) removeDefrag( size - queue.size() );
