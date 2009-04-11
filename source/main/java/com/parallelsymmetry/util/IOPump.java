@@ -182,7 +182,7 @@ public class IOPump implements Runnable {
 		worker.start();
 	}
 
-	public final void startAndWait() {
+	public final void startAndWait() throws InterruptedException {
 		start();
 		waitFor();
 	}
@@ -200,7 +200,7 @@ public class IOPump implements Runnable {
 		execute = false;
 	}
 
-	public final void stopAndWait() {
+	public final void stopAndWait() throws InterruptedException {
 		stop();
 		waitFor();
 	}
@@ -210,12 +210,8 @@ public class IOPump implements Runnable {
 		waitFor( timeout );
 	}
 
-	public final void waitFor() {
-		try {
-			worker.join();
-		} catch( InterruptedException aoException ) {
-			//
-		}
+	public final void waitFor() throws InterruptedException {
+		worker.join();
 	}
 
 	public final void waitFor( long timeout ) {

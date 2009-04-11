@@ -8,9 +8,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
-import com.parallelsymmetry.util.IOPump;
-import com.parallelsymmetry.util.Log;
-
 import junit.framework.TestCase;
 
 public class IOPumpTest extends TestCase {
@@ -202,7 +199,7 @@ public class IOPumpTest extends TestCase {
 		assertEquals( "charset: " + charset, string, new String( output.toByteArray(), charset ) );
 	}
 
-	private void testReaderToWriter( String string, int bufferSize ) {
+	private void testReaderToWriter( String string, int bufferSize ) throws Exception {
 		Reader reader = new CharArrayReader( string.toCharArray() );
 		CharArrayWriter writer = new CharArrayWriter();
 
