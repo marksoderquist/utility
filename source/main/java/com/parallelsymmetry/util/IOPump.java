@@ -261,8 +261,10 @@ public class IOPump implements Runnable {
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
 							datum = bytearray[ index ];
+							if( datum < 0 ) datum += 256;
 						} else {
 							datum = chararray[ index ];
+							if( datum < 0 ) datum += 65536;
 						}
 
 						if( datum == 10 || datum == 13 || builder.length() > 160 ) {
