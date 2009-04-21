@@ -1,7 +1,5 @@
 package com.parallelsymmetry.util;
 
-import com.parallelsymmetry.util.ClassUtil;
-
 import junit.framework.TestCase;
 
 public class ClassUtilTest extends TestCase {

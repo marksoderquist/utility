@@ -1,8 +1,5 @@
 package com.parallelsymmetry.util;
 
-import com.parallelsymmetry.util.ThreadUtil;
-import com.parallelsymmetry.util.TripLock;
-
 import junit.framework.TestCase;
 
 public class TripLockTest extends TestCase {

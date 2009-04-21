@@ -4,8 +4,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.util.IterableStringTokenizer;
-
 public class IterableStringTokenizerTest extends TestCase {
 
 	@Test

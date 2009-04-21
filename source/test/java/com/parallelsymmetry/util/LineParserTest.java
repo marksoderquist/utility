@@ -1,8 +1,5 @@
 package com.parallelsymmetry.util;
 
-import com.parallelsymmetry.util.LineParser;
-import com.parallelsymmetry.util.Log;
-
 import junit.framework.TestCase;
 
 public class LineParserTest extends TestCase {
