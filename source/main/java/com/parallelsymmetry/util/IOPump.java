@@ -23,6 +23,8 @@ public class IOPump implements Runnable {
 
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
 
+	public static final int DEFAULT_LINE_LENGTH = 160;
+
 	private String name;
 
 	private InputStream input;
@@ -42,6 +44,8 @@ public class IOPump implements Runnable {
 	private boolean logContent;
 
 	private int bufferSize;
+
+	private int lineLength = DEFAULT_LINE_LENGTH;
 
 	public IOPump( InputStream input, OutputStream output ) {
 		this( null, input, output, DEFAULT_BUFFER_SIZE );
@@ -149,6 +153,14 @@ public class IOPump implements Runnable {
 		this.reader = new BufferedReader( reader );
 		this.writer = new BufferedWriter( writer );
 		this.bufferSize = bufferSize;
+	}
+
+	public int getLineLength() {
+		return lineLength;
+	}
+
+	public void setLineLength( int length ) {
+		this.lineLength = length;
 	}
 
 	public boolean isLogEnabled() {
@@ -267,7 +279,7 @@ public class IOPump implements Runnable {
 							if( datum < 0 ) datum += 65536;
 						}
 
-						if( datum == 10 || datum == 13 || builder.length() > 80 ) {
+						if( datum == 10 || datum == 13 || builder.length() > lineLength ) {
 							if( !lineTerminator ) {
 								Log.write( Log.TRACE, name, ": ", builder.toString() );
 								builder.delete( 0, builder.length() );
