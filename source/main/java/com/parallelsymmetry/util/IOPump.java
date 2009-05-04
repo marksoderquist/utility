@@ -251,6 +251,7 @@ public class IOPump implements Runnable {
 
 		try {
 			int read = 0;
+			boolean binary = false;
 			boolean lineTerminator = false;
 			StringBuilder builder = new StringBuilder();
 
@@ -279,10 +280,13 @@ public class IOPump implements Runnable {
 							if( datum < 0 ) datum += 65536;
 						}
 
-						if( datum == 10 || datum == 13 || builder.length() > lineLength ) {
+						if( datum < 32 || datum > 127 ) binary = true;
+
+						if( datum == 10 || datum == 13 || builder.length() > lineLength || ( binary && builder.length() > 80 ) ) {
 							if( !lineTerminator ) {
 								Log.write( Log.TRACE, name, ": ", builder.toString() );
 								builder.delete( 0, builder.length() );
+								binary = false;
 							}
 							lineTerminator = true;
 						} else {
