@@ -115,31 +115,31 @@ public class Log {
 		write( level, "" );
 	}
 
-	public static final void write( String... message ) {
+	public static final void write( Object... message ) {
 		write( INFO, message );
 	}
 
-	public static final void write( Level level, String... message ) {
+	public static final void write( Level level, Object... message ) {
 		write( level, null, message );
 	}
 
 	public static final void write( Throwable throwable ) {
-		write( throwable, (String[])null );
+		write( throwable, (Object[])null );
 	}
 
-	public static final void write( Throwable throwable, String... message ) {
+	public static final void write( Throwable throwable, Object... message ) {
 		write( ERROR, throwable, message );
 	}
 
 	public static final void write( Level level, Throwable throwable ) {
-		write( level, throwable, (String[])null );
+		write( level, throwable, (Object[])null );
 	}
 
-	public static final void write( Level level, Throwable throwable, String... message ) {
+	public static final void write( Level level, Throwable throwable, Object... message ) {
 		StringBuilder builder = new StringBuilder();
 		if( message != null ) {
-			for( String string : message ) {
-				builder.append( string );
+			for( Object object : message ) {
+				builder.append( object.toString() );
 			}
 		}
 		LogRecord record = new LogRecord( level, message == null ? null : builder.toString() );
