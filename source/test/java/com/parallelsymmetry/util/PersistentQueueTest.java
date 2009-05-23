@@ -9,6 +9,11 @@ import junit.framework.TestCase;
 
 public class PersistentQueueTest extends TestCase {
 
+	@Override
+	public void setUp() throws Exception {
+		Log.setLevel( Log.NONE );
+	}
+
 	public void testConstructorWithBadFile() throws Exception {
 		try {
 			new PersistentQueue<String>( new File( "/path/should/not/exist/test.queue" ) );

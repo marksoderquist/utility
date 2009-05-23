@@ -1,6 +1,7 @@
 package com.parallelsymmetry.util;
 
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import junit.framework.TestCase;
@@ -11,8 +12,11 @@ public class LogTest extends TestCase {
 
 	@Override
 	public void setUp() {
-		Log.setLevel( Log.NONE );
+		// Must set log level because it is in an unknown state from previous tests.
+		Log.setLevel( Level.INFO );
+		Log.removeHandler( Log.DEFAULT_HANDLER );
 		handler = new TestLogHandler();
+		handler.setLevel( Level.ALL );
 		Log.addHandler( handler );
 	}
 
@@ -24,7 +28,10 @@ public class LogTest extends TestCase {
 
 	public void testWrite() {
 		Log.write();
-		assertEquals( "Incorrect log message.", "", handler.getLogRecord().getMessage() );
+		LogRecord record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
+		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
+		assertEquals( "Incorrect log message.", "", record.getMessage() );
 	}
 
 	public void testWriteWithString() {
@@ -32,6 +39,7 @@ public class LogTest extends TestCase {
 
 		Log.write( "Test" );
 		record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
 		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
 		assertEquals( "Incorrect log message.", "Test", record.getMessage() );
 	}
@@ -41,11 +49,11 @@ public class LogTest extends TestCase {
 
 		Log.write( Log.ALL, "Test 1" );
 		record = handler.getLogRecord();
-		assertEquals( "Incorrect log level.", Log.ALL, record.getLevel() );
-		assertEquals( "Incorrect log message.", "Test 1", record.getMessage() );
+		assertNull( "Log record is null.", record );
 
 		Log.write( Log.NONE, "Test 2" );
 		record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
 		assertEquals( "Incorrect log level.", Log.NONE, record.getLevel() );
 		assertEquals( "Incorrect log message.", "Test 2", record.getMessage() );
 	}
@@ -56,6 +64,7 @@ public class LogTest extends TestCase {
 		Throwable throwable = new Exception( "Test" );
 		Log.write( throwable );
 		record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
 		assertEquals( "Incorrect log level.", Log.ERROR, record.getLevel() );
 		assertEquals( "Incorrect log throwable.", throwable, record.getThrown() );
 	}
@@ -66,9 +75,39 @@ public class LogTest extends TestCase {
 		Throwable throwable = new Exception( "Test" );
 		Log.write( throwable, "Test" );
 		record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
 		assertEquals( "Incorrect log level.", Log.ERROR, record.getLevel() );
 		assertEquals( "Incorrect log message.", "Test", record.getMessage() );
 		assertEquals( "Incorrect log throwable.", throwable, record.getThrown() );
+	}
+
+	public void testWriteToLogger() {
+		String name = "test";
+
+		Log.addHandler( name, handler );
+		Log.writeToLogger( name );
+
+		LogRecord record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
+		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
+		assertEquals( "Incorrect log message.", "", record.getMessage() );
+	}
+
+	public void testWriteToLoggerUsingChangingLevel() {
+		String name = "test";
+
+		Log.addHandler( name, handler );
+		Log.setLevel( name, Log.NONE );
+		Log.writeToLogger( name, "1" );
+		Log.setLevel( name, Log.TRACE );
+		Log.writeToLogger( name, Log.TRACE, "2" );
+		Log.setLevel( name, Log.NONE );
+		Log.writeToLogger( name, "3" );
+
+		LogRecord record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
+		assertEquals( "Incorrect log level.", Log.TRACE, record.getLevel() );
+		assertEquals( "Incorrect log message.", "2", record.getMessage() );
 	}
 
 	public void testParseLevel() {

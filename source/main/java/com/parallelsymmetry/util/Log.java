@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,19 +49,16 @@ public class Log {
 
 	private static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
 
-	private static Map<Logger, Handler> namedLoggerDefaultHandlers;
-
-	private static Set<Logger> namedLoggers;
+	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
 
 	static {
-		namedLoggers = new HashSet<Logger>();
-		namedLoggerDefaultHandlers = new HashMap<Logger, Handler>();
-
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).setUseParentHandlers( false );
 		Logger.getLogger( DEFAULT_LOGGER_NAME ).addHandler( DEFAULT_HANDLER );
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( Log.ALL );
+		Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( DEFAULT_LOG_LEVEL );
 
-		setLevel( DEFAULT_LOG_LEVEL );
+		defaultHandlers.put( Logger.getLogger( DEFAULT_LOGGER_NAME ), DEFAULT_HANDLER );
+
+		DEFAULT_HANDLER.setLevel( Level.ALL );
 	}
 
 	/**
@@ -71,7 +67,7 @@ public class Log {
 	 * @return The default handler log level.
 	 */
 	public static final Level getLevel() {
-		return DEFAULT_HANDLER.getLevel();
+		return getLevel( DEFAULT_LOGGER_NAME );
 	}
 
 	/**
@@ -80,15 +76,17 @@ public class Log {
 	 * @param level
 	 */
 	public static final void setLevel( Level level ) {
-		DEFAULT_HANDLER.setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+		setLevel( DEFAULT_LOGGER_NAME, level );
 	}
 
 	public static final Level getLevel( String name ) {
-		return namedLoggerDefaultHandlers.get( getNamedLogger( name ) ).getLevel();
+		return defaultHandlers.get( getNamedLogger( name ) ).getLevel();
+		//return getNamedLogger( name ).getLevel();
 	}
 
 	public static final void setLevel( String name, Level level ) {
-		namedLoggerDefaultHandlers.get( getNamedLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+		defaultHandlers.get( getNamedLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+		//getNamedLogger( name ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
 	public static final void addHandler( Handler handler ) {
@@ -111,47 +109,81 @@ public class Log {
 		write( INFO, "" );
 	}
 
+	public static final void writeToLogger( String name ) {
+		writeToLogger( name, INFO, "" );
+	}
+
 	public static final void write( Level level ) {
 		write( level, "" );
+	}
+
+	public static final void writeTolLogger( String name, Level level ) {
+		writeToLogger( name, level, "" );
 	}
 
 	public static final void write( Object... message ) {
 		write( INFO, message );
 	}
 
+	public static final void writeToLogger( String name, Object... message ) {
+		writeToLogger( name, INFO, message );
+	}
+
 	public static final void write( Level level, Object... message ) {
 		write( level, null, message );
+	}
+
+	public static final void writeToLogger( String name, Level level, Object... message ) {
+		writeToLogger( name, level, null, message );
 	}
 
 	public static final void write( Throwable throwable ) {
 		write( throwable, (Object[])null );
 	}
 
+	public static final void writeToLogger( String name, Throwable throwable ) {
+		writeToLogger( name, throwable, (Object[])null );
+	}
+
 	public static final void write( Throwable throwable, Object... message ) {
 		write( ERROR, throwable, message );
+	}
+
+	public static final void writeToLogger( String name, Throwable throwable, Object... message ) {
+		writeToLogger( name, ERROR, throwable, message );
 	}
 
 	public static final void write( Level level, Throwable throwable ) {
 		write( level, throwable, (Object[])null );
 	}
 
+	public static final void writeToLogger( String name, Level level, Throwable throwable ) {
+		writeToLogger( name, level, throwable, (Object[])null );
+	}
+
 	public static final void write( Level level, Throwable throwable, Object... message ) {
-		StringBuilder builder = new StringBuilder();
+		writeToLogger( null, level, throwable, message );
+	}
+
+	public static final void writeToLogger( String name, Level level, Throwable throwable, Object... message ) {
+		StringBuilder builder = null;
 		if( message != null ) {
+			builder = new StringBuilder();
 			for( Object object : message ) {
 				builder.append( object.toString() );
 			}
 		}
-		LogRecord record = new LogRecord( level, message == null ? null : builder.toString() );
+
+		LogRecord record = new LogRecord( level == null ? DEFAULT_LOG_LEVEL : level, builder == null ? null : builder.toString() );
 		if( throwable != null ) record.setThrown( throwable );
 		StackTraceElement caller = getCaller();
 		record.setSourceClassName( caller.getClassName() );
 		record.setSourceMethodName( caller.getMethodName() );
-		write( record );
+		writeToLogger( name == null ? DEFAULT_LOGGER_NAME : name, record );
 	}
 
 	public static final void write( LogRecord record ) {
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).log( record );
+		writeToLogger( DEFAULT_LOGGER_NAME, record );
 	}
 
 	/**
@@ -200,15 +232,16 @@ public class Log {
 	private static final Logger getNamedLogger( String name ) {
 		Logger logger = Logger.getLogger( name );
 
-		synchronized( namedLoggers ) {
-			if( !namedLoggers.contains( logger ) ) {
-				Handler handler = new DefaultHandler( System.out, System.err );
-				handler.setLevel( DEFAULT_LOG_LEVEL );
-				logger.setLevel( Level.ALL );
-				logger.addHandler( handler );
+		synchronized( defaultHandlers ) {
+			if( !defaultHandlers.keySet().contains( logger ) ) {
 				logger.setUseParentHandlers( false );
-				namedLoggers.add( logger );
-				namedLoggerDefaultHandlers.put( logger, handler );
+				logger.setLevel( ALL );
+
+				Handler handler = new DefaultHandler( System.out, System.err );
+				logger.addHandler( handler );
+				handler.setLevel( INFO );
+
+				defaultHandlers.put( logger, handler );
 			}
 		}
 
