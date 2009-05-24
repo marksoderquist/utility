@@ -105,6 +105,26 @@ public class Log {
 		Logger.getLogger( name ).removeHandler( handler );
 	}
 
+	public static final Handler getDefaultHandler() {
+		return getDefaultHandler( DEFAULT_LOGGER_NAME );
+	}
+
+	public static final Handler getDefaultHandler( String name ) {
+		return defaultHandlers.get( getNamedLogger( name ) );
+	}
+
+	public static final void setDefaultHandler( Handler handler ) {
+		setDefaultHandler( DEFAULT_LOGGER_NAME, handler );
+	}
+
+	public static final void setDefaultHandler( String name, Handler handler ) {
+		Logger logger = getNamedLogger( name );
+		logger.removeHandler( defaultHandlers.get( logger ) );
+
+		defaultHandlers.put( logger, handler );
+		logger.addHandler( handler );
+	}
+
 	public static final void write() {
 		write( INFO, "" );
 	}

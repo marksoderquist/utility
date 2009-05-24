@@ -82,9 +82,9 @@ public class LogTest extends TestCase {
 	}
 
 	public void testWriteToLogger() {
-		String name = "test";
+		String name = "testWriteToLogger";
 
-		Log.addHandler( name, handler );
+		Log.setDefaultHandler( name, handler );
 		Log.writeToLogger( name );
 
 		LogRecord record = handler.getLogRecord();
@@ -94,9 +94,9 @@ public class LogTest extends TestCase {
 	}
 
 	public void testWriteToLoggerUsingChangingLevel() {
-		String name = "test";
+		String name = "testWriteToLoggerUsingChangingLevel";
 
-		Log.addHandler( name, handler );
+		Log.setDefaultHandler( name, handler );
 		Log.setLevel( name, Log.NONE );
 		Log.writeToLogger( name, "1" );
 		Log.setLevel( name, Log.TRACE );
@@ -106,8 +106,8 @@ public class LogTest extends TestCase {
 
 		LogRecord record = handler.getLogRecord();
 		assertNotNull( "Log record is null.", record );
-		assertEquals( "Incorrect log level.", Log.TRACE, record.getLevel() );
 		assertEquals( "Incorrect log message.", "2", record.getMessage() );
+		assertEquals( "Incorrect log level.", Log.TRACE, record.getLevel() );
 	}
 
 	public void testParseLevel() {
@@ -151,6 +151,7 @@ public class LogTest extends TestCase {
 
 		@Override
 		public synchronized void publish( LogRecord record ) {
+			if( record.getLevel().intValue() < getLevel().intValue() || getLevel().intValue() == Log.NONE.intValue() ) return;
 			this.record = record;
 			this.notifyAll();
 		}
