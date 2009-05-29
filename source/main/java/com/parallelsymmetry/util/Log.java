@@ -190,7 +190,7 @@ public class Log {
 		if( message != null ) {
 			builder = new StringBuilder();
 			for( Object object : message ) {
-				builder.append( object.toString() );
+				if( object != null ) builder.append( object.toString() );
 			}
 		}
 
