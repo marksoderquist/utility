@@ -75,8 +75,8 @@ public class DescriptorTest extends TestCase {
 
 	public void testGetValueWithDefaultWithEmptyDescriptor() throws Exception {
 		Descriptor descriptor = new Descriptor();
-		assertEquals( null, descriptor.getValue( null, null ) );
-		assertEquals( "default", descriptor.getValue( null, "default" ) );
+		assertEquals( null, descriptor.getValue( (String)null, null ) );
+		assertEquals( "default", descriptor.getValue( (String)null, "default" ) );
 		assertEquals( null, descriptor.getValue( "test/name", null ) );
 		assertEquals( null, descriptor.getValue( "", null ) );
 		assertEquals( null, descriptor.getValue( "notfound", null ) );
@@ -140,8 +140,8 @@ public class DescriptorTest extends TestCase {
 		InputStream input = getClass().getResourceAsStream( "descriptor.test.xml" );
 		assertNotNull( input );
 		Descriptor descriptor = new Descriptor( input );
-		assertEquals( null, descriptor.getValue( null, null ) );
-		assertEquals( "default", descriptor.getValue( null, "default" ) );
+		assertEquals( null, descriptor.getValue( (String)null, null ) );
+		assertEquals( "default", descriptor.getValue( (String)null, "default" ) );
 		assertEquals( "test.name", descriptor.getValue( "test/name", null ) );
 		assertEquals( null, descriptor.getValue( "", null ) );
 		assertEquals( null, descriptor.getValue( "notfound", null ) );

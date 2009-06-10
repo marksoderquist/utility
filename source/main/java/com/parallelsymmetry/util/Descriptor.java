@@ -85,6 +85,24 @@ public class Descriptor {
 	}
 
 	public String getValue( String path ) {
+		return getValue( this.node, path );
+	}
+
+	public String getValue( String path, String defaultValue ) {
+		return getValue( this.node, path, defaultValue );
+	}
+
+	/**
+	 * Get an array of all the values that have the same path.
+	 * 
+	 * @param path
+	 * @return An array of values with the same path.
+	 */
+	public String[] getValues( String path ) {
+		return getValues( this.node, path );
+	}
+
+	public static String getValue( Node node, String path ) {
 		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		String value = null;
@@ -101,19 +119,19 @@ public class Descriptor {
 		return value;
 	}
 
-	public String getValue( String path, String defaultValue ) {
-		String value = getValue( path );
+	public static String getValue( Node node, String path, String defaultValue ) {
+		String value = getValue( node, path );
 		if( value == null ) return defaultValue;
 		return value;
 	}
 
 	/**
-	 * Get an array of all the values that have the same path.
+	 * Get an array of all the values in the node that have the same path.
 	 * 
 	 * @param path
 	 * @return An array of values with the same path.
 	 */
-	public String[] getValues( String path ) {
+	public static String[] getValues( Node node, String path ) {
 		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		NodeList nodes = null;
@@ -129,8 +147,8 @@ public class Descriptor {
 		ArrayList<String> values = new ArrayList<String>();
 		int count = nodes.getLength();
 		for( int index = 0; index < count; index++ ) {
-			Node node = nodes.item( index );
-			values.add( node.getTextContent() );
+			Node item = nodes.item( index );
+			values.add( item.getTextContent() );
 		}
 
 		return values.toArray( new String[values.size()] );
