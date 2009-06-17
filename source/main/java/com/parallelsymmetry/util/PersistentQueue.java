@@ -13,6 +13,8 @@ import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.parallelsymmetry.log.Log;
+
 /**
  * Implements a persistent(stored on disk) FIFO Queue.
  * 

@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
+import com.parallelsymmetry.log.Log;
+
 import junit.framework.TestCase;
 
 public class IOPumpTest extends TestCase {

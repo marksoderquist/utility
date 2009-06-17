@@ -2,6 +2,8 @@ package com.parallelsymmetry.util;
 
 import java.io.UnsupportedEncodingException;
 
+import com.parallelsymmetry.log.Log;
+
 /**
  * Encodes and decodes to and from Base64 notation. </p>
  * <p>

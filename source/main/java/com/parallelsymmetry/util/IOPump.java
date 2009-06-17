@@ -13,6 +13,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import com.parallelsymmetry.log.Log;
+
 /**
  * The IOPump class reads data from an InputStream writes it to an OutputStream.
  * Subclasses may change the write behavior by overriding the write() method.

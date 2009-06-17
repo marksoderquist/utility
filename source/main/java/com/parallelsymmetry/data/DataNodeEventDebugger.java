@@ -1,6 +1,6 @@
 package com.parallelsymmetry.data;
 
-import com.parallelsymmetry.util.Log;
+import com.parallelsymmetry.log.Log;
 
 public class DataNodeEventDebugger implements DataListener {
 

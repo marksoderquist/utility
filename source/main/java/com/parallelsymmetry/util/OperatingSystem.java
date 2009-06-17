@@ -2,6 +2,8 @@ package com.parallelsymmetry.util;
 
 import java.io.File;
 
+import com.parallelsymmetry.log.Log;
+
 /**
  * Operating system detection routines.
  * 

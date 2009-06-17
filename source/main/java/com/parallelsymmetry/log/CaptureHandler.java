@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
-import com.parallelsymmetry.util.Log;
 
 public class CaptureHandler extends StreamHandler {
 

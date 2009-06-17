@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import com.parallelsymmetry.log.Log;
+
 import junit.framework.TestCase;
 
 public class PersistentQueueTest extends TestCase {

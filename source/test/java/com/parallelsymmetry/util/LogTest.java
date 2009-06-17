@@ -4,6 +4,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import com.parallelsymmetry.log.Log;
+
 import junit.framework.TestCase;
 
 public class LogTest extends TestCase {
