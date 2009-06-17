@@ -1,4 +1,4 @@
-package com.parallelsymmetry.util.log;
+package com.parallelsymmetry.log;
 
 import java.io.OutputStream;
 import java.util.logging.Formatter;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.parallelsymmetry.util.log;
+package com.parallelsymmetry.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
