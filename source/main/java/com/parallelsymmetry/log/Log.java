@@ -58,6 +58,7 @@ public class Log {
 
 		defaultHandlers.put( Logger.getLogger( DEFAULT_LOGGER_NAME ), DEFAULT_HANDLER );
 
+		Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( Level.ALL );
 		DEFAULT_HANDLER.setLevel( Level.ALL );
 	}
 
