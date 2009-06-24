@@ -449,10 +449,8 @@ public class DataNode implements Comparable<DataNode> {
 				listener.metadataChanged( event );
 			}
 		}
-		/*
-		 * Metadata causes parent metadata to change. Therefore, the event does not
-		 * need to be propagated to the parent.
-		 */
+
+		if( !MODIFIED.equals( event.getKey() ) && parent != null ) parent.fireMetadataChanged( event );
 	}
 
 	protected final void fireAttributeModified( DataAttributeEvent event ) {
@@ -461,10 +459,7 @@ public class DataNode implements Comparable<DataNode> {
 				listener.attributeChanged( event );
 			}
 		}
-		/*
-		 * Attributes do not cause parent attributes to change. Therefore, the event
-		 * needs to be propagated to the parent.
-		 */
+
 		if( parent != null ) parent.fireAttributeModified( event );
 	}
 
