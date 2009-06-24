@@ -4,9 +4,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import com.parallelsymmetry.log.Log;
-
 import junit.framework.TestCase;
+
+import com.parallelsymmetry.log.Log;
 
 public class LogTest extends TestCase {
 
@@ -51,7 +51,7 @@ public class LogTest extends TestCase {
 
 		Log.write( Log.ALL, "Test 1" );
 		record = handler.getLogRecord();
-		assertNull( "Log record is null.", record );
+		assertNotNull( "Log record should not be null.", record );
 
 		Log.write( Log.NONE, "Test 2" );
 		record = handler.getLogRecord();

@@ -13,9 +13,7 @@ import com.parallelsymmetry.util.ObjectUtil;
 
 public class DataNode implements Comparable<DataNode> {
 
-	public enum Metadata {
-		MODIFIED
-	};
+	public static final String MODIFIED = DataNode.class.getName() + ":modified";
 
 	protected boolean modified;
 
@@ -24,6 +22,8 @@ public class DataNode implements Comparable<DataNode> {
 	protected boolean previousCheckModified;
 
 	protected Map<String, Object> attributes;
+
+	protected Map<String, Object> metadata;
 
 	protected Set<DataListener> listeners;
 
@@ -96,6 +96,38 @@ public class DataNode implements Comparable<DataNode> {
 		} else {
 			startTransaction();
 			setAttribute( key, value );
+			commitTransaction();
+		}
+	}
+
+	/**
+	 * Get a metadata attribute from the node.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	@SuppressWarnings( "unchecked" )
+	public <T> T getMetadata( String key ) {
+		if( metadata == null ) return null;
+		return (T)metadata.get( key );
+	}
+
+	/**
+	 * Set a metadata attribute in the node. Setting or removing a metadata
+	 * attribute will not modify the node. Metadata attributes are removed by
+	 * setting the value to null.
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	public void setMetadata( String key, Object value ) {
+		if( key == value ) throw new RuntimeException( "The metadata map cannot allow the key and value to be the same." );
+
+		if( isTransactionActive() ) {
+			getTransaction().add( new SetMetadataStep( this, key, value ) );
+		} else {
+			startTransaction();
+			setMetadata( key, value );
 			commitTransaction();
 		}
 	}
@@ -336,9 +368,9 @@ public class DataNode implements Comparable<DataNode> {
 
 		// Fire events.
 		if( modified ) {
-			fireMetadataChanged( new DataMetadataEvent( this, Metadata.MODIFIED, false, true ) );
+			fireMetadataChanged( new DataMetadataEvent( this, MODIFIED, false, true ) );
 		} else {
-			fireMetadataChanged( new DataMetadataEvent( this, Metadata.MODIFIED, true, false ) );
+			fireMetadataChanged( new DataMetadataEvent( this, MODIFIED, true, false ) );
 		}
 	}
 
@@ -444,6 +476,13 @@ public class DataNode implements Comparable<DataNode> {
 	}
 
 	/**
+	 * The metadata map should not be created until absolutely necessary.
+	 */
+	private final void ensureMetadata() {
+		if( metadata == null ) metadata = new ConcurrentHashMap<String, Object>();
+	}
+
+	/**
 	 * The resource map should not be created until absolutely necessary.
 	 */
 	private final void ensureResources() {
@@ -478,6 +517,34 @@ public class DataNode implements Comparable<DataNode> {
 		return true;
 	}
 
+	/**
+	 * Handle setting a metadata attribute.
+	 * 
+	 * @param key
+	 * @param value
+	 * @return True if the attribute value changed, false otherwise.
+	 */
+	private final boolean handleSetMetadata( String key, Object value ) {
+		Object oldValue = null;
+		if( value == null ) {
+			if( metadata == null ) return false;
+			oldValue = metadata.remove( key );
+			//if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
+			if( metadata.size() == 0 ) metadata = null;
+		} else {
+			//if( value instanceof DataNode ) isolateNode( (DataNode)value );
+			ensureMetadata();
+			oldValue = metadata.get( key );
+			if( value.equals( oldValue ) ) return false;
+			metadata.put( key, value );
+			//if( value instanceof DataNode ) ( (DataNode)value ).setParent( this );
+		}
+
+		fireMetadataChanged( new DataMetadataEvent( this, key, oldValue, value ) );
+
+		return true;
+	}
+
 	interface TransactionStep {
 		public boolean commit();
 	}
@@ -498,6 +565,26 @@ public class DataNode implements Comparable<DataNode> {
 
 		public boolean commit() {
 			return node.handleSetAttribute( key, value );
+		}
+
+	}
+
+	static final class SetMetadataStep implements TransactionStep {
+
+		private DataNode node;
+
+		private String key;
+
+		private Object value;
+
+		public SetMetadataStep( DataNode node, String key, Object value ) {
+			this.node = node;
+			this.key = key;
+			this.value = value;
+		}
+
+		public boolean commit() {
+			return node.handleSetMetadata( key, value );
 		}
 
 	}
