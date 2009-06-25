@@ -24,7 +24,7 @@ public class ArrayUtil {
 
 		for( int index = 0; index < array.length; index++ ) {
 			if( index > 0 ) builder.append( "," );
-			builder.append( Integer.toString( index ) );
+			builder.append( Integer.toString( array[index] ) );
 		}
 
 		return builder.toString();
