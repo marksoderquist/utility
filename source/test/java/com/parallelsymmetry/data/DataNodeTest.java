@@ -350,6 +350,45 @@ public class DataNodeTest extends BaseTestCase {
 	}
 
 	@Test
+	public void testTransactionNested() throws Exception {
+		MockDataNode node = new MockDataNode();
+		DataWatcher watcher = new DataWatcher();
+		node.addDataListener( watcher );
+
+		// Initial transaction.
+		node.startTransaction();
+		node.setAttribute( "key1", "value1" );
+		node.setAttribute( "key2", "value2" );
+		watcher.assertEventCounts( 0, 0, 0, 0, 0 );
+		watcher.reset();
+		assertNull( node.getAttribute( "key1" ) );
+		assertNull( node.getAttribute( "key2" ) );
+		assertNull( node.getAttribute( "key3" ) );
+
+		// Nested transaction.
+		node.startTransaction();
+		node.setAttribute( "key3", "value3" );
+		watcher.assertEventCounts( 0, 0, 0, 0, 0 );
+		watcher.reset();
+		assertNull( node.getAttribute( "key1" ) );
+		assertNull( node.getAttribute( "key2" ) );
+		assertNull( node.getAttribute( "key3" ) );
+
+		// Nested commit.
+		node.commitTransaction();
+		watcher.assertEventCounts( 0, 0, 0, 0, 0 );
+		watcher.reset();
+		assertNull( node.getAttribute( "key1" ) );
+		assertNull( node.getAttribute( "key2" ) );
+		assertNull( node.getAttribute( "key3" ) );
+
+		// Final commit.
+		node.commitTransaction();
+		watcher.assertEventCounts( 1, 1, 3, 0, 0 );
+		watcher.reset();
+	}
+
+	@Test
 	public void testEquals() {
 		MockDataNode node1 = null;
 		MockDataNode node2 = null;

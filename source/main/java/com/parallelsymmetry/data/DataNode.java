@@ -35,6 +35,8 @@ public class DataNode implements Comparable<DataNode> {
 
 	private List<TransactionStep> transaction;
 
+	private int transactionNest;
+
 	public DataNode() {}
 
 	/**
@@ -264,14 +266,17 @@ public class DataNode implements Comparable<DataNode> {
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final void startTransaction() {
-		if( isTransactionActive() ) return;
-		transaction = new CopyOnWriteArrayList<TransactionStep>();
+		if( !isTransactionActive() ) transaction = new CopyOnWriteArrayList<TransactionStep>();
+		transactionNest++;
 	}
 
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final void commitTransaction() {
+		transactionNest--;
+		if( transactionNest > 0 ) return;
+
 		boolean changed = false;
 		if( transaction != null ) {
 			for( TransactionStep activity : transaction ) {
