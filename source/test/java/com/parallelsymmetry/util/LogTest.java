@@ -83,6 +83,18 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log throwable.", throwable, record.getThrown() );
 	}
 
+	public void testWriteWithChangingLevel() {
+		Log.setDefaultHandler( Log.DEFAULT_LOGGER_NAME, handler );
+
+		Log.write( Log.DEBUG, "debug" );
+		assertNull( handler.getLogRecord() );
+
+		Log.write( "info" );
+		LogRecord record = handler.getLogRecord();
+		assertEquals( Log.INFO, record.getLevel() );
+		assertEquals( "info", record.getMessage() );
+	}
+
 	public void testWriteToLogger() {
 		String name = "testWriteToLogger";
 
@@ -147,7 +159,7 @@ public class LogTest extends TestCase {
 				}
 			}
 			LogRecord record = this.record;
-			this.record = null;
+			reset();
 			return record;
 		}
 

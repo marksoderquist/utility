@@ -47,19 +47,18 @@ public class Log {
 
 	public static final Formatter DEFAULT_FORMATTER = new DefaultFormatter();
 
-	private static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
+	public static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
 
 	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
 
 	static {
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).setUseParentHandlers( false );
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).addHandler( DEFAULT_HANDLER );
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( DEFAULT_LOG_LEVEL );
+		Logger defaultLogger = Logger.getLogger( DEFAULT_LOGGER_NAME );
+		defaultLogger.setLevel( Level.ALL );
+		defaultLogger.setUseParentHandlers( false );
 
-		defaultHandlers.put( Logger.getLogger( DEFAULT_LOGGER_NAME ), DEFAULT_HANDLER );
-
-		Logger.getLogger( DEFAULT_LOGGER_NAME ).setLevel( Level.ALL );
-		DEFAULT_HANDLER.setLevel( Level.ALL );
+		defaultLogger.addHandler( DEFAULT_HANDLER );
+		DEFAULT_HANDLER.setLevel( DEFAULT_LOG_LEVEL );
+		defaultHandlers.put( defaultLogger, DEFAULT_HANDLER );
 	}
 
 	/**
@@ -120,7 +119,10 @@ public class Log {
 
 	public static final void setDefaultHandler( String name, Handler handler ) {
 		Logger logger = getNamedLogger( name );
-		logger.removeHandler( defaultHandlers.get( logger ) );
+		Handler oldHandler = defaultHandlers.get( logger );
+		logger.removeHandler( oldHandler );
+
+		handler.setLevel( oldHandler.getLevel() );
 
 		defaultHandlers.put( logger, handler );
 		logger.addHandler( handler );
@@ -274,7 +276,7 @@ public class Log {
 
 		int index = 0;
 		while( index < elements.length ) {
-			StackTraceElement frame = elements[index];
+			StackTraceElement frame = elements[ index ];
 			String clazz = frame.getClassName();
 			if( clazz.equals( Log.class.getName() ) ) {
 				break;
@@ -283,7 +285,7 @@ public class Log {
 		}
 
 		while( index < elements.length ) {
-			StackTraceElement frame = elements[index];
+			StackTraceElement frame = elements[ index ];
 			String clazz = frame.getClassName();
 			if( !clazz.equals( Log.class.getName() ) ) {
 				return frame;
