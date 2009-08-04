@@ -286,6 +286,7 @@ public class DataNode implements Comparable<DataNode> {
 		}
 
 		transaction = null;
+		transactionNest = 0;
 
 		if( changed ) {
 			fireDataChanged( new DataEvent( DataEvent.Type.CHANGE, this ) );
@@ -298,6 +299,7 @@ public class DataNode implements Comparable<DataNode> {
 	 */
 	public final void rollbackTransaction() {
 		transaction = null;
+		transactionNest = 0;
 	}
 
 	@Override
