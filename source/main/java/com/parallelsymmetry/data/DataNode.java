@@ -526,15 +526,12 @@ public class DataNode implements Comparable<DataNode> {
 		if( value == null ) {
 			if( metadata == null ) return false;
 			oldValue = metadata.remove( key );
-			//if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
 			if( metadata.size() == 0 ) metadata = null;
 		} else {
-			//if( value instanceof DataNode ) isolateNode( (DataNode)value );
 			ensureMetadata();
 			oldValue = metadata.get( key );
 			if( value.equals( oldValue ) ) return false;
 			metadata.put( key, value );
-			//if( value instanceof DataNode ) ( (DataNode)value ).setParent( this );
 		}
 
 		fireMetadataChanged( new DataMetadataEvent( this, key, oldValue, value ) );
@@ -543,7 +540,14 @@ public class DataNode implements Comparable<DataNode> {
 	}
 
 	protected interface Action {
+
+		/**
+		 * Entry point to execute transaction actions.
+		 * 
+		 * @return True if the action was successful, false otherwise.
+		 */
 		public boolean commit();
+
 	}
 
 	protected static final class Transaction extends CopyOnWriteArrayList<Action> {
