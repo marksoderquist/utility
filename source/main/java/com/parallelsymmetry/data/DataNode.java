@@ -2,12 +2,12 @@ package com.parallelsymmetry.data;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.parallelsymmetry.util.ObjectUtil;
 
@@ -33,9 +33,7 @@ public class DataNode implements Comparable<DataNode> {
 
 	private Map<String, Object> resources;
 
-	private List<TransactionStep> transaction;
-
-	private int transactionNest;
+	private Transaction transaction;
 
 	public DataNode() {}
 
@@ -92,14 +90,7 @@ public class DataNode implements Comparable<DataNode> {
 	 */
 	public void setAttribute( String key, Object value ) {
 		if( key == value ) throw new RuntimeException( "The attribute map cannot allow the key and value to be the same." );
-
-		if( isTransactionActive() ) {
-			getTransaction().add( new SetAttributeStep( this, key, value ) );
-		} else {
-			startTransaction();
-			setAttribute( key, value );
-			commitTransaction();
-		}
+		submitAction( new SetAttributeAction( this, key, value ) );
 	}
 
 	/**
@@ -125,13 +116,7 @@ public class DataNode implements Comparable<DataNode> {
 	public void setMetadata( String key, Object value ) {
 		if( key == value ) throw new RuntimeException( "The metadata map cannot allow the key and value to be the same." );
 
-		if( isTransactionActive() ) {
-			getTransaction().add( new SetMetadataStep( this, key, value ) );
-		} else {
-			startTransaction();
-			setMetadata( key, value );
-			commitTransaction();
-		}
+		submitAction( new SetMetadataStep( this, key, value ) );
 	}
 
 	/**
@@ -266,27 +251,26 @@ public class DataNode implements Comparable<DataNode> {
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final void startTransaction() {
-		if( !isTransactionActive() ) transaction = new CopyOnWriteArrayList<TransactionStep>();
-		transactionNest++;
+		if( !isTransactionActive() ) transaction = new Transaction();
+		getTransaction().incrementDepth();
 	}
 
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final void commitTransaction() {
-		transactionNest--;
-		if( transactionNest > 0 ) return;
+		int depth = getTransaction().decrementDepth();
+		if( depth > 0 ) return;
 
 		boolean changed = false;
 		if( transaction != null ) {
-			for( TransactionStep activity : transaction ) {
+			for( Action activity : transaction ) {
 				if( !activity.commit() ) continue;
 				changed = true;
 			}
 		}
 
 		transaction = null;
-		transactionNest = 0;
 
 		if( changed ) {
 			fireDataChanged( new DataEvent( DataEvent.Type.CHANGE, this ) );
@@ -299,7 +283,6 @@ public class DataNode implements Comparable<DataNode> {
 	 */
 	public final void rollbackTransaction() {
 		transaction = null;
-		transactionNest = 0;
 	}
 
 	@Override
@@ -432,9 +415,21 @@ public class DataNode implements Comparable<DataNode> {
 		return true;
 	}
 
-	protected final List<TransactionStep> getTransaction() {
+	protected final Transaction getTransaction() {
 		if( transaction == null ) return parent.getTransaction();
 		return transaction;
+	}
+
+	protected final boolean submitAction( Action action ) {
+		if( isTransactionActive() ) {
+			getTransaction().add( action );
+			return true;
+		}
+
+		startTransaction();
+		submitAction( action );
+		commitTransaction();
+		return false;
 	}
 
 	protected final void triggerChangedEvent() {
@@ -547,11 +542,31 @@ public class DataNode implements Comparable<DataNode> {
 		return true;
 	}
 
-	interface TransactionStep {
+	protected interface Action {
 		public boolean commit();
 	}
 
-	static final class SetAttributeStep implements TransactionStep {
+	protected static final class Transaction extends CopyOnWriteArrayList<Action> {
+
+		private static final long serialVersionUID = 1487819772538317960L;
+
+		private AtomicInteger depth = new AtomicInteger();
+
+		public int getDepth() {
+			return depth.get();
+		}
+
+		public int incrementDepth() {
+			return depth.incrementAndGet();
+		}
+
+		public int decrementDepth() {
+			return depth.decrementAndGet();
+		}
+
+	}
+
+	static final class SetAttributeAction implements Action {
 
 		private DataNode node;
 
@@ -559,7 +574,7 @@ public class DataNode implements Comparable<DataNode> {
 
 		private Object value;
 
-		public SetAttributeStep( DataNode node, String key, Object value ) {
+		public SetAttributeAction( DataNode node, String key, Object value ) {
 			this.node = node;
 			this.key = key;
 			this.value = value;
@@ -571,7 +586,7 @@ public class DataNode implements Comparable<DataNode> {
 
 	}
 
-	static final class SetMetadataStep implements TransactionStep {
+	static final class SetMetadataStep implements Action {
 
 		private DataNode node;
 

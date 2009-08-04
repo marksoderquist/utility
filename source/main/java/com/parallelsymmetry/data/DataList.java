@@ -332,7 +332,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		return true;
 	}
 
-	private static class AddChildStep<T extends DataNode> implements TransactionStep {
+	private static class AddChildStep<T extends DataNode> implements Action {
 
 		private DataList<T> parent;
 
@@ -352,7 +352,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 
 	}
 
-	private static class RemoveChildStep<T extends DataNode> implements TransactionStep {
+	private static class RemoveChildStep<T extends DataNode> implements Action {
 
 		private DataList<T> parent;
 
