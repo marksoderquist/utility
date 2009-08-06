@@ -416,7 +416,7 @@ public class DataNode implements Comparable<DataNode> {
 	}
 
 	protected final Transaction getTransaction() {
-		if( transaction == null ) return parent.getTransaction();
+		if( transaction == null && parent != null ) return parent.getTransaction();
 		return transaction;
 	}
 
