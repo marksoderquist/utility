@@ -292,15 +292,38 @@ public class DataListTest extends BaseTestCase {
 
 		node.add( child0 );
 		assertEquals( node, child0.getParent() );
-		assertEquals( "Child 0 not added", child0, node.get( 0 ) );
+		assertSame( child0, node.get( 0 ) );
 
 		node.add( child1 );
 		assertEquals( node, child1.getParent() );
-		assertEquals( "Child 1 not added", child1, node.get( 1 ) );
+		assertSame( child1, node.get( 1 ) );
 
 		node.add( child2 );
 		assertEquals( node, child2.getParent() );
-		assertEquals( "Child 2 not added", child2, node.get( 2 ) );
+		assertSame( child2, node.get( 2 ) );
+	}
+
+	@Test
+	public void testAddUsingTransaction() {
+		MockDataList node = new MockDataList();
+		MockDataNode child0 = new MockDataNode();
+		MockDataNode child1 = new MockDataNode();
+		MockDataNode child2 = new MockDataNode();
+
+		node.startTransaction();
+		node.add( child0 );
+		node.add( child1 );
+		node.add( child2 );
+		node.commitTransaction();
+
+		assertEquals( node, child0.getParent() );
+		assertSame( child0, node.get( 0 ) );
+
+		assertEquals( node, child1.getParent() );
+		assertSame( child1, node.get( 1 ) );
+
+		assertEquals( node, child2.getParent() );
+		assertSame( child2, node.get( 2 ) );
 	}
 
 	@Test
@@ -312,15 +335,15 @@ public class DataListTest extends BaseTestCase {
 
 		node.add( child0 );
 		assertEquals( node, child0.getParent() );
-		assertEquals( "Child 0 not added", child0, node.get( 0 ) );
+		assertSame( child0, node.get( 0 ) );
 
 		node.add( child2 );
 		assertEquals( node, child2.getParent() );
-		assertEquals( "Child 2 not added", child2, node.get( 1 ) );
+		assertSame( child2, node.get( 1 ) );
 
 		node.add( 1, child1 );
 		assertEquals( node, child1.getParent() );
-		assertEquals( "Child 1 not added", child1, node.get( 1 ) );
+		assertSame( child1, node.get( 1 ) );
 	}
 
 	@Test
@@ -355,7 +378,10 @@ public class DataListTest extends BaseTestCase {
 		node1.add( child );
 		assertTrue( node0.isModified() );
 		assertNull( node0.getAttribute( key ) );
-		assertEquals( 1, node1.size() );
+		assertEquals( 0, node0.size() );
+
+		assertTrue( node1.isModified() );
+		assertEquals( child, node1.get( 0 ) );
 	}
 
 	@Test

@@ -9,6 +9,8 @@ import com.parallelsymmetry.util.ObjectUtil;
 
 public class DataList<T extends DataNode> extends DataNode implements Collection<T>, Iterable<T> {
 
+	private int currentChildrenHashcode;
+
 	private int previousChildrenHashcode;
 
 	List<T> children;
@@ -65,7 +67,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	 * @return The added node.
 	 */
 	public boolean add( T node ) {
-		return add( children == null ? 0 : children.size(), node );
+		return add( Integer.MAX_VALUE, node );
 	}
 
 	/**
@@ -79,7 +81,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		if( node == null ) return false;
 
 		if( isTransactionActive() ) {
-			getTransaction().add( new AddChildStep<T>( this, node, index ) );
+			getTransaction().add( new AddChildAction<T>( this, node, index ) );
 		} else {
 			startTransaction();
 			add( index, node );
@@ -99,7 +101,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		if( needTransaction ) startTransaction();
 		for( T node : collection ) {
 			if( contains( node ) ) continue;
-			getTransaction().add( new AddChildStep<T>( this, node, index++ ) );
+			getTransaction().add( new AddChildAction<T>( this, node, index++ ) );
 			count++;
 		}
 		if( needTransaction ) commitTransaction();
@@ -134,7 +136,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		if( node == null ) return false;
 
 		if( isTransactionActive() ) {
-			getTransaction().add( new RemoveChildStep<T>( this, node ) );
+			getTransaction().add( new RemoveChildAction<T>( this, node ) );
 		} else {
 			startTransaction();
 			remove( node );
@@ -171,7 +173,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		if( needsTransaction ) startTransaction();
 		for( Object node : collection ) {
 			if( !( node instanceof DataNode ) ) continue;
-			getTransaction().add( new RemoveChildStep<T>( this, (T)node ) );
+			getTransaction().add( new RemoveChildAction<T>( this, (T)node ) );
 			count++;
 		}
 		if( needsTransaction ) commitTransaction();
@@ -244,7 +246,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	}
 
 	protected boolean equalsUsingChildren( Object object ) {
-		if( !( object instanceof DataList ) ) return false;
+		if( !( object instanceof DataList<?> ) ) return false;
 
 		DataList<?> that = (DataList<?>)object;
 		return ObjectUtil.areEqual( this.children, that.children );
@@ -254,13 +256,19 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		return equalsUsingAttributes( object ) & equalsUsingChildren( object );
 	}
 
+	@Override
+	protected void updateCurrentState() {
+		currentChildrenHashcode = calcChildrenHashcode();
+		super.updateCurrentState();
+	}
+
 	/**
 	 * Are any of the descendants of this node modified.
 	 * 
 	 * @return The tree modified flag.
 	 */
 	protected boolean isTreeModified() {
-		return super.isTreeModified() || previousChildrenHashcode != getChildrenHashcode();
+		return super.isTreeModified() || currentChildrenHashcode != previousChildrenHashcode;
 	}
 
 	protected void unmodifyChildren() {
@@ -298,6 +306,10 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	}
 
 	private int getChildrenHashcode() {
+		return currentChildrenHashcode;
+	}
+
+	private int calcChildrenHashcode() {
 		if( children == null ) return 0;
 		return children.hashCode();
 	}
@@ -315,6 +327,8 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 
 		fireChildAdded( new DataChildEvent( DataEvent.Type.INSERT, this, node, index ) );
 
+		getTransaction().nodeModified( this );
+
 		return true;
 	}
 
@@ -329,10 +343,12 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 
 		fireChildRemoved( new DataChildEvent( DataEvent.Type.REMOVE, this, node, index ) );
 
+		getTransaction().nodeModified( this );
+
 		return true;
 	}
 
-	private static class AddChildStep<T extends DataNode> implements Action {
+	private static class AddChildAction<T extends DataNode> implements Action {
 
 		private DataList<T> parent;
 
@@ -340,7 +356,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 
 		private int index;
 
-		public AddChildStep( DataList<T> parent, T child, int index ) {
+		public AddChildAction( DataList<T> parent, T child, int index ) {
 			this.parent = parent;
 			this.child = child;
 			this.index = index;
@@ -352,13 +368,13 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 
 	}
 
-	private static class RemoveChildStep<T extends DataNode> implements Action {
+	private static class RemoveChildAction<T extends DataNode> implements Action {
 
 		private DataList<T> parent;
 
 		private T child;
 
-		public RemoveChildStep( DataList<T> parent, T child ) {
+		public RemoveChildAction( DataList<T> parent, T child ) {
 			this.parent = parent;
 			this.child = child;
 		}

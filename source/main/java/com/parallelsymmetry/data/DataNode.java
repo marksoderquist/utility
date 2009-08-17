@@ -1,11 +1,12 @@
 package com.parallelsymmetry.data;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -16,6 +17,8 @@ public class DataNode implements Comparable<DataNode> {
 	public static final String MODIFIED = DataNode.class.getName() + ":modified";
 
 	protected boolean modified;
+
+	protected int currentAttributesHashcode;
 
 	protected int previousAttributesHashcode;
 
@@ -264,18 +267,19 @@ public class DataNode implements Comparable<DataNode> {
 
 		boolean changed = false;
 		if( transaction != null ) {
-			for( Action activity : transaction ) {
-				if( !activity.commit() ) continue;
+			for( Action action : transaction ) {
+				if( !action.commit() ) continue;
 				changed = true;
 			}
 		}
 
-		transaction = null;
-
 		if( changed ) {
+			transaction.updateNodes();
 			fireDataChanged( new DataEvent( DataEvent.Type.CHANGE, this ) );
 			processModifiedFlag( isModified() );
 		}
+
+		transaction = null;
 	}
 
 	/**
@@ -327,14 +331,15 @@ public class DataNode implements Comparable<DataNode> {
 	 * @return The tree modified flag.
 	 */
 	protected boolean isTreeModified() {
-		return modifiedChildren != 0;
+		return modifiedChildren > 0;
 	}
 
 	protected void childModified( boolean modified ) {
 		if( modified ) {
 			modifiedChildren++;
 		} else {
-			if( modifiedChildren > 0 ) modifiedChildren--;
+			modifiedChildren--;
+			if( modifiedChildren < 0 ) modifiedChildren = 0;
 		}
 
 		if( !isTransactionActive() ) processModifiedFlag( isModified() );
@@ -374,7 +379,17 @@ public class DataNode implements Comparable<DataNode> {
 		}
 	}
 
+	protected void updateCurrentState() {
+		currentAttributesHashcode = calcAttributesHashcode();
+		DataNode parent = getParent();
+		if( parent != null ) parent.updateCurrentState();
+	}
+
 	protected int getAttributesHashcode() {
+		return currentAttributesHashcode;
+	}
+
+	protected final int calcAttributesHashcode() {
 		return attributes == null ? 0 : attributes.hashCode();
 	}
 
@@ -406,11 +421,12 @@ public class DataNode implements Comparable<DataNode> {
 					break;
 				}
 			}
-			//
 		} else if( parent instanceof DataList && ( (DataList)parent ).children != null ) {
 			// If the node is a child.
 			( (DataList<DataNode>)parent ).remove( node );
 		}
+
+		getTransaction().nodeModified( parent );
 
 		return true;
 	}
@@ -495,6 +511,7 @@ public class DataNode implements Comparable<DataNode> {
 	 */
 	private final boolean handleSetAttribute( String key, Object value ) {
 		Object oldValue = null;
+
 		if( value == null ) {
 			if( attributes == null ) return false;
 			oldValue = attributes.remove( key );
@@ -508,6 +525,8 @@ public class DataNode implements Comparable<DataNode> {
 			attributes.put( key, value );
 			if( value instanceof DataNode ) ( (DataNode)value ).setParent( this );
 		}
+
+		getTransaction().nodeModified( this );
 
 		fireAttributeModified( new DataAttributeEvent( this, key, oldValue, value ) );
 
@@ -534,6 +553,8 @@ public class DataNode implements Comparable<DataNode> {
 			metadata.put( key, value );
 		}
 
+		getTransaction().nodeModified( this );
+
 		fireMetadataChanged( new DataMetadataEvent( this, key, oldValue, value ) );
 
 		return true;
@@ -550,11 +571,13 @@ public class DataNode implements Comparable<DataNode> {
 
 	}
 
-	protected static final class Transaction extends CopyOnWriteArrayList<Action> {
+	protected static final class Transaction extends ArrayList<Action> {
 
 		private static final long serialVersionUID = 1487819772538317960L;
 
 		private AtomicInteger depth = new AtomicInteger();
+
+		private Collection<DataNode> nodes = new HashSet<DataNode>();
 
 		public int getDepth() {
 			return depth.get();
@@ -566,6 +589,16 @@ public class DataNode implements Comparable<DataNode> {
 
 		public int decrementDepth() {
 			return depth.decrementAndGet();
+		}
+
+		public void nodeModified( DataNode node ) {
+			nodes.add( node );
+		}
+
+		public void updateNodes() {
+			for( DataNode node : nodes ) {
+				node.updateCurrentState();
+			}
 		}
 
 	}
