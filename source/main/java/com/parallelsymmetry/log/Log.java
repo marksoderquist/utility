@@ -276,7 +276,7 @@ public class Log {
 
 		int index = 0;
 		while( index < elements.length ) {
-			StackTraceElement frame = elements[ index ];
+			StackTraceElement frame = elements[index];
 			String clazz = frame.getClassName();
 			if( clazz.equals( Log.class.getName() ) ) {
 				break;
@@ -285,7 +285,7 @@ public class Log {
 		}
 
 		while( index < elements.length ) {
-			StackTraceElement frame = elements[ index ];
+			StackTraceElement frame = elements[index];
 			String clazz = frame.getClassName();
 			if( !clazz.equals( Log.class.getName() ) ) {
 				return frame;
@@ -311,10 +311,6 @@ public class Log {
 		private StreamHandler outputHandler;
 
 		private StreamHandler errorHandler;
-
-		public DefaultHandler( OutputStream stream ) {
-			this( stream, stream );
-		}
 
 		public DefaultHandler( OutputStream stream, OutputStream error ) {
 			outputHandler = new StreamHandler( stream, new DefaultFormatter() );
