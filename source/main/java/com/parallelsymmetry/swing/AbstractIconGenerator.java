@@ -24,7 +24,7 @@ public class AbstractIconGenerator {
 
 	protected static final void save( File target, String name, Icon icon, int width, int height, RGBImageFilter filter ) {
 		if( !target.isDirectory() ) target = target.getParentFile();
-		if( !target.exists() || target.mkdirs() ) {
+		if( !target.exists() && target.mkdirs() ) {
 			System.err.println( "Could not create target: " + target );
 			return;
 		}
