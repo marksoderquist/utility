@@ -140,7 +140,7 @@ public class Log {
 		write( level, "" );
 	}
 
-	public static final void writeTolLogger( String name, Level level ) {
+	public static final void writeToLogger( String name, Level level ) {
 		writeToLogger( name, level, "" );
 	}
 
