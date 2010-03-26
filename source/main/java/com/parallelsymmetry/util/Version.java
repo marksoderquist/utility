@@ -58,19 +58,23 @@ public class Version implements Comparable<Version> {
 		Version version = new Version( TextUtil.isEmpty( string ) );
 
 		if( !TextUtil.isEmpty( string ) ) {
-			// Parse the version elements.
-			List<String> elements = new ArrayList<String>();
-			StringTokenizer tokenizer = new StringTokenizer( string, ".- " );
-			while( tokenizer.hasMoreTokens() ) {
-				elements.add( tokenizer.nextToken() );
-			}
+			try {
+				// Parse the version elements.
+				List<String> elements = new ArrayList<String>();
+				StringTokenizer tokenizer = new StringTokenizer( string, ".- " );
+				while( tokenizer.hasMoreTokens() ) {
+					elements.add( tokenizer.nextToken() );
+				}
 
-			// Set the original version string. 
-			version.original = string;
+				// Set the original version string. 
+				version.original = string;
 
-			// Check each element for use.
-			for( String element : elements ) {
-				checkElement( version, element );
+				// Check each element for use.
+				for( String element : elements ) {
+					checkElement( version, element );
+				}
+			} catch( IllegalArgumentException exception ) {
+				throw new RuntimeException( "Version could not be parsed: " + string );
 			}
 		}
 
@@ -232,7 +236,7 @@ public class Version implements Comparable<Version> {
 				version.build = Integer.parseInt( element );
 			}
 		} else {
-			if( version.state != null ) throw new RuntimeException( "State should only be declared once." );
+			if( version.state != null ) throw new IllegalArgumentException( "State should only be declared once: " + element );
 			version.state = element;
 		}
 	}
