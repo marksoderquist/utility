@@ -1,13 +1,15 @@
 package com.parallelsymmetry.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.parallelsymmetry.util.ObjectUtil;
 
-public class DataList<T extends DataNode> extends DataNode implements Collection<T>, Iterable<T> {
+public class DataList<T extends DataNode> extends DataNode implements Collection<T>, List<T> {
 
 	private int currentChildrenHashcode;
 
@@ -55,9 +57,16 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	 * @param node
 	 * @return The index of the child.
 	 */
-	public int getIndex( T node ) {
+	@Override
+	public int indexOf( Object node ) {
 		if( children == null ) return -1;
 		return children.indexOf( node );
+	}
+
+	@Override
+	public int lastIndexOf( Object object ) {
+		if( children == null ) return -1;
+		return children.lastIndexOf( object );
 	}
 
 	/**
@@ -67,35 +76,23 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	 * @return The added node.
 	 */
 	public boolean add( T node ) {
-		return add( Integer.MAX_VALUE, node );
+		return addNode( Integer.MAX_VALUE, node );
 	}
 
-	/**
-	 * Add a node after the node at the specified index.
-	 * 
-	 * @param index
-	 * @param node
-	 * @return The added node.
-	 */
-	public boolean add( int index, T node ) {
-		if( node == null ) return false;
-
-		if( isTransactionActive() ) {
-			getTransaction().add( new AddChildAction<T>( this, node, index ) );
-		} else {
-			startTransaction();
-			add( index, node );
-			commitTransaction();
-		}
-		return true;
+	public void add( int index, T node ) {
+		addNode( index, node );
 	}
 
 	@Override
 	public boolean addAll( Collection<? extends T> collection ) {
+		return addAll( size(), collection );
+	}
+
+	@Override
+	public boolean addAll( int index, Collection<? extends T> collection ) {
 		if( collection == null ) return false;
 
 		int count = 0;
-		int index = size();
 		boolean needTransaction = !isTransactionActive();
 
 		if( needTransaction ) startTransaction();
@@ -126,30 +123,22 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		return children.containsAll( collection );
 	}
 
-	/**
-	 * Remove a child node.
-	 * 
-	 * @param node
-	 * @return The removed node.
-	 */
-	public boolean remove( T node ) {
-		if( node == null ) return false;
-
-		if( isTransactionActive() ) {
-			getTransaction().add( new RemoveChildAction<T>( this, node ) );
-		} else {
-			startTransaction();
-			remove( node );
-			commitTransaction();
-		}
-
-		return true;
+	@Override
+	public T set( int index, T element ) {
+		throw new RuntimeException( "The DataList.set(index, node) method is not implemented yet." );
 	}
 
 	@Override
+	public List<T> subList( int fromIndex, int toIndex ) {
+		if( children == null ) return new ArrayList<T>();
+		return children.subList( fromIndex, toIndex );
+	}
+
+	@SuppressWarnings( "unchecked" )
+	@Override
 	public boolean remove( Object node ) {
 		if( !( node instanceof DataNode ) ) return false;
-		return remove( (DataNode)node );
+		return removeNode( (T)node );
 	}
 
 	/**
@@ -158,9 +147,11 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	 * @param index
 	 * @return The removed node.
 	 */
-	public void remove( int index ) {
+	public T remove( int index ) {
 		if( children == null ) throw new ArrayIndexOutOfBoundsException( index );
-		remove( children.get( index ) );
+		T node = children.get( index );
+		removeNode( node );
+		return node;
 	}
 
 	@Override
@@ -231,8 +222,20 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 	 * @return
 	 */
 	public Iterator<T> iterator() {
-		if( children == null ) return new CopyOnWriteArrayList<T>().iterator();
+		if( children == null ) return new ArrayList<T>().iterator();
 		return children.iterator();
+	}
+
+	@Override
+	public ListIterator<T> listIterator() {
+		if( children == null ) return new ArrayList<T>().listIterator();
+		return children.listIterator();
+	}
+
+	@Override
+	public ListIterator<T> listIterator( int index ) {
+		if( children == null ) return new ArrayList<T>().listIterator( index );
+		return children.listIterator( index );
 	}
 
 	@Override
@@ -296,6 +299,47 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 			}
 		}
 		if( getParent() instanceof DataList<?> ) ( (DataList<?>)getParent() ).fireChildRemoved( event );
+	}
+
+	/**
+	 * Add a node after the node at the specified index.
+	 * 
+	 * @param index
+	 * @param node
+	 * @return The added node.
+	 */
+	private boolean addNode( int index, T node ) {
+		if( node == null ) return false;
+
+		if( isTransactionActive() ) {
+			getTransaction().add( new AddChildAction<T>( this, node, index ) );
+		} else {
+			startTransaction();
+			add( index, node );
+			commitTransaction();
+		}
+
+		return true;
+	}
+
+	/**
+	 * Remove a child node.
+	 * 
+	 * @param node
+	 * @return The removed node.
+	 */
+	private boolean removeNode( T node ) {
+		if( node == null ) return false;
+
+		if( isTransactionActive() ) {
+			getTransaction().add( new RemoveChildAction<T>( this, node ) );
+		} else {
+			startTransaction();
+			remove( node );
+			commitTransaction();
+		}
+
+		return true;
 	}
 
 	/**

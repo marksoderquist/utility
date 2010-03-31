@@ -274,13 +274,13 @@ public class DataListTest extends BaseTestCase {
 	}
 
 	@Test
-	public void testGetIndex() {
+	public void testIndexOf() {
 		MockDataList parent = new MockDataList();
 		MockDataList child = new MockDataList();
-		assertEquals( -1, parent.getIndex( child ) );
+		assertEquals( -1, parent.indexOf( child ) );
 
 		parent.add( child );
-		assertEquals( 0, parent.getIndex( child ) );
+		assertEquals( 0, parent.indexOf( child ) );
 	}
 
 	@Test
