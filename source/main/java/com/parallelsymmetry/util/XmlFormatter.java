@@ -47,12 +47,8 @@ public class XmlFormatter extends Thread {
 	}
 
 	public synchronized void waitFor() throws IOException, InterruptedException {
-		long timeout = 100;
-		long delay = timeout;
-		long timestamp = System.currentTimeMillis();
-		while( !finished && ( System.currentTimeMillis() - timestamp < timeout ) ) {
-			wait( delay );
-			delay = 1;
+		while( !finished ) {
+			wait();
 		}
 		if( exception != null ) throw exception;
 	}
