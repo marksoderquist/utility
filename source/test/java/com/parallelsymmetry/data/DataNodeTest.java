@@ -1,6 +1,7 @@
 package com.parallelsymmetry.data;
 
 import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.junit.Test;
 
@@ -135,6 +136,23 @@ public class DataNodeTest extends BaseTestCase {
 
 		node.setAttribute( key, null );
 		assertFalse( "Node still modified after removing attribute.", node.isModified() );
+	}
+
+	@Test
+	public void testIsModifiedByCollectionAttributes() {
+		MockDataNode node = new MockDataNode();
+
+		String COLLECTION = "collection";
+		node.setAttribute( COLLECTION, new CopyOnWriteArraySet<String>() );
+
+		node.setModified( false );
+		assertFalse( node.isModified() );
+
+		node.addElement( COLLECTION, "test" );
+		assertTrue( node.isModified() );
+
+		node.removeElement( COLLECTION, "test" );
+		assertFalse( node.isModified() );
 	}
 
 	@Test

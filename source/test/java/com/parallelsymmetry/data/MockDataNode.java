@@ -1,6 +1,5 @@
 package com.parallelsymmetry.data;
 
-import com.parallelsymmetry.data.DataNode;
 
 public class MockDataNode extends DataNode {
 

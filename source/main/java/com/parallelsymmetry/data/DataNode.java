@@ -96,6 +96,14 @@ public class DataNode implements Comparable<DataNode> {
 		submitAction( new SetAttributeAction( this, key, value ) );
 	}
 
+	public <E> void addElement( String key, E element ) {
+		submitAction( new AddElementAction<E>( this, key, element ) );
+	}
+
+	public <E> void removeElement( String key, E element ) {
+		submitAction( new RemoveElementAction<E>( this, key, element ) );
+	}
+
 	/**
 	 * Get a metadata attribute from the node.
 	 * 
@@ -533,6 +541,36 @@ public class DataNode implements Comparable<DataNode> {
 		return true;
 	}
 
+	@SuppressWarnings( "unchecked" )
+	private final <E> boolean handleAddElement( String key, E element ) {
+		Collection<E> collection = (Collection<E>)getAttribute( key );
+		if( collection == null ) return false;
+
+		boolean result = collection.add( element );
+
+		if( result ) {
+			getTransaction().nodeModified( this );
+			fireAttributeModified( new DataAttributeEvent( this, key, element, null ) );
+		}
+
+		return result;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	private final <E> boolean handleRemoveElement( String key, E element ) {
+		Collection<E> collection = (Collection<E>)getAttribute( key );
+		if( collection == null ) return false;
+
+		boolean result = collection.remove( element );
+
+		if( result ) {
+			getTransaction().nodeModified( this );
+			fireAttributeModified( new DataAttributeEvent( this, key, element, null ) );
+		}
+
+		return result;
+	}
+
 	/**
 	 * Handle setting a metadata attribute.
 	 * 
@@ -621,6 +659,44 @@ public class DataNode implements Comparable<DataNode> {
 			return node.handleSetAttribute( key, value );
 		}
 
+	}
+
+	static final class AddElementAction<E> implements Action {
+
+		private DataNode node;
+
+		private String key;
+
+		private E element;
+
+		public AddElementAction( DataNode node, String key, E element ) {
+			this.node = node;
+			this.key = key;
+			this.element = element;
+		}
+
+		public boolean commit() {
+			return node.handleAddElement( key, element );
+		}
+	}
+
+	static final class RemoveElementAction<E> implements Action {
+
+		private DataNode node;
+
+		private String key;
+
+		private E element;
+
+		public RemoveElementAction( DataNode node, String key, E element ) {
+			this.node = node;
+			this.key = key;
+			this.element = element;
+		}
+
+		public boolean commit() {
+			return node.handleRemoveElement( key, element );
+		}
 	}
 
 	static final class SetMetadataStep implements Action {
