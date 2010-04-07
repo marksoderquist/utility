@@ -127,7 +127,7 @@ public class DataNode implements Comparable<DataNode> {
 	public void setMetadata( String key, Object value ) {
 		if( key == value ) throw new RuntimeException( "The metadata map cannot allow the key and value to be the same." );
 
-		submitAction( new SetMetadataStep( this, key, value ) );
+		submitAction( new SetMetadataAction( this, key, value ) );
 	}
 
 	/**
@@ -270,15 +270,20 @@ public class DataNode implements Comparable<DataNode> {
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final void commitTransaction() {
+		if( transaction == null ) return;
+
 		int depth = getTransaction().decrementDepth();
 		if( depth > 0 ) return;
 
 		boolean changed = false;
-		if( transaction != null ) {
-			for( Action action : transaction ) {
-				if( !action.commit() ) continue;
-				changed = true;
-			}
+		for( Action action : transaction ) {
+			if( !action.commit() ) continue;
+			changed = true;
+		}
+
+		// Process events.
+		for( Action action : new Transaction( transaction ) ) {
+			action.fireEvents();
 		}
 
 		if( changed ) {
@@ -510,102 +515,19 @@ public class DataNode implements Comparable<DataNode> {
 		if( resources == null ) resources = new ConcurrentHashMap<String, Object>();
 	}
 
-	/**
-	 * Handle setting an attribute.
-	 * 
-	 * @param key
-	 * @param value
-	 * @return True if the attribute value changed, false otherwise.
-	 */
-	private final boolean handleSetAttribute( String key, Object value ) {
-		Object oldValue = null;
-
-		if( value == null ) {
-			if( attributes == null ) return false;
-			oldValue = attributes.remove( key );
-			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
-			if( attributes.size() == 0 ) attributes = null;
-		} else {
-			if( value instanceof DataNode ) isolateNode( (DataNode)value );
-			ensureAttributes();
-			oldValue = attributes.get( key );
-			if( value.equals( oldValue ) ) return false;
-			attributes.put( key, value );
-			if( value instanceof DataNode ) ( (DataNode)value ).setParent( this );
-		}
-
-		getTransaction().nodeModified( this );
-
-		fireAttributeModified( new DataAttributeEvent( this, key, oldValue, value ) );
-
-		return true;
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private final <E> boolean handleAddElement( String key, E element ) {
-		Collection<E> collection = (Collection<E>)getAttribute( key );
-		if( collection == null ) return false;
-
-		boolean result = collection.add( element );
-
-		if( result ) {
-			getTransaction().nodeModified( this );
-			fireAttributeModified( new DataAttributeEvent( this, key, element, null ) );
-		}
-
-		return result;
-	}
-
-	@SuppressWarnings( "unchecked" )
-	private final <E> boolean handleRemoveElement( String key, E element ) {
-		Collection<E> collection = (Collection<E>)getAttribute( key );
-		if( collection == null ) return false;
-
-		boolean result = collection.remove( element );
-
-		if( result ) {
-			getTransaction().nodeModified( this );
-			fireAttributeModified( new DataAttributeEvent( this, key, element, null ) );
-		}
-
-		return result;
-	}
-
-	/**
-	 * Handle setting a metadata attribute.
-	 * 
-	 * @param key
-	 * @param value
-	 * @return True if the attribute value changed, false otherwise.
-	 */
-	private final boolean handleSetMetadata( String key, Object value ) {
-		Object oldValue = null;
-		if( value == null ) {
-			if( metadata == null ) return false;
-			oldValue = metadata.remove( key );
-			if( metadata.size() == 0 ) metadata = null;
-		} else {
-			ensureMetadata();
-			oldValue = metadata.get( key );
-			if( value.equals( oldValue ) ) return false;
-			metadata.put( key, value );
-		}
-
-		getTransaction().nodeModified( this );
-
-		fireMetadataChanged( new DataMetadataEvent( this, key, oldValue, value ) );
-
-		return true;
-	}
-
-	protected interface Action {
+	protected static abstract class Action {
 
 		/**
 		 * Entry point to execute transaction actions.
 		 * 
 		 * @return True if the action was successful, false otherwise.
 		 */
-		public boolean commit();
+		public abstract boolean commit();
+
+		/**
+		 * Called by the commitTransaction to fire any events due to this action.
+		 */
+		public void fireEvents() {}
 
 	}
 
@@ -616,6 +538,14 @@ public class DataNode implements Comparable<DataNode> {
 		private AtomicInteger depth = new AtomicInteger();
 
 		private Collection<DataNode> nodes = new HashSet<DataNode>();
+
+		public Transaction() {
+			super();
+		}
+
+		public Transaction( Transaction transaction ) {
+			super( transaction );
+		}
 
 		public int getDepth() {
 			return depth.get();
@@ -641,13 +571,15 @@ public class DataNode implements Comparable<DataNode> {
 
 	}
 
-	static final class SetAttributeAction implements Action {
+	static final class SetAttributeAction extends Action {
 
 		private DataNode node;
 
 		private String key;
 
 		private Object value;
+
+		private DataAttributeEvent event;
 
 		public SetAttributeAction( DataNode node, String key, Object value ) {
 			this.node = node;
@@ -655,19 +587,47 @@ public class DataNode implements Comparable<DataNode> {
 			this.value = value;
 		}
 
+		@Override
 		public boolean commit() {
-			return node.handleSetAttribute( key, value );
+			Object oldValue = null;
+
+			if( value == null ) {
+				if( node.attributes == null ) return false;
+				oldValue = node.attributes.remove( key );
+				if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
+				if( node.attributes.size() == 0 ) node.attributes = null;
+			} else {
+				if( value instanceof DataNode ) node.isolateNode( (DataNode)value );
+				node.ensureAttributes();
+				oldValue = node.attributes.get( key );
+				if( value.equals( oldValue ) ) return false;
+				node.attributes.put( key, value );
+				if( value instanceof DataNode ) ( (DataNode)value ).setParent( node );
+			}
+
+			node.getTransaction().nodeModified( node );
+
+			event = new DataAttributeEvent( node, key, oldValue, value );
+
+			return true;
+		}
+
+		@Override
+		public void fireEvents() {
+			if( event != null ) node.fireAttributeModified( event );
 		}
 
 	}
 
-	static final class AddElementAction<E> implements Action {
+	static final class AddElementAction<E> extends Action {
 
 		private DataNode node;
 
 		private String key;
 
 		private E element;
+
+		private DataAttributeEvent event;
 
 		public AddElementAction( DataNode node, String key, E element ) {
 			this.node = node;
@@ -675,12 +635,29 @@ public class DataNode implements Comparable<DataNode> {
 			this.element = element;
 		}
 
+		@Override
+		@SuppressWarnings( "unchecked" )
 		public boolean commit() {
-			return node.handleAddElement( key, element );
+			Collection<E> collection = (Collection<E>)node.getAttribute( key );
+			if( collection == null ) return false;
+
+			boolean result = collection.add( element );
+
+			if( result ) {
+				node.getTransaction().nodeModified( node );
+				event = new DataAttributeEvent( node, key, element, null );
+			}
+
+			return result;
+		}
+
+		@Override
+		public void fireEvents() {
+			if( event != null ) node.fireAttributeModified( event );
 		}
 	}
 
-	static final class RemoveElementAction<E> implements Action {
+	static final class RemoveElementAction<E> extends Action {
 
 		private DataNode node;
 
@@ -688,18 +665,37 @@ public class DataNode implements Comparable<DataNode> {
 
 		private E element;
 
+		private DataAttributeEvent event;
+
 		public RemoveElementAction( DataNode node, String key, E element ) {
 			this.node = node;
 			this.key = key;
 			this.element = element;
 		}
 
+		@Override
+		@SuppressWarnings( "unchecked" )
 		public boolean commit() {
-			return node.handleRemoveElement( key, element );
+			Collection<E> collection = (Collection<E>)node.getAttribute( key );
+			if( collection == null ) return false;
+
+			boolean result = collection.remove( element );
+
+			if( result ) {
+				node.getTransaction().nodeModified( node );
+				event = new DataAttributeEvent( node, key, element, null );
+			}
+
+			return result;
+		}
+
+		@Override
+		public void fireEvents() {
+			if( event != null ) node.fireAttributeModified( event );
 		}
 	}
 
-	static final class SetMetadataStep implements Action {
+	static final class SetMetadataAction extends Action {
 
 		private DataNode node;
 
@@ -707,14 +703,37 @@ public class DataNode implements Comparable<DataNode> {
 
 		private Object value;
 
-		public SetMetadataStep( DataNode node, String key, Object value ) {
+		private DataMetadataEvent event;
+
+		public SetMetadataAction( DataNode node, String key, Object value ) {
 			this.node = node;
 			this.key = key;
 			this.value = value;
 		}
 
 		public boolean commit() {
-			return node.handleSetMetadata( key, value );
+			Object oldValue = null;
+			if( value == null ) {
+				if( node.metadata == null ) return false;
+				oldValue = node.metadata.remove( key );
+				if( node.metadata.size() == 0 ) node.metadata = null;
+			} else {
+				node.ensureMetadata();
+				oldValue = node.metadata.get( key );
+				if( value.equals( oldValue ) ) return false;
+				node.metadata.put( key, value );
+			}
+
+			node.getTransaction().nodeModified( node );
+
+			event = new DataMetadataEvent( node, key, oldValue, value );
+
+			return true;
+		}
+
+		@Override
+		public void fireEvents() {
+			if( event != null ) node.fireMetadataChanged( event );
 		}
 
 	}

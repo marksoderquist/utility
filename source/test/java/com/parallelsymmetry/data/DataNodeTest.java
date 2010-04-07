@@ -407,6 +407,13 @@ public class DataNodeTest extends BaseTestCase {
 	}
 
 	@Test
+	public void testTransactionWithModifingEvent() {
+		MockDataNode node = new MockDataNode();
+		node.addDataListener( new ModifyingDataHandler() );
+		node.setAttribute( "fire", "event" );
+	}
+
+	@Test
 	public void testEquals() {
 		MockDataNode node1 = null;
 		MockDataNode node2 = null;
@@ -450,6 +457,15 @@ public class DataNodeTest extends BaseTestCase {
 		node2.setAttribute( "key", "b" );
 		assertFalse( node1.equalsUsingAttributes( node2 ) );
 		assertFalse( node2.equalsUsingAttributes( node1 ) );
+	}
+
+	private class ModifyingDataHandler extends DataAdapter {
+	
+		@Override
+		public void attributeChanged( DataAttributeEvent event ) {
+			event.getData().setMetadata( "time", System.nanoTime() );
+		}
+	
 	}
 
 }

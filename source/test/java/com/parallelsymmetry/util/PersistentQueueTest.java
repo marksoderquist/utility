@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
-import com.parallelsymmetry.log.Log;
-
 import junit.framework.TestCase;
+
+import com.parallelsymmetry.log.Log;
 
 public class PersistentQueueTest extends TestCase {
 
@@ -124,7 +124,8 @@ public class PersistentQueueTest extends TestCase {
 	}
 
 	private PersistentQueue<String> createTemporaryQueue( int defragInterval ) throws IOException {
-		File store = File.createTempFile( "store", ".queue" );
+		String filename = "store" + System.nanoTime() + ".queue";
+		File store = new File( System.getProperty( "temp.dir", filename ) );
 		store.deleteOnExit();
 		return new PersistentQueue<String>( store, defragInterval );
 	}

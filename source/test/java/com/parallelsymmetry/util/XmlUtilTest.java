@@ -32,7 +32,7 @@ public class XmlUtilTest extends TestCase {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		XmlUtil.format( input, output );
-		assertEquals( test, output.toString().trim() );
+		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class XmlUtilTest extends TestCase {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 		XmlUtil.format( input, output, 3 );
-		assertEquals( test, output.toString().trim() );
+		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 
 }

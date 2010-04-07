@@ -79,8 +79,8 @@ public class FileUtilTest extends TestCase {
 		assertEquals( time, input.readLong() );
 		input.close();
 
-		assertTrue( source.delete() );
-		assertTrue( target.delete() );
+		source.deleteOnExit();
+		target.deleteOnExit();
 	}
 
 	public void testCopyFileToFolder() throws Exception {

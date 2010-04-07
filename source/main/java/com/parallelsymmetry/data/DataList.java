@@ -358,41 +358,7 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 		return children.hashCode();
 	}
 
-	private boolean handleAddChild( int index, T node ) {
-		if( node == null ) return false;
-
-		isolateNode( node );
-		node.setParent( this );
-
-		ensureChildren();
-		if( index < 0 ) index = 0;
-		if( index > children.size() ) index = children.size();
-		children.add( index, node );
-
-		fireChildAdded( new DataChildEvent( DataEvent.Type.INSERT, this, node, index ) );
-
-		getTransaction().nodeModified( this );
-
-		return true;
-	}
-
-	private boolean handleRemoveChild( T node ) {
-		if( node == null || children == null ) return false;
-		if( !children.contains( node ) ) return false;
-
-		int index = children.indexOf( node );
-		children.remove( node );
-		node.setParent( null );
-		if( children.size() == 0 ) children = null;
-
-		fireChildRemoved( new DataChildEvent( DataEvent.Type.REMOVE, this, node, index ) );
-
-		getTransaction().nodeModified( this );
-
-		return true;
-	}
-
-	private static class AddChildAction<T extends DataNode> implements Action {
+	private static class AddChildAction<T extends DataNode> extends Action {
 
 		private DataList<T> parent;
 
@@ -400,31 +366,73 @@ public class DataList<T extends DataNode> extends DataNode implements Collection
 
 		private int index;
 
+		private DataChildEvent event;
+
 		public AddChildAction( DataList<T> parent, T child, int index ) {
 			this.parent = parent;
 			this.child = child;
 			this.index = index;
 		}
 
+		@Override
 		public boolean commit() {
-			return parent.handleAddChild( index, child );
+			if( child == null ) return false;
+
+			parent.isolateNode( child );
+			child.setParent( parent );
+
+			parent.ensureChildren();
+			if( index < 0 ) index = 0;
+			if( index > parent.children.size() ) index = parent.children.size();
+			parent.children.add( index, child );
+
+			event = new DataChildEvent( DataEvent.Type.INSERT, parent, child, index );
+
+			parent.getTransaction().nodeModified( parent );
+
+			return true;
+		}
+
+		@Override
+		public void fireEvents() {
+			if( event != null ) parent.fireChildAdded( event );
 		}
 
 	}
 
-	private static class RemoveChildAction<T extends DataNode> implements Action {
+	private static class RemoveChildAction<T extends DataNode> extends Action {
 
 		private DataList<T> parent;
 
 		private T child;
+
+		private DataChildEvent event;
 
 		public RemoveChildAction( DataList<T> parent, T child ) {
 			this.parent = parent;
 			this.child = child;
 		}
 
+		@Override
 		public boolean commit() {
-			return parent.handleRemoveChild( child );
+			if( child == null || parent.children == null ) return false;
+			if( !parent.children.contains( child ) ) return false;
+
+			int index = parent.children.indexOf( child );
+			parent.children.remove( child );
+			child.setParent( null );
+			if( parent.children.size() == 0 ) parent.children = null;
+
+			event = new DataChildEvent( DataEvent.Type.REMOVE, parent, child, index );
+
+			parent.getTransaction().nodeModified( parent );
+
+			return true;
+		}
+
+		@Override
+		public void fireEvents() {
+			if( event != null ) parent.fireChildRemoved( event );
 		}
 
 	}
