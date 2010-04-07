@@ -7,16 +7,8 @@ public class ThreadUtil {
 	private static final StackClassResolver STACK_CLASS_RESOLVER = new StackClassResolver();
 
 	public static final void pause( long duration ) {
-		long remainder = duration;
-		long start = 0;
-		long stop = 0;
 		try {
-			while( remainder > 0 ) {
-				start = System.currentTimeMillis();
-				Thread.sleep( remainder );
-				stop = System.currentTimeMillis();
-				remainder -= stop - start;
-			}
+			Thread.sleep( duration );
 		} catch( InterruptedException exception ) {
 			// Intentionally ignore exception.
 		}

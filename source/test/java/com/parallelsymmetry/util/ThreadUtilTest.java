@@ -6,10 +6,11 @@ public class ThreadUtilTest extends TestCase {
 
 	public void testPause() {
 		long length = 100;
-		long start = System.currentTimeMillis();
+		long start = System.nanoTime();
 		ThreadUtil.pause( length );
-		long stop = System.currentTimeMillis();
-		assertTrue( stop - start >= length );
+		long stop = System.nanoTime();
+		long delta = stop - start;
+		assertTrue( "Delta: " + delta, delta >= length * 1000 );
 	}
 
 	public void testAppendStackTraceWithNullOriginal() throws Exception {
