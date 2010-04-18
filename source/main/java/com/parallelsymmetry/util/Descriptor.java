@@ -83,7 +83,7 @@ public class Descriptor {
 			values.add( nodes.item( index ) );
 		}
 
-		return values.toArray( new Node[values.size()] );
+		return values.toArray( new Node[ values.size() ] );
 	}
 
 	public String getValue( String path ) {
@@ -153,7 +153,12 @@ public class Descriptor {
 			values.add( item.getTextContent() );
 		}
 
-		return values.toArray( new String[values.size()] );
+		return values.toArray( new String[ values.size() ] );
+	}
+
+	public static String getAttribute( Node node, String name ) {
+		Node attribute = node.getAttributes().getNamedItem( name );
+		return attribute == null ? null : attribute.getNodeValue();
 	}
 
 	private List<String> listPaths( Node parent ) {

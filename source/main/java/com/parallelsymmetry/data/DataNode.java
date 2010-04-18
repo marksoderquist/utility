@@ -104,6 +104,22 @@ public class DataNode implements Comparable<DataNode> {
 		submitAction( new RemoveElementAction<E>( this, key, element ) );
 	}
 
+	@SuppressWarnings( "unchecked" )
+	public <E> void clearElements( String key ) {
+		Collection<E> collection = (Collection<E>)getAttribute( key );
+		if( collection == null ) return;
+
+		int count = 0;
+		boolean needsTransaction = !isTransactionActive();
+		if( needsTransaction ) startTransaction();
+		for( Object node : collection ) {
+			if( !( node instanceof DataNode ) ) continue;
+			getTransaction().add( new RemoveElementAction<E>( this, key, (E)node ) );
+			count++;
+		}
+		if( needsTransaction ) commitTransaction();
+	}
+
 	/**
 	 * Get a metadata attribute from the node.
 	 * 

@@ -21,7 +21,9 @@ public class XmlUtil {
 	public static final Document loadXmlDocument( InputStream stream ) throws SAXException, IOException, ParserConfigurationException {
 		if( stream == null ) return null;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		return factory.newDocumentBuilder().parse( stream );
+		Document document = factory.newDocumentBuilder().parse( stream );
+		document.getDocumentElement().normalize();
+		return document;
 	}
 
 	public static final void format( InputStream input, OutputStream output ) throws IOException {
