@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.parallelsymmetry.log.Log;
 import com.parallelsymmetry.util.ObjectUtil;
 
 public class DataNode implements Comparable<DataNode> {
@@ -280,16 +281,18 @@ public class DataNode implements Comparable<DataNode> {
 	public final void startTransaction() {
 		if( !isTransactionActive() ) transaction = new Transaction();
 		getTransaction().incrementDepth();
+		Log.write( Log.DEBUG, "Starting transaction..." );
 	}
 
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final void commitTransaction() {
-		if( transaction == null ) return;
-
 		int depth = getTransaction().decrementDepth();
 		if( depth > 0 ) return;
+
+		// Must be called after depth check.
+		if( transaction == null ) return;
 
 		boolean changed = false;
 		for( Action action : transaction ) {
