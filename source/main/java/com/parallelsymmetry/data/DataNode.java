@@ -281,7 +281,6 @@ public class DataNode implements Comparable<DataNode> {
 	public final void startTransaction() {
 		if( !isTransactionActive() ) transaction = new Transaction();
 		getTransaction().incrementDepth();
-		Log.write( Log.DEBUG, "Starting transaction..." );
 	}
 
 	/**
