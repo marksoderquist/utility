@@ -91,6 +91,24 @@ public class AccessorTest extends TestCase {
 		assertEquals( object, Accessor.getField( privateClass, "field" ) );
 	}
 
+	public void testSetField() throws Exception {
+		PrivateClass privateClass = new PrivateClass();
+		assertNull( Accessor.getField( privateClass, "field" ) );
+
+		Object object = new Object();
+		Accessor.setField( privateClass, "field", object );
+		assertEquals( object, Accessor.getField( privateClass, "field" ) );
+	}
+
+	public void testSetStaticField() throws Exception {
+		PrivateClass privateClass = new PrivateClass();
+		assertNull( Accessor.getField( PrivateClass.class, "staticField" ) );
+
+		Object object = new Object();
+		Accessor.setField( privateClass, "staticField", object );
+		assertEquals( object, Accessor.getField( privateClass, "staticField" ) );
+	}
+
 	public void testCallMethod() throws Exception {
 		Object object = new Object();
 		PrivateClass privateClass = new PrivateClass( object );
