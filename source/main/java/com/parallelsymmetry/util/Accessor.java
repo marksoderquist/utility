@@ -10,7 +10,7 @@ public class Accessor {
 	@SuppressWarnings( "unchecked" )
 	public static <T> T create( String name, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( name == null ) throw new NullPointerException( "Class name cannot be null." );
-		Class<?> clazz = Class.forName( name );
+		Class< ? > clazz = Class.forName( name );
 		return (T)create( clazz, parameters );
 	}
 
@@ -18,12 +18,12 @@ public class Accessor {
 	public static <T> T create( Class clazz, Object... parameters ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InstantiationException, InvocationTargetException {
 		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
 
-		Constructor<?> constructor = null;
+		Constructor< ? > constructor = null;
 
 		if( constructor == null ) {
-			Class<?>[] parameterTypes = new Class<?>[parameters.length];
+			Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
 			for( int index = 0; index < parameters.length; index++ ) {
-				if( parameters[index] != null ) parameterTypes[index] = parameters[index].getClass();
+				if( parameters[ index ] != null ) parameterTypes[ index ] = parameters[ index ].getClass();
 			}
 			try {
 				constructor = clazz.getDeclaredConstructor( parameterTypes );
@@ -31,23 +31,23 @@ public class Accessor {
 		}
 
 		if( constructor == null ) {
-			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
+			Class< ? >[] parameterTypes = new Class< ? >[ parameters.length / 2 ];
 			if( parameters.length % 2 == 0 ) {
 				int count = parameters.length / 2;
-				parameterTypes = new Class<?>[count];
+				parameterTypes = new Class< ? >[ count ];
 				for( int index = 0; index < count; index++ ) {
-					parameterTypes[index] = (Class<?>)parameters[index * 2];
+					parameterTypes[ index ] = (Class< ? >)parameters[ index * 2 ];
 				}
 			} else {
 				int count = ( parameters.length - 1 ) / 2;
-				parameterTypes = new Class<?>[count + 1];
-				parameterTypes[0] = parameters[0].getClass();
+				parameterTypes = new Class< ? >[ count + 1 ];
+				parameterTypes[ 0 ] = parameters[ 0 ].getClass();
 				for( int index = 0; index < count; index++ ) {
-					parameterTypes[index + 1] = (Class<?>)parameters[( index * 2 ) + 1];
+					parameterTypes[ index + 1 ] = (Class< ? >)parameters[ ( index * 2 ) + 1 ];
 				}
 			}
 
-			Class<?> checkClass = clazz;
+			Class< ? > checkClass = clazz;
 			while( constructor == null & checkClass != null ) {
 				try {
 					constructor = checkClass.getDeclaredConstructor( parameterTypes );
@@ -58,15 +58,15 @@ public class Accessor {
 			if( constructor != null ) {
 				if( parameters.length % 2 == 0 ) {
 					Object[] incomming = parameters;
-					parameters = new Object[parameters.length / 2];
+					parameters = new Object[ parameters.length / 2 ];
 					for( int index = 0; index < parameters.length; index++ ) {
-						parameters[index] = incomming[index * 2 + 1];
+						parameters[ index ] = incomming[ index * 2 + 1 ];
 					}
 				} else {
 					Object[] incomming = parameters;
-					parameters = new Object[parameters.length / 2 + 1];
+					parameters = new Object[ parameters.length / 2 + 1 ];
 					for( int index = 0; index < parameters.length; index++ ) {
-						parameters[index] = incomming[index * 2];
+						parameters[ index ] = incomming[ index * 2 ];
 					}
 				}
 			}
@@ -107,6 +107,26 @@ public class Accessor {
 		return (T)field.get( null );
 	}
 
+	public static void setField( Object object, String name, Object value ) throws NoSuchFieldException, IllegalAccessException {
+		setField( object.getClass(), object, name, value );
+	}
+
+	public static void setField( Class< ? > clazz, Object object, String name, Object value ) throws NoSuchFieldException, IllegalAccessException {
+		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
+
+		Field field = clazz.getDeclaredField( name );
+		field.setAccessible( true );
+		field.set( object, value );
+	}
+
+	public static void setField( Class< ? > clazz, String name, Object value ) throws NoSuchFieldException, IllegalAccessException {
+		if( clazz == null ) throw new NullPointerException( "Class cannot be null." );
+
+		Field field = clazz.getDeclaredField( name );
+		field.setAccessible( true );
+		field.set( null, value );
+	}
+
 	/**
 	 * Parameters can be specified in two ways:
 	 * <ol>
@@ -133,9 +153,9 @@ public class Accessor {
 		Method method = null;
 		if( method == null ) {
 			Class clazz = object.getClass();
-			Class<?>[] parameterTypes = new Class<?>[parameters.length];
+			Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
 			for( int index = 0; index < parameters.length; index++ ) {
-				if( parameters[index] != null ) parameterTypes[index] = parameters[index].getClass();
+				if( parameters[ index ] != null ) parameterTypes[ index ] = parameters[ index ].getClass();
 			}
 
 			while( method == null & clazz != null ) {
@@ -148,9 +168,9 @@ public class Accessor {
 
 		if( method == null && parameters.length % 2 == 0 ) {
 			Class clazz = object.getClass();
-			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
+			Class< ? >[] parameterTypes = new Class< ? >[ parameters.length / 2 ];
 			for( int index = 0; index < parameters.length / 2; index++ ) {
-				parameterTypes[index] = (Class<?>)parameters[index * 2];
+				parameterTypes[ index ] = (Class< ? >)parameters[ index * 2 ];
 			}
 
 			while( method == null & clazz != null ) {
@@ -162,9 +182,9 @@ public class Accessor {
 
 			if( method != null ) {
 				Object[] incomming = parameters;
-				parameters = new Object[parameters.length / 2];
+				parameters = new Object[ parameters.length / 2 ];
 				for( int index = 0; index < parameters.length; index++ ) {
-					parameters[index] = incomming[index * 2 + 1];
+					parameters[ index ] = incomming[ index * 2 + 1 ];
 				}
 			}
 		}
@@ -180,9 +200,9 @@ public class Accessor {
 
 		Method method = null;
 		if( method == null ) {
-			Class<?>[] parameterTypes = new Class<?>[parameters.length];
+			Class< ? >[] parameterTypes = new Class< ? >[ parameters.length ];
 			for( int index = 0; index < parameters.length; index++ ) {
-				if( parameters[index] != null ) parameterTypes[index] = parameters[index].getClass();
+				if( parameters[ index ] != null ) parameterTypes[ index ] = parameters[ index ].getClass();
 			}
 
 			try {
@@ -191,9 +211,9 @@ public class Accessor {
 		}
 
 		if( method == null && parameters.length % 2 == 0 ) {
-			Class<?>[] parameterTypes = new Class<?>[parameters.length / 2];
+			Class< ? >[] parameterTypes = new Class< ? >[ parameters.length / 2 ];
 			for( int index = 0; index < parameters.length / 2; index++ ) {
-				parameterTypes[index] = (Class<?>)parameters[index * 2];
+				parameterTypes[ index ] = (Class< ? >)parameters[ index * 2 ];
 			}
 
 			try {
@@ -202,9 +222,9 @@ public class Accessor {
 
 			if( method != null ) {
 				Object[] incomming = parameters;
-				parameters = new Object[parameters.length / 2];
+				parameters = new Object[ parameters.length / 2 ];
 				for( int index = 0; index < parameters.length; index++ ) {
-					parameters[index] = incomming[index * 2 + 1];
+					parameters[ index ] = incomming[ index * 2 + 1 ];
 				}
 			}
 		}

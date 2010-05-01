@@ -104,7 +104,12 @@ public class FileUtil {
 			FileInputStream input = new FileInputStream( source );
 			FileOutputStream output = new FileOutputStream( target );
 			IOPump pump = new IOPump( input, output );
-			pump.startAndWait( 0 );
+			try {
+				pump.startAndWait();
+				pump.waitFor();
+			} catch( InterruptedException exception ) {
+				return false;
+			}
 			return true;
 		}
 

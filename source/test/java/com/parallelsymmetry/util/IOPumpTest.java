@@ -8,9 +8,9 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
-import com.parallelsymmetry.log.Log;
-
 import junit.framework.TestCase;
+
+import com.parallelsymmetry.log.Log;
 
 public class IOPumpTest extends TestCase {
 
@@ -171,6 +171,7 @@ public class IOPumpTest extends TestCase {
 
 		IOPump pump = new IOPump( input, output );
 		pump.startAndWait();
+		pump.waitFor();
 		assertEquals( string, new String( output.toByteArray() ) );
 	}
 
@@ -184,6 +185,7 @@ public class IOPumpTest extends TestCase {
 		CharArrayWriter writer = new CharArrayWriter();
 		IOPump pump = new IOPump( input, writer, charset );
 		pump.startAndWait();
+		pump.waitFor();
 		assertEquals( "charset: " + charset, string, new String( writer.toCharArray() ) );
 	}
 
@@ -198,6 +200,7 @@ public class IOPumpTest extends TestCase {
 
 		IOPump pump = new IOPump( reader, output, charset );
 		pump.startAndWait();
+		pump.waitFor();
 		assertEquals( "charset: " + charset, string, new String( output.toByteArray(), charset ) );
 	}
 
@@ -207,6 +210,7 @@ public class IOPumpTest extends TestCase {
 
 		IOPump pump = new IOPump( reader, writer );
 		pump.startAndWait();
+		pump.waitFor();
 		assertEquals( string, new String( writer.toCharArray() ) );
 	}
 

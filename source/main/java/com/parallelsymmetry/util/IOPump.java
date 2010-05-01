@@ -49,6 +49,8 @@ public class IOPump implements Runnable {
 
 	private int lineLength = DEFAULT_LINE_LENGTH;
 
+	private Object startLock = new Object();
+
 	public IOPump( InputStream input, OutputStream output ) {
 		this( null, input, output, DEFAULT_BUFFER_SIZE );
 	}
@@ -181,6 +183,9 @@ public class IOPump implements Runnable {
 		this.logContent = showContent;
 	}
 
+	/**
+	 * Start the pump thread and return immediately.
+	 */
 	public final void start() {
 		if( input == null & reader == null ) throw new IllegalArgumentException( "Must specify either an input stream or reader." );
 		if( output == null & writer == null ) throw new IllegalArgumentException( "Must specify either an output stream or writer." );
@@ -196,14 +201,34 @@ public class IOPump implements Runnable {
 		worker.start();
 	}
 
+	/**
+	 * Start the pump thread and wait for the pump thread to begin.
+	 * 
+	 * @throws InterruptedException
+	 */
 	public final void startAndWait() throws InterruptedException {
 		start();
-		waitFor();
+		waitForStart( 0 );
 	}
 
-	public final void startAndWait( long timeout ) {
+	/**
+	 * Start the pump thread and wait for the pump thread to begin.
+	 * 
+	 * @param timeout
+	 */
+	public final void startAndWait( long timeout ) throws InterruptedException {
 		start();
-		waitFor( timeout );
+		waitForStart( timeout );
+	}
+
+	private final void waitForStart( long timeout ) {
+		synchronized( startLock ) {
+			try {
+				startLock.wait( timeout );
+			} catch( InterruptedException exception ) {
+				// Intentionally ignore exception.
+			}
+		}
 	}
 
 	public final boolean isExecuting() {
@@ -237,21 +262,26 @@ public class IOPump implements Runnable {
 	}
 
 	public final void run() {
-		// Check for bad parameters.
-		if( input == null & reader == null || output == null & writer == null ) return;
-
-		// Setup the data buffer.
-		byte[] bytearray = null;
-		char[] chararray = null;
-		if( reader == null ) {
-			bytearray = new byte[ bufferSize ];
-		} else {
-			chararray = new char[ bufferSize ];
-		}
-
-		if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " started." );
-
 		try {
+			// Check for bad parameters.
+			if( input == null & reader == null || output == null & writer == null ) return;
+
+			// Setup the data buffer.
+			byte[] bytearray = null;
+			char[] chararray = null;
+			if( reader == null ) {
+				bytearray = new byte[bufferSize];
+			} else {
+				chararray = new char[bufferSize];
+			}
+
+			if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " started." );
+
+			// Notify threads waiting for start.
+			synchronized( startLock ) {
+				startLock.notifyAll();
+			}
+
 			int read = 0;
 			boolean binary = false;
 			boolean lineTerminator = false;
@@ -275,10 +305,10 @@ public class IOPump implements Runnable {
 					int datum = 0;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
-							datum = bytearray[ index ];
+							datum = bytearray[index];
 							if( datum < 0 ) datum += 256;
 						} else {
-							datum = chararray[ index ];
+							datum = chararray[index];
 							if( datum < 0 ) datum += 65536;
 						}
 
@@ -308,6 +338,10 @@ public class IOPump implements Runnable {
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception );
 		} finally {
+			// Notify threads waiting for start.
+			synchronized( startLock ) {
+				startLock.notifyAll();
+			}
 			if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " finished." );
 		}
 	}
