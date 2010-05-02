@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -40,6 +41,8 @@ public class IOPump implements Runnable {
 	private Thread worker;
 
 	private boolean execute;
+
+	private boolean interruptOnStop;
 
 	private boolean logEnabled;
 
@@ -161,6 +164,14 @@ public class IOPump implements Runnable {
 		this.bufferSize = bufferSize;
 	}
 
+	public boolean isInterruptOnStop() {
+		return interruptOnStop;
+	}
+
+	public void setInterruptOnStop( boolean interruptOnStop ) {
+		this.interruptOnStop = interruptOnStop;
+	}
+
 	public int getLineLength() {
 		return lineLength;
 	}
@@ -237,39 +248,20 @@ public class IOPump implements Runnable {
 		}
 	}
 
+	private final void startNotify() {
+		synchronized( startLock ) {
+			started = true;
+			startLock.notifyAll();
+		}
+	}
+
 	public final boolean isExecuting() {
 		return worker.isAlive();
 	}
 
 	public final void stop() {
-		stop( false );
-	}
-
-	public final void stop( boolean closeStreams ) {
 		execute = false;
-
-		if( closeStreams ) {
-			try {
-				if( reader == null ) {
-					input.close();
-				} else {
-					reader.close();
-				}
-			} catch( IOException exception ) {
-				// Intentionally ignore exception.
-				Log.write( exception );
-			}
-			try {
-				if( writer == null ) {
-					output.close();
-				} else {
-					writer.close();
-				}
-			} catch( IOException exception ) {
-				// Intentionally ignore exception.
-				Log.write( exception );
-			}
-		}
+		if( interruptOnStop ) worker.interrupt();
 	}
 
 	public final void stopAndWait() throws InterruptedException {
@@ -309,12 +301,7 @@ public class IOPump implements Runnable {
 			}
 
 			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump started." );
-
-			// Notify threads waiting for start.
-			synchronized( startLock ) {
-				started = true;
-				startLock.notifyAll();
-			}
+			startNotify();
 
 			int read = 0;
 			boolean binary = false;
@@ -369,13 +356,12 @@ public class IOPump implements Runnable {
 					writeToWriter( chararray, read );
 				}
 			}
+		} catch( InterruptedIOException exception ) {
+			// Intentionally ignore exception.
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception, name, " ", exception.getMessage() );
 		} finally {
-			// Notify threads waiting for start.
-			synchronized( startLock ) {
-				startLock.notifyAll();
-			}
+			startNotify();
 			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump finished." );
 		}
 	}
