@@ -49,6 +49,8 @@ public class IOPump implements Runnable {
 
 	private int lineLength = DEFAULT_LINE_LENGTH;
 
+	private boolean started;
+
 	private Object startLock = new Object();
 
 	public IOPump( InputStream input, OutputStream output ) {
@@ -224,11 +226,13 @@ public class IOPump implements Runnable {
 	}
 
 	private final void waitForStart( long timeout ) {
-		synchronized( startLock ) {
-			try {
-				startLock.wait( timeout );
-			} catch( InterruptedException exception ) {
-				// Intentionally ignore exception.
+		while( !started ) {
+			synchronized( startLock ) {
+				try {
+					startLock.wait( timeout );
+				} catch( InterruptedException exception ) {
+					// Intentionally ignore exception.
+				}
 			}
 		}
 	}
@@ -281,6 +285,7 @@ public class IOPump implements Runnable {
 
 			// Notify threads waiting for start.
 			synchronized( startLock ) {
+				started = true;
 				startLock.notifyAll();
 			}
 
