@@ -190,6 +190,8 @@ public class IOPump implements Runnable {
 		if( input == null & reader == null ) throw new IllegalArgumentException( "Must specify either an input stream or reader." );
 		if( output == null & writer == null ) throw new IllegalArgumentException( "Must specify either an output stream or writer." );
 
+		if( logEnabled ) Log.write( Log.DEBUG, name + " IO Pump starting..." );
+
 		execute = true;
 		if( name == null ) {
 			worker = new Thread( this );
@@ -270,12 +272,12 @@ public class IOPump implements Runnable {
 			byte[] bytearray = null;
 			char[] chararray = null;
 			if( reader == null ) {
-				bytearray = new byte[bufferSize];
+				bytearray = new byte[ bufferSize ];
 			} else {
-				chararray = new char[bufferSize];
+				chararray = new char[ bufferSize ];
 			}
 
-			if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " started." );
+			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump started." );
 
 			// Notify threads waiting for start.
 			synchronized( startLock ) {
@@ -305,10 +307,10 @@ public class IOPump implements Runnable {
 					int datum = 0;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
-							datum = bytearray[index];
+							datum = bytearray[ index ];
 							if( datum < 0 ) datum += 256;
 						} else {
-							datum = chararray[index];
+							datum = chararray[ index ];
 							if( datum < 0 ) datum += 65536;
 						}
 
