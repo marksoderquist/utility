@@ -50,6 +50,32 @@ public class Descriptor {
 	}
 
 	public Node getNode( String path ) {
+		return getNode( this.node, path );
+	}
+
+	public Node[] getNodes( String path ) {
+		return getNodes( this.node, path );
+	}
+
+	public String getValue( String path ) {
+		return getValue( this.node, path );
+	}
+
+	public String getValue( String path, String defaultValue ) {
+		return getValue( this.node, path, defaultValue );
+	}
+
+	/**
+	 * Get an array of all the values that have the same path.
+	 * 
+	 * @param path
+	 * @return An array of values with the same path.
+	 */
+	public String[] getValues( String path ) {
+		return getValues( this.node, path );
+	}
+
+	public static Node getNode( Node node, String path ) {
 		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		Node value = null;
@@ -64,7 +90,7 @@ public class Descriptor {
 		return value;
 	}
 
-	public Node[] getNodes( String path ) {
+	public static Node[] getNodes( Node node, String path ) {
 		if( node == null || TextUtil.isEmpty( path ) ) return null;
 
 		NodeList nodes = null;
@@ -84,24 +110,6 @@ public class Descriptor {
 		}
 
 		return values.toArray( new Node[ values.size() ] );
-	}
-
-	public String getValue( String path ) {
-		return getValue( this.node, path );
-	}
-
-	public String getValue( String path, String defaultValue ) {
-		return getValue( this.node, path, defaultValue );
-	}
-
-	/**
-	 * Get an array of all the values that have the same path.
-	 * 
-	 * @param path
-	 * @return An array of values with the same path.
-	 */
-	public String[] getValues( String path ) {
-		return getValues( this.node, path );
 	}
 
 	public static String getValue( Node node, String path ) {
