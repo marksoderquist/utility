@@ -242,7 +242,34 @@ public class IOPump implements Runnable {
 	}
 
 	public final void stop() {
+		stop( false );
+	}
+
+	public final void stop( boolean closeStreams ) {
 		execute = false;
+
+		if( closeStreams ) {
+			try {
+				if( reader == null ) {
+					input.close();
+				} else {
+					reader.close();
+				}
+			} catch( IOException exception ) {
+				// Intentionally ignore exception.
+				Log.write( exception );
+			}
+			try {
+				if( writer == null ) {
+					output.close();
+				} else {
+					writer.close();
+				}
+			} catch( IOException exception ) {
+				// Intentionally ignore exception.
+				Log.write( exception );
+			}
+		}
 	}
 
 	public final void stopAndWait() throws InterruptedException {
@@ -343,13 +370,13 @@ public class IOPump implements Runnable {
 				}
 			}
 		} catch( IOException exception ) {
-			if( logEnabled ) Log.write( exception );
+			if( logEnabled ) Log.write( exception, name, " ", exception.getMessage() );
 		} finally {
 			// Notify threads waiting for start.
 			synchronized( startLock ) {
 				startLock.notifyAll();
 			}
-			if( logEnabled ) Log.write( Log.TRACE, "IOPump ", name, " finished." );
+			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump finished." );
 		}
 	}
 
