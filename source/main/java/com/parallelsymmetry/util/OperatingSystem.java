@@ -11,11 +11,11 @@ import com.parallelsymmetry.log.Log;
  */
 public class OperatingSystem {
 
-	public enum Family {
+	public static enum Family {
 		UNKNOWN, LINUX, UNIX, WINDOWS, OS2, MAC, OSX
 	};
 
-	public enum Architecture {
+	public static enum Architecture {
 		UNKNOWN, X86, X64, PPC
 	}
 
