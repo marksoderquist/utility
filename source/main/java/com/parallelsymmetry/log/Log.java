@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,10 @@ public class Log {
 
 	private static final DateFormat dateFormat = new SimpleDateFormat( DEFAULT_DATE_FORMAT );
 
+	private static boolean showDate;
+
+	private static boolean showPrefix;
+
 	static {
 		Logger defaultLogger = Logger.getLogger( DEFAULT_LOGGER_NAME );
 		defaultLogger.setLevel( Level.ALL );
@@ -99,6 +104,22 @@ public class Log {
 	public static final void setLevel( String name, Level level ) {
 		defaultHandlers.get( getNamedLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 		//getNamedLogger( name ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+	}
+
+	public static final boolean isShowDate() {
+		return showDate;
+	}
+
+	public static final void setShowDate( boolean showDate ) {
+		Log.showDate = showDate;
+	}
+
+	public static final boolean isShowPrefix() {
+		return showPrefix;
+	}
+
+	public static final void setShowPrefix( boolean showPrefix ) {
+		Log.showPrefix = showPrefix;
 	}
 
 	public static final void addHandler( Handler handler ) {
@@ -471,9 +492,13 @@ public class Log {
 			StringBuilder buffer = new StringBuilder();
 
 			if( record.getMessage() != null ) {
-				//buffer.append( dateFormat.format( new Date( record.getMillis() ) ) );
-				//buffer.append( " " );
-				buffer.append( getPrefix( record.getLevel() ) );
+				if( Log.showDate ) {
+					buffer.append( dateFormat.format( new Date( record.getMillis() ) ) );
+					buffer.append( " " );
+				}
+				if( Log.showPrefix ) {
+					buffer.append( getPrefix( record.getLevel() ) );
+				}
 				buffer.append( record.getMessage() );
 				buffer.append( "\n" );
 			}
