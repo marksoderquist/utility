@@ -4,6 +4,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +39,13 @@ public class Log {
 
 	public static final Level TRACE = new CustomLevel( "TRACE", Level.CONFIG.intValue() );
 
-	public static final Level DEBUG = new CustomLevel( "DEBUG", Level.FINE.intValue() );
+	public static final Level DEBUG = new CustomLevel( "DEBUG", 600 );
+
+	public static final Level FINE = Level.FINE;
+
+	public static final Level FINER = Level.FINER;
+
+	public static final Level FINEST = Level.FINEST;
 
 	public static final Level ALL = Level.ALL;
 
@@ -49,7 +57,11 @@ public class Log {
 
 	public static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
 
+	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+
 	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
+
+	private static final DateFormat dateFormat = new SimpleDateFormat( DEFAULT_DATE_FORMAT );
 
 	static {
 		Logger defaultLogger = Logger.getLogger( DEFAULT_LOGGER_NAME );
@@ -242,6 +254,45 @@ public class Log {
 		return INFO;
 	}
 
+	public static final String getPrefix( Level level ) {
+		int index = ( Level.INFO.intValue() - level.intValue() ) / 100;
+
+		if( index < -3 ) index = -3;
+		if( index > 5 ) index = 5;
+
+		switch( index ) {
+			case -3: {
+				return "";
+			}
+			case -2: {
+				return "*";
+			}
+			case -1: {
+				return "-";
+			}
+			case 0: {
+				return " ";
+			}
+			case 1: {
+				return "  ";
+			}
+			case 2: {
+				return "   ";
+			}
+			case 3: {
+				return "    ";
+			}
+			case 4: {
+				return "     ";
+			}
+			case 5: {
+				return "      ";
+			}
+		}
+
+		return "";
+	}
+
 	public static final void writeSystemProperties() {
 		Set<String> keySet = System.getProperties().stringPropertyNames();
 		List<String> keys = new ArrayList<String>( keySet.size() );
@@ -417,9 +468,12 @@ public class Log {
 		@Override
 		public String format( LogRecord record ) {
 			Throwable thrown = record.getThrown();
-			StringBuffer buffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
 
 			if( record.getMessage() != null ) {
+				//buffer.append( dateFormat.format( new Date( record.getMillis() ) ) );
+				//buffer.append( " " );
+				buffer.append( getPrefix( record.getLevel() ) );
 				buffer.append( record.getMessage() );
 				buffer.append( "\n" );
 			}

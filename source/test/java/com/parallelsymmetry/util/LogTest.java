@@ -141,6 +141,18 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log level.", Log.ALL, Log.parseLevel( "all" ) );
 	}
 
+	public void testGetPrefix() throws Exception {
+		assertEquals( "", Log.getPrefix( Log.NONE ) );
+		assertEquals( "*", Log.getPrefix( Log.ERROR ) );
+		assertEquals( "-", Log.getPrefix( Log.WARN ) );
+		assertEquals( " ", Log.getPrefix( Log.INFO ) );
+		assertEquals( "  ", Log.getPrefix( Log.TRACE ) );
+		assertEquals( "   ", Log.getPrefix( Log.DEBUG ) );
+		assertEquals( "    ", Log.getPrefix( Log.FINE ) );
+		assertEquals( "     ", Log.getPrefix( Log.FINER ) );
+		assertEquals( "      ", Log.getPrefix( Log.FINEST ) );
+	}
+
 	private class TestLogHandler extends Handler {
 
 		private LogRecord record;
