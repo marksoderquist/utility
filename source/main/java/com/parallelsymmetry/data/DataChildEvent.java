@@ -20,4 +20,9 @@ public class DataChildEvent extends DataEvent {
 		return index;
 	}
 
+	@Override
+	public String toString() {
+		return getType().toString() + ": " + getData() + ": " + child;
+	}
+
 }
