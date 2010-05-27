@@ -348,7 +348,7 @@ public class Log {
 
 		int index = 0;
 		while( index < elements.length ) {
-			StackTraceElement frame = elements[index];
+			StackTraceElement frame = elements[ index ];
 			String clazz = frame.getClassName();
 			if( clazz.equals( Log.class.getName() ) ) {
 				break;
@@ -357,7 +357,7 @@ public class Log {
 		}
 
 		while( index < elements.length ) {
-			StackTraceElement frame = elements[index];
+			StackTraceElement frame = elements[ index ];
 			String clazz = frame.getClassName();
 			if( !clazz.equals( Log.class.getName() ) ) {
 				return frame;
