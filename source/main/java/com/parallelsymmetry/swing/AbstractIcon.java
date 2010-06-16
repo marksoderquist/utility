@@ -96,8 +96,6 @@ public abstract class AbstractIcon implements Icon {
 	private List<Instruction> instructions;
 
 	static {
-		// Color basic = Color.decode( "#204080" );
-		// Color basic = Color.decode( "#206080" );
 		Color basic = Color.BLACK;
 
 		colors = new ConcurrentHashMap<String, Color>();
