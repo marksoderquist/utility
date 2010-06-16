@@ -53,6 +53,8 @@ public abstract class AbstractIcon implements Icon {
 
 	public static final double DEGREES_PER_RADIAN = 180 / Math.PI;
 
+	public static final double RADIANS_PER_DEGREE = Math.PI / 180;
+
 	protected static final String OUTLINE_DARK = "outline.dark";
 
 	protected static final String OUTLINE = "outline";
@@ -211,7 +213,7 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected void spin() {
-		instructions.add( new SpinInstruction( 0, 0, angle * ( Math.PI / 180 ) ) );
+		instructions.add( new SpinInstruction( 0, 0, angle * ( RADIANS_PER_DEGREE ) ) );
 		this.angle = 0;
 	}
 
@@ -220,7 +222,7 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected void spin( double x, double y, double angle ) {
-		double phi = -angle * ( Math.PI / 180 );
+		double phi = -angle * ( RADIANS_PER_DEGREE );
 		double ax = x;
 		double ay = y;
 
