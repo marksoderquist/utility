@@ -25,6 +25,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
+import java.awt.image.RGBImageFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -37,8 +38,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
-import com.parallelsymmetry.log.Log;
-import com.parallelsymmetry.util.FileUtil;
 import com.parallelsymmetry.util.TextUtil;
 
 public abstract class AbstractIcon implements Icon {
@@ -441,15 +440,52 @@ public abstract class AbstractIcon implements Icon {
 		return currentFont;
 	}
 
-	protected final void save( File file ) {
+	protected void save( File target, String name ) {
+		save( target, name, getIconWidth(), getIconHeight() );
+	}
+
+	protected void save( File target, String name, int size ) {
+		save( target, name, size, size, null );
+	}
+
+	protected void save( File target, String name, int width, int height ) {
+		save( target, name, width, height, null );
+	}
+
+	protected void save( File target, String name, int width, int height, RGBImageFilter filter ) {
+		if( !target.isDirectory() ) target = target.getParentFile();
+		if( !target.exists() && target.mkdirs() ) {
+			System.err.println( "Could not create target: " + target );
+			return;
+		}
+
 		BufferedImage image = new BufferedImage( getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 		paintIcon( null, image.getGraphics(), 0, 0 );
-		String extension = FileUtil.getExtension( file );
+
+		// Scale the icon.
+		if( getIconWidth() != width || getIconHeight() != height ) image = Images.scale( image, width, height );
+
+		// Filter the icon.
+		filter( image, filter );
+
 		try {
-			ImageIO.write( image, extension, file );
-			Log.write( "Image saved: " + file.getCanonicalPath() );
+			File file = new File( target, name + ".png" );
+			ImageIO.write( image, "png", file );
+			System.out.println( "Image created: " + file.toString() );
 		} catch( IOException exception ) {
-			Log.write( exception );
+			exception.printStackTrace();
+		}
+	}
+
+	private void filter( BufferedImage image, RGBImageFilter filter ) {
+		if( filter == null ) return;
+
+		int w = image.getWidth();
+		int h = image.getHeight();
+		for( int x = 0; x < w; x++ ) {
+			for( int y = 0; y < h; y++ ) {
+				image.setRGB( x, y, filter.filterRGB( x, y, image.getRGB( x, y ) ) );
+			}
 		}
 	}
 
