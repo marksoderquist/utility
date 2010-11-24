@@ -2,6 +2,7 @@ package com.parallelsymmetry.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,13 +28,23 @@ public class Descriptor {
 
 	public Descriptor() throws SAXException, IOException, ParserConfigurationException {}
 
+	public Descriptor( Node node ) {
+		this.node = node;
+	}
+
+	public Descriptor( String uri ) throws SAXException, IOException, ParserConfigurationException {
+		if( uri == null ) return;
+		node = XmlUtil.loadXmlDocument( uri );
+	}
+
+	public Descriptor( Reader reader ) throws SAXException, IOException, ParserConfigurationException {
+		if( reader == null ) return;
+		node = XmlUtil.loadXmlDocument( reader );
+	}
+
 	public Descriptor( InputStream input ) throws SAXException, IOException, ParserConfigurationException {
 		if( input == null ) return;
 		node = XmlUtil.loadXmlDocument( input );
-	}
-
-	public Descriptor( Node node ) {
-		this.node = node;
 	}
 
 	public Document getDocument() {

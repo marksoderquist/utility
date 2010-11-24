@@ -3,6 +3,7 @@ package com.parallelsymmetry.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.Reader;
 
 import junit.framework.TestCase;
 
@@ -19,8 +20,20 @@ public class XmlUtilTest extends TestCase {
 	}
 
 	@Test
+	public void testLoadXmlDocumentWithNullUri() throws Exception {
+		Document document = XmlUtil.loadXmlDocument( (String)null );
+		assertNull( document );
+	}
+
+	@Test
+	public void testLoadXmlDocumentWithNullReader() throws Exception {
+		Document document = XmlUtil.loadXmlDocument( (Reader)null );
+		assertNull( document );
+	}
+
+	@Test
 	public void testLoadXmlDocumentWithNullStream() throws Exception {
-		Document document = XmlUtil.loadXmlDocument( null );
+		Document document = XmlUtil.loadXmlDocument( (InputStream)null );
 		assertNull( document );
 	}
 

@@ -3,6 +3,7 @@ package com.parallelsymmetry.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,14 +15,31 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class XmlUtil {
 
+	public static final Document loadXmlDocument( String uri ) throws SAXException, IOException, ParserConfigurationException {
+		if( uri == null ) return null;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		Document document = factory.newDocumentBuilder().parse( uri );
+		document.getDocumentElement().normalize();
+		return document;
+	}
+
+	public static final Document loadXmlDocument( Reader reader ) throws SAXException, IOException, ParserConfigurationException {
+		if( reader == null ) return null;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		Document document = factory.newDocumentBuilder().parse( new InputSource( reader ) );
+		document.getDocumentElement().normalize();
+		return document;
+	}
+
 	public static final Document loadXmlDocument( InputStream stream ) throws SAXException, IOException, ParserConfigurationException {
 		if( stream == null ) return null;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		Document document = factory.newDocumentBuilder().parse( stream );
+		Document document = factory.newDocumentBuilder().parse( new InputSource( stream ) );
 		document.getDocumentElement().normalize();
 		return document;
 	}
