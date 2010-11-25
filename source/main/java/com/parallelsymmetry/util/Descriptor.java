@@ -22,6 +22,8 @@ import com.parallelsymmetry.log.Log;
 
 public class Descriptor {
 
+	private String source;
+
 	private Node node;
 
 	private List<String> paths;
@@ -29,22 +31,42 @@ public class Descriptor {
 	public Descriptor() throws SAXException, IOException, ParserConfigurationException {}
 
 	public Descriptor( Node node ) {
+		this( null, node );
+	}
+
+	public Descriptor( String source, Node node ) {
+		this.source = source;
 		this.node = node;
 	}
 
 	public Descriptor( String uri ) throws SAXException, IOException, ParserConfigurationException {
 		if( uri == null ) return;
+		source = uri;
 		node = XmlUtil.loadXmlDocument( uri );
 	}
 
 	public Descriptor( Reader reader ) throws SAXException, IOException, ParserConfigurationException {
+		this( null, reader );
+	}
+
+	public Descriptor( String source, Reader reader ) throws SAXException, IOException, ParserConfigurationException {
 		if( reader == null ) return;
+		this.source = source;
 		node = XmlUtil.loadXmlDocument( reader );
 	}
 
 	public Descriptor( InputStream input ) throws SAXException, IOException, ParserConfigurationException {
+		this( null, input );
+	}
+
+	public Descriptor( String source, InputStream input ) throws SAXException, IOException, ParserConfigurationException {
 		if( input == null ) return;
+		this.source = source;
 		node = XmlUtil.loadXmlDocument( input );
+	}
+
+	public String getSource() {
+		return source;
 	}
 
 	public Document getDocument() {
@@ -120,7 +142,7 @@ public class Descriptor {
 			values.add( nodes.item( index ) );
 		}
 
-		return values.toArray( new Node[ values.size() ] );
+		return values.toArray( new Node[values.size()] );
 	}
 
 	public static String getValue( Node node, String path ) {
@@ -172,7 +194,7 @@ public class Descriptor {
 			values.add( item.getTextContent() );
 		}
 
-		return values.toArray( new String[ values.size() ] );
+		return values.toArray( new String[values.size()] );
 	}
 
 	public static String getAttribute( Node node, String name ) {
