@@ -22,8 +22,8 @@ public class JavaUtilTest extends TestCase {
 	}
 
 	public void testParseManifestClasspath() throws Exception {
-		File home = new File( "" );
-		URI base = new File( "" ).toURI();
+		File home = new File( "." ).getCanonicalFile();
+		URI base = home.toURI();
 		String classpath = "test1.jar test2.jar test%203.jar";
 
 		List<URL> entries = JavaUtil.parseManifestClasspath( base, null );
