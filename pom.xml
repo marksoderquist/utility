@@ -43,4 +43,18 @@
 		</repository>
 	</repositories>
 
+	<distributionManagement>
+		<repository>
+			<id>parallelsymmetry-release</id>
+			<name>Parallel Symmetry Maven Repository</name>
+			<url>http://www.parallelsymmetry.com/nexus/content/repositories/release/</url>
+		</repository>
+
+		<snapshotRepository>
+			<id>parallelsymmetry-snapshot</id>
+			<name>Parallel Symmetry Maven Snapshot Repository</name>
+			<url>http://www.parallelsymmetry.com/nexus/content/repositories/snapshot/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
