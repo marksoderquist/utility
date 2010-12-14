@@ -4,13 +4,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<!--
 	<parent>
 		<groupId>com.parallelsymmetry</groupId>
 		<artifactId>pom-parent-signed</artifactId>
 		<version>1.0.4-SNAPSHOT</version>
 	</parent>
-	-->
 
 	<groupId>com.parallelsymmetry</groupId>
 	<artifactId>utility</artifactId>
@@ -26,26 +24,4 @@
 		<connection>scm:svn:http://svn.parallelsymmetry.com/software/utility/trunk</connection>
 	</scm>
 	
-	<repositories>
-		<repository>
-			<id>parallelsymmetry</id>
-			<name>Parallel Symmetry</name>
-			<url>http://www.parallelsymmetry.com:8080/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
-
-	<distributionManagement>
-		<repository>
-			<id>parallelsymmetry-release</id>
-			<name>Parallel Symmetry Maven Repository</name>
-			<url>http://www.parallelsymmetry.com:8080/nexus/content/repositories/release/</url>
-		</repository>
-
-		<snapshotRepository>
-			<id>parallelsymmetry-snapshot</id>
-			<name>Parallel Symmetry Maven Snapshot Repository</name>
-			<url>http://www.parallelsymmetry.com:8080/nexus/content/repositories/snapshot/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 </project>
