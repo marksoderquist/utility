@@ -1,4 +1,4 @@
-package com.parallelsymmetry.escape.utility.log;
+package com.parallelsymmetry.escape.utility;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,9 +7,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-
-import com.parallelsymmetry.escape.utility.InvalidParameterException;
-import com.parallelsymmetry.escape.utility.Parameters;
 
 public class ParametersTest extends TestCase {
 
