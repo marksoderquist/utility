@@ -82,14 +82,6 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetCommands() throws Exception {
-		String[] args = new String[] { "-flag", "-key", "value", "file" };
-		Parameters parameters = Parameters.parse( args );
-		assertNotSame( "Commands are same object.", args, parameters.getCommands() );
-		assertEquals( "Commands not identical values.", sumHashCode( args ), sumHashCode( parameters.getCommands() ) );
-	}
-
-	@Test
 	public void testParseWithFlag() throws Exception {
 		String flag = "flag";
 		String notaflag = "notaflag";
@@ -224,6 +216,33 @@ public class ParametersTest extends TestCase {
 		} catch( InvalidParameterException exception ) {
 			assertEquals( "Null command at index: 0", exception.getMessage() );
 		}
+	}
+
+	@Test
+	public void testGet() throws Exception {
+		String[] args = new String[] { "-flag", "-key", "value", "file" };
+		Parameters parameters = Parameters.parse( args );
+		assertEquals( null, parameters.get( "none" ) );
+		assertEquals( "true", parameters.get( "flag" ) );
+		assertEquals( "value", parameters.get( "key" ) );
+	}
+
+	@Test
+	public void testGetWithDefault() throws Exception {
+		String[] args = new String[] { "-flag", "-key", "value", "file" };
+		Parameters parameters = Parameters.parse( args );
+
+		assertEquals( "true", parameters.get( "none", "true" ) );
+		assertEquals( "true", parameters.get( "flag", "false" ) );
+		assertEquals( "value", parameters.get( "key", null ) );
+	}
+
+	@Test
+	public void testGetCommands() throws Exception {
+		String[] args = new String[] { "-flag", "-key", "value", "file" };
+		Parameters parameters = Parameters.parse( args );
+		assertNotSame( "Commands are same object.", args, parameters.getCommands() );
+		assertEquals( "Commands not identical values.", sumHashCode( args ), sumHashCode( parameters.getCommands() ) );
 	}
 
 	private long sumHashCode( Object[] objects ) {

@@ -138,6 +138,11 @@ public class Parameters {
 		return values.get( name );
 	}
 
+	public String get( String name, String defaultValue ) {
+		String value = get( name );
+		return value != null ? value : defaultValue;
+	}
+
 	public boolean isSet( String name ) {
 		return values.get( name ) != null;
 	}
@@ -150,4 +155,14 @@ public class Parameters {
 		return commands;
 	}
 
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+
+		for( String command : commands ) {
+			builder.append( command );
+			builder.append( " " );
+		}
+
+		return builder.toString().trim();
+	}
 }
