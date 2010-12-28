@@ -60,6 +60,12 @@ import java.util.Set;
  * </tr>
  * </table>
  * </blockquote>
+ * <p>
+ * <h2>Validation</h2> The Parameters class can validate command line flags by
+ * passing a set of valid flags to the parse() method. If a flag is specified in
+ * the command line that does not match the valid set an
+ * InvalidParameterException is thrown.
+ * <p>
  * 
  * @author Mark Soderquist
  */
