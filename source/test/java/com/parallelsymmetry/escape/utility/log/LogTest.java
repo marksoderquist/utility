@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility.log;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -32,6 +34,30 @@ public class LogTest extends TestCase {
 		assertNotNull( "Log record is null.", record );
 		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
 		assertEquals( "Incorrect log message.", "", record.getMessage() );
+	}
+
+	public void testWriteWithColor() {
+		String message = "Should be surrounded by color tags.";
+
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( output );
+
+		Handler oldHandler = Log.getDefaultHandler();
+		Handler newHandler = new DefaultHandler( stream );
+
+		try {
+			Log.setShowColor( true );
+			Log.setDefaultHandler( newHandler );
+
+			Log.write( message );
+			LogRecord record = handler.getLogRecord();
+			assertNotNull( "Log record is null.", record );
+			assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
+			assertEquals( "Incorrect log message.", "\u001b[37m" + message + "\u001b[0m\n", output.toString() );
+		} finally {
+			Log.setShowColor( false );
+			Log.setDefaultHandler( oldHandler );
+		}
 	}
 
 	public void testWriteWithString() {
@@ -141,14 +167,102 @@ public class LogTest extends TestCase {
 
 	public void testGetPrefix() throws Exception {
 		assertEquals( "", Log.getPrefix( Log.NONE ) );
+
+		assertEquals( "*", Log.getPrefix( new TestLevel( "", Log.ERROR.intValue() + 1 ) ) );
+
 		assertEquals( "*", Log.getPrefix( Log.ERROR ) );
+
+		assertEquals( "-", Log.getPrefix( new TestLevel( "", Log.ERROR.intValue() - 1 ) ) );
+		assertEquals( "-", Log.getPrefix( new TestLevel( "", Log.WARN.intValue() + 1 ) ) );
+
 		assertEquals( "-", Log.getPrefix( Log.WARN ) );
+
+		assertEquals( " ", Log.getPrefix( new TestLevel( "", Log.WARN.intValue() - 1 ) ) );
+		assertEquals( " ", Log.getPrefix( new TestLevel( "", Log.INFO.intValue() + 1 ) ) );
+
 		assertEquals( " ", Log.getPrefix( Log.INFO ) );
+
+		assertEquals( "  ", Log.getPrefix( new TestLevel( "", Log.INFO.intValue() - 1 ) ) );
+		assertEquals( "  ", Log.getPrefix( new TestLevel( "", Log.TRACE.intValue() + 1 ) ) );
+
 		assertEquals( "  ", Log.getPrefix( Log.TRACE ) );
+
+		assertEquals( "   ", Log.getPrefix( new TestLevel( "", Log.TRACE.intValue() - 1 ) ) );
+		assertEquals( "   ", Log.getPrefix( new TestLevel( "", Log.DEBUG.intValue() + 1 ) ) );
+
 		assertEquals( "   ", Log.getPrefix( Log.DEBUG ) );
-		assertEquals( "    ", Log.getPrefix( Log.FINE ) );
-		assertEquals( "     ", Log.getPrefix( Log.FINER ) );
-		assertEquals( "      ", Log.getPrefix( Log.FINEST ) );
+
+		assertEquals( "    ", Log.getPrefix( new TestLevel( "", Log.DEBUG.intValue() - 1 ) ) );
+	}
+
+	public void testGetColorPrefix() throws Exception {
+		assertEquals( "", Log.getColorPrefix( Log.NONE ) );
+
+		assertEquals( "\u001b[31m", Log.getColorPrefix( new TestLevel( "", Log.ERROR.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[31m", Log.getColorPrefix( Log.ERROR ) );
+
+		assertEquals( "\u001b[33m", Log.getColorPrefix( new TestLevel( "", Log.ERROR.intValue() - 1 ) ) );
+		assertEquals( "\u001b[33m", Log.getColorPrefix( new TestLevel( "", Log.WARN.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[33m", Log.getColorPrefix( Log.WARN ) );
+
+		assertEquals( "\u001b[37m", Log.getColorPrefix( new TestLevel( "", Log.WARN.intValue() - 1 ) ) );
+		assertEquals( "\u001b[37m", Log.getColorPrefix( new TestLevel( "", Log.INFO.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[37m", Log.getColorPrefix( Log.INFO ) );
+
+		assertEquals( "\u001b[1m\u001b[30m", Log.getColorPrefix( new TestLevel( "", Log.INFO.intValue() - 1 ) ) );
+		assertEquals( "\u001b[1m\u001b[30m", Log.getColorPrefix( new TestLevel( "", Log.TRACE.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[1m\u001b[30m", Log.getColorPrefix( Log.TRACE ) );
+
+		assertEquals( "\u001b[34m", Log.getColorPrefix( new TestLevel( "", Log.TRACE.intValue() - 1 ) ) );
+		assertEquals( "\u001b[34m", Log.getColorPrefix( new TestLevel( "", Log.DEBUG.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[34m", Log.getColorPrefix( Log.DEBUG ) );
+
+		assertEquals( "", Log.getColorPrefix( new TestLevel( "", Log.DEBUG.intValue() - 1 ) ) );
+	}
+
+	public void testGetColorSuffix() throws Exception {
+		assertEquals( "", Log.getColorSuffix( Log.NONE ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.ERROR.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( Log.ERROR ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.ERROR.intValue() - 1 ) ) );
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.WARN.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( Log.WARN ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.WARN.intValue() - 1 ) ) );
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.INFO.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( Log.INFO ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.INFO.intValue() - 1 ) ) );
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.TRACE.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( Log.TRACE ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.TRACE.intValue() - 1 ) ) );
+		assertEquals( "\u001b[0m", Log.getColorSuffix( new TestLevel( "", Log.DEBUG.intValue() + 1 ) ) );
+
+		assertEquals( "\u001b[0m", Log.getColorSuffix( Log.DEBUG ) );
+
+		assertEquals( "", Log.getColorSuffix( new TestLevel( "", Log.DEBUG.intValue() - 1 ) ) );
+	}
+
+	private static class TestLevel extends Level {
+
+		private static final long serialVersionUID = 7758425141513202129L;
+
+		protected TestLevel( String name, int value ) {
+			super( name, value );
+		}
+
 	}
 
 	private class TestLogHandler extends Handler {

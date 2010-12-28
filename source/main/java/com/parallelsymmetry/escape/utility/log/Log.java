@@ -1,26 +1,16 @@
 package com.parallelsymmetry.escape.utility.log;
 
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.ErrorManager;
-import java.util.logging.Filter;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.StreamHandler;
 
 /**
  * Provides a facade to the standard Java logging architecture. This facade
@@ -30,29 +20,33 @@ import java.util.logging.StreamHandler;
  */
 public class Log {
 
-	public static final Level NONE = new CustomLevel( "NONE", Level.OFF.intValue() );
+	private static final int ERROR_VALUE = 1000;
 
-	public static final Level ERROR = new CustomLevel( "ERROR", Level.SEVERE.intValue() );
+	private static final int WARN_VALUE = 900;
 
-	public static final Level WARN = new CustomLevel( "WARN", Level.WARNING.intValue() );
+	private static final int INFO_VALUE = 800;
 
-	public static final Level INFO = Level.INFO;
+	private static final int TRACE_VALUE = 700;
 
-	public static final Level TRACE = new CustomLevel( "TRACE", Level.CONFIG.intValue() );
+	private static final int DEBUG_VALUE = 600;
 
-	public static final Level DEBUG = new CustomLevel( "DEBUG", 600 );
+	public static final Level NONE = new CustomLevel( "NONE", Integer.MAX_VALUE );
 
-	public static final Level FINE = Level.FINE;
+	public static final Level ERROR = new CustomLevel( "ERROR", ERROR_VALUE );
 
-	public static final Level FINER = Level.FINER;
+	public static final Level WARN = new CustomLevel( "WARN", WARN_VALUE );
 
-	public static final Level FINEST = Level.FINEST;
+	public static final Level INFO = new CustomLevel( "INFO", INFO_VALUE );
 
-	public static final Level ALL = Level.ALL;
+	public static final Level TRACE = new CustomLevel( "TRACE", TRACE_VALUE );
+
+	public static final Level DEBUG = new CustomLevel( "DEBUG", DEBUG_VALUE );
+
+	public static final Level ALL = new CustomLevel( "ALL", Integer.MIN_VALUE );
 
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
-	public static final Handler DEFAULT_HANDLER = new DefaultHandler( System.out, System.err );
+	public static final Handler DEFAULT_HANDLER = new DefaultHandler( System.out );
 
 	public static final Formatter DEFAULT_FORMATTER = new DefaultFormatter();
 
@@ -60,11 +54,11 @@ public class Log {
 
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
-	private static Map<Logger, Handler> handlers = new HashMap<Logger, Handler>();
-
-	private static final DateFormat dateFormat = new SimpleDateFormat( DEFAULT_DATE_FORMAT );
+	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
 
 	private static boolean showDate;
+
+	private static boolean showColor;
 
 	private static boolean showPrefix;
 
@@ -75,7 +69,7 @@ public class Log {
 
 		defaultLogger.addHandler( DEFAULT_HANDLER );
 		DEFAULT_HANDLER.setLevel( DEFAULT_LOG_LEVEL );
-		handlers.put( defaultLogger, DEFAULT_HANDLER );
+		defaultHandlers.put( defaultLogger, DEFAULT_HANDLER );
 	}
 
 	/**
@@ -97,13 +91,11 @@ public class Log {
 	}
 
 	public static final Level getLevel( String name ) {
-		return handlers.get( getLogger( name ) ).getLevel();
-		//return getNamedLogger( name ).getLevel();
+		return defaultHandlers.get( getLogger( name ) ).getLevel();
 	}
 
 	public static final void setLevel( String name, Level level ) {
-		handlers.get( getLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
-		//getNamedLogger( name ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+		defaultHandlers.get( getLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
 	}
 
 	public static final boolean isShowDate() {
@@ -112,6 +104,14 @@ public class Log {
 
 	public static final void setShowDate( boolean showDate ) {
 		Log.showDate = showDate;
+	}
+
+	public static final boolean isShowColor() {
+		return showColor;
+	}
+
+	public static final void setShowColor( boolean showColor ) {
+		Log.showColor = showColor;
 	}
 
 	public static final boolean isShowPrefix() {
@@ -143,7 +143,7 @@ public class Log {
 	}
 
 	public static final Handler getDefaultHandler( String name ) {
-		return handlers.get( getLogger( name ) );
+		return defaultHandlers.get( getLogger( name ) );
 	}
 
 	public static final void setDefaultHandler( Handler handler ) {
@@ -152,12 +152,12 @@ public class Log {
 
 	public static final void setDefaultHandler( String name, Handler handler ) {
 		Logger logger = getLogger( name );
-		Handler oldHandler = handlers.get( logger );
+		Handler oldHandler = defaultHandlers.get( logger );
 		logger.removeHandler( oldHandler );
 
 		handler.setLevel( oldHandler.getLevel() );
 
-		handlers.put( logger, handler );
+		defaultHandlers.put( logger, handler );
 		logger.addHandler( handler );
 	}
 
@@ -277,42 +277,82 @@ public class Log {
 	}
 
 	public static final String getPrefix( Level level ) {
-		int index = ( Level.INFO.intValue() - level.intValue() ) / 100;
+		int index = level.intValue() / 100;
 
-		if( index < -3 ) index = -3;
-		if( index > 5 ) index = 5;
+		if( index > 11 ) index = 11;
+		if( index < 0 ) index = 0;
 
 		switch( index ) {
-			case -3: {
+			case 11: {
 				return "";
 			}
-			case -2: {
+				// ERROR
+			case 10: {
 				return "*";
 			}
-			case -1: {
+				// WARN
+			case 9: {
 				return "-";
 			}
-			case 0: {
+				// INFO
+			case 8: {
 				return " ";
 			}
-			case 1: {
+				// TRACE
+			case 7: {
 				return "  ";
 			}
-			case 2: {
+				// DEBUG
+			case 6: {
 				return "   ";
 			}
-			case 3: {
-				return "    ";
+		}
+
+		return "    ";
+	}
+
+	/**
+	 * Add ANSI color tags to the specified message for the specified level.
+	 */
+	public static final String getColorPrefix( Level level ) {
+		int index = level.intValue() / 100;
+
+		if( index > 11 ) index = 11;
+		if( index < 0 ) index = 0;
+
+		switch( index ) {
+			// ERROR
+			case 10: {
+				return "\u001b[31m";
 			}
-			case 4: {
-				return "     ";
+				// WARN
+			case 9: {
+				return "\u001b[33m";
 			}
-			case 5: {
-				return "      ";
+				// INFO
+			case 8: {
+				return "\u001b[37m";
+			}
+				// TRACE
+			case 7: {
+				return "\u001b[1m\u001b[30m";
+			}
+				// DEBUG
+			case 6: {
+				return "\u001b[34m";
 			}
 		}
 
 		return "";
+	}
+
+	public static final String getColorSuffix( Level level ) {
+		int index = level.intValue() / 100;
+
+		if( index > 11 ) index = 11;
+		if( index < 0 ) index = 0;
+
+		return ( index > 5 && index < 11 ) ? "\u001b[0m" : "";
 	}
 
 	public static final void writeSystemProperties() {
@@ -328,16 +368,16 @@ public class Log {
 	private static final Logger getLogger( String name ) {
 		Logger logger = Logger.getLogger( name );
 
-		synchronized( handlers ) {
-			if( !handlers.keySet().contains( logger ) ) {
+		synchronized( defaultHandlers ) {
+			if( !defaultHandlers.keySet().contains( logger ) ) {
 				logger.setUseParentHandlers( false );
 				logger.setLevel( ALL );
 
-				Handler handler = new DefaultHandler( System.out, System.err );
+				Handler handler = new DefaultHandler( System.out );
 				logger.addHandler( handler );
 				handler.setLevel( INFO );
 
-				handlers.put( logger, handler );
+				defaultHandlers.put( logger, handler );
 			}
 		}
 
@@ -375,144 +415,6 @@ public class Log {
 
 		protected CustomLevel( String name, int value ) {
 			super( name, value );
-		}
-
-	}
-
-	private static class DefaultHandler extends Handler {
-
-		private StreamHandler outputHandler;
-
-		private StreamHandler errorHandler;
-
-		public DefaultHandler( OutputStream stream, OutputStream error ) {
-			outputHandler = new StreamHandler( stream, new DefaultFormatter() );
-			errorHandler = new StreamHandler( error, new DefaultFormatter() );
-		}
-
-		@Override
-		public void setLevel( Level level ) {
-			outputHandler.setLevel( level );
-			errorHandler.setLevel( level );
-			super.setLevel( level );
-		}
-
-		@Override
-		public synchronized Level getLevel() {
-			return super.getLevel();
-		}
-
-		@Override
-		public void publish( LogRecord record ) {
-			int recordLevel = record.getLevel().intValue();
-			if( recordLevel < Log.NONE.intValue() && recordLevel > Log.INFO.intValue() ) {
-				errorHandler.publish( record );
-			} else {
-				outputHandler.publish( record );
-			}
-			flush();
-		}
-
-		@Override
-		public void close() {
-			outputHandler.close();
-			errorHandler.close();
-		}
-
-		@Override
-		public void flush() {
-			outputHandler.flush();
-			errorHandler.flush();
-		}
-
-		@Override
-		public void setEncoding( String encoding ) throws SecurityException, UnsupportedEncodingException {
-			outputHandler.setEncoding( encoding );
-			errorHandler.setEncoding( encoding );
-			super.setEncoding( encoding );
-		}
-
-		@Override
-		public String getEncoding() {
-			return super.getEncoding();
-		}
-
-		@Override
-		public void setErrorManager( ErrorManager manager ) {
-			outputHandler.setErrorManager( manager );
-			errorHandler.setErrorManager( manager );
-			super.setErrorManager( manager );
-		}
-
-		@Override
-		public ErrorManager getErrorManager() {
-			return super.getErrorManager();
-		}
-
-		@Override
-		public void setFilter( Filter filter ) throws SecurityException {
-			outputHandler.setFilter( filter );
-			errorHandler.setFilter( filter );
-			super.setFilter( filter );
-		}
-
-		@Override
-		public Filter getFilter() {
-			return super.getFilter();
-		}
-
-		@Override
-		public void setFormatter( Formatter formatter ) throws SecurityException {
-			outputHandler.setFormatter( formatter );
-			errorHandler.setFormatter( formatter );
-			super.setFormatter( formatter );
-		}
-
-		@Override
-		public Formatter getFormatter() {
-			return super.getFormatter();
-		}
-
-		@Override
-		public boolean isLoggable( LogRecord record ) {
-			return super.isLoggable( record );
-		}
-
-		@Override
-		protected void reportError( String message, Exception exception, int code ) {
-			super.reportError( message, exception, code );
-		}
-
-	}
-
-	private static class DefaultFormatter extends Formatter {
-
-		@Override
-		public String format( LogRecord record ) {
-			Throwable thrown = record.getThrown();
-			StringBuilder buffer = new StringBuilder();
-
-			if( record.getMessage() != null ) {
-				if( Log.showDate ) {
-					buffer.append( dateFormat.format( new Date( record.getMillis() ) ) );
-					buffer.append( " " );
-				}
-				if( Log.showPrefix ) {
-					buffer.append( getPrefix( record.getLevel() ) );
-				}
-				buffer.append( record.getMessage() );
-				buffer.append( "\n" );
-			}
-
-			if( thrown != null ) {
-				StringWriter stringWriter = new StringWriter();
-				PrintWriter printWriter = new PrintWriter( stringWriter );
-				thrown.printStackTrace( printWriter );
-				printWriter.close();
-				buffer.append( stringWriter.toString() );
-			}
-
-			return buffer.toString();
 		}
 
 	}
