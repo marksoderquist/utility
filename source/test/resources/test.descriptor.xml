@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<test>
+	<name>test.name</name>
+	<alias>test.alias</alias>
+	<path>
+		<value>test.path.value</value>
+	</path>
+	<integer>5</integer>
+	<list>
+		<one/>
+		<two/>
+		<three/>
+	</list>
+	<nodes>
+		<node>one</node>
+		<notthisone>notone</notthisone>
+		<node>two</node>
+		<notthisone>nottwo</notthisone>
+		<node>three</node>
+	</nodes>
+</test>
