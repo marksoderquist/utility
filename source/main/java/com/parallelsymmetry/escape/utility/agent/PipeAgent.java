@@ -6,7 +6,7 @@ import java.io.OutputStream;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public abstract class IOAgent extends Agent implements Pipe {
+public abstract class PipeAgent extends Agent implements Pipe {
 
 	private static final int DEFAULT_RECONNECT_DELAY = 5000;
 
@@ -34,19 +34,19 @@ public abstract class IOAgent extends Agent implements Pipe {
 
 	private boolean connected;
 
-	public IOAgent() {
+	public PipeAgent() {
 		this( null, false );
 	}
 
-	public IOAgent( boolean stopOnException ) {
+	public PipeAgent( boolean stopOnException ) {
 		this( null, stopOnException );
 	}
 
-	public IOAgent( String name ) {
+	public PipeAgent( String name ) {
 		this( name, false );
 	}
 
-	public IOAgent( String name, boolean stopOnException ) {
+	public PipeAgent( String name, boolean stopOnException ) {
 		super( name );
 		this.stopOnException = stopOnException;
 	}
@@ -63,10 +63,20 @@ public abstract class IOAgent extends Agent implements Pipe {
 		this.reconnectDelay = reconnectDelay;
 	}
 
+	/**
+	 * Should the agent connect only once.
+	 * 
+	 * @return
+	 */
 	public boolean isConnectOnce() {
 		return connectOnce;
 	}
 
+	/**
+	 * Set if the agent should connect only once.
+	 * 
+	 * @param connectOnce
+	 */
 	public void setConnectOnce( boolean connectOnce ) {
 		this.connectOnce = connectOnce;
 	}

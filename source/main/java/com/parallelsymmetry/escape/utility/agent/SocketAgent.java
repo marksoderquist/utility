@@ -7,7 +7,7 @@ import java.net.Socket;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public class SocketAgent extends IOAgent {
+public class SocketAgent extends PipeAgent {
 
 	public static final int TIMEOUT = 5000;
 

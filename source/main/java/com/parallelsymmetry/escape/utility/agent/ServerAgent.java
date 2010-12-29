@@ -11,7 +11,7 @@ import java.net.SocketException;
 import com.parallelsymmetry.escape.utility.TripLock;
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public class ServerAgent extends IOAgent {
+public class ServerAgent extends PipeAgent {
 
 	private String host;
 
