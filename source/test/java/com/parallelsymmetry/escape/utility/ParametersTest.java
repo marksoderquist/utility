@@ -76,7 +76,7 @@ public class ParametersTest extends TestCase {
 		try {
 			Parameters.parse( new String[] { "-help", "topic", "-test", "test", "test.txt" }, "help" );
 			fail( "Unknown flags should cause an exception" );
-		} catch( InvalidParameterException exception ) {
+		} catch( IllegalArgumentException exception ) {
 			assertEquals( "Unknown flag: -test", exception.getMessage() );
 		}
 	}
@@ -213,7 +213,7 @@ public class ParametersTest extends TestCase {
 		try {
 			Parameters.parse( args );
 			fail( "Null values should cause an exception" );
-		} catch( InvalidParameterException exception ) {
+		} catch( IllegalArgumentException exception ) {
 			assertEquals( "Null command at index: 0", exception.getMessage() );
 		}
 	}

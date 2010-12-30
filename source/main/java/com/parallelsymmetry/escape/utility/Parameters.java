@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.io.File;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,15 +88,15 @@ public class Parameters {
 		this.files = files;
 	}
 
-	public static final Parameters parse( String[] commands ) throws InvalidParameterException {
+	public static final Parameters parse( String[] commands ) {
 		return parse( commands, (Set<String>)null );
 	}
 
-	public static final Parameters parse( String[] commands, String... flags ) throws InvalidParameterException {
+	public static final Parameters parse( String[] commands, String... flags ) {
 		return parse( commands, new HashSet<String>( Arrays.asList( flags ) ) );
 	}
 
-	public static final Parameters parse( String[] commands, Set<String> flags ) throws InvalidParameterException {
+	public static final Parameters parse( String[] commands, Set<String> flags ) {
 		Map<String, String> values = new HashMap<String, String>();
 		List<File> files = new ArrayList<File>();
 
@@ -104,7 +105,7 @@ public class Parameters {
 		for( int index = 0; index < commands.length; index++ ) {
 			String command = commands[index];
 
-			if( command == null ) throw new InvalidParameterException( "Null command at index: " + index );
+			if( command == null ) throw new IllegalArgumentException( "Null command at index: " + index );
 
 			if( TERMINATOR.equals( command ) ) {
 				terminated = true;
