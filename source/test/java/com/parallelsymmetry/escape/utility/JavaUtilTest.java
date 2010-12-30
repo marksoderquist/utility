@@ -10,6 +10,10 @@ import junit.framework.TestCase;
 
 public class JavaUtilTest extends TestCase {
 
+	public void testGetSimpleClassName() {
+		assertEquals( "Object", JavaUtil.getSimpleClassName( "java.lang.Object" ) );
+	}
+
 	public void testParseSystemClasspath() throws IOException {
 		List<File> entries = JavaUtil.parseSystemClasspath( null );
 		assertEquals( 0, entries.size() );

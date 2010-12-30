@@ -13,6 +13,16 @@ import java.util.StringTokenizer;
 public class JavaUtil {
 
 	/**
+	 * Get the simple class name from a full class name.
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public static final String getSimpleClassName( String name ) {
+		return name.substring( name.lastIndexOf( '.' ) + 1 );
+	}
+
+	/**
 	 * Parse the relative URI strings from the specified classpath in system
 	 * property format. See <a href=
 	 * "http://java.sun.com/javase/6/docs/technotes/tools/windows/classpath.html"
