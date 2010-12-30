@@ -6,10 +6,10 @@ import junit.framework.TestCase;
 
 public class ReleaseTest extends TestCase {
 
-	private Release release = new Release( Version.parse( "1.2.3-u-4" ), new Date( 0 ) );
+	private Release release = new Release( Version.parse( "1.2.3-u-04" ), new Date( 0 ) );
 
 	public void testGetVersion() {
-		assertEquals( 0, Version.parse( "1.2.3-u-4" ).compareTo( release.getVersion() ) );
+		assertEquals( 0, Version.parse( "1.2.3-u-04" ).compareTo( release.getVersion() ) );
 	}
 
 	public void testGetDate() {
