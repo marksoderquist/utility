@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public final class Version {
+public final class Version implements Comparable<Version> {
 
 	private static final String SNAPSHOT = "s";
 
@@ -35,6 +35,10 @@ public final class Version {
 	}
 
 	private Version() {}
+
+	public boolean isSnapshot() {
+		return snapshot;
+	}
 
 	public String getVersion() {
 		return getVersion( 0 );
@@ -76,44 +80,45 @@ public final class Version {
 		return builder.toString();
 	}
 
-	public String getHumanVersion() {
-		return getHumanVersion( 0 );
+	public String toHumanString() {
+		return toHumanString( 0 );
 	}
 
-	public String getHumanVersion( int level ) {
+	public String toHumanString( int level ) {
 		if( level == 0 ) level = Integer.MAX_VALUE;
-
+	
 		StringBuilder builder = new StringBuilder();
-
+	
 		if( level > 0 ) {
 			builder.append( major );
 		}
-
+	
 		if( level > 1 ) {
 			builder.append( '.' );
 			builder.append( minor );
 		}
-
+	
 		if( level > 2 ) {
 			builder.append( '.' );
 			builder.append( micro );
 		}
-
+	
 		if( level > 3 ) {
 			builder.append( ' ' );
 			builder.append( QUALIFIER_NAMES.get( qualifier ) );
 		}
-
+	
 		if( level > 4 && !isSnapshot() ) {
 			builder.append( ' ' );
 			builder.append( release );
 		}
-
+	
 		return builder.toString();
 	}
 
-	public boolean isSnapshot() {
-		return snapshot;
+	@Override
+	public int compareTo( Version that ) {
+		return compareVersions( this, that );
 	}
 
 	/**
@@ -123,7 +128,7 @@ public final class Version {
 	 */
 	@Override
 	public String toString() {
-		return getHumanVersion();
+		return toHumanString();
 	}
 
 	public static Version parse( String string ) {

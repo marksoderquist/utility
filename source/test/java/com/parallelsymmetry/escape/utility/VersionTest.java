@@ -50,11 +50,11 @@ public class VersionTest extends TestCase {
 		assertEquals( "Version number incorrect.", "1.2.3-SNAPSHOT", snapshot.getVersion() );
 	}
 
-	public void testGetHumanVersion() {
-		assertEquals( "Version number incorrect.", "1.2.3 Alpha 4", alpha.getHumanVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3 Beta 4", beta.getHumanVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3 Update 4", update.getHumanVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3 Snapshot", snapshot.getHumanVersion() );
+	public void testToHumanString() {
+		assertEquals( "Version number incorrect.", "1.2.3 Alpha 4", alpha.toHumanString() );
+		assertEquals( "Version number incorrect.", "1.2.3 Beta 4", beta.toHumanString() );
+		assertEquals( "Version number incorrect.", "1.2.3 Update 4", update.toHumanString() );
+		assertEquals( "Version number incorrect.", "1.2.3 Snapshot", snapshot.toHumanString() );
 	}
 
 	public void testToString() {
