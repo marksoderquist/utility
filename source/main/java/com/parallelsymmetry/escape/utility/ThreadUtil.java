@@ -19,6 +19,30 @@ public class ThreadUtil {
 	}
 
 	/**
+	 * Check if the calling method was called from a different method. Class names
+	 * are compared both by the simple name and by the full name. For example,
+	 * both of the following calls will return true:
+	 * <p>
+	 * <blockquote> <code>ThreadUtil.calledFrom( "Thread", "run" );</code><br/>
+	 * <code>ThreadUtil.calledFrom( "java.lang.Thread", "run" );</code>
+	 * </blockquote>
+	 * 
+	 * @param className
+	 * @param methodName
+	 * @return
+	 */
+	public static final boolean calledFrom( String className, String methodName ) {
+		StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+
+		for( StackTraceElement element : trace ) {
+			if( element.getClassName().equals( className ) && element.getMethodName().equals( methodName ) ) return true;
+			if( JavaUtil.getSimpleClassName( element.getClassName() ).equals( JavaUtil.getSimpleClassName( className ) ) && element.getMethodName().equals( methodName ) ) return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Append the stack trace of the source throwable to the target throwable.
 	 * 
 	 * @param source

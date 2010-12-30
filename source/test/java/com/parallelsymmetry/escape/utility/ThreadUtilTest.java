@@ -13,6 +13,13 @@ public class ThreadUtilTest extends TestCase {
 		assertTrue( "Delta: " + delta, delta >= length * 1000 );
 	}
 
+	public void testCalledFrom() {
+		assertFalse( ThreadUtil.calledFrom( "ThreadUtilTest", "notHere" ) );
+
+		assertTrue( ThreadUtil.calledFrom( "ThreadUtilTest", "testCalledFrom" ) );
+		assertTrue( ThreadUtil.calledFrom( "com.parallelsymmetry.escape.utility.ThreadUtilTest", "testCalledFrom" ) );
+	}
+
 	public void testAppendStackTraceWithNullSource() throws Exception {
 		Throwable target = new Throwable();
 		StackTraceElement[] trace = target.getStackTrace();
