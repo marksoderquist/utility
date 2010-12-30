@@ -20,17 +20,18 @@ public abstract class Agent {
 
 	private Set<AgentListener> listeners = new HashSet<AgentListener>();
 
+	private Object statelock = new Object();
+
 	protected Agent() {
 		this( null );
 	}
 
 	protected Agent( String name ) {
-		setName( name );
-
-		thread = new Thread( new AgentRunner(), getName() );
+		thread = new Thread( new AgentRunner() );
 		thread.setPriority( Thread.NORM_PRIORITY );
 		thread.setDaemon( true );
 		thread.start();
+		setName( name );
 	}
 
 	public String getName() {
@@ -39,6 +40,7 @@ public abstract class Agent {
 
 	public void setName( String name ) {
 		this.name = name == null ? getClass().getSimpleName() : name;
+		thread.setName( "Agent - " + this.name );
 	}
 
 	/**
@@ -256,8 +258,6 @@ public abstract class Agent {
 			Log.write( throwable );
 		}
 	}
-
-	private Object statelock = new Object();
 
 	private void changeState( State state ) {
 		if( this.state == state ) return;

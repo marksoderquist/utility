@@ -74,6 +74,7 @@ public class ServerAgent extends PipeAgent {
 		server.setReuseAddress( true );
 		Log.write( Log.DEBUG, getName() + ": Binding " + address + "..." );
 		server.bind( address );
+		setName( getName() + ": " + server.getLocalPort() );
 		Log.write( Log.DEBUG, getName() + ": Starting on " + address + "..." );
 		runner = new ServerRunner();
 		startlock.reset();
