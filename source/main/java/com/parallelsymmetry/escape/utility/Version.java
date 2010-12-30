@@ -70,6 +70,7 @@ public final class Version implements Comparable<Version> {
 			} else {
 				builder.append( qualifier );
 			}
+
 		}
 
 		if( level > 4 && !isSnapshot() ) {
@@ -86,33 +87,33 @@ public final class Version implements Comparable<Version> {
 
 	public String toHumanString( int level ) {
 		if( level == 0 ) level = Integer.MAX_VALUE;
-	
+
 		StringBuilder builder = new StringBuilder();
-	
+
 		if( level > 0 ) {
 			builder.append( major );
 		}
-	
+
 		if( level > 1 ) {
 			builder.append( '.' );
 			builder.append( minor );
 		}
-	
+
 		if( level > 2 ) {
 			builder.append( '.' );
 			builder.append( micro );
 		}
-	
-		if( level > 3 ) {
+
+		if( level > 3 && !( "u".equals( qualifier ) && release == 0 ) ) {
 			builder.append( ' ' );
 			builder.append( QUALIFIER_NAMES.get( qualifier ) );
 		}
-	
-		if( level > 4 && !isSnapshot() ) {
+
+		if( level > 4 && !isSnapshot() && !( "u".equals( qualifier ) && release == 0 ) ) {
 			builder.append( ' ' );
 			builder.append( release );
 		}
-	
+
 		return builder.toString();
 	}
 

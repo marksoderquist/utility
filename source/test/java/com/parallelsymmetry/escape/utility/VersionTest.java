@@ -30,6 +30,8 @@ public class VersionTest extends TestCase {
 
 	private Version beta = Version.parse( "1.2.3-b-4" );
 
+	private Version release = Version.parse( "1.2.3-u-0" );
+
 	private Version update = Version.parse( "1.2.3-u-4" );
 
 	private Version snapshot = Version.parse( "1.2.3-SNAPSHOT" );
@@ -46,6 +48,7 @@ public class VersionTest extends TestCase {
 	public void testGetVersion() {
 		assertEquals( "Version number incorrect.", "1.2.3-a-4", alpha.getVersion() );
 		assertEquals( "Version number incorrect.", "1.2.3-b-4", beta.getVersion() );
+		assertEquals( "Version number incorrect.", "1.2.3-u-0", release.getVersion() );
 		assertEquals( "Version number incorrect.", "1.2.3-u-4", update.getVersion() );
 		assertEquals( "Version number incorrect.", "1.2.3-SNAPSHOT", snapshot.getVersion() );
 	}
@@ -53,6 +56,7 @@ public class VersionTest extends TestCase {
 	public void testToHumanString() {
 		assertEquals( "Version number incorrect.", "1.2.3 Alpha 4", alpha.toHumanString() );
 		assertEquals( "Version number incorrect.", "1.2.3 Beta 4", beta.toHumanString() );
+		assertEquals( "Version number incorrect.", "1.2.3", release.toHumanString() );
 		assertEquals( "Version number incorrect.", "1.2.3 Update 4", update.toHumanString() );
 		assertEquals( "Version number incorrect.", "1.2.3 Snapshot", snapshot.toHumanString() );
 	}
@@ -60,6 +64,7 @@ public class VersionTest extends TestCase {
 	public void testToString() {
 		assertEquals( "Version number incorrect", "1.2.3 Alpha 4", alpha.toString() );
 		assertEquals( "Version number incorrect", "1.2.3 Beta 4", beta.toString() );
+		assertEquals( "Version number incorrect", "1.2.3", release.toString() );
 		assertEquals( "Version number incorrect", "1.2.3 Update 4", update.toString() );
 		assertEquals( "Version number incorrect", "1.2.3 Snapshot", snapshot.toString() );
 	}
