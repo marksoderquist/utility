@@ -4,37 +4,37 @@ import junit.framework.TestCase;
 
 public class VersionTest extends TestCase {
 
-	private Version version = Version.parse( "1.2.3-b-4" );
+	private Version version = Version.parse( "3.4.5-b-06" );
 
-	private Version majorGreater = Version.parse( "2.2.3-b-4" );
+	private Version majorGreater = Version.parse( "4.4.5-b-06" );
 
-	private Version majorLesser = Version.parse( "0.2.3-b-4" );
+	private Version majorLesser = Version.parse( "2.4.5-b-06" );
 
-	private Version minorGreater = Version.parse( "1.3.3-b-4" );
+	private Version minorGreater = Version.parse( "3.5.3-b-04" );
 
-	private Version minorLesser = Version.parse( "1.1.3-b-4" );
+	private Version minorLesser = Version.parse( "3.3.3-b-04" );
 
-	private Version microGreater = Version.parse( "1.2.4-b-4" );
+	private Version microGreater = Version.parse( "3.4.6-b-04" );
 
-	private Version microLesser = Version.parse( "1.2.2-b-4" );
+	private Version microLesser = Version.parse( "3.4.4-b-04" );
 
-	private Version revisionGreater = Version.parse( "1.2.3-u-4" );
+	private Version revisionGreater = Version.parse( "3.4.5-u-04" );
 
-	private Version revisionLesser = Version.parse( "1.2.3-a-4" );
+	private Version revisionLesser = Version.parse( "3.4.5-a-04" );
 
-	private Version buildGreater = Version.parse( "1.2.3-b-5" );
+	private Version buildGreater = Version.parse( "3.4.5-b-07" );
 
-	private Version buildLesser = Version.parse( "1.2.3-b-3" );
+	private Version buildLesser = Version.parse( "3.4.5-b-05" );
 
-	private Version alpha = Version.parse( "1.2.3-a-4" );
+	private Version alpha = Version.parse( "3.4.5-a-06" );
 
-	private Version beta = Version.parse( "1.2.3-b-4" );
+	private Version beta = Version.parse( "3.4.5-b-06" );
 
-	private Version release = Version.parse( "1.2.3-u-0" );
+	private Version release = Version.parse( "3.4.5-u-00" );
 
-	private Version update = Version.parse( "1.2.3-u-4" );
+	private Version update = Version.parse( "3.4.5-u-06" );
 
-	private Version snapshot = Version.parse( "1.2.3-SNAPSHOT" );
+	private Version snapshot = Version.parse( "3.4.5-SNAPSHOT" );
 
 	public void testParseInvalidVersions() {
 		assertNull( Version.parse( null ) );
@@ -43,46 +43,53 @@ public class VersionTest extends TestCase {
 		assertNull( Version.parse( "1.2" ) );
 		assertNull( Version.parse( "1.2.3" ) );
 		assertNull( Version.parse( "1.2.3.4" ) );
+
+		assertNull( Version.parse( "0.2.3-a-00" ) );
+		assertNull( Version.parse( "10.2.3-a-00" ) );
+		assertNull( Version.parse( "1.10.3-a-00" ) );
+		assertNull( Version.parse( "1.2.10-a-00" ) );
+		assertNull( Version.parse( "1.2.3-c-00" ) );
+		assertNull( Version.parse( "1.2.3-a-0" ) );
 	}
 
 	public void testGetVersion() {
-		assertEquals( "Version number incorrect.", "1.2.3-a-4", alpha.getVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3-b-4", beta.getVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3-u-0", release.getVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3-u-4", update.getVersion() );
-		assertEquals( "Version number incorrect.", "1.2.3-SNAPSHOT", snapshot.getVersion() );
+		assertEquals( "Version number incorrect.", "3.4.5-a-06", alpha.getVersion() );
+		assertEquals( "Version number incorrect.", "3.4.5-b-06", beta.getVersion() );
+		assertEquals( "Version number incorrect.", "3.4.5-u-00", release.getVersion() );
+		assertEquals( "Version number incorrect.", "3.4.5-u-06", update.getVersion() );
+		assertEquals( "Version number incorrect.", "3.4.5-SNAPSHOT", snapshot.getVersion() );
 	}
 
 	public void testToHumanString() {
-		assertEquals( "Version number incorrect.", "1.2.3 Alpha 4", alpha.toHumanString() );
-		assertEquals( "Version number incorrect.", "1.2.3 Beta 4", beta.toHumanString() );
-		assertEquals( "Version number incorrect.", "1.2.3", release.toHumanString() );
-		assertEquals( "Version number incorrect.", "1.2.3 Update 4", update.toHumanString() );
-		assertEquals( "Version number incorrect.", "1.2.3 Snapshot", snapshot.toHumanString() );
+		assertEquals( "Version number incorrect.", "3.4.5 Alpha 6", alpha.toHumanString() );
+		assertEquals( "Version number incorrect.", "3.4.5 Beta 6", beta.toHumanString() );
+		assertEquals( "Version number incorrect.", "3.4.5", release.toHumanString() );
+		assertEquals( "Version number incorrect.", "3.4.5 Update 6", update.toHumanString() );
+		assertEquals( "Version number incorrect.", "3.4.5 Snapshot", snapshot.toHumanString() );
 	}
 
 	public void testToString() {
-		assertEquals( "Version number incorrect", "1.2.3 Alpha 4", alpha.toString() );
-		assertEquals( "Version number incorrect", "1.2.3 Beta 4", beta.toString() );
-		assertEquals( "Version number incorrect", "1.2.3", release.toString() );
-		assertEquals( "Version number incorrect", "1.2.3 Update 4", update.toString() );
-		assertEquals( "Version number incorrect", "1.2.3 Snapshot", snapshot.toString() );
+		assertEquals( "Version number incorrect", "3.4.5 Alpha 6", alpha.toString() );
+		assertEquals( "Version number incorrect", "3.4.5 Beta 6", beta.toString() );
+		assertEquals( "Version number incorrect", "3.4.5", release.toString() );
+		assertEquals( "Version number incorrect", "3.4.5 Update 6", update.toString() );
+		assertEquals( "Version number incorrect", "3.4.5 Snapshot", snapshot.toString() );
 	}
 
 	public void testGetVersionWithLimit() {
-		assertEquals( "Version number incorrect", "1", version.getVersion( 1 ) );
-		assertEquals( "Version number incorrect", "1.2", version.getVersion( 2 ) );
-		assertEquals( "Version number incorrect", "1.2.3", version.getVersion( 3 ) );
-		assertEquals( "Version number incorrect", "1.2.3-b", version.getVersion( 4 ) );
-		assertEquals( "Version number incorrect", "1.2.3-b-4", version.getVersion( 5 ) );
+		assertEquals( "Version number incorrect", "3", version.getVersion( 1 ) );
+		assertEquals( "Version number incorrect", "3.4", version.getVersion( 2 ) );
+		assertEquals( "Version number incorrect", "3.4.5", version.getVersion( 3 ) );
+		assertEquals( "Version number incorrect", "3.4.5-b", version.getVersion( 4 ) );
+		assertEquals( "Version number incorrect", "3.4.5-b-06", version.getVersion( 5 ) );
 	}
 
 	public void testGetSnapshotVersionWithLimit() {
-		assertEquals( "Version number incorrect", "1", snapshot.getVersion( 1 ) );
-		assertEquals( "Version number incorrect", "1.2", snapshot.getVersion( 2 ) );
-		assertEquals( "Version number incorrect", "1.2.3", snapshot.getVersion( 3 ) );
-		assertEquals( "Version number incorrect", "1.2.3-SNAPSHOT", snapshot.getVersion( 4 ) );
-		assertEquals( "Version number incorrect", "1.2.3-SNAPSHOT", snapshot.getVersion( 5 ) );
+		assertEquals( "Version number incorrect", "3", snapshot.getVersion( 1 ) );
+		assertEquals( "Version number incorrect", "3.4", snapshot.getVersion( 2 ) );
+		assertEquals( "Version number incorrect", "3.4.5", snapshot.getVersion( 3 ) );
+		assertEquals( "Version number incorrect", "3.4.5-SNAPSHOT", snapshot.getVersion( 4 ) );
+		assertEquals( "Version number incorrect", "3.4.5-SNAPSHOT", snapshot.getVersion( 5 ) );
 	}
 
 	public void testCompareVersions() {

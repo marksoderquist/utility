@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +9,13 @@ import java.util.StringTokenizer;
 
 public final class Version implements Comparable<Version> {
 
-	private static final String SNAPSHOT = "s";
-
 	private static final List<String> QUALIFIERS = Arrays.asList( new String[] { "a", "b", "s", "u" } );
 
 	private static final Map<String, String> QUALIFIER_NAMES;
+
+	private static final String RELEASE_FORMAT = "00";
+
+	private static final String SNAPSHOT = "s";
 
 	private int major;
 
@@ -74,8 +77,9 @@ public final class Version implements Comparable<Version> {
 		}
 
 		if( level > 4 && !isSnapshot() ) {
+			DecimalFormat format = new DecimalFormat( RELEASE_FORMAT );
 			builder.append( '-' );
-			builder.append( release );
+			builder.append( format.format( release ) );
 		}
 
 		return builder.toString();
@@ -142,6 +146,7 @@ public final class Version implements Comparable<Version> {
 		if( tokenizer.hasMoreTokens() ) {
 			try {
 				version.major = Integer.parseInt( tokenizer.nextToken() );
+				if( version.major < 1 || version.major > 9 ) return null;
 			} catch( NumberFormatException exception ) {
 				return null;
 			}
@@ -153,6 +158,7 @@ public final class Version implements Comparable<Version> {
 		if( tokenizer.hasMoreTokens() ) {
 			try {
 				version.minor = Integer.parseInt( tokenizer.nextToken() );
+				if( version.minor < 0 || version.minor > 9 ) return null;
 			} catch( NumberFormatException exception ) {
 				return null;
 			}
@@ -164,6 +170,7 @@ public final class Version implements Comparable<Version> {
 		if( tokenizer.hasMoreTokens() ) {
 			try {
 				version.micro = Integer.parseInt( tokenizer.nextToken() );
+				if( version.micro < 0 || version.micro > 9 ) return null;
 			} catch( NumberFormatException exception ) {
 				return null;
 			}
@@ -184,7 +191,9 @@ public final class Version implements Comparable<Version> {
 		// Parse the build number.
 		if( !version.isSnapshot() && tokenizer.hasMoreTokens() ) {
 			try {
-				version.release = Integer.parseInt( tokenizer.nextToken() );
+				String release = tokenizer.nextToken();
+				if( release.length() != 2 ) return null;
+				version.release = Integer.parseInt( release );
 			} catch( NumberFormatException exception ) {
 				return null;
 			}
