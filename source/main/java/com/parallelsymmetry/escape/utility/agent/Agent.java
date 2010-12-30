@@ -42,6 +42,16 @@ public abstract class Agent {
 	}
 
 	/**
+	 * Convenience method to check if the agent is currently running. The agent is
+	 * running if the state is STARTED.
+	 * 
+	 * @return True if running, false otherwise.
+	 */
+	public boolean isRunning() {
+		return state == State.STARTED;
+	}
+
+	/**
 	 * Start the agent. This method changes the agent state to STARTING and
 	 * returns immediately.
 	 */
@@ -121,16 +131,6 @@ public abstract class Agent {
 		startAndWait();
 	}
 
-	/**
-	 * Convenience method to check if the agent is currently running. The agent is
-	 * running if the state is STARTED.
-	 * 
-	 * @return True if running, false otherwise.
-	 */
-	public final boolean isRunning() {
-		return state == State.STARTED;
-	}
-
 	public final boolean isAgentThread() {
 		return Thread.currentThread() == thread;
 	}
@@ -166,7 +166,7 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void waitForStartup( int timeout ) throws InterruptedException {
-		waitForState( State.STARTED, timeout );
+		waitForStateChange( State.STARTING, timeout );
 	}
 
 	/**
@@ -187,7 +187,7 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void waitForShutdown( int timeout ) throws InterruptedException {
-		waitForState( State.STOPPED, timeout );
+		waitForStateChange( State.STOPPING, timeout );
 	}
 
 	public final void addListener( AgentListener listener ) {
@@ -229,19 +229,31 @@ public abstract class Agent {
 		}
 	}
 
-	private final void startup() throws Exception {
+	/**
+	 * Start the agent. If the start is successful then the state is set to
+	 * STARTED. If an exception is thrown the state is set to STOPPED.
+	 */
+	private final void startup() {
 		try {
 			startAgent();
-		} finally {
 			changeState( State.STARTED );
+		} catch( Throwable throwable ) {
+			changeState( State.STOPPED );
+			Log.write( throwable );
 		}
 	}
 
-	private final void shutdown() throws Exception {
+	/**
+	 * Stop the agent. If the stop is successful then the state is set to STOPPED.
+	 * If an exception is thrown the state is set to STARTED.
+	 */
+	private final void shutdown() {
 		try {
 			stopAgent();
-		} finally {
 			changeState( State.STOPPED );
+		} catch( Throwable throwable ) {
+			changeState( State.STARTED );
+			Log.write( throwable );
 		}
 	}
 
@@ -264,8 +276,24 @@ public abstract class Agent {
 
 	private void waitForState( State state, int timeout ) throws InterruptedException {
 		synchronized( statelock ) {
+			//Log.write( Log.TRACE, "Waiting for " + state + "..." );
 			long mark = System.currentTimeMillis();
 			while( this.state != state ) {
+				statelock.wait( timeout );
+				if( timeout > 0 && System.currentTimeMillis() - mark > timeout ) return;
+			}
+		}
+	}
+
+	private void waitForStateChange( State state ) throws InterruptedException {
+		waitForStateChange( state, 0 );
+	}
+
+	private void waitForStateChange( State state, int timeout ) throws InterruptedException {
+		synchronized( statelock ) {
+			//Log.write( Log.TRACE, "Waiting for " + state + " to change..." );
+			long mark = System.currentTimeMillis();
+			while( this.state == state ) {
 				statelock.wait( timeout );
 				if( timeout > 0 && System.currentTimeMillis() - mark > timeout ) return;
 			}
@@ -281,18 +309,23 @@ public abstract class Agent {
 		public void run() {
 			try {
 				while( true ) {
-					waitForState( State.STARTING );
-					try {
-						startup();
-					} catch( Exception exception ) {
-						Log.write( exception );
+					switch( getState() ) {
+						case STOPPED:
+						case STARTING: {
+							waitForState( State.STARTING );
+							startup();
+							waitForStateChange( State.STARTING );
+							break;
+						}
+						case STARTED:
+						case STOPPING: {
+							waitForState( State.STOPPING );
+							shutdown();
+							waitForStateChange( State.STOPPING );
+							break;
+						}
 					}
-					waitForState( State.STOPPING );
-					try {
-						shutdown();
-					} catch( Exception exception ) {
-						Log.write( exception );
-					}
+
 				}
 			} catch( InterruptedException exception ) {
 				Log.write( Log.ERROR, exception, "AgentRunner terminated." );

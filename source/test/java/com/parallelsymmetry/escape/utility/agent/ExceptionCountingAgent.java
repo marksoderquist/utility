@@ -2,20 +2,26 @@ package com.parallelsymmetry.escape.utility.agent;
 
 public class ExceptionCountingAgent extends CountingAgent {
 
-	public ExceptionCountingAgent( int startupPause, int shutdownPause ) {
-		super( startupPause, shutdownPause );
+	private boolean failStart;
+
+	private boolean failStop;
+
+	public ExceptionCountingAgent( boolean failStart, boolean failStop ) {
+		super( 0, 0 );
+		this.failStart = failStart;
+		this.failStop = failStop;
 	}
 
 	@Override
 	protected void startAgent() throws Exception {
 		super.startAgent();
-		throw new Exception( "Test exception during startAgent()." );
+		if( failStart ) throw new Exception( "Test exception during startAgent()." );
 	}
 
 	@Override
 	protected void stopAgent() throws Exception {
 		super.stopAgent();
-		throw new Exception( "Test exception during stopAgent()." );
+		if( failStop ) throw new Exception( "Test exception during stopAgent()." );
 	}
 
 }
