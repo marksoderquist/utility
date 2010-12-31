@@ -66,8 +66,8 @@ public class Log {
 		Logger defaultLogger = Logger.getLogger( DEFAULT_LOGGER_NAME );
 		defaultLogger.setLevel( Level.ALL );
 		defaultLogger.setUseParentHandlers( false );
-
 		defaultLogger.addHandler( DEFAULT_HANDLER );
+
 		DEFAULT_HANDLER.setLevel( DEFAULT_LOG_LEVEL );
 		defaultHandlers.put( defaultLogger, DEFAULT_HANDLER );
 	}
@@ -95,7 +95,8 @@ public class Log {
 	}
 
 	public static final void setLevel( String name, Level level ) {
-		defaultHandlers.get( getLogger( name ) ).setLevel( level == null ? DEFAULT_LOG_LEVEL : level );
+		if( level == null ) return;
+		defaultHandlers.get( getLogger( name ) ).setLevel( level );
 	}
 
 	public static final boolean isShowDate() {
@@ -131,11 +132,11 @@ public class Log {
 	}
 
 	public static final void addHandler( String name, Handler handler ) {
-		Logger.getLogger( name ).addHandler( handler );
+		getLogger( name ).addHandler( handler );
 	}
 
 	public static final void removeHandler( String name, Handler handler ) {
-		Logger.getLogger( name ).removeHandler( handler );
+		getLogger( name ).removeHandler( handler );
 	}
 
 	public static final Handler getDefaultHandler() {

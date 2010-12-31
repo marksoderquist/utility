@@ -3,6 +3,7 @@ package com.parallelsymmetry.escape.utility.log;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import junit.framework.TestCase;
@@ -24,6 +25,30 @@ public class LogTest extends TestCase {
 	public void tearDown() {
 		Log.removeHandler( handler );
 		Log.setLevel( null );
+	}
+
+	public void testSetLevel() {
+		Level level = Log.getLevel();
+
+		Log.setLevel( Log.DEBUG );
+		assertEquals( Log.DEBUG, Log.getLevel() );
+
+		Log.setLevel( Log.TRACE );
+		assertEquals( Log.TRACE, Log.getLevel() );
+
+		Log.setLevel( Log.INFO );
+		assertEquals( Log.INFO, Log.getLevel() );
+
+		Log.setLevel( Log.WARN );
+		assertEquals( Log.WARN, Log.getLevel() );
+
+		Log.setLevel( Log.ERROR );
+		assertEquals( Log.ERROR, Log.getLevel() );
+
+		Log.setLevel( null );
+		assertEquals( Log.ERROR, Log.getLevel() );
+
+		Log.setLevel( level );
 	}
 
 	public void testWrite() {
