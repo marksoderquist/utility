@@ -254,27 +254,27 @@ public class Log {
 	}
 
 	public static final Level parseLevel( String string ) {
-		if( string == null ) return INFO;
+		if( string == null ) return null;
 
 		// FIXME In Java 7 this can be turned into a switch statement.
-		string = string.toLowerCase();
-		if( NONE.getName().toLowerCase().equals( string ) ) {
+		string = string.toUpperCase();
+		if( NONE.getName().equals( string ) ) {
 			return NONE;
-		} else if( ERROR.getName().toLowerCase().equals( string ) ) {
+		} else if( ERROR.getName().equals( string ) ) {
 			return ERROR;
-		} else if( WARN.getName().toLowerCase().equals( string ) ) {
+		} else if( WARN.getName().equals( string ) ) {
 			return WARN;
-		} else if( INFO.getName().toLowerCase().equals( string ) ) {
+		} else if( INFO.getName().equals( string ) ) {
 			return INFO;
-		} else if( TRACE.getName().toLowerCase().equals( string ) ) {
+		} else if( TRACE.getName().equals( string ) ) {
 			return TRACE;
-		} else if( DEBUG.getName().toLowerCase().equals( string ) ) {
+		} else if( DEBUG.getName().equals( string ) ) {
 			return DEBUG;
-		} else if( ALL.getName().toLowerCase().equals( string ) ) {
+		} else if( ALL.getName().equals( string ) ) {
 			return ALL;
 		}
 
-		return INFO;
+		return null;
 	}
 
 	public static final void writeSystemProperties() {

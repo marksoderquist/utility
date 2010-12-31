@@ -172,12 +172,12 @@ public class LogTest extends TestCase {
 	}
 
 	public void testParseLevel() {
-		assertEquals( "Incorrect log level.", Log.INFO, Log.parseLevel( null ) );
-		assertEquals( "Incorrect log level.", Log.INFO, Log.parseLevel( "" ) );
-		assertEquals( "Incorrect log level.", Log.INFO, Log.parseLevel( "junk" ) );
+		assertEquals( "Incorrect log level.", null, Log.parseLevel( null ) );
+		assertEquals( "Incorrect log level.", null, Log.parseLevel( "" ) );
+		assertEquals( "Incorrect log level.", null, Log.parseLevel( "junk" ) );
 
 		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "none" ) );
-		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "None" ) );
+		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "NonE" ) );
 		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "NONE" ) );
 
 		assertEquals( "Incorrect log level.", Log.ERROR, Log.parseLevel( "error" ) );
