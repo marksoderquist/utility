@@ -298,23 +298,4 @@ public class TextUtil {
 		return count;
 	}
 
-	public static final String indent( String text ) {
-		return indent( text, "  " );
-	}
-
-	public static final String indent( String text, String indentation ) {
-		if( text == null ) return null;
-		if( "".equals( text ) ) return indentation;
-
-		LineParser parser = new LineParser( text );
-		StringBuilder builder = new StringBuilder();
-		while( parser.next() != null ) {
-			builder.append( indentation );
-			builder.append( parser.getLine() );
-			builder.append( parser.getTerminator() );
-		}
-
-		return builder.toString();
-	}
-
 }

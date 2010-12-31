@@ -210,15 +210,4 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
 	}
 
-	@Test
-	public void testIndent() {
-		assertEquals( null, TextUtil.indent( null ) );
-		assertEquals( "  ", TextUtil.indent( "" ) );
-		assertEquals( "  a", TextUtil.indent( "a" ) );
-		assertEquals( "  \n  \n  ", TextUtil.indent( "\n\n" ) );
-		assertEquals( "  \r  \r  ", TextUtil.indent( "\r\r" ) );
-		assertEquals( "  \r\n  \r\n  ", TextUtil.indent( "\r\n\r\n" ) );
-		assertEquals( "  \n  a\n  ", TextUtil.indent( "\na\n" ) );
-	}
-
 }
