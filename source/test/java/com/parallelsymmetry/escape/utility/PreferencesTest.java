@@ -293,6 +293,7 @@ public class PreferencesTest extends TestCase {
 
 		private PreferenceChangeEvent preferenceChangedEvent;
 
+		@SuppressWarnings( "unused" )
 		public synchronized NodeChangeEvent getChildAddedEvent() {
 			try {
 				while( childAddedEvent == null ) {
@@ -304,6 +305,7 @@ public class PreferencesTest extends TestCase {
 			return childAddedEvent;
 		}
 
+		@SuppressWarnings( "unused" )
 		public synchronized NodeChangeEvent getChildRemovedEvent() {
 			try {
 				while( childRemovedEvent == null ) {

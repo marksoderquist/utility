@@ -191,6 +191,7 @@ public class AccessorTest extends TestCase {
 			return object;
 		}
 
+		@SuppressWarnings( "unused" )
 		private class InnerClass {
 
 			private Object object;
@@ -209,6 +210,7 @@ public class AccessorTest extends TestCase {
 
 		}
 
+		@SuppressWarnings( "unused" )
 		private static class NestedClass {
 
 			private Object object;

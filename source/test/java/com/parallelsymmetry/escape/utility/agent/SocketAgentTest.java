@@ -96,6 +96,7 @@ public class SocketAgentTest extends TestCase {
 			}
 		}
 
+		@SuppressWarnings( "unused" )
 		public String getMessage( int count ) {
 			while( builder.length() < count ) {
 				synchronized( builder ) {
