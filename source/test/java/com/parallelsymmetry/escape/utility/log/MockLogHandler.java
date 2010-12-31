@@ -3,11 +3,11 @@ package com.parallelsymmetry.escape.utility.log;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-public class TestLogHandler extends Handler {
+public class MockLogHandler extends Handler {
 
 	private LogRecord record;
 
-	public TestLogHandler() {
+	public MockLogHandler() {
 		setLevel( Log.ALL );
 	}
 

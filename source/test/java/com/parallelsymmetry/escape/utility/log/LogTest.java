@@ -9,14 +9,14 @@ import junit.framework.TestCase;
 
 public class LogTest extends TestCase {
 
-	private TestLogHandler handler;
+	private MockLogHandler handler;
 
 	@Override
 	public void setUp() {
 		// Must set log level because it is in an unknown state from previous tests.
 		Log.setLevel( Log.INFO );
 		Log.removeHandler( Log.DEFAULT_HANDLER );
-		handler = new TestLogHandler();
+		handler = new MockLogHandler();
 		Log.addHandler( handler );
 	}
 
