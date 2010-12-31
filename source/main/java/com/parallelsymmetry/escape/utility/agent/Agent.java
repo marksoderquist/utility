@@ -22,6 +22,12 @@ public abstract class Agent {
 
 	private Object statelock = new Object();
 
+	private Object operationLock = new Object();
+
+	private boolean startingFlag;
+
+	private boolean stoppingFlag;
+
 	protected Agent() {
 		this( null );
 	}
@@ -58,7 +64,16 @@ public abstract class Agent {
 	 * returns immediately.
 	 */
 	public final void start() {
-		if( state == State.STOPPED ) changeState( State.STARTING );
+		synchronized( operationLock ) {
+			if( state != State.STOPPED ) return;
+
+			// Set the starting flag to synchronize with external callers.
+			startingFlag = true;
+			operationLock.notifyAll();
+
+			// Change the state so the agent thread can start the agent.
+			changeState( State.STARTING );
+		}
 	}
 
 	/**
@@ -83,8 +98,10 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void startAndWait( int timeout ) throws InterruptedException {
-		start();
-		waitForStartup( timeout );
+		synchronized( operationLock ) {
+			start();
+			waitForStartup( timeout );
+		}
 	}
 
 	/**
@@ -92,7 +109,16 @@ public abstract class Agent {
 	 * immediately.
 	 */
 	public final void stop() {
-		if( state == State.STARTED ) changeState( State.STOPPING );
+		synchronized( operationLock ) {
+			if( state != State.STARTED ) return;
+
+			// Set the stopping flag to synchronize with external callers.
+			stoppingFlag = true;
+			operationLock.notifyAll();
+
+			// Change the state so the agent thread can stop the agent.
+			changeState( State.STOPPING );
+		}
 	}
 
 	/**
@@ -117,20 +143,37 @@ public abstract class Agent {
 	 * @throws Exception
 	 */
 	public final void stopAndWait( int timeout ) throws Exception {
-		stop();
-		waitForShutdown( timeout );
+		synchronized( operationLock ) {
+			stop();
+			waitForShutdown( timeout );
+		}
 	}
 
 	/**
-	 * Restart the agent. This method waits indefinitely for all operations to
-	 * complete before returning.
+	 * Restart the agent.
 	 * 
 	 * @throws IOException
 	 */
 	public final void restart() throws Exception {
-		// Don't use start() and stop() because they are asynchronous.
-		stopAndWait();
-		startAndWait();
+		restart( 0 );
+	}
+
+	/**
+	 * Restart the agent.
+	 * 
+	 * @param timeout
+	 * @throws Exception
+	 */
+	public final void restart( int timeout ) throws Exception {
+		synchronized( operationLock ) {
+			startingFlag = true;
+			stoppingFlag = true;
+			operationLock.notifyAll();
+
+			// Don't use start() and stop() because they are asynchronous.
+			stopAndWait( timeout / 2 );
+			startAndWait( timeout / 2 );
+		}
 	}
 
 	public final boolean isAgentThread() {
@@ -168,7 +211,12 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void waitForStartup( int timeout ) throws InterruptedException {
-		waitForStateChange( State.STARTING, timeout );
+		//waitForStateChange( State.STARTING, timeout );
+		synchronized( operationLock ) {
+			while( startingFlag ) {
+				operationLock.wait( timeout );
+			}
+		}
 	}
 
 	/**
@@ -189,7 +237,12 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void waitForShutdown( int timeout ) throws InterruptedException {
-		waitForStateChange( State.STOPPING, timeout );
+		//waitForStateChange( State.STOPPING, timeout );
+		synchronized( operationLock ) {
+			while( stoppingFlag ) {
+				operationLock.wait( timeout );
+			}
+		}
 	}
 
 	public final void addListener( AgentListener listener ) {
@@ -242,6 +295,11 @@ public abstract class Agent {
 		} catch( Throwable throwable ) {
 			changeState( State.STOPPED );
 			Log.write( throwable );
+		} finally {
+			synchronized( operationLock ) {
+				startingFlag = false;
+				operationLock.notifyAll();
+			}
 		}
 	}
 
@@ -256,10 +314,15 @@ public abstract class Agent {
 		} catch( Throwable throwable ) {
 			changeState( State.STARTED );
 			Log.write( throwable );
+		} finally {
+			synchronized( operationLock ) {
+				stoppingFlag = false;
+				operationLock.notifyAll();
+			}
 		}
 	}
 
-	private void changeState( State state ) {
+	private final void changeState( State state ) {
 		if( this.state == state ) return;
 
 		synchronized( statelock ) {
@@ -270,11 +333,11 @@ public abstract class Agent {
 		fireEvent( state );
 	}
 
-	private void waitForState( State state ) throws InterruptedException {
+	private final void waitForState( State state ) throws InterruptedException {
 		waitForState( state, 0 );
 	}
 
-	private void waitForState( State state, int timeout ) throws InterruptedException {
+	private final void waitForState( State state, int timeout ) throws InterruptedException {
 		synchronized( statelock ) {
 			//Log.write( Log.TRACE, "Waiting for " + state + "..." );
 			long mark = System.currentTimeMillis();
@@ -285,11 +348,11 @@ public abstract class Agent {
 		}
 	}
 
-	private void waitForStateChange( State state ) throws InterruptedException {
+	private final void waitForStateChange( State state ) throws InterruptedException {
 		waitForStateChange( state, 0 );
 	}
 
-	private void waitForStateChange( State state, int timeout ) throws InterruptedException {
+	private final void waitForStateChange( State state, int timeout ) throws InterruptedException {
 		synchronized( statelock ) {
 			//Log.write( Log.TRACE, "Waiting for " + state + " to change..." );
 			long mark = System.currentTimeMillis();

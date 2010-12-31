@@ -20,7 +20,7 @@ public abstract class AgentTestCase extends TestCase {
 
 	public void testStartAndStop() throws Exception {
 		//Log.write( "testStartAndStop()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 
 		agent.start();
 		agent.waitForStartup();
@@ -37,56 +37,56 @@ public abstract class AgentTestCase extends TestCase {
 
 	public void testDoubleStart() throws Exception {
 		//Log.write( "testDoubleStart()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.start();
 		agent.start();
 		agent.waitForStartup();
 		agent.start();
 		agent.waitForStartup();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		agent.stop();
 		agent.waitForShutdown();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 	}
 
 	public void testStartAndWait() throws Exception {
 		//Log.write( "testStartAndWait()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.startAndWait();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		agent.stopAndWait();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 	}
 
 	public void testStop() throws Exception {
 		//Log.write( "testStop()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.start();
 		agent.waitForStartup();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		agent.stop();
 		agent.waitForShutdown();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 	}
 
 	public void testDoubleStop() throws Exception {
 		//Log.write( "testDoubleStop()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.start();
 		agent.waitForStartup();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		agent.stop();
@@ -94,57 +94,57 @@ public abstract class AgentTestCase extends TestCase {
 		agent.waitForShutdown();
 		agent.stop();
 		agent.waitForShutdown();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 	}
 
 	public void testStopAndWait() throws Exception {
 		//Log.write( "testStopAndWait()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.startAndWait();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		agent.stopAndWait();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 	}
 
 	public void testRestart() throws Exception {
 		//Log.write( "testRestart()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.startAndWait();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		agent.restart();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 2, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 		agent.stopAndWait();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 2, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 2, agent.getStopAgentCount() );
 	}
 
 	public void testFastRestarts() throws Exception {
 		//Log.write( "testFastRestarts()..." );
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		agent.startAndWait();
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
 		int count = 10;
 		for( int index = 0; index < count; index++ ) {
 			agent.restart();
 		}
-		assertTrue( agent.isRunning() );
+		assertEquals( Agent.State.STARTED, agent.getState() );
 		assertEquals( "Wrong start call count.", count + 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", count, agent.getStopAgentCount() );
 		agent.stopAndWait();
-		assertFalse( agent.isRunning() );
+		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", count + 1, agent.getStartAgentCount() );
 		assertEquals( "Wrong stop call count.", count + 1, agent.getStopAgentCount() );
 	}
