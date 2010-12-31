@@ -1,12 +1,12 @@
 package com.parallelsymmetry.escape.utility.log;
 
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
 public class DefaultHandler extends StreamHandler {
 
-	public DefaultHandler( PrintStream stream ) {
+	public DefaultHandler( OutputStream stream ) {
 		super( stream, new DefaultFormatter() );
 	}
 
