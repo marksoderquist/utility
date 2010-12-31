@@ -30,6 +30,10 @@ public class LineParser {
 		return term;
 	}
 
+	public String getRemaining() {
+		return content.substring( next );
+	}
+
 	private void parseNextLine() {
 		if( next > length ) {
 			line = null;

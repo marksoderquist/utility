@@ -78,4 +78,14 @@ public class LineParserTest extends TestCase {
 		assertNull( parser.next() );
 	}
 
+	public void testGetRemaining() {
+		LineParser parser = new LineParser( "a\nb\nc" );
+		assertEquals( "a", parser.next() );
+		assertEquals( "b\nc", parser.getRemaining() );
+		assertEquals( "b", parser.next() );
+		assertEquals( "c", parser.getRemaining() );
+		assertEquals( "c", parser.next() );
+		assertNull( parser.next() );
+	}
+
 }
