@@ -3,7 +3,6 @@ package com.parallelsymmetry.escape.utility.log;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import junit.framework.TestCase;
@@ -15,10 +14,9 @@ public class LogTest extends TestCase {
 	@Override
 	public void setUp() {
 		// Must set log level because it is in an unknown state from previous tests.
-		Log.setLevel( Level.INFO );
+		Log.setLevel( Log.INFO );
 		Log.removeHandler( Log.DEFAULT_HANDLER );
 		handler = new TestLogHandler();
-		handler.setLevel( Level.ALL );
 		Log.addHandler( handler );
 	}
 
@@ -163,43 +161,6 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log level.", Log.TRACE, Log.parseLevel( "trace" ) );
 		assertEquals( "Incorrect log level.", Log.DEBUG, Log.parseLevel( "debug" ) );
 		assertEquals( "Incorrect log level.", Log.ALL, Log.parseLevel( "all" ) );
-	}
-
-	private class TestLogHandler extends Handler {
-
-		private LogRecord record;
-
-		public synchronized void reset() {
-			record = null;
-		}
-
-		public synchronized LogRecord getLogRecord() {
-			while( record == null ) {
-				try {
-					this.wait( 50 );
-					return null;
-				} catch( InterruptedException exception ) {
-					return null;
-				}
-			}
-			LogRecord record = this.record;
-			reset();
-			return record;
-		}
-
-		@Override
-		public synchronized void publish( LogRecord record ) {
-			if( record.getLevel().intValue() < getLevel().intValue() || getLevel().intValue() == Log.NONE.intValue() ) return;
-			this.record = record;
-			this.notifyAll();
-		}
-
-		@Override
-		public void flush() {}
-
-		@Override
-		public void close() throws SecurityException {}
-
 	}
 
 }
