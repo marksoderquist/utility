@@ -290,7 +290,8 @@ public class Log {
 		Logger logger = Logger.getLogger( name );
 
 		synchronized( defaultHandlers ) {
-			if( !defaultHandlers.keySet().contains( logger ) ) {
+			// Ensure a default handler exists for the logger.
+			if( defaultHandlers.get( logger ) == null ) {
 				logger.setUseParentHandlers( false );
 				logger.setLevel( ALL );
 
