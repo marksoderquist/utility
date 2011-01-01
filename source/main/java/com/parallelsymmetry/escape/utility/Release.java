@@ -17,7 +17,12 @@ public class Release {
 
 	private Date date;
 
+	public Release( Version version ) {
+		this( version, null );
+	}
+
 	public Release( Version version, Date date ) {
+		if( version == null ) throw new NullPointerException( "Version cannot be null." );
 		this.version = version;
 		this.date = date;
 	}
@@ -37,8 +42,10 @@ public class Release {
 		StringBuffer buffer = new StringBuffer();
 
 		buffer.append( version.toHumanString() );
-		buffer.append( "  " );
-		buffer.append( dateFormat.format( date ) );
+		if( date != null ) {
+			buffer.append( "  " );
+			buffer.append( dateFormat.format( date ) );
+		}
 
 		return buffer.toString();
 	}
