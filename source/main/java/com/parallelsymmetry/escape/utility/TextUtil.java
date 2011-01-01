@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class TextUtil {
 
@@ -296,6 +297,32 @@ public class TextUtil {
 		}
 
 		return count;
+	}
+
+	public static final String reline( String text, int width ) {
+		StringBuilder line = new StringBuilder();
+		StringBuilder result = new StringBuilder();
+		StringTokenizer tokenizer = new StringTokenizer( text );
+
+		while( tokenizer.hasMoreTokens() ) {
+			String token = tokenizer.nextToken();
+			int lineLength = line.length();
+			int next = lineLength + token.length() + 1;
+
+			if( next <= width ) {
+				if( lineLength > 0 ) line.append( " " );
+				line.append( token );
+			}
+
+			if( next > width || !tokenizer.hasMoreTokens() ) {
+				if( result.length() > 0 ) result.append( "\n" );
+				result.append( line.toString() );
+				line.delete( 0, line.length() );
+				line.append( token );
+			}
+		}
+
+		return result.toString();
 	}
 
 }

@@ -210,4 +210,28 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
 	}
 
+	@Test
+	public void testReline() {
+		int length = 40;
+		String sample = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+		String result = TextUtil.reline( sample, length );
+
+		System.out.println( result );
+
+		LineParser parser = new LineParser( result );
+		assertEquals( "Lorem ipsum dolor sit amet, consectetur", parser.next() );
+		assertEquals( "adipisicing elit, sed do eiusmod tempor", parser.next() );
+		assertEquals( "incididunt ut labore et dolore magna", parser.next() );
+		assertEquals( "aliqua. Ut enim ad minim veniam, quis", parser.next() );
+		assertEquals( "nostrud exercitation ullamco laboris", parser.next() );
+		assertEquals( "nisi ut aliquip ex ea commodo consequat.", parser.next() );
+		assertEquals( "Duis aute irure dolor in reprehenderit", parser.next() );
+		assertEquals( "in voluptate velit esse cillum dolore eu", parser.next() );
+		assertEquals( "fugiat nulla pariatur. Excepteur sint", parser.next() );
+		assertEquals( "occaecat cupidatat non proident, sunt in", parser.next() );
+		assertEquals( "culpa qui officia deserunt mollit anim", parser.next() );
+		assertEquals( "id est laborum.", parser.next() );
+	}
+
 }
