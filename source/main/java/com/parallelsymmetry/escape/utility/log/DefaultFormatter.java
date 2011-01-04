@@ -104,7 +104,7 @@ public class DefaultFormatter extends Formatter {
 			}
 				// INFO
 			case 8: {
-				return "\u001b[37m";
+				return "\u001b[0m";
 			}
 				// TRACE
 			case 7: {
