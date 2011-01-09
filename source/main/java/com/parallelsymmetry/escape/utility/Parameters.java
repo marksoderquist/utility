@@ -78,12 +78,12 @@ public class Parameters {
 
 	private String[] commands;
 
-	private Map<String, String> values;
+	private Map<String, String[]> values;
 
 	private List<File> files;
 
-	private Parameters( String[] commands, Map<String, String> values, List<File> files ) {
-		this.commands = commands;
+	private Parameters( String[] commands, Map<String, String[]> values, List<File> files ) {
+		this.commands = Arrays.copyOf( commands, commands.length );
 		this.values = values;
 		this.files = files;
 	}
@@ -97,7 +97,7 @@ public class Parameters {
 	}
 
 	public static final Parameters parse( String[] commands, Set<String> flags ) {
-		Map<String, String> values = new HashMap<String, String>();
+		Map<String, String[]> values = new HashMap<String, String[]>();
 		List<File> files = new ArrayList<File>();
 
 		boolean terminated = false;
@@ -109,18 +109,32 @@ public class Parameters {
 
 			if( TERMINATOR.equals( command ) ) {
 				terminated = true;
+			} else if( !terminated && command.startsWith( TERMINATOR ) ) {
+				String flag = command.substring( 2 );
+
+				if( flags != null && !flags.contains( flag ) ) throw new InvalidParameterException( "Unknown flag: " + TERMINATOR + flag );
+
+				List<String> valueList = new ArrayList<String>();
+				while( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( FLAG_PREFIX ) ) ) {
+					valueList.add( commands[index + 1] );
+					index++;
+				}
+				if( valueList.size() == 0 ) valueList.add( "true" );
+
+				values.put( flag, valueList.toArray( new String[valueList.size()] ) );
 			} else if( !terminated && command.startsWith( FLAG_PREFIX ) ) {
 				String flag = command.substring( 1 );
 
 				if( flags != null && !flags.contains( flag ) ) throw new InvalidParameterException( "Unknown flag: " + FLAG_PREFIX + flag );
 
-				String value = "true";
+				List<String> valueList = new ArrayList<String>();
 				if( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( FLAG_PREFIX ) ) ) {
-					value = commands[index + 1];
+					valueList.add( commands[index + 1] );
 					index++;
 				}
+				if( valueList.size() == 0 ) valueList.add( "true" );
 
-				values.put( flag, value );
+				values.put( flag, valueList.toArray( new String[valueList.size()] ) );
 			} else {
 				terminated = true;
 				files.add( new File( command ) );
@@ -136,7 +150,8 @@ public class Parameters {
 	}
 
 	public String get( String name ) {
-		return values.get( name );
+		String[] values = this.values.get( name );
+		return values == null ? null : values[0];
 	}
 
 	public String get( String name, String defaultValue ) {
@@ -144,8 +159,13 @@ public class Parameters {
 		return value != null ? value : defaultValue;
 	}
 
+	public String[] getValues( String name ) {
+		return values.get( name );
+	}
+
 	public boolean isSet( String name ) {
-		return values.get( name ) != null;
+		String value = get( name );
+		return !( value == null || "false".equals( value ) );
 	}
 
 	public List<File> getFiles() {

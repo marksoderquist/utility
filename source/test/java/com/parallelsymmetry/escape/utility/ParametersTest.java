@@ -238,6 +238,64 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
+	public void testGetValues() throws Exception {
+		String[] args = new String[] { "--flag", "value0", "value1", "value2" };
+		Parameters parameters = Parameters.parse( args );
+
+		assertEquals( "value0", parameters.getValues( "flag" )[0] );
+		assertEquals( "value1", parameters.getValues( "flag" )[1] );
+		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+	}
+
+	@Test
+	public void testGetValuesWithFlags() throws Exception {
+		String[] args = new String[] { "--flag", "value0", "value1", "value2", "-other" };
+		Parameters parameters = Parameters.parse( args );
+
+		assertEquals( "value0", parameters.getValues( "flag" )[0] );
+		assertEquals( "value1", parameters.getValues( "flag" )[1] );
+		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+
+		assertTrue( parameters.isSet( "other" ) );
+	}
+
+	@Test
+	public void testGetValuesWithFiles() throws Exception {
+		String[] args = new String[] { "--flag", "value0", "value1", "value2", "--", "file1.txt" };
+		Parameters parameters = Parameters.parse( args );
+
+		assertEquals( "value0", parameters.getValues( "flag" )[0] );
+		assertEquals( "value1", parameters.getValues( "flag" )[1] );
+		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+
+		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
+	}
+
+	@Test
+	public void testGetValuesWithFlagsAndFiles() throws Exception {
+		String[] args = new String[] { "--flag", "value0", "value1", "value2", "-other", "test", "file1.txt" };
+		Parameters parameters = Parameters.parse( args );
+
+		assertEquals( "value0", parameters.getValues( "flag" )[0] );
+		assertEquals( "value1", parameters.getValues( "flag" )[1] );
+		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+
+		assertTrue( parameters.isSet( "other" ) );
+
+		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
+	}
+
+	@Test
+	public void testIsSet() throws Exception {
+		String[] args = new String[] { "-flag1", "false", "-flag2", "true", "-flag3" };
+		Parameters parameters = Parameters.parse( args );
+		assertFalse( parameters.isSet( "flag0" ) );
+		assertFalse( parameters.isSet( "flag1" ) );
+		assertTrue( parameters.isSet( "flag2" ) );
+		assertTrue( parameters.isSet( "flag3" ) );
+	}
+
+	@Test
 	public void testGetCommands() throws Exception {
 		String[] args = new String[] { "-flag", "-key", "value", "file" };
 		Parameters parameters = Parameters.parse( args );
