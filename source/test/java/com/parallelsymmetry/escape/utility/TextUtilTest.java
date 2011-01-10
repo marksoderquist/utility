@@ -217,8 +217,6 @@ public class TextUtilTest extends TestCase {
 
 		String result = TextUtil.reline( sample, length );
 
-		System.out.println( result );
-
 		LineParser parser = new LineParser( result );
 		assertEquals( "Lorem ipsum dolor sit amet, consectetur", parser.next() );
 		assertEquals( "adipisicing elit, sed do eiusmod tempor", parser.next() );
