@@ -83,15 +83,19 @@ public class OperatingSystem {
 		return name;
 	}
 
-	public static final String getFamily() {
-		return family.name();
+	public static final Family getFamily() {
+		return family;
 	}
 
 	public static final String getVersion() {
 		return version;
 	}
 
-	public static final String getArchitecture() {
+	public static final Architecture getArchitecture() {
+		return architecture;
+	}
+	
+	public static final String getSystemArchitecture() {
 		return arch;
 	}
 
@@ -99,7 +103,7 @@ public class OperatingSystem {
 		return family == Family.LINUX;
 	}
 
-	public static final boolean isMacOsx() {
+	public static final boolean isMac() {
 		return family == Family.MAC;
 	}
 
