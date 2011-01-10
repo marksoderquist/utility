@@ -131,22 +131,22 @@ public class FileUtil {
 		return false;
 	}
 
-	public static final boolean deleteTree( File file ) {
+	public static final boolean delete( File file ) {
 		if( !file.exists() ) return true;
 		if( file.isDirectory() ) {
 			for( File child : file.listFiles() ) {
-				deleteTree( child );
+				delete( child );
 			}
 		}
 		return file.delete();
 	}
 
-	public static final void deleteTreeOnExit( File file ) {
+	public static final void deleteOnExit( File file ) {
 		if( !file.exists() ) return;
 		file.deleteOnExit();
 		if( file.isDirectory() ) {
 			for( File child : file.listFiles() ) {
-				deleteTreeOnExit( child );
+				deleteOnExit( child );
 			}
 		}
 	}

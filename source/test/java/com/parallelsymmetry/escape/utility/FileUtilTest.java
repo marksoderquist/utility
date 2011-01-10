@@ -19,7 +19,7 @@ public class FileUtilTest extends TestCase {
 	public void tearDown() throws Exception {
 		File tmp = new File( System.getProperty( "java.io.tmpdir" ) );
 		for( File file : tmp.listFiles( TEST_FILE_FILTER ) ) {
-			FileUtil.deleteTree( file );
+			FileUtil.delete( file );
 		}
 	}
 
@@ -157,7 +157,7 @@ public class FileUtilTest extends TestCase {
 	}
 
 	public void testDeleteTree() throws Exception {
-		assertTrue( FileUtil.deleteTree( new File( "" ) ) );
+		assertTrue( FileUtil.delete( new File( "" ) ) );
 		File file = File.createTempFile( PREFIX, "deleteTree" );
 		File temp = file.getParentFile();
 		File parent = new File( temp, "parent" );
@@ -168,7 +168,7 @@ public class FileUtilTest extends TestCase {
 		assertTrue( parent.exists() );
 		assertTrue( child.exists() );
 
-		FileUtil.deleteTree( parent );
+		FileUtil.delete( parent );
 		assertFalse( parent.exists() );
 		assertFalse( child.exists() );
 
@@ -176,7 +176,7 @@ public class FileUtilTest extends TestCase {
 	}
 
 	public void testDeleteTreeOnExit() throws Exception {
-		FileUtil.deleteTreeOnExit( new File( "" ) );
+		FileUtil.deleteOnExit( new File( "" ) );
 
 		File parent0 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent0" );
 		File parent1 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent1", parent0 );
@@ -187,7 +187,7 @@ public class FileUtilTest extends TestCase {
 		assertEquals( 3, parent0.listFiles().length );
 		assertEquals( 2, parent1.listFiles().length );
 
-		FileUtil.deleteTreeOnExit( parent0 );
+		FileUtil.deleteOnExit( parent0 );
 	}
 
 	private static final class TestFilenameFilter implements FilenameFilter {
