@@ -17,6 +17,16 @@ public class ReleaseTest extends TestCase {
 		assertNull( new Release( Version.parse( versionString ), null ).getDate() );
 		assertEquals( new Date( 0 ), new Release( Version.parse( versionString ), new Date( 0 ) ).getDate() );
 	}
+	
+	public void testGetRelease() {
+		assertEquals( "1.2.3-u-04", new Release( Version.parse( versionString ) ).getRelease() );
+		assertEquals( "1.2.3-u-04  1970-01-01 00:00:00", new Release( Version.parse( versionString ), new Date( 0 ) ).getRelease());
+	}
+
+	public void testToString() {
+		assertEquals( "1.2.3 Update 4", new Release( Version.parse( versionString ) ).toString() );
+		assertEquals( "1.2.3 Update 4  1970-01-01 00:00:00", new Release( Version.parse( versionString ), new Date( 0 ) ).toString());
+	}
 
 	public void testToHumanString() {
 		assertEquals( "1.2.3 Update 4", new Release( Version.parse( versionString ) ).toHumanString() );
