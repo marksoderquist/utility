@@ -9,7 +9,7 @@ import com.parallelsymmetry.escape.utility.log.Log;
 public class OperatingSystem {
 
 	public static enum Family {
-		UNKNOWN, LINUX, UNIX, WINDOWS, OS2, MAC, MAC_OSX
+		UNKNOWN, LINUX, UNIX, WINDOWS, OS2, MAC, MAC_OLD
 	};
 
 	public static enum Architecture {
@@ -21,6 +21,10 @@ public class OperatingSystem {
 	private static Family family;
 
 	private static String version;
+
+	private static String name;
+
+	private static String arch;
 
 	/**
 	 * Initialize the class.
@@ -38,6 +42,9 @@ public class OperatingSystem {
 	 * @param version The os version from System.getProperty( "os.version" ).
 	 */
 	private static final void init( String name, String arch, String version ) {
+		OperatingSystem.name = name;
+		OperatingSystem.arch = arch;
+
 		// Determine the OS family.
 		if( name.contains( "Linux" ) ) {
 			family = Family.LINUX;
@@ -49,9 +56,9 @@ public class OperatingSystem {
 			family = Family.UNIX;
 		} else if( name.contains( "Mac OS" ) ) {
 			if( name.contains( "Mac OS X" ) ) {
-				family = Family.MAC_OSX;
-			} else {
 				family = Family.MAC;
+			} else {
+				family = Family.MAC_OLD;
 			}
 		} else {
 			family = Family.UNKNOWN;
@@ -67,9 +74,25 @@ public class OperatingSystem {
 		} else {
 			OperatingSystem.architecture = Architecture.UNKNOWN;
 		}
-		
+
 		// Store the version.
 		OperatingSystem.version = version;
+	}
+
+	public static final String getName() {
+		return name;
+	}
+
+	public static final String getFamily() {
+		return family.name();
+	}
+
+	public static final String getVersion() {
+		return version;
+	}
+
+	public static final String getArchitecture() {
+		return arch;
 	}
 
 	public static final boolean isLinux() {
@@ -77,23 +100,11 @@ public class OperatingSystem {
 	}
 
 	public static final boolean isMacOsx() {
-		return family == Family.MAC_OSX;
+		return family == Family.MAC;
 	}
 
 	public static final boolean isWindows() {
 		return family == Family.WINDOWS;
-	}
-
-	public static final String getVersion() {
-		return version;
-	}
-
-	public static final Family getFamily() {
-		return family;
-	}
-
-	public static final Architecture getArchitecture() {
-		return architecture;
 	}
 
 	/**

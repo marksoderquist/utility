@@ -12,7 +12,8 @@ public class OperatingSystemTest extends TestCase {
 		assertFalse( OperatingSystem.isMacOsx() );
 		assertFalse( OperatingSystem.isWindows() );
 		assertEquals( "2.6.32_45", OperatingSystem.getVersion() );
-		assertEquals( OperatingSystem.Architecture.X64, OperatingSystem.getArchitecture() );
+		assertEquals( "x86_64", OperatingSystem.getArchitecture() );
+		assertEquals( "LINUX", OperatingSystem.getFamily() );
 	}
 
 	public void testMacOs() throws Exception {
@@ -21,7 +22,8 @@ public class OperatingSystemTest extends TestCase {
 		assertTrue( OperatingSystem.isMacOsx() );
 		assertFalse( OperatingSystem.isWindows() );
 		assertEquals( "10", OperatingSystem.getVersion() );
-		assertEquals( OperatingSystem.Architecture.PPC, OperatingSystem.getArchitecture() );
+		assertEquals( "ppc", OperatingSystem.getArchitecture() );
+		assertEquals( "MAC", OperatingSystem.getFamily() );
 	}
 
 	public void testWindows() throws Exception {
@@ -30,7 +32,8 @@ public class OperatingSystemTest extends TestCase {
 		assertFalse( OperatingSystem.isMacOsx() );
 		assertTrue( OperatingSystem.isWindows() );
 		assertEquals( "6.1", OperatingSystem.getVersion() );
-		assertEquals( OperatingSystem.Architecture.X86, OperatingSystem.getArchitecture() );
+		assertEquals( "x86", OperatingSystem.getArchitecture() );
+		assertEquals( "WINDOWS", OperatingSystem.getFamily() );
 	}
 
 	private void init( String name, String arch, String version ) throws Exception {
