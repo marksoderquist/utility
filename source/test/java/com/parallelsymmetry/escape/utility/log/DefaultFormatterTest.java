@@ -36,8 +36,8 @@ public class DefaultFormatterTest extends TestCase {
 		assertEquals( "\u001b[31mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.ERROR, "Test message." ) ) );
 		assertEquals( "\u001b[33mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.WARN, "Test message." ) ) );
 		assertEquals( "\u001b[0mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.INFO, "Test message." ) ) );
-		assertEquals( "\u001b[1m\u001b[30mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
-		assertEquals( "\u001b[34mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
+		assertEquals( "\u001b[34mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
+		assertEquals( "\u001b[1m\u001b[30mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
 	}
 
 	public void testGetPrefix() throws Exception {
@@ -87,15 +87,15 @@ public class DefaultFormatterTest extends TestCase {
 
 		assertEquals( "\u001b[0m", DefaultFormatter.getColorPrefix( Log.INFO ) );
 
-		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.INFO.intValue() - 1 ) ) );
-		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.TRACE.intValue() + 1 ) ) );
+		assertEquals( "\u001b[34m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.INFO.intValue() - 1 ) ) );
+		assertEquals( "\u001b[34m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.TRACE.intValue() + 1 ) ) );
 
-		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( Log.TRACE ) );
+		assertEquals( "\u001b[34m", DefaultFormatter.getColorPrefix( Log.TRACE ) );
 
-		assertEquals( "\u001b[34m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.TRACE.intValue() - 1 ) ) );
-		assertEquals( "\u001b[34m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.DEBUG.intValue() + 1 ) ) );
+		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.TRACE.intValue() - 1 ) ) );
+		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.DEBUG.intValue() + 1 ) ) );
 
-		assertEquals( "\u001b[34m", DefaultFormatter.getColorPrefix( Log.DEBUG ) );
+		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( Log.DEBUG ) );
 
 		assertEquals( "", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.DEBUG.intValue() - 1 ) ) );
 	}
