@@ -116,7 +116,9 @@ public class Parameters {
 
 				List<String> valueList = new ArrayList<String>();
 				while( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( FLAG_PREFIX ) ) ) {
-					valueList.add( commands[index + 1] );
+					String value = commands[index + 1];
+					if( value.startsWith( "\\-" ) ) value = value.substring( 1 );
+					valueList.add( value );
 					index++;
 				}
 				if( valueList.size() == 0 ) valueList.add( "true" );
