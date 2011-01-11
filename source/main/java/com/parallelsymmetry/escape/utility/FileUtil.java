@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
@@ -89,22 +89,39 @@ public class FileUtil {
 	}
 
 	public static final void save( String data, File target ) throws IOException {
-		FileWriter writer = new FileWriter( target );
-		writer.write( data );
-		writer.close();
+		save( data, target, "UTF-8" );
+	}
+
+	public static final void save( String data, File target, String encoding ) throws IOException {
+		OutputStreamWriter writer = null;
+		try {
+			writer = new OutputStreamWriter( new FileOutputStream( target ), encoding );
+			writer.write( data );
+		} finally {
+			if( writer != null ) writer.close();
+		}
 	}
 
 	public static final String load( File source ) throws IOException {
+		return load( source, "UTF-8" );
+	}
+
+	public static final String load( File source, String encoding ) throws IOException {
 		char[] buffer = new char[4096];
-		FileReader reader = new FileReader( source );
+		InputStreamReader reader = null;
 		StringWriter writer = new StringWriter();
 
-		int read = reader.read( buffer );
-		while( read > -1 ) {
-			writer.write( buffer, 0, read );
-			read = reader.read( buffer );
+		try {
+			reader = new InputStreamReader( new FileInputStream( source ), encoding );
+			int read = reader.read( buffer );
+			while( read > -1 ) {
+				writer.write( buffer, 0, read );
+				read = reader.read( buffer );
+			}
+			writer.close();
+		} finally {
+			if( reader != null ) reader.close();
 		}
-		writer.close();
 
 		return writer.toString();
 	}
@@ -150,6 +167,7 @@ public class FileUtil {
 				} else {
 					FileOutputStream output = null;
 					try {
+						file.getParentFile().mkdirs();
 						output = new FileOutputStream( file );
 						IoUtil.copy( zip, output );
 					} finally {
@@ -215,6 +233,17 @@ public class FileUtil {
 			return result;
 		}
 
+		return false;
+	}
+
+	public static final boolean move( File source, File target ) throws IOException {
+		if( source.renameTo( target ) ) {
+			return true;
+		} else {
+			if( copy( source, target ) && delete( source ) ) {
+				return true;
+			}
+		}
 		return false;
 	}
 
