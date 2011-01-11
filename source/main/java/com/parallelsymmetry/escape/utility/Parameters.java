@@ -78,11 +78,11 @@ public class Parameters {
 
 	private String[] commands;
 
-	private Map<String, String[]> values;
+	private Map<String, List<String>> values;
 
 	private List<File> files;
 
-	private Parameters( String[] commands, Map<String, String[]> values, List<File> files ) {
+	private Parameters( String[] commands, Map<String, List<String>> values, List<File> files ) {
 		this.commands = Arrays.copyOf( commands, commands.length );
 		this.values = values;
 		this.files = files;
@@ -97,7 +97,7 @@ public class Parameters {
 	}
 
 	public static final Parameters parse( String[] commands, Set<String> flags ) {
-		Map<String, String[]> values = new HashMap<String, String[]>();
+		Map<String, List<String>> values = new HashMap<String, List<String>>();
 		List<File> files = new ArrayList<File>();
 
 		boolean terminated = false;
@@ -121,7 +121,7 @@ public class Parameters {
 				}
 				if( valueList.size() == 0 ) valueList.add( "true" );
 
-				values.put( flag, valueList.toArray( new String[valueList.size()] ) );
+				values.put( flag, valueList );
 			} else if( !terminated && command.startsWith( FLAG_PREFIX ) ) {
 				String flag = command.substring( 1 );
 
@@ -134,7 +134,7 @@ public class Parameters {
 				}
 				if( valueList.size() == 0 ) valueList.add( "true" );
 
-				values.put( flag, valueList.toArray( new String[valueList.size()] ) );
+				values.put( flag, valueList );
 			} else {
 				terminated = true;
 				files.add( new File( command ) );
@@ -150,8 +150,8 @@ public class Parameters {
 	}
 
 	public String get( String name ) {
-		String[] values = this.values.get( name );
-		return values == null ? null : values[0];
+		List<String> values = this.values.get( name );
+		return values == null ? null : values.get( 0 );
 	}
 
 	public String get( String name, String defaultValue ) {
@@ -159,7 +159,7 @@ public class Parameters {
 		return value != null ? value : defaultValue;
 	}
 
-	public String[] getValues( String name ) {
+	public List<String> getValues( String name ) {
 		return values.get( name );
 	}
 

@@ -242,9 +242,9 @@ public class ParametersTest extends TestCase {
 		String[] args = new String[] { "--flag", "value0", "value1", "value2" };
 		Parameters parameters = Parameters.parse( args );
 
-		assertEquals( "value0", parameters.getValues( "flag" )[0] );
-		assertEquals( "value1", parameters.getValues( "flag" )[1] );
-		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+		assertEquals( "value0", parameters.getValues( "flag" ).get( 0 ) );
+		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
+		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 	}
 
 	@Test
@@ -252,9 +252,9 @@ public class ParametersTest extends TestCase {
 		String[] args = new String[] { "--flag", "value0", "value1", "value2", "-other" };
 		Parameters parameters = Parameters.parse( args );
 
-		assertEquals( "value0", parameters.getValues( "flag" )[0] );
-		assertEquals( "value1", parameters.getValues( "flag" )[1] );
-		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+		assertEquals( "value0", parameters.getValues( "flag" ).get( 0 ) );
+		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
+		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
 		assertTrue( parameters.isSet( "other" ) );
 	}
@@ -264,9 +264,9 @@ public class ParametersTest extends TestCase {
 		String[] args = new String[] { "--flag", "value0", "value1", "value2", "--", "file1.txt" };
 		Parameters parameters = Parameters.parse( args );
 
-		assertEquals( "value0", parameters.getValues( "flag" )[0] );
-		assertEquals( "value1", parameters.getValues( "flag" )[1] );
-		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+		assertEquals( "value0", parameters.getValues( "flag" ).get( 0 ) );
+		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
+		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
 		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
 	}
@@ -276,9 +276,9 @@ public class ParametersTest extends TestCase {
 		String[] args = new String[] { "--flag", "value0", "value1", "value2", "-other", "test", "file1.txt" };
 		Parameters parameters = Parameters.parse( args );
 
-		assertEquals( "value0", parameters.getValues( "flag" )[0] );
-		assertEquals( "value1", parameters.getValues( "flag" )[1] );
-		assertEquals( "value2", parameters.getValues( "flag" )[2] );
+		assertEquals( "value0", parameters.getValues( "flag" ).get(0) );
+		assertEquals( "value1", parameters.getValues( "flag" ).get(1) );
+		assertEquals( "value2", parameters.getValues( "flag" ).get(2) );
 
 		assertTrue( parameters.isSet( "other" ) );
 
