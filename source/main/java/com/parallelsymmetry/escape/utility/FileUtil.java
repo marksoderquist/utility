@@ -8,6 +8,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class FileUtil {
 
@@ -101,6 +107,75 @@ public class FileUtil {
 		writer.close();
 
 		return writer.toString();
+	}
+
+	public static final void zip( File source, File target ) throws IOException {
+		URI base = source.toURI();
+		List<File> files = listFiles( source );
+
+		ZipOutputStream zip = null;
+		try {
+			zip = new ZipOutputStream( new FileOutputStream( target ) );
+
+			for( File file : files ) {
+				zip.putNextEntry( new ZipEntry( base.relativize( file.toURI() ).toString() ) );
+				if( !file.isDirectory() ) {
+					FileInputStream input = null;
+					try {
+						input = new FileInputStream( file );
+						IoUtil.copy( new FileInputStream( file ), zip );
+					} finally {
+						if( input != null ) input.close();
+					}
+				}
+				zip.closeEntry();
+			}
+		} finally {
+			if( zip != null ) zip.close();
+		}
+	}
+
+	public static final void unzip( File source, File target ) throws IOException {
+		target.mkdirs();
+
+		ZipEntry entry = null;
+		ZipInputStream zip = null;
+		try {
+			zip = new ZipInputStream( new FileInputStream( source ) );
+			while( ( entry = zip.getNextEntry() ) != null ) {
+				String path = entry.getName();
+				File file = new File( target, path );
+				if( path.endsWith( "/" ) ) {
+					file.mkdirs();
+				} else {
+					FileOutputStream output = null;
+					try {
+						output = new FileOutputStream( file );
+						IoUtil.copy( zip, output );
+					} finally {
+						if( output != null ) output.close();
+					}
+				}
+			}
+		} finally {
+			if( zip != null ) zip.close();
+		}
+	}
+
+	public static final List<File> listFiles( File file ) {
+		List<File> files = new ArrayList<File>();
+
+		File[] fileArray = file.listFiles();
+		for( File temp : fileArray ) {
+			if( temp.isDirectory() ) {
+				files.add( temp );
+				files.addAll( listFiles( temp ) );
+			} else {
+				files.add( temp );
+			}
+		}
+
+		return files;
 	}
 
 	public static final boolean copy( File source, File target ) throws IOException {

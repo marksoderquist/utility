@@ -6,6 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import junit.framework.TestCase;
 
@@ -69,6 +75,49 @@ public class FileUtilTest extends TestCase {
 		File file = File.createTempFile( "FileUtil", "Test" );
 		FileUtil.save( file.toString(), file );
 		assertEquals( file.toString(), FileUtil.load( file ) );
+	}
+
+	public void testZipAndUnzip() throws Exception {
+		File sourceData = new File( "source/test/java" );
+		File zip = new File( "target/test.source.zip" );
+		File targetData = new File( "target/test/data" );
+
+		// Make a list of relativized paths.
+		URI base = sourceData.toURI();
+		List<File> sourceFiles = FileUtil.listFiles( sourceData );
+		List<String> paths = new ArrayList<String>( sourceFiles.size() );
+		for( File file : sourceFiles ) {
+			paths.add( base.relativize( file.toURI() ).toString() );
+		}
+
+		// Initialize for zip tests.
+		zip.delete();
+		assertFalse( zip.exists() );
+
+		// Zip the data.
+		FileUtil.zip( sourceData, zip );
+		assertTrue( zip.exists() );
+
+		// Check that all paths are in the zip file.
+		ZipFile zipFile = new ZipFile( zip );
+		for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
+			String zipEntryName = entries.nextElement().getName();
+			assertTrue( paths.contains( zipEntryName ) );
+		}
+
+		// Initialize for unzip tests.
+		FileUtil.delete( targetData );
+		assertFalse( targetData.exists() );
+		targetData.mkdirs();
+		assertTrue( targetData.exists() );
+
+		// Unzip the data.
+		FileUtil.unzip( zip, targetData );
+
+		// Check that all the files are in the target.
+		for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
+			assertTrue( new File( targetData, entries.nextElement().getName() ).exists() );
+		}
 	}
 
 	public void testCopyWithNonExistantFiles() throws Exception {
