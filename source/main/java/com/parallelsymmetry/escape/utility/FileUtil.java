@@ -37,6 +37,18 @@ public class FileUtil {
 		return name.substring( index + 1 );
 	}
 
+	public static final File removeExtension( File file ) {
+		if( file == null ) return null;
+		return new File( removeExtension( file.toString() ) );
+	}
+
+	public static final String removeExtension( String name ) {
+		if( name == null ) return null;
+		int index = name.lastIndexOf( '.' );
+		if( index < 0 ) return name;
+		return name.substring( 0, index );
+	}
+
 	/**
 	 * Create a temporary folder. If there is a problem creating the folder this
 	 * method will return null.
@@ -111,7 +123,7 @@ public class FileUtil {
 		if( source.isFile() && target.isDirectory() ) {
 			File newTarget = new File( target, source.getName() );
 			newTarget.createNewFile();
-			return copy( source, newTarget );
+			return copy( source, newTarget, false );
 		}
 
 		// Copy folder sources to folder targets.

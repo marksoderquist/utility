@@ -43,6 +43,18 @@ public class FileUtilTest extends TestCase {
 		assertEquals( "Incorrect extension.", "txt", FileUtil.getExtension( "test.txt" ) );
 	}
 
+	public void testRemoveExtensionWithFile() throws Exception {
+		assertEquals( "Incorrect file name.", null, FileUtil.removeExtension( (File)null ) );
+		assertEquals( "Incorrect file name.", new File( "test" ), FileUtil.removeExtension( new File( "test" ) ) );
+		assertEquals( "Incorrect file name.", new File( "test" ), FileUtil.removeExtension( new File( "test.txt" ) ) );
+	}
+
+	public void testRemoveExtensionWithName() throws Exception {
+		assertEquals( "Incorrect file name.", null, FileUtil.removeExtension( (String)null ) );
+		assertEquals( "Incorrect file name.", "test", FileUtil.removeExtension( "test" ) );
+		assertEquals( "Incorrect file name.", "test", FileUtil.removeExtension( "test.txt" ) );
+	}
+
 	public void testCreateTempFolder() throws Exception {
 		File folder = FileUtil.createTempFolder( PREFIX, "createTempFolder" );
 		assertTrue( folder.exists() );
