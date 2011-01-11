@@ -108,11 +108,11 @@ public class DefaultFormatter extends Formatter {
 			}
 				// TRACE
 			case 7: {
-				return "\u001b[1m\u001b[30m";
+				return "\u001b[34m";
 			}
 				// DEBUG
 			case 6: {
-				return "\u001b[34m";
+				return "\u001b[1m\u001b[30m";
 			}
 		}
 
