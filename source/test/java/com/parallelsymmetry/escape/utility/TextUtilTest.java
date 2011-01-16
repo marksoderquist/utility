@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -60,6 +61,18 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Count: 10", TextUtil.concatenate( "Count: ", 10 ) );
 		assertEquals( "Flag: false", TextUtil.concatenate( "Flag: ", false ) );
 		assertEquals( "Test String", TextUtil.concatenate( "Test", " ", "String" ) );
+	}
+
+	@Test
+	public void testGetMD5Sum() {
+		assertEquals( null, TextUtil.getMD5Sum( null ) );
+		assertEquals( "d41d8cd98f00b204e9800998ecf8427e", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( "" ) ) );
+		assertEquals( "7215ee9c7d9dc229d2921a40e899ec5f", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( " " ) ) );
+		assertEquals( "ae2b1fca515949e5d54fb22b8ed95575", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( "testing" ) ) );
+
+		char[] data = new char[8192];
+		Arrays.fill( data, 't' );
+		assertEquals( "aea6ce04bb28d644a8d4e0bc6a319b54", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( new String( data ) ) ) );
 	}
 
 	@Test

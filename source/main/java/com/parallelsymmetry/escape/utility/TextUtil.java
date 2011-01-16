@@ -1,17 +1,25 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-public class TextUtil {
+public final class TextUtil {
 
-	public static final int LEFT = 1;
+	public static final int LEFT = -1;
 
-	public static final int CENTER = 2;
+	public static final int CENTER = 0;
 
-	public static final int RIGHT = 3;
+	public static final int RIGHT = 1;
 
-	private static final char SPACE = ' ';
+	public static final String DEFAULT_ENCODING = "UTF-8";
+
+	private static final char DEFAULT_PAD_CHAR = ' ';
 
 	public static final boolean isEmpty( String string ) {
 		if( string == null ) return true;
@@ -54,6 +62,38 @@ public class TextUtil {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Return the string representation of the MD5 sum of the specified string.
+	 * This method is implemented using NIO buffers so it should be efficient for
+	 * large strings without causing memory or CPU issues.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static byte[] getMD5Sum( String string ) {
+		if( string == null ) return null;
+
+		int width = 512;
+		try {
+			byte[] buffer = new byte[width];
+			MessageDigest digest = MessageDigest.getInstance( "MD5" );
+			CharBuffer chars = CharBuffer.wrap( string );
+			ByteBuffer bytes = ByteBuffer.allocateDirect( width );
+
+			CharsetEncoder encoder = Charset.forName( DEFAULT_ENCODING ).newEncoder();
+			while( chars.hasRemaining() ) {
+				encoder.encode( chars, bytes, false );
+				bytes.flip();
+				bytes.get( buffer, 0, bytes.limit() );
+				digest.update( buffer, 0, bytes.limit() );
+				bytes.flip();
+			}
+			return digest.digest();
+		} catch( NoSuchAlgorithmException exception ) {
+			return null;
+		}
 	}
 
 	/**
@@ -178,7 +218,7 @@ public class TextUtil {
 	}
 
 	public static final String justify( int alignment, String text, int width ) {
-		return justify( alignment, text, width, SPACE );
+		return justify( alignment, text, width, DEFAULT_PAD_CHAR );
 	}
 
 	public static final String justify( int alignment, String text, int width, char chr ) {
@@ -197,7 +237,7 @@ public class TextUtil {
 	}
 
 	public static final String pad( int width ) {
-		return pad( width, SPACE );
+		return pad( width, DEFAULT_PAD_CHAR );
 	}
 
 	public static final String pad( int width, char chr ) {
@@ -208,7 +248,7 @@ public class TextUtil {
 	}
 
 	public static final String leftJustify( String text, int width ) {
-		return leftJustify( text, width, SPACE );
+		return leftJustify( text, width, DEFAULT_PAD_CHAR );
 	}
 
 	public static final String leftJustify( String text, int width, char chr ) {
@@ -232,7 +272,7 @@ public class TextUtil {
 	}
 
 	public static final String centerJustify( String text, int width ) {
-		return centerJustify( text, width, SPACE );
+		return centerJustify( text, width, DEFAULT_PAD_CHAR );
 	}
 
 	public static final String centerJustify( String text, int width, char chr ) {
@@ -264,7 +304,7 @@ public class TextUtil {
 	}
 
 	public static final String rightJustify( String text, int width ) {
-		return rightJustify( text, width, SPACE );
+		return rightJustify( text, width, DEFAULT_PAD_CHAR );
 	}
 
 	public static final String rightJustify( String text, int width, char chr ) {
