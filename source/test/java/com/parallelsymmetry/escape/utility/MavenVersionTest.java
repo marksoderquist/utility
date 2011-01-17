@@ -10,6 +10,14 @@ public class MavenVersionTest extends TestCase {
 
 	private static final String[] VERSIONS_NUMBER = { "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1", "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m" };
 
+	public void testVersionsQualifier() {
+		checkVersionsOrder( VERSIONS_QUALIFIER );
+	}
+
+	public void testVersionsNumber() {
+		checkVersionsOrder( VERSIONS_NUMBER );
+	}
+
 	public void testIsSnapshot() {
 		assertEquals( true, new MavenVersion( "1-alpha2snapshot" ).isSnapshot() );
 		assertEquals( false, new MavenVersion( "1-alpha2" ).isSnapshot() );
@@ -33,14 +41,6 @@ public class MavenVersionTest extends TestCase {
 		assertEquals( false, new MavenVersion( "1-1" ).isSnapshot() );
 		assertEquals( false, new MavenVersion( "1-2" ).isSnapshot() );
 		assertEquals( false, new MavenVersion( "1-123" ).isSnapshot() );
-	}
-
-	public void testVersionsQualifier() {
-		checkVersionsOrder( VERSIONS_QUALIFIER );
-	}
-
-	public void testVersionsNumber() {
-		checkVersionsOrder( VERSIONS_NUMBER );
 	}
 
 	public void testVersionsEqual() {
