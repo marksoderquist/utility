@@ -13,11 +13,15 @@ import java.util.Stack;
 
 public class MavenVersion implements Comparable<MavenVersion> {
 
+	private static final String SNAPSHOT = "snapshot";
+
 	private String version;
 
 	private String canonical;
 
 	private ListItem items;
+
+	private boolean snapshot;
 
 	public MavenVersion( String version ) {
 		parseVersion( version );
@@ -94,6 +98,10 @@ public class MavenVersion implements Comparable<MavenVersion> {
 		canonical = items.toString();
 	}
 
+	public final boolean isSnapshot() {
+		return snapshot;
+	}
+
 	public int compareTo( MavenVersion version ) {
 		return items.compareTo( version.items );
 	}
@@ -110,11 +118,12 @@ public class MavenVersion implements Comparable<MavenVersion> {
 		return canonical.hashCode();
 	}
 
-	private static Item parseItem( boolean isDigit, String buffer ) {
+	private Item parseItem( boolean isDigit, String buffer ) {
+		if( SNAPSHOT.equals( buffer ) ) snapshot = true;
 		return isDigit ? new IntegerItem( buffer ) : new StringItem( buffer, false );
 	}
 
-	private interface Item {
+	private static interface Item {
 		final int INTEGER_ITEM = 0;
 
 		final int STRING_ITEM = 1;
@@ -189,7 +198,7 @@ public class MavenVersion implements Comparable<MavenVersion> {
 	 */
 	private static class StringItem implements Item {
 
-		private static final List<String> QUALIFIERS = Arrays.asList( new String[] { "alpha", "beta", "milestone", "rc", "snapshot", "", "sp" } );
+		private static final List<String> QUALIFIERS = Arrays.asList( new String[] { "alpha", "beta", "milestone", "rc", SNAPSHOT, "", "sp" } );
 
 		private static final Map<String, String> ALIASES = new HashMap<String, String>();
 
