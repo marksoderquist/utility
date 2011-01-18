@@ -111,16 +111,16 @@ public class MavenVersion implements Comparable<MavenVersion> {
 	}
 
 	public String debug() {
-		return debug( 0 );
+		return debug( items, 0 );
 	}
 
-	private String debug( int level ) {
+	private String debug( ListItem items, int level ) {
 		StringBuilder builder = new StringBuilder();
 
 		for( Item item : items ) {
 			if( item instanceof ListItem ) {
 				builder.append( "\n" );
-				builder.append( Indenter.indent( debug( level + 1 ) ) );
+				builder.append( Indenter.indent( debug( (ListItem)item, level + 1 ), 1, "  " ) );
 			} else {
 				builder.append( ( item instanceof StringItem ) ? "S:" : "I:" );
 				builder.append( item.toString() );
