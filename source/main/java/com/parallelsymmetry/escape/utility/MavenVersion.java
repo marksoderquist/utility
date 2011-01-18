@@ -110,6 +110,27 @@ public class MavenVersion implements Comparable<MavenVersion> {
 		return version;
 	}
 
+	public String debug() {
+		return debug( 0 );
+	}
+
+	private String debug( int level ) {
+		StringBuilder builder = new StringBuilder();
+
+		for( Item item : items ) {
+			if( item instanceof ListItem ) {
+				builder.append( "\n" );
+				builder.append( Indenter.indent( debug( level + 1 ) ) );
+			} else {
+				builder.append( ( item instanceof StringItem ) ? "S:" : "I:" );
+				builder.append( item.toString() );
+				builder.append( " " );
+			}
+		}
+
+		return builder.toString();
+	}
+
 	public boolean equals( Object object ) {
 		return ( object instanceof MavenVersion ) && canonical.equals( ( (MavenVersion)object ).canonical );
 	}
