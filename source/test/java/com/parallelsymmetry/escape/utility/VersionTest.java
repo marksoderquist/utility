@@ -219,17 +219,21 @@ public class VersionTest extends TestCase {
 		assertEquals( "Compare snapshot versions", -1, Version.compareVersions( snapshot, version ) );
 	}
 
-	public void testConstructorWithNull() {
-		assertEquals( "unknown", new Version( null ).toString() );
-		assertEquals( "UNKNOWN", new Version( null ).toHumanString() );
-	}
-
 	public void testToString() {
+		assertEquals( "unknown", new Version( null ).toString() );
+
 		assertEquals( "3.4.5-a-06", alpha.toString() );
 		assertEquals( "3.4.5-b-06", beta.toString() );
 		assertEquals( "3.4.5-u-00", release.toString() );
 		assertEquals( "3.4.5-u-06", update.toString() );
 		assertEquals( "3.4.5-SNAPSHOT", snapshot.toString() );
+
+		for( String string : VERSIONS_NUMBER ) {
+			assertEquals( string, new Version( string ).toString() );
+		}
+		for( String string : VERSIONS_QUALIFIER ) {
+			assertEquals( string, new Version( string ).toString() );
+		}
 	}
 
 	public void testToHumanString() {
@@ -256,13 +260,13 @@ public class VersionTest extends TestCase {
 		assertEquals( "1-2", new Version( "1-2" ).toHumanString() );
 		assertEquals( "1-123", new Version( "1-123" ).toHumanString() );
 
-		assertEquals( "2", new Version( "2.0" ).toHumanString() );
+		assertEquals( "2.0", new Version( "2.0" ).toHumanString() );
 		assertEquals( "2-1", new Version( "2-1" ).toHumanString() );
 		assertEquals( "2.0 Alpha", new Version( "2.0.a" ).toHumanString() );
 		assertEquals( "2.0.0 Alpha", new Version( "2.0.0.a" ).toHumanString() );
 		assertEquals( "2.0.2", new Version( "2.0.2" ).toHumanString() );
 		assertEquals( "2.0.123", new Version( "2.0.123" ).toHumanString() );
-		assertEquals( "2.1", new Version( "2.1.0" ).toHumanString() );
+		assertEquals( "2.1.0", new Version( "2.1.0" ).toHumanString() );
 		assertEquals( "2.1 Alpha", new Version( "2.1-a" ).toHumanString() );
 		assertEquals( "2.1 Beta", new Version( "2.1b" ).toHumanString() );
 		assertEquals( "2.1 c", new Version( "2.1-c" ).toHumanString() );
@@ -284,7 +288,7 @@ public class VersionTest extends TestCase {
 
 		assertEquals( "3.4.5 Alpha 6", alpha.toHumanString() );
 		assertEquals( "3.4.5 Beta 6", beta.toHumanString() );
-		assertEquals( "3.4.5 Update", release.toHumanString() );
+		assertEquals( "3.4.5 Update 0", release.toHumanString() );
 		assertEquals( "3.4.5 Update 6", update.toHumanString() );
 		assertEquals( "3.4.5 SNAPSHOT", snapshot.toHumanString() );
 	}

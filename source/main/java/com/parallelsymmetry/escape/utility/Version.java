@@ -34,6 +34,8 @@ public class Version implements Comparable<Version> {
 
 	private ListItem items;
 
+	private List<String> pieces;
+
 	static {
 		expansions.put( "a", "Alpha" );
 		expansions.put( "alpha", "Alpha" );
@@ -69,7 +71,13 @@ public class Version implements Comparable<Version> {
 	}
 
 	public String toHumanString() {
-		return expand( items );
+		StringBuilder builder = new StringBuilder();
+
+		for( String part : pieces ) {
+			builder.append( part );
+		}
+
+		return builder.toString();
 	}
 
 	public int compareTo( Version version ) {
@@ -79,7 +87,13 @@ public class Version implements Comparable<Version> {
 	}
 
 	public String toString() {
-		return version;
+		StringBuilder builder = new StringBuilder();
+
+		for( String part : pieces ) {
+			builder.append( part );
+		}
+
+		return builder.toString();
 	}
 
 	public boolean equals( Object object ) {
@@ -102,7 +116,9 @@ public class Version implements Comparable<Version> {
 		this.version = string;
 
 		items = new ListItem();
+		pieces = new ArrayList<String>();
 
+		String original = string;
 		string = string.toLowerCase( Locale.ENGLISH );
 
 		ListItem list = items;
@@ -120,15 +136,20 @@ public class Version implements Comparable<Version> {
 			if( c == '.' ) {
 				if( index == startIndex ) {
 					list.add( IntegerItem.ZERO );
+					pieces.add( "0" );
 				} else {
 					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
+					pieces.add( original.substring( startIndex, index ) );
 				}
 				startIndex = index + 1;
+				pieces.add( "." );
 			} else if( c == '-' ) {
 				if( index == startIndex ) {
 					list.add( IntegerItem.ZERO );
+					pieces.add( "0" );
 				} else {
 					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
+					pieces.add( original.substring( startIndex, index ) );
 				}
 				startIndex = index + 1;
 
@@ -140,9 +161,11 @@ public class Version implements Comparable<Version> {
 						stack.push( list );
 					}
 				}
+				pieces.add( "-" );
 			} else if( Character.isDigit( c ) ) {
 				if( !isDigit && index > startIndex ) {
 					list.add( new StringItem( string.substring( startIndex, index ), true ) );
+					pieces.add( original.substring( startIndex, index ) );
 					startIndex = index;
 				}
 
@@ -150,6 +173,7 @@ public class Version implements Comparable<Version> {
 			} else {
 				if( isDigit && index > startIndex ) {
 					list.add( parse( true, string.substring( startIndex, index ) ) );
+					pieces.add( original.substring( startIndex, index ) );
 					startIndex = index;
 				}
 
@@ -159,6 +183,7 @@ public class Version implements Comparable<Version> {
 
 		if( string.length() > startIndex ) {
 			list.add( parse( isDigit, string.substring( startIndex ) ) );
+			pieces.add( original.substring( startIndex ) );
 		}
 
 		while( !stack.isEmpty() ) {
@@ -240,9 +265,9 @@ public class Version implements Comparable<Version> {
 
 		private static final BigInteger BigInteger_ZERO = new BigInteger( "0" );
 
-		private final BigInteger value;
-
 		public static final IntegerItem ZERO = new IntegerItem();
+
+		private final BigInteger value;
 
 		private IntegerItem() {
 			this.value = BigInteger_ZERO;
