@@ -217,6 +217,13 @@ public final class TextUtil {
 		return true;
 	}
 
+	public static final String capitalize( String string ) {
+		if( string == null ) return null;
+		char[] chars = string.toCharArray();
+		if( chars.length > 0 ) chars[0] = Character.toUpperCase( chars[0] );
+		return new String( chars );
+	}
+
 	public static final String justify( int alignment, String text, int width ) {
 		return justify( alignment, text, width, DEFAULT_PAD_CHAR );
 	}

@@ -26,7 +26,7 @@ public class Release {
 		this.version = version;
 		this.date = date;
 	}
-	
+
 	public Version getVersion() {
 		return version;
 	}
@@ -34,19 +34,15 @@ public class Release {
 	public Date getDate() {
 		return date;
 	}
-	
-	public String getRelease() {
-		return format( version.getVersion());
-	}
 
 	public String toString() {
-		return format( version.toString());
+		return format( version.toString() );
 	}
 
 	public String toHumanString() {
-		return format( version.toHumanString());
+		return format( version.toHumanString() );
 	}
-	
+
 	private String format( String version ) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
 		dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
