@@ -17,6 +17,8 @@ public class Version implements Comparable<Version> {
 	private static final String UNKNOWN = "unknown";
 
 	private static final String SNAPSHOT = "snapshot";
+	
+	private static final String MILESTONE = "milestone";
 
 	private static final String ALPHA = "alpha";
 
@@ -27,6 +29,8 @@ public class Version implements Comparable<Version> {
 	private static final String UPDATE = "update";
 
 	private static final Map<String, String> expansions = new ConcurrentHashMap<String, String>();
+	
+	private String human;
 
 	private String version;
 
@@ -38,15 +42,15 @@ public class Version implements Comparable<Version> {
 
 	static {
 		expansions.put( "a", "Alpha" );
-		expansions.put( "alpha", "Alpha" );
+		expansions.put( ALPHA, "Alpha" );
 		expansions.put( "b", "Beta" );
-		expansions.put( "beta", "Beta" );
+		expansions.put( BETA, "Beta" );
 		expansions.put( "m", "Milestone" );
-		expansions.put( "milestone", "Milestone" );
+		expansions.put( MILESTONE, "Milestone" );
 		expansions.put( "p", "Patch" );
-		expansions.put( "patch", "Patch" );
+		expansions.put( PATCH, "Patch" );
 		expansions.put( "u", "Update" );
-		expansions.put( "update", "Update" );
+		expansions.put( UPDATE, "Update" );
 		expansions.put( "cr", "Release Candidate" );
 		expansions.put( "rc", "Release Candidate" );
 		expansions.put( "ga", "" );
@@ -72,6 +76,141 @@ public class Version implements Comparable<Version> {
 	}
 
 	public String toHumanString() {
+		return this.human;
+	}
+
+	public int compareTo( Version version ) {
+		int result = items.compareTo( version.items );
+		if( result == 0 ) return 0;
+		return result < 0 ? -1 : 1;
+	}
+
+	public String toString() {
+		return version;
+	}
+
+	public boolean equals( Object object ) {
+		return ( object instanceof Version ) && canonical.equals( ( (Version)object ).canonical );
+	}
+
+	public int hashCode() {
+		return canonical.hashCode();
+	}
+
+	public static final int compareVersions( String version1, String version2 ) {
+		return new Version( version1 ).compareTo( new Version( version2 ) );
+	}
+
+	public static final int compareVersions( Version version1, Version version2 ) {
+		return version1.compareTo( version2 );
+	}
+
+	private void parse( String version ) {
+		items = new ListItem();
+		parts = new ArrayList<Part>();
+
+		ListItem list = items;
+		Stack<Item> stack = new Stack<Item>();
+		String string = version.toLowerCase( Locale.ENGLISH );
+
+		int startIndex = 0;
+		boolean isDigit = false;
+		stack.push( list );
+
+		for( int index = 0; index < string.length(); index++ ) {
+			char c = string.charAt( index );
+
+			if( c == '.' ) {
+				if( index == startIndex ) {
+					list.add( IntegerItem.ZERO );
+					parts.add( new NumberPart( "0" ) );
+				} else {
+					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
+					parts.add( parsePart( isDigit, version.substring( startIndex, index ) ) );
+				}
+				startIndex = index + 1;
+				parts.add( new DividePart( "." ) );
+			} else if( c == '-' ) {
+				if( index == startIndex ) {
+					list.add( IntegerItem.ZERO );
+					parts.add( new NumberPart( "0" ) );
+				} else {
+					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
+					parts.add( parsePart( isDigit, version.substring( startIndex, index ) ) );
+				}
+				startIndex = index + 1;
+
+				if( isDigit ) {
+					list.normalize();
+
+					if( ( index + 1 < string.length() ) && Character.isDigit( string.charAt( index + 1 ) ) ) {
+						list.add( list = new ListItem() );
+						stack.push( list );
+					}
+				}
+				parts.add( new DividePart( "-" ) );
+			} else if( Character.isDigit( c ) ) {
+				if( !isDigit && index > startIndex ) {
+					list.add( new StringItem( string.substring( startIndex, index ), true ) );
+					parts.add( new StringPart( version.substring( startIndex, index ) ) );
+					startIndex = index;
+				}
+
+				isDigit = true;
+			} else {
+				if( isDigit && index > startIndex ) {
+					list.add( parse( true, string.substring( startIndex, index ) ) );
+					parts.add( parsePart( true, version.substring( startIndex, index ) ) );
+					startIndex = index;
+				}
+
+				isDigit = false;
+			}
+		}
+
+		if( string.length() > startIndex ) {
+			list.add( parse( isDigit, string.substring( startIndex ) ) );
+			parts.add( parsePart( isDigit, version.substring( startIndex ) ) );
+		}
+
+		while( !stack.isEmpty() ) {
+			list = (ListItem)stack.pop();
+			list.normalize();
+		}
+
+		this.version = version;
+		this.canonical = items.toString();
+		this.human = generateHumanString();
+	}
+
+	private Item parse( boolean digit, String buffer ) {
+		return digit ? new IntegerItem( buffer ) : new StringItem( buffer, false );
+	}
+
+	private Part parsePart( boolean digit, String buffer ) {
+		return digit ? new NumberPart( buffer ) : new StringPart( buffer );
+	}
+
+	private boolean checkForString( ListItem list, String string ) {
+		boolean result = false;
+
+		for( Item item : list ) {
+			if( item instanceof ListItem ) {
+				if( checkForString( (ListItem)item, string ) ) result = true;
+			} else if( item instanceof StringItem ) {
+				if( string.equals( expand( item.toString() ).toLowerCase() ) ) result = true;
+			}
+		}
+
+		return result;
+	}
+
+	private String expand( String text ) {
+		String result = expansions.get( text );
+		return result == null ? text : result;
+	}
+
+	public String generateHumanString() {
 		StringBuilder builder = new StringBuilder();
 
 		Part prefix = null;
@@ -95,174 +234,6 @@ public class Version implements Comparable<Version> {
 		}
 
 		return builder.toString();
-	}
-
-	public int compareTo( Version version ) {
-		int result = items.compareTo( version.items );
-		if( result == 0 ) return 0;
-		return result < 0 ? -1 : 1;
-	}
-
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-
-		for( Part part : parts ) {
-			builder.append( part );
-		}
-
-		return builder.toString();
-	}
-
-	public boolean equals( Object object ) {
-		return ( object instanceof Version ) && canonical.equals( ( (Version)object ).canonical );
-	}
-
-	public int hashCode() {
-		return canonical.hashCode();
-	}
-
-	public static final int compareVersions( String version1, String version2 ) {
-		return new Version( version1 ).compareTo( new Version( version2 ) );
-	}
-
-	public static final int compareVersions( Version version1, Version version2 ) {
-		return version1.compareTo( version2 );
-	}
-
-	private void parse( String string ) {
-		this.version = string;
-
-		items = new ListItem();
-		parts = new ArrayList<Part>();
-
-		String original = string;
-		string = string.toLowerCase( Locale.ENGLISH );
-
-		ListItem list = items;
-
-		Stack<Item> stack = new Stack<Item>();
-		stack.push( list );
-
-		boolean isDigit = false;
-
-		int startIndex = 0;
-
-		for( int index = 0; index < string.length(); index++ ) {
-			char c = string.charAt( index );
-
-			if( c == '.' ) {
-				if( index == startIndex ) {
-					list.add( IntegerItem.ZERO );
-					parts.add( new NumberPart( "0" ) );
-				} else {
-					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
-					parts.add( parsePart( isDigit, original.substring( startIndex, index ) ) );
-				}
-				startIndex = index + 1;
-				parts.add( new DividePart( "." ) );
-			} else if( c == '-' ) {
-				if( index == startIndex ) {
-					list.add( IntegerItem.ZERO );
-					parts.add( new NumberPart( "0" ) );
-				} else {
-					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
-					parts.add( parsePart( isDigit, original.substring( startIndex, index ) ) );
-				}
-				startIndex = index + 1;
-
-				if( isDigit ) {
-					list.normalize();
-
-					if( ( index + 1 < string.length() ) && Character.isDigit( string.charAt( index + 1 ) ) ) {
-						list.add( list = new ListItem() );
-						stack.push( list );
-					}
-				}
-				parts.add( new DividePart( "-" ) );
-			} else if( Character.isDigit( c ) ) {
-				if( !isDigit && index > startIndex ) {
-					list.add( new StringItem( string.substring( startIndex, index ), true ) );
-					parts.add( new StringPart( original.substring( startIndex, index ) ) );
-					startIndex = index;
-				}
-
-				isDigit = true;
-			} else {
-				if( isDigit && index > startIndex ) {
-					list.add( parse( true, string.substring( startIndex, index ) ) );
-					parts.add( parsePart( true, original.substring( startIndex, index ) ) );
-					startIndex = index;
-				}
-
-				isDigit = false;
-			}
-		}
-
-		if( string.length() > startIndex ) {
-			list.add( parse( isDigit, string.substring( startIndex ) ) );
-			parts.add( parsePart( isDigit, original.substring( startIndex ) ) );
-		}
-
-		while( !stack.isEmpty() ) {
-			list = (ListItem)stack.pop();
-			list.normalize();
-		}
-
-		canonical = items.toString();
-	}
-
-	private Item parse( boolean digit, String buffer ) {
-		return digit ? new IntegerItem( buffer ) : new StringItem( buffer, false );
-	}
-
-	private Part parsePart( boolean digit, String buffer ) {
-		return digit ? new NumberPart( buffer ) : new StringPart( buffer );
-	}
-
-	private String expand( ListItem list ) {
-		StringBuilder builder = new StringBuilder();
-
-		Item previous = null;
-		for( Item item : list ) {
-			if( item instanceof ListItem ) {
-				builder.append( "-" );
-				builder.append( expand( (ListItem)item ) );
-			} else if( item instanceof IntegerItem ) {
-				if( builder.length() > 0 ) {
-					if( previous instanceof IntegerItem ) {
-						builder.append( "." );
-					} else {
-						builder.append( " " );
-					}
-				}
-				builder.append( item.toString() );
-			} else {
-				if( builder.length() > 0 ) builder.append( " " );
-				builder.append( expand( item.toString() ) );
-			}
-			previous = item;
-		}
-
-		return builder.toString();
-	}
-
-	private String expand( String text ) {
-		String result = expansions.get( text );
-		return result == null ? text : result;
-	}
-
-	private boolean checkForString( ListItem list, String string ) {
-		boolean result = false;
-
-		for( Item item : list ) {
-			if( item instanceof ListItem ) {
-				if( checkForString( (ListItem)item, string ) ) result = true;
-			} else if( item instanceof StringItem ) {
-				if( string.equals( expand( item.toString() ).toLowerCase() ) ) result = true;
-			}
-		}
-
-		return result;
 	}
 
 	private static interface Item {
@@ -340,7 +311,7 @@ public class Version implements Comparable<Version> {
 	 */
 	private static class StringItem implements Item {
 
-		private static final List<String> QUALIFIERS = Arrays.asList( new String[] { UNKNOWN, ALPHA, BETA, "milestone", "rc", SNAPSHOT, "", "sp" } );
+		private static final List<String> QUALIFIERS = Arrays.asList( new String[] { UNKNOWN, ALPHA, BETA, MILESTONE, "rc", SNAPSHOT, "", "sp" } );
 
 		private static final Map<String, String> ALIASES = new HashMap<String, String>();
 
@@ -374,7 +345,7 @@ public class Version implements Comparable<Version> {
 						break;
 					}
 					case 'm': {
-						value = "milestone";
+						value = MILESTONE;
 						break;
 					}
 					case 'p': {
