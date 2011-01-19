@@ -34,7 +34,7 @@ public class Version implements Comparable<Version> {
 
 	private ListItem items;
 
-	private List<String> pieces;
+	private List<Part> parts;
 
 	static {
 		expansions.put( "a", "Alpha" );
@@ -73,8 +73,31 @@ public class Version implements Comparable<Version> {
 	public String toHumanString() {
 		StringBuilder builder = new StringBuilder();
 
-		for( String part : pieces ) {
-			builder.append( part );
+		Part previous = null;
+		int count = parts.size();
+		for( int index = 0; index < count; index++ ) {
+			Part part = parts.get( index );
+			//			if( part instanceof StringPart ) {
+			//				builder.append( " " );
+			//				builder.append( expand( part.toString() ) );
+			//				builder.append( " " );
+			//			} else if( part instanceof NumberPart ) {
+			//				if( previous != null ) builder.append( previous );
+			//				builder.append( part );
+			//			} else {
+			//				if( previous instanceof DividePart ) builder.append( previous );
+			//			}
+
+			if( part instanceof NumberPart ) {
+				if( previous instanceof DividePart ) builder.append( previous );
+				if( previous instanceof StringPart ) builder.append( " " );
+				builder.append( part );
+			} else if( part instanceof StringPart ) {
+				if( previous != null ) builder.append( " " );
+				builder.append( expand( part.toString() ) );
+			}
+
+			previous = part;
 		}
 
 		return builder.toString();
@@ -89,7 +112,7 @@ public class Version implements Comparable<Version> {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 
-		for( String part : pieces ) {
+		for( Part part : parts ) {
 			builder.append( part );
 		}
 
@@ -116,7 +139,7 @@ public class Version implements Comparable<Version> {
 		this.version = string;
 
 		items = new ListItem();
-		pieces = new ArrayList<String>();
+		parts = new ArrayList<Part>();
 
 		String original = string;
 		string = string.toLowerCase( Locale.ENGLISH );
@@ -136,20 +159,20 @@ public class Version implements Comparable<Version> {
 			if( c == '.' ) {
 				if( index == startIndex ) {
 					list.add( IntegerItem.ZERO );
-					pieces.add( "0" );
+					parts.add( new NumberPart( "0" ) );
 				} else {
 					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
-					pieces.add( original.substring( startIndex, index ) );
+					parts.add( parsePart( isDigit, original.substring( startIndex, index ) ) );
 				}
 				startIndex = index + 1;
-				pieces.add( "." );
+				parts.add( new DividePart( "." ) );
 			} else if( c == '-' ) {
 				if( index == startIndex ) {
 					list.add( IntegerItem.ZERO );
-					pieces.add( "0" );
+					parts.add( new NumberPart( "0" ) );
 				} else {
 					list.add( parse( isDigit, string.substring( startIndex, index ) ) );
-					pieces.add( original.substring( startIndex, index ) );
+					parts.add( parsePart( isDigit, original.substring( startIndex, index ) ) );
 				}
 				startIndex = index + 1;
 
@@ -161,11 +184,11 @@ public class Version implements Comparable<Version> {
 						stack.push( list );
 					}
 				}
-				pieces.add( "-" );
+				parts.add( new DividePart( "-" ) );
 			} else if( Character.isDigit( c ) ) {
 				if( !isDigit && index > startIndex ) {
 					list.add( new StringItem( string.substring( startIndex, index ), true ) );
-					pieces.add( original.substring( startIndex, index ) );
+					parts.add( new StringPart( original.substring( startIndex, index ) ) );
 					startIndex = index;
 				}
 
@@ -173,7 +196,7 @@ public class Version implements Comparable<Version> {
 			} else {
 				if( isDigit && index > startIndex ) {
 					list.add( parse( true, string.substring( startIndex, index ) ) );
-					pieces.add( original.substring( startIndex, index ) );
+					parts.add( parsePart( true, original.substring( startIndex, index ) ) );
 					startIndex = index;
 				}
 
@@ -183,7 +206,7 @@ public class Version implements Comparable<Version> {
 
 		if( string.length() > startIndex ) {
 			list.add( parse( isDigit, string.substring( startIndex ) ) );
-			pieces.add( original.substring( startIndex ) );
+			parts.add( parsePart( isDigit, original.substring( startIndex ) ) );
 		}
 
 		while( !stack.isEmpty() ) {
@@ -196,6 +219,10 @@ public class Version implements Comparable<Version> {
 
 	private Item parse( boolean digit, String buffer ) {
 		return digit ? new IntegerItem( buffer ) : new StringItem( buffer, false );
+	}
+
+	private Part parsePart( boolean digit, String buffer ) {
+		return digit ? new NumberPart( buffer ) : new StringPart( buffer );
 	}
 
 	private String expand( ListItem list ) {
@@ -496,6 +523,44 @@ public class Version implements Comparable<Version> {
 			}
 			buffer.append( ')' );
 			return buffer.toString();
+		}
+
+	}
+
+	private static abstract class Part {
+
+		private String value;
+
+		public Part( String value ) {
+			this.value = value;
+		}
+
+		public String toString() {
+			return value;
+		}
+
+	}
+
+	private static class DividePart extends Part {
+
+		public DividePart( String value ) {
+			super( value );
+		}
+
+	}
+
+	private static class NumberPart extends Part {
+
+		public NumberPart( String value ) {
+			super( value );
+		}
+
+	}
+
+	private static class StringPart extends Part {
+
+		public StringPart( String value ) {
+			super( value );
 		}
 
 	}

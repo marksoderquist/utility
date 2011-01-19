@@ -237,29 +237,6 @@ public class VersionTest extends TestCase {
 	}
 
 	public void testToHumanString() {
-		assertEquals( "1 Alpha 2 SNAPSHOT", new Version( "1-alpha2snapshot" ).toHumanString() );
-		assertEquals( "1 Alpha 2", new Version( "1-alpha2" ).toHumanString() );
-		assertEquals( "1 Alpha 123", new Version( "1-alpha-123" ).toHumanString() );
-		assertEquals( "1 Beta 2", new Version( "1-beta-2" ).toHumanString() );
-		assertEquals( "1 Beta 123", new Version( "1-beta123" ).toHumanString() );
-		assertEquals( "1 Milestone 2", new Version( "1-m2" ).toHumanString() );
-		assertEquals( "1 Milestone 11", new Version( "1-m11" ).toHumanString() );
-		assertEquals( "1 Release Candidate", new Version( "1-rc" ).toHumanString() );
-		assertEquals( "1 Release Candidate 2", new Version( "1-cr2" ).toHumanString() );
-		assertEquals( "1 Release Candidate 123", new Version( "1-rc123" ).toHumanString() );
-		assertEquals( "1 SNAPSHOT", new Version( "1-SNAPSHOT" ).toHumanString() );
-		assertEquals( "1", new Version( "1" ).toHumanString() );
-		assertEquals( "1 Service Pack", new Version( "1-sp" ).toHumanString() );
-		assertEquals( "1 Service Pack 2", new Version( "1-sp2" ).toHumanString() );
-		assertEquals( "1 Service Pack 123", new Version( "1-sp123" ).toHumanString() );
-		assertEquals( "1 abc", new Version( "1-abc" ).toHumanString() );
-		assertEquals( "1 def", new Version( "1-def" ).toHumanString() );
-		assertEquals( "1 pom 1", new Version( "1-pom-1" ).toHumanString() );
-		assertEquals( "1-1 SNAPSHOT", new Version( "1-1-snapshot" ).toHumanString() );
-		assertEquals( "1-1", new Version( "1-1" ).toHumanString() );
-		assertEquals( "1-2", new Version( "1-2" ).toHumanString() );
-		assertEquals( "1-123", new Version( "1-123" ).toHumanString() );
-
 		assertEquals( "2.0", new Version( "2.0" ).toHumanString() );
 		assertEquals( "2-1", new Version( "2-1" ).toHumanString() );
 		assertEquals( "2.0 Alpha", new Version( "2.0.a" ).toHumanString() );
@@ -285,6 +262,29 @@ public class VersionTest extends TestCase {
 		assertEquals( "11 Beta", new Version( "11b" ).toHumanString() );
 		assertEquals( "11 c", new Version( "11c" ).toHumanString() );
 		assertEquals( "11 Milestone", new Version( "11m" ).toHumanString() );
+
+		assertEquals( "1 Alpha 2 SNAPSHOT", new Version( "1-alpha2snapshot" ).toHumanString() );
+		assertEquals( "1 Alpha 2", new Version( "1-alpha2" ).toHumanString() );
+		assertEquals( "1 Alpha 123", new Version( "1-alpha-123" ).toHumanString() );
+		assertEquals( "1 Beta 2", new Version( "1-beta-2" ).toHumanString() );
+		assertEquals( "1 Beta 123", new Version( "1-beta123" ).toHumanString() );
+		assertEquals( "1 Milestone 2", new Version( "1-m2" ).toHumanString() );
+		assertEquals( "1 Milestone 11", new Version( "1-m11" ).toHumanString() );
+		assertEquals( "1 Release Candidate", new Version( "1-rc" ).toHumanString() );
+		assertEquals( "1 Release Candidate 2", new Version( "1-cr2" ).toHumanString() );
+		assertEquals( "1 Release Candidate 123", new Version( "1-rc123" ).toHumanString() );
+		assertEquals( "1 SNAPSHOT", new Version( "1-SNAPSHOT" ).toHumanString() );
+		assertEquals( "1", new Version( "1" ).toHumanString() );
+		assertEquals( "1 Service Pack", new Version( "1-sp" ).toHumanString() );
+		assertEquals( "1 Service Pack 2", new Version( "1-sp2" ).toHumanString() );
+		assertEquals( "1 Service Pack 123", new Version( "1-sp123" ).toHumanString() );
+		assertEquals( "1 abc", new Version( "1-abc" ).toHumanString() );
+		assertEquals( "1 def", new Version( "1-def" ).toHumanString() );
+		assertEquals( "1 pom 1", new Version( "1-pom-1" ).toHumanString() );
+		assertEquals( "1-1 SNAPSHOT", new Version( "1-1-snapshot" ).toHumanString() );
+		assertEquals( "1-1", new Version( "1-1" ).toHumanString() );
+		assertEquals( "1-2", new Version( "1-2" ).toHumanString() );
+		assertEquals( "1-123", new Version( "1-123" ).toHumanString() );
 
 		assertEquals( "3.4.5 Alpha 6", alpha.toHumanString() );
 		assertEquals( "3.4.5 Beta 6", beta.toHumanString() );
