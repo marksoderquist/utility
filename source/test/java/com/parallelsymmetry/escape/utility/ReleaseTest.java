@@ -19,13 +19,13 @@ public class ReleaseTest extends TestCase {
 	}
 
 	public void testToString() {
-		assertEquals( "1.2.3 Update 4", new Release( new Version( versionString ) ).toString() );
-		assertEquals( "1.2.3 Update 4  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toString() );
+		assertEquals( "1.2.3-u-04", new Release( new Version( versionString ) ).toString() );
+		assertEquals( "1.2.3-u-04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toString() );
 	}
 
 	public void testToHumanString() {
-		assertEquals( "1.2.3 Update 4", new Release( new Version( versionString ) ).toHumanString() );
-		assertEquals( "1.2.3 Update 4  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString() );
+		assertEquals( "1.2.3 Update 04", new Release( new Version( versionString ) ).toHumanString() );
+		assertEquals( "1.2.3 Update 04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString() );
 	}
 
 }

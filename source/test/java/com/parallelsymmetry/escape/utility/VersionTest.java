@@ -286,10 +286,10 @@ public class VersionTest extends TestCase {
 		assertEquals( "1-2", new Version( "1-2" ).toHumanString() );
 		assertEquals( "1-123", new Version( "1-123" ).toHumanString() );
 
-		assertEquals( "3.4.5 Alpha 6", alpha.toHumanString() );
-		assertEquals( "3.4.5 Beta 6", beta.toHumanString() );
-		assertEquals( "3.4.5 Update 0", release.toHumanString() );
-		assertEquals( "3.4.5 Update 6", update.toHumanString() );
+		assertEquals( "3.4.5 Alpha 06", alpha.toHumanString() );
+		assertEquals( "3.4.5 Beta 06", beta.toHumanString() );
+		assertEquals( "3.4.5 Update 00", release.toHumanString() );
+		assertEquals( "3.4.5 Update 06", update.toHumanString() );
 		assertEquals( "3.4.5 SNAPSHOT", snapshot.toHumanString() );
 	}
 

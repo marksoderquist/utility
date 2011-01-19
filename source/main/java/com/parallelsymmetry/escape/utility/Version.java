@@ -47,6 +47,7 @@ public class Version implements Comparable<Version> {
 		expansions.put( "patch", "Patch" );
 		expansions.put( "u", "Update" );
 		expansions.put( "update", "Update" );
+		expansions.put( "cr", "Release Candidate" );
 		expansions.put( "rc", "Release Candidate" );
 		expansions.put( "ga", "" );
 		expansions.put( "sp", "Service Pack" );
@@ -73,31 +74,24 @@ public class Version implements Comparable<Version> {
 	public String toHumanString() {
 		StringBuilder builder = new StringBuilder();
 
+		Part prefix = null;
 		Part previous = null;
 		int count = parts.size();
 		for( int index = 0; index < count; index++ ) {
 			Part part = parts.get( index );
-			//			if( part instanceof StringPart ) {
-			//				builder.append( " " );
-			//				builder.append( expand( part.toString() ) );
-			//				builder.append( " " );
-			//			} else if( part instanceof NumberPart ) {
-			//				if( previous != null ) builder.append( previous );
-			//				builder.append( part );
-			//			} else {
-			//				if( previous instanceof DividePart ) builder.append( previous );
-			//			}
-
+			if( index > 0 ) prefix = parts.get( index - 1 );
 			if( part instanceof NumberPart ) {
-				if( previous instanceof DividePart ) builder.append( previous );
+				if( prefix instanceof DividePart && previous instanceof NumberPart ) builder.append( prefix );
 				if( previous instanceof StringPart ) builder.append( " " );
 				builder.append( part );
+				previous = part;
 			} else if( part instanceof StringPart ) {
-				if( previous != null ) builder.append( " " );
+				if( prefix != null ) builder.append( " " );
 				builder.append( expand( part.toString() ) );
+				previous = part;
 			}
 
-			previous = part;
+			prefix = part;
 		}
 
 		return builder.toString();
