@@ -55,6 +55,8 @@ public class Log {
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
 	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
+	
+	private static boolean showTag;
 
 	private static boolean showDate;
 
@@ -99,6 +101,14 @@ public class Log {
 		defaultHandlers.get( getLogger( name ) ).setLevel( level );
 	}
 
+	public static final boolean isShowTag() {
+		return showTag;
+	}
+
+	public static final void setShowTag( boolean showTag ) {
+		Log.showTag = showTag;
+	}
+	
 	public static final boolean isShowDate() {
 		return showDate;
 	}
@@ -110,7 +120,7 @@ public class Log {
 	public static final boolean isShowColor() {
 		return showColor;
 	}
-
+	
 	public static final void setShowColor( boolean showColor ) {
 		Log.showColor = showColor;
 	}

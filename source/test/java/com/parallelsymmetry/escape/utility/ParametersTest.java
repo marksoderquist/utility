@@ -77,7 +77,7 @@ public class ParametersTest extends TestCase {
 			Parameters.parse( new String[] { "-help", "topic", "-test", "test", "test.txt" }, "help" );
 			fail( "Unknown flags should cause an exception" );
 		} catch( IllegalArgumentException exception ) {
-			assertEquals( "Unknown flag: -test", exception.getMessage() );
+			assertEquals( "Unknown parameter: -test", exception.getMessage() );
 		}
 	}
 
@@ -142,6 +142,7 @@ public class ParametersTest extends TestCase {
 		}
 
 		Parameters parameters = Parameters.parse( args );
+		assertFalse( parameters.isSpecified( notakey ) );
 		assertFalse( parameters.isSet( notakey ) );
 		for( int index = 0; index < count; index++ ) {
 			assertEquals( "Value not set.", values.get( index ), parameters.get( keys.get( index ) ) );
@@ -151,7 +152,8 @@ public class ParametersTest extends TestCase {
 	@Test
 	public void testParseWithEscapedValues() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "--test", "go", "\\-help" } );
-		assertTrue( parameters.isSet( "test" ) );
+		assertTrue( parameters.isSpecified( "test" ) );
+		assertFalse( parameters.isSet( "test" ) );
 		List<String> values = parameters.getValues( "test" );
 
 		assertEquals( "go", values.get( 0 ) );
@@ -266,6 +268,7 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
+		assertTrue( parameters.isSpecified( "other" ) );
 		assertTrue( parameters.isSet( "other" ) );
 	}
 
@@ -290,7 +293,8 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
-		assertTrue( parameters.isSet( "other" ) );
+		assertTrue( parameters.isSpecified( "other" ) );
+		assertFalse( parameters.isSet( "other" ) );
 
 		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
 	}
@@ -299,9 +303,16 @@ public class ParametersTest extends TestCase {
 	public void testIsSet() throws Exception {
 		String[] args = new String[] { "-flag1", "false", "-flag2", "true", "-flag3" };
 		Parameters parameters = Parameters.parse( args );
+		assertFalse( parameters.isSpecified( "flag0" ) );
 		assertFalse( parameters.isSet( "flag0" ) );
+
+		assertTrue( parameters.isSpecified( "flag1" ) );
 		assertFalse( parameters.isSet( "flag1" ) );
+
+		assertTrue( parameters.isSpecified( "flag2" ) );
 		assertTrue( parameters.isSet( "flag2" ) );
+
+		assertTrue( parameters.isSpecified( "flag3" ) );
 		assertTrue( parameters.isSet( "flag3" ) );
 	}
 

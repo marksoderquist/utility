@@ -24,6 +24,9 @@ public class DefaultFormatter extends Formatter {
 			if( Log.isShowColor() ) {
 				buffer.append( getColorPrefix( record.getLevel() ) );
 			}
+			if( Log.isShowTag() ) {
+				buffer.append( getTag( record.getLevel() ) );
+			}
 			if( Log.isShowDate() ) {
 				buffer.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
 				buffer.append( " " );
@@ -49,7 +52,7 @@ public class DefaultFormatter extends Formatter {
 		return buffer.toString();
 	}
 
-	protected static final String getPrefix( Level level ) {
+	protected static final String getTag( Level level ) {
 		int index = level.intValue() / 100;
 
 		if( index > 11 ) index = 11;
@@ -61,27 +64,27 @@ public class DefaultFormatter extends Formatter {
 			}
 				// ERROR
 			case 10: {
-				return "*";
+				return "[E] ";
 			}
 				// WARN
 			case 9: {
-				return "-";
+				return "[W] ";
 			}
 				// INFO
 			case 8: {
-				return " ";
+				return "[I] ";
 			}
 				// TRACE
 			case 7: {
-				return "  ";
+				return "[T] ";
 			}
 				// DEBUG
 			case 6: {
-				return "   ";
+				return "[D] ";
 			}
 		}
 
-		return "    ";
+		return "[?]";
 	}
 
 	/**
@@ -126,6 +129,41 @@ public class DefaultFormatter extends Formatter {
 		if( index < 0 ) index = 0;
 
 		return ( index > 5 && index < 11 ) ? "\u001b[0m" : "";
+	}
+
+	protected static final String getPrefix( Level level ) {
+		int index = level.intValue() / 100;
+
+		if( index > 11 ) index = 11;
+		if( index < 0 ) index = 0;
+
+		switch( index ) {
+			case 11: {
+				return "";
+			}
+				// ERROR
+			case 10: {
+				return "*";
+			}
+				// WARN
+			case 9: {
+				return "-";
+			}
+				// INFO
+			case 8: {
+				return " ";
+			}
+				// TRACE
+			case 7: {
+				return "  ";
+			}
+				// DEBUG
+			case 6: {
+				return "   ";
+			}
+		}
+
+		return "    ";
 	}
 
 }
