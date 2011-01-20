@@ -11,6 +11,11 @@ public class ParametersSettingProvider implements SettingProvider {
 	}
 
 	@Override
+	public boolean isWritable() {
+		return false;
+	}
+
+	@Override
 	public String get( String path ) {
 		if( parameters == null ) return null;
 
@@ -21,10 +26,5 @@ public class ParametersSettingProvider implements SettingProvider {
 
 	@Override
 	public void put( String path, String value ) {}
-
-	@Override
-	public boolean isWritable() {
-		return false;
-	}
 
 }
