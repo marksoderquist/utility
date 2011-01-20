@@ -208,6 +208,24 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 2, TextUtil.getLineCount( " \r " ) );
 		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
 	}
+	
+	public void testPrepend() {
+		assertEquals( null, TextUtil.prepend( null, "X" ) );
+		assertEquals( "A", TextUtil.prepend( "A", null ) );
+		assertEquals( "B", TextUtil.prepend( "B", "" ) );
+
+		assertEquals( "XC", TextUtil.prepend( "C", "X" ) );
+		assertEquals( "XD\nXE", TextUtil.prepend( "D\nE", "X" ) );
+	}
+
+	public void testAppend() {
+		assertEquals( null, TextUtil.append( null, "X" ) );
+		assertEquals( "A", TextUtil.append( "A", null ) );
+		assertEquals( "B", TextUtil.append( "B", "" ) );
+
+		assertEquals( "CX", TextUtil.append( "C", "X" ) );
+		assertEquals( "DX\nEX", TextUtil.append( "D\nE", "X" ) );
+	}
 
 	public void testReline() {
 		int length = 40;

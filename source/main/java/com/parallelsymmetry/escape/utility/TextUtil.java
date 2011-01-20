@@ -346,6 +346,40 @@ public final class TextUtil {
 		return count;
 	}
 
+	public static final String prepend( String content, String text ) {
+		if( content == null ) return null;
+		if( text == null || "".equals( text ) ) return content;
+
+		String line = null;
+		LineParser parser = new LineParser( content );
+		StringBuilder result = new StringBuilder();
+
+		while( ( line = parser.next() ) != null ) {
+			result.append( text );
+			result.append( line );
+			result.append( parser.getTerminator() );
+		}
+
+		return result.toString();
+	}
+
+	public static final String append( String content, String text ) {
+		if( content == null ) return null;
+		if( text == null || "".equals( text ) ) return content;
+
+		String line = null;
+		LineParser parser = new LineParser( content );
+		StringBuilder result = new StringBuilder();
+
+		while( ( line = parser.next() ) != null ) {
+			result.append( line );
+			result.append( text );
+			result.append( parser.getTerminator() );
+		}
+
+		return result.toString();
+	}
+
 	public static final String reline( String text, int width ) {
 		StringBuilder line = new StringBuilder();
 		StringBuilder result = new StringBuilder();

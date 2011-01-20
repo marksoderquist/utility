@@ -9,6 +9,8 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import com.parallelsymmetry.escape.utility.TextUtil;
+
 public class DefaultFormatter extends Formatter {
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat( Log.DEFAULT_DATE_FORMAT );
@@ -20,24 +22,32 @@ public class DefaultFormatter extends Formatter {
 		Throwable thrown = record.getThrown();
 		StringBuilder buffer = new StringBuilder();
 
+		// Determine the prefix.
+		StringBuilder prefix = new StringBuilder();
+		if( Log.isShowColor() ) {
+			prefix.append( getColorPrefix( record.getLevel() ) );
+		}
+		if( Log.isShowTag() ) {
+			prefix.append( getTag( record.getLevel() ) );
+		}
+		if( Log.isShowDate() ) {
+			prefix.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
+			prefix.append( " " );
+		}
+		if( Log.isShowPrefix() ) {
+			prefix.append( getPrefix( record.getLevel() ) );
+		}
+
+		// Determine the suffix.
+		StringBuilder suffix = new StringBuilder();
+		if( Log.isShowColor() ) {
+			suffix.append( getColorSuffix( record.getLevel() ) );
+		}
+
 		if( record.getMessage() != null ) {
-			if( Log.isShowColor() ) {
-				buffer.append( getColorPrefix( record.getLevel() ) );
-			}
-			if( Log.isShowTag() ) {
-				buffer.append( getTag( record.getLevel() ) );
-			}
-			if( Log.isShowDate() ) {
-				buffer.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
-				buffer.append( " " );
-			}
-			if( Log.isShowPrefix() ) {
-				buffer.append( getPrefix( record.getLevel() ) );
-			}
+			buffer.append( prefix );
 			buffer.append( record.getMessage() );
-			if( Log.isShowColor() ) {
-				buffer.append( getColorSuffix( record.getLevel() ) );
-			}
+			buffer.append( suffix );
 			buffer.append( "\n" );
 		}
 
@@ -46,7 +56,13 @@ public class DefaultFormatter extends Formatter {
 			PrintWriter printWriter = new PrintWriter( stringWriter );
 			thrown.printStackTrace( printWriter );
 			printWriter.close();
-			buffer.append( stringWriter.toString() );
+
+			String stack = stringWriter.toString();
+
+			stack = TextUtil.prepend( stack, prefix.toString() );
+			stack = TextUtil.append( stack, suffix.toString() );
+
+			buffer.append( stack );
 		}
 
 		return buffer.toString();

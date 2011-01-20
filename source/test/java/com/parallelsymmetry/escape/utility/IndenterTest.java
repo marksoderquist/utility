@@ -22,7 +22,7 @@ public class IndenterTest extends TestCase {
 		assertEquals( IND + "" + IND + "" + IND + "", Indenter.createIndent( 3 ) );
 	}
 
-	public void testCreateIndentWithChar() {
+	public void testCreateIndentWithString() {
 		assertEquals( "", Indenter.createIndent( -1, "<>" ) );
 		assertEquals( "", Indenter.createIndent( 0, "<>" ) );
 		assertEquals( "<>", Indenter.createIndent( 1, "<>" ) );
@@ -44,12 +44,18 @@ public class IndenterTest extends TestCase {
 		assertWriteIndent( IND + "" + IND + "" + IND + "", 3 );
 	}
 
-	public void testWriteIndentWithChar() throws Exception {
-		assertWriteIndentWithChar( "", -1, "<>" );
-		assertWriteIndentWithChar( "", 0, "<>" );
-		assertWriteIndentWithChar( "<>", 1, "<>" );
-		assertWriteIndentWithChar( "<><>", 2, "<>" );
-		assertWriteIndentWithChar( "<><><>", 3, "<>" );
+	public void testWriteIndentWithString() throws Exception {
+		assertWriteIndentWithString( "<>", "<>");
+		assertWriteIndentWithString( "<><>", "<><>");
+		assertWriteIndentWithString( "<><><>", "<><><>");
+	}
+
+	public void testWriteIndentWithSizeAndString() throws Exception {
+		assertWriteIndentWithSizeAndString( "", -1, "<>" );
+		assertWriteIndentWithSizeAndString( "", 0, "<>" );
+		assertWriteIndentWithSizeAndString( "<>", 1, "<>" );
+		assertWriteIndentWithSizeAndString( "<><>", 2, "<>" );
+		assertWriteIndentWithSizeAndString( "<><><>", 3, "<>" );
 	}
 
 	public void testIndent() {
@@ -79,6 +85,19 @@ public class IndenterTest extends TestCase {
 	}
 
 	public void testIndentWithString() {
+		assertEquals( null, Indenter.indent( null, "<>" ) );
+
+		assertEquals( "<>", Indenter.indent( "", "<>" ) );
+		assertEquals( "<>a", Indenter.indent( "a", "<>" ) );
+
+		assertEquals( "<>\n<>", Indenter.indent( "\n", "<>" ) );
+		assertEquals( "<>a\n<>a", Indenter.indent( "a\na", "<>" ) );
+
+		assertEquals( "<>\n<>\n<>", Indenter.indent( "\n\n", "<>" ) );
+		assertEquals( "<>a\n<>a\n<>a", Indenter.indent( "a\na\na", "<>" ) );
+	}
+
+	public void testIndentWithSizeAndString() {
 		assertEquals( null, Indenter.indent( null, 1, "<>" ) );
 
 		assertEquals( "<><><>", Indenter.indent( "", 3, "<>" ) );
@@ -224,7 +243,13 @@ public class IndenterTest extends TestCase {
 		assertEquals( result, writer.toString() );
 	}
 
-	private void assertWriteIndentWithChar( String result, int size, String text ) throws IOException {
+	private void assertWriteIndentWithString( String result, String text ) throws IOException {
+		StringWriter writer = new StringWriter();
+		Indenter.writeIndent( writer, text );
+		assertEquals( result, writer.toString() );
+	}
+
+	private void assertWriteIndentWithSizeAndString( String result, int size, String text ) throws IOException {
 		StringWriter writer = new StringWriter();
 		Indenter.writeIndent( writer, size, text );
 		assertEquals( result, writer.toString() );

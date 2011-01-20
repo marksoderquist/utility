@@ -18,6 +18,8 @@ public class Indenter {
 	}
 
 	public static final String createIndent( int count, String indent ) {
+		if( count == 1 ) return indent;
+		
 		int size = count * indent.length();
 		if( size < 1 ) return "";
 
@@ -39,6 +41,10 @@ public class Indenter {
 		writeIndent( writer, count, DEFAULT_INDENT_STRING );
 	}
 
+	public static final void writeIndent( Writer writer, String indent ) throws IOException {
+		writeIndent( writer, 1, indent );
+	}
+
 	public static final void writeIndent( Writer writer, int count, String indent ) throws IOException {
 		if( count < 1 ) return;
 		writer.write( createIndent( count, indent ) );
@@ -50,6 +56,10 @@ public class Indenter {
 
 	public static final String indent( String content, int size ) {
 		return indent( content, size, DEFAULT_INDENT_STRING );
+	}
+
+	public static final String indent( String content, String indent ) {
+		return indent( content, 1, indent );
 	}
 
 	public static final String indent( String content, int size, String indent ) {
