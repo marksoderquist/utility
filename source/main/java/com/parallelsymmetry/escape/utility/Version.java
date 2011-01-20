@@ -17,7 +17,7 @@ public class Version implements Comparable<Version> {
 	private static final String UNKNOWN = "unknown";
 
 	private static final String SNAPSHOT = "snapshot";
-	
+
 	private static final String MILESTONE = "milestone";
 
 	private static final String ALPHA = "alpha";
@@ -29,7 +29,7 @@ public class Version implements Comparable<Version> {
 	private static final String UPDATE = "update";
 
 	private static final Map<String, String> expansions = new ConcurrentHashMap<String, String>();
-	
+
 	private String human;
 
 	private String version;
@@ -57,6 +57,10 @@ public class Version implements Comparable<Version> {
 		expansions.put( "sp", "Service Pack" );
 		expansions.put( SNAPSHOT, "SNAPSHOT" );
 		expansions.put( UNKNOWN, "UNKNOWN" );
+	}
+
+	public Version() {
+		this( null );
 	}
 
 	public Version( String version ) {
