@@ -28,7 +28,7 @@ public class Descriptor {
 
 	private List<String> paths;
 
-	public Descriptor() throws SAXException, IOException, ParserConfigurationException {}
+	public Descriptor() {}
 
 	public Descriptor( Node node ) {
 		this( null, node );
