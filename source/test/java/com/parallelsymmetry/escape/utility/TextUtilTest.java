@@ -216,6 +216,7 @@ public class TextUtilTest extends TestCase {
 
 		assertEquals( "XC", TextUtil.prepend( "C", "X" ) );
 		assertEquals( "XD\nXE", TextUtil.prepend( "D\nE", "X" ) );
+		assertEquals( "XF\nXG\nX", TextUtil.prepend( "F\nG\n", "X" ) );
 	}
 
 	public void testAppend() {
@@ -225,6 +226,7 @@ public class TextUtilTest extends TestCase {
 
 		assertEquals( "CX", TextUtil.append( "C", "X" ) );
 		assertEquals( "DX\nEX", TextUtil.append( "D\nE", "X" ) );
+		assertEquals( "FX\nGX\nX", TextUtil.append( "F\nG\n", "X" ) );
 	}
 
 	public void testReline() {

@@ -57,12 +57,13 @@ public class DefaultFormatter extends Formatter {
 			thrown.printStackTrace( printWriter );
 			printWriter.close();
 
-			String stack = stringWriter.toString();
+			String stack = stringWriter.toString().trim();
 
 			stack = TextUtil.prepend( stack, prefix.toString() );
 			stack = TextUtil.append( stack, suffix.toString() );
 
 			buffer.append( stack );
+			buffer.append( "\n" );
 		}
 
 		return buffer.toString();
