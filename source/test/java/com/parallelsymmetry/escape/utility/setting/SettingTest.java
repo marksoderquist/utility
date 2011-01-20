@@ -41,17 +41,35 @@ public class SettingTest extends TestCase {
 		provider1.set( path, "1" );
 		assertEquals( "1", settings.get( path ) );
 	}
-	
+
 	public void testPut() {
 		String path = "/test/put/value";
 		String value = "X";
-		settings.put(path, value );
-		
+		settings.put( path, value );
+
 		// The value should be stored in provider 2 since it is the only one writable.
-		assertNull( provider1.get( path ));
-		assertEquals( value, provider2.get( path ));
-		assertNull( provider3.get( path ));
-		assertNull( providerD.get( path ));
+		assertNull( provider1.get( path ) );
+		assertEquals( value, provider2.get( path ) );
+		assertNull( provider3.get( path ) );
+		assertNull( providerD.get( path ) );
+	}
+
+	public void testMounts() {
+		settings = new Settings();
+		settings.addProvider( provider1, "/1" );
+		settings.addProvider( provider2, "/2" );
+		settings.addProvider( provider3, "/3" );
+		settings.setDefaultProvider( providerD, "/D" );
+
+		provider1.set( "/value", "1" );
+		provider2.set( "/value", "2" );
+		provider3.set( "/value", "3" );
+		providerD.set( "/value", "D" );
+
+		assertEquals( "1", settings.get( "/1/value" ) );
+		assertEquals( "2", settings.get( "/2/value" ) );
+		assertEquals( "3", settings.get( "/3/value" ) );
+		assertEquals( "D", settings.get( "/D/value" ) );
 	}
 
 	public void testNoProviders() {

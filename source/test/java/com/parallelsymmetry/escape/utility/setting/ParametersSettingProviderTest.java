@@ -29,5 +29,12 @@ public class ParametersSettingProviderTest extends TestCase {
 	public void testIsWritable() {
 		assertFalse( provider.isWritable() );
 	}
+	
+	public void testPrefix() {
+		parameters = Parameters.parse( new String[] { "-host", "localhost" } );
+		provider = new ParametersSettingProvider("/test", parameters );
+		assertNull( provider.get( "/test/port" ) );
+		assertEquals( "localhost", provider.get( "/test/host" ) );
+	}
 
 }

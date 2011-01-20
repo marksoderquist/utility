@@ -6,22 +6,23 @@ public class ParametersSettingProvider implements SettingProvider {
 
 	private Parameters parameters;
 
-	private String prefix;
+	private String path;
 
 	public ParametersSettingProvider( Parameters parameters ) {
 		this( null, parameters );
 	}
 
-	public ParametersSettingProvider( String prefix, Parameters parameters ) {
+	public ParametersSettingProvider( String path, Parameters parameters ) {
 		this.parameters = parameters;
-		this.prefix = prefix;
+		this.path = path;
 	}
 
 	@Override
 	public String get( String path ) {
 		if( parameters == null ) return null;
 
-		String name = prefix == null ? path : prefix + path; 
+		String name = path;
+		if( this.path != null && name.startsWith( this.path ) ) name = name.substring( this.path.length() );
 		name = name.replace( '/', '.' ).substring( 1 );
 
 		return parameters.get( name );
