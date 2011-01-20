@@ -1,6 +1,9 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public class PreferencesSettingProvider implements SettingProvider {
 
@@ -32,6 +35,11 @@ public class PreferencesSettingProvider implements SettingProvider {
 			preferences.node( prefPath ).remove( prefKey );
 		} else {
 			preferences.node( prefPath ).put( prefKey, value );
+		}
+		try {
+			preferences.flush();
+		} catch( BackingStoreException exception ) {
+			Log.write( exception );
 		}
 	}
 

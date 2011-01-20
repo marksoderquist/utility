@@ -16,11 +16,6 @@ public class Settings {
 	private Map<SettingProvider, String> mounts;
 
 	public Settings() {
-		this( null );
-	}
-
-	public Settings( SettingProvider provider ) {
-		this.defaultProvider = provider;
 		this.providers = new CopyOnWriteArrayList<SettingProvider>();
 		this.mounts = new ConcurrentHashMap<SettingProvider, String>();
 	}
@@ -78,6 +73,10 @@ public class Settings {
 	}
 
 	public String get( String path ) {
+		return get( path, null );
+	}
+
+	public String get( String path, String defaultValue ) {
 		validatePath( path );
 		String result = null;
 		for( SettingProvider provider : providers ) {
@@ -101,7 +100,7 @@ public class Settings {
 			return result;
 		}
 
-		return null;
+		return defaultValue;
 	}
 
 	public void put( String path, String value ) {
@@ -117,6 +116,36 @@ public class Settings {
 				if( written ) break;
 			}
 		}
+	}
+
+	public boolean getBoolean( String path ) {
+		return Boolean.parseBoolean( get( path ) );
+	}
+
+	public boolean getBoolean( String path, boolean defaultValue ) {
+		String value = get( path );
+		if( value == null ) return defaultValue;
+		return Boolean.parseBoolean( value );
+	}
+
+	public void putBoolean( String path, boolean value ) {
+		put( path, value ? "true" : "false" );
+	}
+
+	public int getInt( String path ) {
+		return Integer.parseInt( get( path ) );
+	}
+
+	public int getInt( String path, int defaultValue ) {
+		try {
+			return Integer.parseInt( get( path ) );
+		} catch( Throwable throwable ) {
+			return defaultValue;
+		}
+	}
+
+	public void putInt( String path, int value ) {
+		put( path, String.valueOf( value ) );
 	}
 
 	private void validatePath( String path ) {
