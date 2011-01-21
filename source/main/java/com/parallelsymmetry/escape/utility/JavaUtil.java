@@ -2,10 +2,12 @@ package com.parallelsymmetry.escape.utility;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -22,6 +24,10 @@ public class JavaUtil {
 		return name.substring( name.lastIndexOf( '.' ) + 1 );
 	}
 
+	public static List<URI> parseSystemClasspath( String classpath ) throws URISyntaxException {
+		return parseSystemClasspath( classpath, File.pathSeparator );
+	}
+
 	/**
 	 * Parse the relative URI strings from the specified classpath in system
 	 * property format. See <a href=
@@ -30,20 +36,22 @@ public class JavaUtil {
 	 * "http://java.sun.com/javase/6/docs/technotes/tools/solaris/classpath.html"
 	 * >Setting the Unix Classpath</a>
 	 */
-	public static List<URI> parseSystemClasspath( String classpath ) throws URISyntaxException {
+	public static List<URI> parseSystemClasspath( String classpath, String separator ) throws URISyntaxException {
 		ArrayList<URI> list = new ArrayList<URI>();
 		if( classpath == null ) return list;
 
 		URI uri = null;
 		String token = null;
-		StringTokenizer tokenizer = new StringTokenizer( classpath, File.pathSeparator );
+		StringTokenizer tokenizer = new StringTokenizer( classpath, separator );
 		while( tokenizer.hasMoreTokens() ) {
 			token = tokenizer.nextToken();
 
 			try {
-				uri = new URI( token );
+				uri = new URI( URLDecoder.decode( token, "UTF-8" ) );
 			} catch( URISyntaxException excpetion ) {
 				uri = new File( token ).toURI();
+			} catch( UnsupportedEncodingException exception ) {
+				// Intentionally ignore exception because UTF-8 is always supported.
 			}
 			if( uri.getScheme() == null ) uri = new File( token ).toURI();
 

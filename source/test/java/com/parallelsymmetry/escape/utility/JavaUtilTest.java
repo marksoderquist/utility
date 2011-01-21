@@ -3,6 +3,7 @@ package com.parallelsymmetry.escape.utility;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -17,18 +18,25 @@ public class JavaUtilTest extends TestCase {
 		List<URI> entries = JavaUtil.parseSystemClasspath( null );
 		assertEquals( 0, entries.size() );
 
+		String separator = ";";
 		String classpath = "test1.jar";
-		classpath += File.pathSeparator + "test2.jar";
-		classpath += File.pathSeparator + new File( "test3.jar" ).getCanonicalPath().toString();
-		classpath += File.pathSeparator + "/test";
-		classpath += File.pathSeparator + "http://www.parallelsymmetry.com/software/test5.jar";
-		entries = JavaUtil.parseSystemClasspath( classpath );
+		classpath += separator + "test2.jar";
+		classpath += separator + URLEncoder.encode( "http://www.parallelsymmetry.com/software/test3.jar", "UTF-8" );
+		entries = JavaUtil.parseSystemClasspath( classpath, separator );
 
 		assertEquals( new File( "test1.jar" ).toURI(), entries.get( 0 ) );
 		assertEquals( new File( "test2.jar" ).toURI(), entries.get( 1 ) );
-		assertEquals( new File( "test3.jar" ).toURI(), entries.get( 2 ) );
-		assertEquals( new File( "/test" ).toURI(), entries.get( 3 ) );
-		assertEquals( URI.create( "http://www.parallelsymmetry.com/software/test5.jar" ), entries.get( 4 ) );
+		assertEquals( URI.create( "http://www.parallelsymmetry.com/software/test3.jar" ), entries.get( 2 ) );
+
+		separator = ":";
+		classpath = "test1.jar";
+		classpath += separator + "test2.jar";
+		classpath += separator + URLEncoder.encode( "http://www.parallelsymmetry.com/software/test3.jar", "UTF-8" );
+		entries = JavaUtil.parseSystemClasspath( classpath, separator );
+
+		assertEquals( new File( "test1.jar" ).toURI(), entries.get( 0 ) );
+		assertEquals( new File( "test2.jar" ).toURI(), entries.get( 1 ) );
+		assertEquals( URI.create( "http://www.parallelsymmetry.com/software/test3.jar" ), entries.get( 2 ) );
 	}
 
 	public void testParseManifestClasspath() throws Exception {
