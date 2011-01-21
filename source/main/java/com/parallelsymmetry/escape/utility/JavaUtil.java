@@ -2,10 +2,12 @@ package com.parallelsymmetry.escape.utility;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -35,10 +37,14 @@ public class JavaUtil {
 		if( classpath == null ) return list;
 
 		StringTokenizer tokenizer = new StringTokenizer( classpath, File.pathSeparator );
-		while( tokenizer.hasMoreTokens() ) {
-			list.add( new URI( tokenizer.nextToken() ) );
+		try {
+			while( tokenizer.hasMoreTokens() ) {
+				list.add( new URI( URLEncoder.encode( tokenizer.nextToken(), "UTF-8" ) ) );
+			}
+		} catch( UnsupportedEncodingException exception ) {
+			// Intentionally ignore exception since UTF-8 is supported.
 		}
-		
+
 		return list;
 	}
 
