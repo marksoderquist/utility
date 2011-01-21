@@ -1,7 +1,6 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -14,15 +13,15 @@ public class JavaUtilTest extends TestCase {
 		assertEquals( "Object", JavaUtil.getSimpleClassName( "java.lang.Object" ) );
 	}
 
-	public void testParseSystemClasspath() throws IOException {
-		List<File> entries = JavaUtil.parseSystemClasspath( null );
+	public void testParseSystemClasspath() throws Exception {
+		List<URI> entries = JavaUtil.parseSystemClasspath( null );
 		assertEquals( 0, entries.size() );
 
 		String classpath = "test1.jar" + File.pathSeparator + "test2.jar";
 		entries = JavaUtil.parseSystemClasspath( classpath );
 
-		assertEquals( new File( "test1.jar" ).getAbsoluteFile(), entries.get( 0 ) );
-		assertEquals( new File( "test2.jar" ).getAbsoluteFile(), entries.get( 1 ) );
+		assertEquals( URI.create( "test1.jar" ), entries.get( 0 ) );
+		assertEquals( URI.create( "test2.jar" ), entries.get( 1 ) );
 	}
 
 	public void testParseManifestClasspath() throws Exception {

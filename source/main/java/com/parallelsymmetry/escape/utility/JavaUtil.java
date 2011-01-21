@@ -30,16 +30,15 @@ public class JavaUtil {
 	 * "http://java.sun.com/javase/6/docs/technotes/tools/solaris/classpath.html"
 	 * >Setting the Unix Classpath</a>
 	 */
-	public static List<File> parseSystemClasspath( String classpath ) throws IOException {
-		ArrayList<File> list = new ArrayList<File>();
-
+	public static List<URI> parseSystemClasspath( String classpath ) throws URISyntaxException {
+		ArrayList<URI> list = new ArrayList<URI>();
 		if( classpath == null ) return list;
 
 		StringTokenizer tokenizer = new StringTokenizer( classpath, File.pathSeparator );
 		while( tokenizer.hasMoreTokens() ) {
-			File file = new File( tokenizer.nextToken() ).getCanonicalFile();
-			list.add( file );
+			list.add( new URI( tokenizer.nextToken() ) );
 		}
+		
 		return list;
 	}
 
