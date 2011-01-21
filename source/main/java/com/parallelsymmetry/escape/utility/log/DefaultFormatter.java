@@ -116,11 +116,11 @@ public class DefaultFormatter extends Formatter {
 		switch( index ) {
 			// ERROR
 			case 10: {
-				return "\u001b[31m";
+				return "\u001b[1m\u001b[31m";
 			}
 				// WARN
 			case 9: {
-				return "\u001b[33m";
+				return "\u001b[1m\u001b[33m";
 			}
 				// INFO
 			case 8: {
@@ -128,7 +128,7 @@ public class DefaultFormatter extends Formatter {
 			}
 				// TRACE
 			case 7: {
-				return "\u001b[34m";
+				return "\u001b[36m";
 			}
 				// DEBUG
 			case 6: {
