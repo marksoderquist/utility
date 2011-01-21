@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.parallelsymmetry.escape.utility.log.Log;
+
 public class JavaUtil {
 
 	/**
@@ -36,13 +38,20 @@ public class JavaUtil {
 		ArrayList<URI> list = new ArrayList<URI>();
 		if( classpath == null ) return list;
 
+		URI uri = null;
+		String token = null;
 		StringTokenizer tokenizer = new StringTokenizer( classpath, File.pathSeparator );
-		try {
-			while( tokenizer.hasMoreTokens() ) {
-				list.add( new URI( URLEncoder.encode( tokenizer.nextToken(), "UTF-8" ) ) );
+		while( tokenizer.hasMoreTokens() ) {
+			token = tokenizer.nextToken();
+
+			try {
+				uri = new URI( token );
+			} catch( URISyntaxException excpetion ) {
+				uri = new File( token ).toURI();
 			}
-		} catch( UnsupportedEncodingException exception ) {
-			// Intentionally ignore exception since UTF-8 is supported.
+			if( uri.getScheme() == null ) uri = new File( token ).toURI();
+
+			list.add( uri );
 		}
 
 		return list;

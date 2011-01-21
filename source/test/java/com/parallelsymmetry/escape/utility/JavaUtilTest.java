@@ -17,11 +17,18 @@ public class JavaUtilTest extends TestCase {
 		List<URI> entries = JavaUtil.parseSystemClasspath( null );
 		assertEquals( 0, entries.size() );
 
-		String classpath = "test1.jar" + File.pathSeparator + "test2.jar";
+		String classpath = "test1.jar";
+		classpath += File.pathSeparator + "test2.jar";
+		classpath += File.pathSeparator + new File( "test3.jar" ).getCanonicalPath().toString();
+		classpath += File.pathSeparator + "/test";
+		classpath += File.pathSeparator + "http://www.parallelsymmetry.com/software/test5.jar";
 		entries = JavaUtil.parseSystemClasspath( classpath );
 
-		assertEquals( URI.create( "test1.jar" ), entries.get( 0 ) );
-		assertEquals( URI.create( "test2.jar" ), entries.get( 1 ) );
+		assertEquals( new File( "test1.jar" ).toURI(), entries.get( 0 ) );
+		assertEquals( new File( "test2.jar" ).toURI(), entries.get( 1 ) );
+		assertEquals( new File( "test3.jar" ).toURI(), entries.get( 2 ) );
+		assertEquals( new File( "/test" ).toURI(), entries.get( 3 ) );
+		assertEquals( URI.create( "http://www.parallelsymmetry.com/software/test5.jar" ), entries.get( 4 ) );
 	}
 
 	public void testParseManifestClasspath() throws Exception {
