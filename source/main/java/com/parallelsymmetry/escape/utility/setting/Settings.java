@@ -15,9 +15,20 @@ public class Settings {
 
 	private Map<SettingProvider, String> mounts;
 
+	private Settings root;
+
+	private String path;
+
 	public Settings() {
 		this.providers = new CopyOnWriteArrayList<SettingProvider>();
 		this.mounts = new ConcurrentHashMap<SettingProvider, String>();
+		this.root = this;
+		this.path = "";
+	}
+
+	private Settings( Settings root, String path ) {
+		this.root = root;
+		this.path = path;
 	}
 
 	public int getProviderCount() {
@@ -72,30 +83,35 @@ public class Settings {
 		mounts.remove( providers.remove( index ) );
 	}
 
+	public Settings node( String path ) {
+		return new Settings( root, this.path + path );
+	}
+
 	public String get( String path ) {
 		return get( path, null );
 	}
 
 	public String get( String path, String defaultValue ) {
-		validatePath( path );
+		String full = this.path + path;
+		validatePath( full );
 		String result = null;
-		for( SettingProvider provider : providers ) {
-			String mount = mounts.get( provider );
+		for( SettingProvider provider : root.providers ) {
+			String mount = root.mounts.get( provider );
 
 			if( mount == null ) {
-				result = provider.get( path );
-			} else if( path.startsWith( mount ) ) {
-				result = provider.get( path.substring( mount.length() ) );
+				result = provider.get( full );
+			} else if( full.startsWith( mount ) ) {
+				result = provider.get( full.substring( mount.length() ) );
 			}
 
 			if( result != null ) return result;
 		}
 
-		if( defaultProvider != null ) {
-			if( defaultMount == null ) {
-				result = defaultProvider.get( path );
-			} else if( path.startsWith( defaultMount ) ) {
-				result = defaultProvider.get( path.substring( defaultMount.length() ) );
+		if( root.defaultProvider != null ) {
+			if( root.defaultMount == null ) {
+				result = root.defaultProvider.get( full );
+			} else if( full.startsWith( root.defaultMount ) ) {
+				result = root.defaultProvider.get( full.substring( root.defaultMount.length() ) );
 			}
 			return result;
 		}
@@ -104,14 +120,15 @@ public class Settings {
 	}
 
 	public void put( String path, String value ) {
-		validatePath( path );
+		String full = this.path + path;
+		validatePath( full );
 
 		boolean written = false;
-		for( SettingProvider provider : providers ) {
+		for( SettingProvider provider : root.providers ) {
 			if( provider.isWritable() ) {
-				String mount = mounts.get( provider );
+				String mount = root.mounts.get( provider );
 
-				provider.put( mount == null ? path : mount + path, value );
+				provider.put( mount == null ? full : mount + full, value );
 
 				if( written ) break;
 			}

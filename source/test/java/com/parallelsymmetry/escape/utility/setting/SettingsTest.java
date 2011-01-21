@@ -2,7 +2,7 @@ package com.parallelsymmetry.escape.utility.setting;
 
 import junit.framework.TestCase;
 
-public class SettingTest extends TestCase {
+public class SettingsTest extends TestCase {
 
 	private MockSettingProvider provider1 = new MockSettingProvider( false );
 
@@ -95,6 +95,39 @@ public class SettingTest extends TestCase {
 		assertEquals( "2", settings.get( "/test/path/2" ) );
 		assertEquals( "3", settings.get( "/test/path/3" ) );
 		assertEquals( "D", settings.get( "/test/path/D" ) );
+	}
+
+	public void testNode() {
+		provider1.set( "/test/path/1", "1" );
+
+		provider2.set( "/test/path/1", "2" );
+		provider2.set( "/test/path/2", "2" );
+
+		provider3.set( "/test/path/1", "3" );
+		provider3.set( "/test/path/2", "3" );
+		provider3.set( "/test/path/3", "3" );
+
+		providerD.set( "/test/path/1", "D" );
+		providerD.set( "/test/path/2", "D" );
+		providerD.set( "/test/path/3", "D" );
+		providerD.set( "/test/path/D", "D" );
+
+		Settings node = settings.node( "/test" );
+
+		assertEquals( "1", node.get( "/path/1" ) );
+		assertEquals( "2", node.get( "/path/2" ) );
+		assertEquals( "3", node.get( "/path/3" ) );
+		assertEquals( "D", node.get( "/path/D" ) );
+
+		node.put( "/path/1", "A" );
+		node.put( "/path/2", "B" );
+		node.put( "/path/3", "C" );
+
+		// Remember that provider2 is the only one writable.
+		assertEquals( "1", node.get( "/path/1" ) );
+		assertEquals( "B", node.get( "/path/2" ) );
+		assertEquals( "C", node.get( "/path/3" ) );
+		assertEquals( "D", node.get( "/path/D" ) );
 	}
 
 }
