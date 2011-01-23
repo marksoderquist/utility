@@ -3,16 +3,11 @@ package com.parallelsymmetry.escape.utility.setting;
 import com.parallelsymmetry.escape.utility.Descriptor;
 
 public class DescriptorSettingProvider implements SettingProvider {
-	
-	private Descriptor descriptor;
-	
-	public DescriptorSettingProvider(Descriptor descriptor) {
-		this.descriptor = descriptor;
-	}
 
-	@Override
-	public boolean isWritable() {
-		return false;
+	private Descriptor descriptor;
+
+	public DescriptorSettingProvider( Descriptor descriptor ) {
+		this.descriptor = descriptor;
 	}
 
 	@Override
@@ -21,6 +16,8 @@ public class DescriptorSettingProvider implements SettingProvider {
 	}
 
 	@Override
-	public void put( String path, String value ) {}
+	public boolean nodeExists( String path ) {
+		return descriptor.getNode( path ) != null;
+	}
 
 }

@@ -19,7 +19,7 @@ public class Indenter {
 
 	public static final String createIndent( int count, String indent ) {
 		if( count == 1 ) return indent;
-		
+
 		int size = count * indent.length();
 		if( size < 1 ) return "";
 
@@ -200,7 +200,9 @@ public class Indenter {
 		StringReader stringReader = new StringReader( content );
 		BufferedReader bufferedReader = new BufferedReader( stringReader );
 
+		int lineNumber = 0;
 		try {
+			lineNumber++;
 			String line = bufferedReader.readLine();
 			while( line != null && line.length() == 0 ) {
 				builder.append( trim( "\n", trimChars ) );
@@ -214,8 +216,8 @@ public class Indenter {
 					line = bufferedReader.readLine();
 				}
 			}
-		} catch( IOException acException ) {
-			System.out.println( "Error running unindent( String asText )." );
+		} catch( IOException exception ) {
+			throw new RuntimeException( "Could not unindent at line: " + lineNumber );
 		}
 
 		return builder.toString();

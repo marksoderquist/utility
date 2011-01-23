@@ -19,14 +19,9 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "test.path.value", provider.get( "/test/path/value" ) );
 	}
 
-	public void testPut() {
-		assertNull( provider.get( "/xtest/path" ) );
-		provider.put( "/xtest/path", "value" );
-		assertNull( provider.get( "/xtest/path" ) );
-	}
-
-	public void testIsWritable() {
-		assertFalse( provider.isWritable() );
+	public void testNodeExists() {
+		assertFalse( provider.nodeExists( "/test/path/invalid" ) );
+		assertTrue( provider.nodeExists( "/test/path" ) );
 	}
 
 }

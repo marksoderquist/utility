@@ -35,8 +35,13 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertNull( provider.get( "/test/path2" ) );
 	}
 
-	public void testIsWritable() {
-		assertTrue( provider.isWritable() );
+	public void testNodeExists() {
+		provider.removeNode( "/test/node" );
+		assertFalse( provider.nodeExists( "/test/node" ) );
+		provider.get( "/test/node" );
+		assertFalse( provider.nodeExists( "/test/node" ) );
+		provider.get( "/test/node/exists" );
+		assertTrue( provider.nodeExists( "/test/node" ) );
 	}
 
 }

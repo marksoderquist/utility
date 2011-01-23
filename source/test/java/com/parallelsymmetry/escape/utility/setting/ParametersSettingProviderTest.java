@@ -11,7 +11,7 @@ public class ParametersSettingProviderTest extends TestCase {
 	private ParametersSettingProvider provider;
 
 	public void setUp() {
-		parameters = Parameters.parse( new String[] { "-host", "localhost" } );
+		parameters = Parameters.parse( new String[] { "-host", "localhost", "-log.level", "debug" } );
 		provider = new ParametersSettingProvider( parameters );
 	}
 
@@ -20,14 +20,9 @@ public class ParametersSettingProviderTest extends TestCase {
 		assertEquals( "localhost", provider.get( "/host" ) );
 	}
 
-	public void testPut() {
-		assertNull( provider.get( "/port" ) );
-		provider.put( "/port", "80" );
-		assertNull( provider.get( "/port" ) );
+	public void testNodeExists() {
+		assertFalse( provider.nodeExists( "/invalid" ) );
+		assertTrue( provider.nodeExists( "/log" ) );
 	}
 
-	public void testIsWritable() {
-		assertFalse( provider.isWritable() );
-	}
-	
 }

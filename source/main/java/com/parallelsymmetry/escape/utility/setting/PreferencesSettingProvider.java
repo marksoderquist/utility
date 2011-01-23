@@ -5,7 +5,7 @@ import java.util.prefs.Preferences;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public class PreferencesSettingProvider implements SettingProvider {
+public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	private Preferences preferences;
 
@@ -14,8 +14,13 @@ public class PreferencesSettingProvider implements SettingProvider {
 	}
 
 	@Override
-	public boolean isWritable() {
-		return true;
+	public boolean nodeExists( String path ) {
+		try {
+			return preferences.nodeExists( path );
+		} catch( BackingStoreException exception ) {
+			Log.write( exception );
+		}
+		return false;
 	}
 
 	@Override
@@ -41,6 +46,20 @@ public class PreferencesSettingProvider implements SettingProvider {
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
+	}
+
+	@Override
+	public void removeNode( String path ) {
+		try {
+			preferences.node( path ).removeNode();
+		} catch( BackingStoreException exception ) {
+			Log.write( exception );
+		}
+	}
+
+	@Override
+	public void renameNode( String oldPath, String newPath ) {
+		preferences.node( oldPath );
 	}
 
 }

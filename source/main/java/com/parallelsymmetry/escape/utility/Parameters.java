@@ -225,6 +225,10 @@ public class Parameters {
 		return files;
 	}
 
+	public Set<String> getNames() {
+		return values.keySet();
+	}
+
 	public String[] getCommands() {
 		return commands;
 	}
