@@ -135,7 +135,7 @@ public class Settings {
 	}
 
 	public List<Settings> getList( String path ) {
-		int count = getInt( path + ITEM_COUNT );
+		int count = getInt( path + ITEM_COUNT, 0 );
 
 		List<Settings> list = new ArrayList<Settings>( count );
 		for( int index = 0; index < count; index++ ) {

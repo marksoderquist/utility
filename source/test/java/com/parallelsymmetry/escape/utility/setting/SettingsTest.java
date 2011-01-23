@@ -187,6 +187,9 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testGetList() {
+		List<Settings> empty = settings.getList( "/test/empty" );
+		assertEquals( 0, empty.size() );
+
 		int count = 3;
 
 		String listPath = "/test/path/list";
