@@ -10,18 +10,24 @@ public class DescriptorSettingProviderTest extends TestCase {
 
 	private DescriptorSettingProvider provider;
 
+	private DescriptorSettingProvider rootedProvider;
+
 	public void setUp() throws Exception {
 		descriptor = new Descriptor( getClass().getResourceAsStream( "/test.descriptor.xml" ) );
 		provider = new DescriptorSettingProvider( descriptor );
+		rootedProvider = new DescriptorSettingProvider( descriptor, false );
 	}
 
 	public void testGet() {
-		assertEquals( "test.path.value", provider.get( "/test/path/value" ) );
+		assertEquals( "test.path.value", provider.get( "/path/value" ) );
+		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
 
 	public void testNodeExists() {
-		assertFalse( provider.nodeExists( "/test/path/invalid" ) );
-		assertTrue( provider.nodeExists( "/test/path" ) );
+		assertFalse( provider.nodeExists( "/path/invalid" ) );
+		assertFalse( rootedProvider.nodeExists( "/test/path/invalid" ) );
+		assertTrue( provider.nodeExists( "/path" ) );
+		assertTrue( rootedProvider.nodeExists( "/test/path" ) );
 	}
 
 }
