@@ -90,9 +90,9 @@ import java.util.Set;
  */
 public class Parameters {
 
-	public static final String PREFIX = "-";
+	public static final String SINGLE = "-";
 
-	private static final String MULTIPLE = "--";
+	public static final String MULTIPLE = "--";
 
 	private String[] commands;
 
@@ -133,7 +133,7 @@ public class Parameters {
 				if( validParameters != null && !validParameters.contains( parameter ) ) throw new InvalidParameterException( "Unknown parameter: " + MULTIPLE + parameter );
 
 				List<String> valueList = new ArrayList<String>();
-				while( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( PREFIX ) ) ) {
+				while( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( SINGLE ) ) ) {
 					String value = commands[index + 1];
 					if( value.startsWith( "\\-" ) ) value = value.substring( 1 );
 					valueList.add( value );
@@ -142,13 +142,13 @@ public class Parameters {
 				if( valueList.size() == 0 ) valueList.add( "true" );
 
 				values.put( parameter, valueList );
-			} else if( !terminated && command.startsWith( PREFIX ) ) {
+			} else if( !terminated && command.startsWith( SINGLE ) ) {
 				String parameter = command.substring( 1 );
 
-				if( validParameters != null && !validParameters.contains( parameter ) ) throw new InvalidParameterException( "Unknown parameter: " + PREFIX + parameter );
+				if( validParameters != null && !validParameters.contains( parameter ) ) throw new InvalidParameterException( "Unknown parameter: " + SINGLE + parameter );
 
 				List<String> valueList = new ArrayList<String>();
-				if( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( PREFIX ) ) ) {
+				if( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( SINGLE ) ) ) {
 					valueList.add( commands[index + 1] );
 					index++;
 				}
