@@ -266,7 +266,6 @@ public class Log {
 	public static final Level parseLevel( String string ) {
 		if( string == null ) return null;
 
-		// FIXME In Java 7 this can be turned into a switch statement.
 		string = string.toUpperCase();
 		if( NONE.getName().equals( string ) ) {
 			return NONE;
