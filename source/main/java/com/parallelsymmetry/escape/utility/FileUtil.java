@@ -27,6 +27,8 @@ public class FileUtil {
 
 	public static final long PETABYTE = 1L << 50;
 
+	public static final File TEMP_FOLDER = new File( System.getProperty( "java.io.tmpdir" ) );
+
 	public static final FileFilter FOLDER_FILTER = new FolderFilter();
 
 	public static final FileFilter JAR_FILE_FILTER = new JarFileFilter();
