@@ -5,9 +5,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,13 +92,7 @@ public class FileUtil {
 	}
 
 	public static final void save( String data, File target, String encoding ) throws IOException {
-		OutputStreamWriter writer = null;
-		try {
-			writer = new OutputStreamWriter( new FileOutputStream( target ), encoding );
-			writer.write( data );
-		} finally {
-			if( writer != null ) writer.close();
-		}
+		IoUtil.save( data, new FileOutputStream( target ), encoding );
 	}
 
 	public static final String load( File source ) throws IOException {
@@ -109,23 +100,7 @@ public class FileUtil {
 	}
 
 	public static final String load( File source, String encoding ) throws IOException {
-		char[] buffer = new char[4096];
-		InputStreamReader reader = null;
-		StringWriter writer = new StringWriter();
-
-		try {
-			reader = new InputStreamReader( new FileInputStream( source ), encoding );
-			int read = reader.read( buffer );
-			while( read > -1 ) {
-				writer.write( buffer, 0, read );
-				read = reader.read( buffer );
-			}
-			writer.close();
-		} finally {
-			if( reader != null ) reader.close();
-		}
-
-		return writer.toString();
+		return IoUtil.load( new FileInputStream( source ), encoding );
 	}
 
 	public static final void zip( File source, File target ) throws IOException {
