@@ -7,6 +7,7 @@ import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public final class TextUtil {
@@ -94,6 +95,31 @@ public final class TextUtil {
 		} catch( NoSuchAlgorithmException exception ) {
 			return null;
 		}
+	}
+
+	public static String toString( List<? extends Object> list ) {
+		return toString( list, "[", "]" );
+	}
+
+	public static String toString( List<? extends Object> list, String delimiter ) {
+		return toString( list, delimiter, null );
+	}
+
+	public static String toString( List<? extends Object> list, String prefix, String suffix ) {
+		if( list == null ) return null;
+
+		boolean delimiter = suffix == null;
+
+		StringBuilder builder = new StringBuilder();
+
+		for( Object object : list ) {
+			if( !delimiter && builder.length() > 0 ) builder.append( " " );
+			if( !delimiter || builder.length() > 0 ) builder.append( prefix );
+			builder.append( object.toString() );
+			if( !delimiter ) builder.append( suffix );
+		}
+
+		return builder.toString();
 	}
 
 	/**
