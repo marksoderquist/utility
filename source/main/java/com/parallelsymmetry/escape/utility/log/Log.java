@@ -1,16 +1,20 @@
 package com.parallelsymmetry.escape.utility.log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import com.parallelsymmetry.escape.utility.Parameters;
 
 /**
  * Provides a facade to the standard Java logging architecture. This facade
@@ -55,7 +59,7 @@ public class Log {
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
 	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
-	
+
 	private static boolean showTag;
 
 	private static boolean showDate;
@@ -72,6 +76,29 @@ public class Log {
 
 		DEFAULT_HANDLER.setLevel( DEFAULT_LOG_LEVEL );
 		defaultHandlers.put( defaultLogger, DEFAULT_HANDLER );
+	}
+
+	/**
+	 * Initialize the log framework with values from a parameters object.
+	 * 
+	 * @param parameters
+	 * @return
+	 */
+	public static final void init( Parameters parameters ) {
+		if( parameters.isSpecified( "log.tag" ) ) Log.setShowTag( parameters.isSet( "log.tag" ) );
+		if( parameters.isSpecified( "log.color" ) ) Log.setShowColor( parameters.isSet( "log.color" ) );
+		if( parameters.isSpecified( "log.prefix" ) ) Log.setShowPrefix( parameters.isSet( "log.prefix" ) );
+		if( parameters.isSpecified( "log.level" ) ) Log.setLevel( Log.parseLevel( parameters.get( "log.level" ) ) );
+
+		if( parameters.isSpecified( "log.name" ) ) {
+			try {
+				String pattern = parameters.get( "log.name" );
+				if( parameters.isSet( "log.name" ) ) pattern = "log.txt";
+				addHandler( new FileHandler( pattern ) );
+			} catch( IOException exception ) {
+				Log.write( exception );
+			}
+		}
 	}
 
 	/**
@@ -108,7 +135,7 @@ public class Log {
 	public static final void setShowTag( boolean showTag ) {
 		Log.showTag = showTag;
 	}
-	
+
 	public static final boolean isShowDate() {
 		return showDate;
 	}
@@ -120,7 +147,7 @@ public class Log {
 	public static final boolean isShowColor() {
 		return showColor;
 	}
-	
+
 	public static final void setShowColor( boolean showColor ) {
 		Log.showColor = showColor;
 	}
