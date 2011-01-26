@@ -94,7 +94,9 @@ public class Log {
 			try {
 				String pattern = parameters.get( "log.file" );
 				if( parameters.isTrue( "log.file" ) ) pattern = "log.txt";
-				addHandler( new FileHandler( pattern ) );
+				FileHandler handler = new FileHandler( pattern );
+				handler.setFormatter( new DefaultFormatter() );
+				addHandler( handler );
 			} catch( IOException exception ) {
 				Log.write( exception );
 			}
