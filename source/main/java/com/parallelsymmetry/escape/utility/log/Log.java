@@ -90,10 +90,10 @@ public class Log {
 		if( parameters.isSet( "log.prefix" ) ) Log.setShowPrefix( parameters.isTrue( "log.prefix" ) );
 		if( parameters.isSet( "log.level" ) ) Log.setLevel( Log.parseLevel( parameters.get( "log.level" ) ) );
 
-		if( parameters.isSet( "log.name" ) ) {
+		if( parameters.isSet( "log.file" ) ) {
 			try {
-				String pattern = parameters.get( "log.name" );
-				if( parameters.isTrue( "log.name" ) ) pattern = "log.txt";
+				String pattern = parameters.get( "log.file" );
+				if( parameters.isTrue( "log.file" ) ) pattern = "log.txt";
 				addHandler( new FileHandler( pattern ) );
 			} catch( IOException exception ) {
 				Log.write( exception );
