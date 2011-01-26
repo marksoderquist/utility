@@ -187,7 +187,7 @@ public class Parameters {
 	 * @param name
 	 * @return
 	 */
-	public boolean isSet( String name ) {
+	public boolean isTrue( String name ) {
 		return Boolean.parseBoolean( get( name ) );
 	}
 
@@ -217,7 +217,7 @@ public class Parameters {
 	 * @param name
 	 * @return
 	 */
-	public boolean isSpecified( String name ) {
+	public boolean isSet( String name ) {
 		return !( get( name ) == null );
 	}
 

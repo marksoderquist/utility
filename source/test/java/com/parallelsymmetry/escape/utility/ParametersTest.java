@@ -87,8 +87,8 @@ public class ParametersTest extends TestCase {
 		String notaflag = "notaflag";
 		String[] args = new String[] { "-" + flag };
 		Parameters parameters = Parameters.parse( args );
-		assertFalse( parameters.isSet( notaflag ) );
-		assertTrue( "Flag not set.", parameters.isSet( flag ) );
+		assertFalse( parameters.isTrue( notaflag ) );
+		assertTrue( "Flag not set.", parameters.isTrue( flag ) );
 	}
 
 	@Test
@@ -108,9 +108,9 @@ public class ParametersTest extends TestCase {
 		}
 
 		Parameters parameters = Parameters.parse( args );
-		assertFalse( parameters.isSet( notaflag ) );
+		assertFalse( parameters.isTrue( notaflag ) );
 		for( String flag : flags ) {
-			assertTrue( "Flag not set.", parameters.isSet( flag ) );
+			assertTrue( "Flag not set.", parameters.isTrue( flag ) );
 		}
 	}
 
@@ -120,7 +120,7 @@ public class ParametersTest extends TestCase {
 		String notakey = "notakey";
 		String[] args = new String[] { "-" + key, value };
 		Parameters parameters = Parameters.parse( args );
-		assertFalse( parameters.isSet( notakey ) );
+		assertFalse( parameters.isTrue( notakey ) );
 		assertEquals( "Value not set.", value, parameters.get( key ) );
 	}
 
@@ -142,8 +142,8 @@ public class ParametersTest extends TestCase {
 		}
 
 		Parameters parameters = Parameters.parse( args );
-		assertFalse( parameters.isSpecified( notakey ) );
 		assertFalse( parameters.isSet( notakey ) );
+		assertFalse( parameters.isTrue( notakey ) );
 		for( int index = 0; index < count; index++ ) {
 			assertEquals( "Value not set.", values.get( index ), parameters.get( keys.get( index ) ) );
 		}
@@ -152,8 +152,8 @@ public class ParametersTest extends TestCase {
 	@Test
 	public void testParseWithEscapedValues() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "--test", "go", "\\-help" } );
-		assertTrue( parameters.isSpecified( "test" ) );
-		assertFalse( parameters.isSet( "test" ) );
+		assertTrue( parameters.isSet( "test" ) );
+		assertFalse( parameters.isTrue( "test" ) );
 		List<String> values = parameters.getValues( "test" );
 
 		assertEquals( "go", values.get( 0 ) );
@@ -164,9 +164,9 @@ public class ParametersTest extends TestCase {
 	public void testParseFlagsWithValue() throws Exception {
 		String[] args = new String[] { "-flag1", "-key", "value", "-flag2" };
 		Parameters parameters = Parameters.parse( args );
-		assertTrue( "Flag 1 not set.", parameters.isSet( "flag1" ) );
+		assertTrue( "Flag 1 not set.", parameters.isTrue( "flag1" ) );
 		assertEquals( "Value not set.", "value", parameters.get( "key" ) );
-		assertTrue( "Flag 2 not set.", parameters.isSet( "flag2" ) );
+		assertTrue( "Flag 2 not set.", parameters.isTrue( "flag2" ) );
 	}
 
 	@Test
@@ -174,7 +174,7 @@ public class ParametersTest extends TestCase {
 		String[] args = new String[] { "-key1", "value1", "-flag", "-key2", "value2" };
 		Parameters parameters = Parameters.parse( args );
 		assertEquals( "Value 1 not set.", "value1", parameters.get( "key1" ) );
-		assertTrue( "Flag not set.", parameters.isSet( "flag" ) );
+		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
 		assertEquals( "Value 2 not set.", "value2", parameters.get( "key2" ) );
 	}
 
@@ -214,7 +214,7 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( args );
 		List<File> files = parameters.getFiles();
 
-		assertTrue( "Flag not set.", parameters.isSet( "flag" ) );
+		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
 		assertEquals( "Number of files incorrect.", 1, files.size() );
 		assertEquals( "File name incorrect.", new File( filename ), files.get( 0 ) );
 	}
@@ -268,8 +268,8 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
-		assertTrue( parameters.isSpecified( "other" ) );
 		assertTrue( parameters.isSet( "other" ) );
+		assertTrue( parameters.isTrue( "other" ) );
 	}
 
 	@Test
@@ -293,8 +293,8 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
-		assertTrue( parameters.isSpecified( "other" ) );
-		assertFalse( parameters.isSet( "other" ) );
+		assertTrue( parameters.isSet( "other" ) );
+		assertFalse( parameters.isTrue( "other" ) );
 
 		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
 	}
@@ -303,17 +303,17 @@ public class ParametersTest extends TestCase {
 	public void testIsSet() throws Exception {
 		String[] args = new String[] { "-flag1", "false", "-flag2", "true", "-flag3" };
 		Parameters parameters = Parameters.parse( args );
-		assertFalse( parameters.isSpecified( "flag0" ) );
 		assertFalse( parameters.isSet( "flag0" ) );
+		assertFalse( parameters.isTrue( "flag0" ) );
 
-		assertTrue( parameters.isSpecified( "flag1" ) );
-		assertFalse( parameters.isSet( "flag1" ) );
+		assertTrue( parameters.isSet( "flag1" ) );
+		assertFalse( parameters.isTrue( "flag1" ) );
 
-		assertTrue( parameters.isSpecified( "flag2" ) );
 		assertTrue( parameters.isSet( "flag2" ) );
+		assertTrue( parameters.isTrue( "flag2" ) );
 
-		assertTrue( parameters.isSpecified( "flag3" ) );
 		assertTrue( parameters.isSet( "flag3" ) );
+		assertTrue( parameters.isTrue( "flag3" ) );
 	}
 
 	@Test

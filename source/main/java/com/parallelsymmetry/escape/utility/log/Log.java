@@ -85,15 +85,15 @@ public class Log {
 	 * @return
 	 */
 	public static final void init( Parameters parameters ) {
-		if( parameters.isSpecified( "log.tag" ) ) Log.setShowTag( parameters.isSet( "log.tag" ) );
-		if( parameters.isSpecified( "log.color" ) ) Log.setShowColor( parameters.isSet( "log.color" ) );
-		if( parameters.isSpecified( "log.prefix" ) ) Log.setShowPrefix( parameters.isSet( "log.prefix" ) );
-		if( parameters.isSpecified( "log.level" ) ) Log.setLevel( Log.parseLevel( parameters.get( "log.level" ) ) );
+		if( parameters.isSet( "log.tag" ) ) Log.setShowTag( parameters.isTrue( "log.tag" ) );
+		if( parameters.isSet( "log.color" ) ) Log.setShowColor( parameters.isTrue( "log.color" ) );
+		if( parameters.isSet( "log.prefix" ) ) Log.setShowPrefix( parameters.isTrue( "log.prefix" ) );
+		if( parameters.isSet( "log.level" ) ) Log.setLevel( Log.parseLevel( parameters.get( "log.level" ) ) );
 
-		if( parameters.isSpecified( "log.name" ) ) {
+		if( parameters.isSet( "log.name" ) ) {
 			try {
 				String pattern = parameters.get( "log.name" );
-				if( parameters.isSet( "log.name" ) ) pattern = "log.txt";
+				if( parameters.isTrue( "log.name" ) ) pattern = "log.txt";
 				addHandler( new FileHandler( pattern ) );
 			} catch( IOException exception ) {
 				Log.write( exception );
