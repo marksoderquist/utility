@@ -68,15 +68,11 @@ public class Version implements Comparable<Version> {
 	}
 
 	public boolean isSnapshot() {
-		return checkForString( items, SNAPSHOT );
+		return hasQualifier( SNAPSHOT );
 	}
 
-	public boolean isAlpha() {
-		return checkForString( items, "alpha" );
-	}
-
-	public boolean isBeta() {
-		return checkForString( items, "beta" );
+	public boolean hasQualifier( String qualifier ) {
+		return checkForString( items, qualifier.toLowerCase() );
 	}
 
 	public String toHumanString() {
