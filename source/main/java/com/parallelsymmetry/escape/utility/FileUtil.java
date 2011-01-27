@@ -210,6 +210,14 @@ public class FileUtil {
 			return result;
 		}
 
+		// Copy file source to new file target.
+		if( source.isFile() ) {
+			File parent = target.getParentFile();
+			if( !parent.exists() ) target.getParentFile().mkdirs();
+			target.createNewFile();
+			return copy( source, target, false );
+		}
+
 		return false;
 	}
 

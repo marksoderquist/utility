@@ -118,6 +118,8 @@ public class FileUtilTest extends TestCase {
 		for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
 			assertTrue( new File( targetData, entries.nextElement().getName() ).exists() );
 		}
+		
+		targetData.deleteOnExit();
 	}
 
 	public void testCopyWithNonExistantFiles() throws Exception {
@@ -144,6 +146,28 @@ public class FileUtilTest extends TestCase {
 		target.deleteOnExit();
 	}
 
+	public void testCopyFileToNewFile() throws Exception {
+		long time = System.currentTimeMillis();
+		File source = File.createTempFile( PREFIX, "copyFileToFileSource" );
+		File temp = File.createTempFile( PREFIX, "copyFileToFileTarget" );
+		File target = new File( temp.getParentFile(), "copyFileToNewFileTarget" );
+		FileOutputStream fileOutput = new FileOutputStream( source );
+		DataOutputStream output = new DataOutputStream( fileOutput );
+		output.writeLong( time );
+		output.close();
+
+		assertTrue( FileUtil.copy( source, target ) );
+
+		FileInputStream fileInput = new FileInputStream( target );
+		DataInputStream input = new DataInputStream( fileInput );
+		assertEquals( time, input.readLong() );
+		input.close();
+
+		source.deleteOnExit();
+		temp.deleteOnExit();
+		target.deleteOnExit();
+	}
+
 	public void testCopyFileToFolder() throws Exception {
 		long time = System.currentTimeMillis();
 		File source = File.createTempFile( PREFIX, "copyFileToFolderSource" );
@@ -160,14 +184,20 @@ public class FileUtilTest extends TestCase {
 		DataInputStream input = new DataInputStream( fileInput );
 		assertEquals( time, input.readLong() );
 		input.close();
+
+		source.deleteOnExit();
+		target.deleteOnExit();
 	}
 
 	public void testCopyFolderToFile() throws Exception {
 		File source = FileUtil.createTempFolder( PREFIX, "copyFolderToFileSource" );
 		File target = File.createTempFile( PREFIX, "copyFolderToFileTarget" );
 		assertFalse( FileUtil.copy( source, target ) );
-		assertTrue( source.delete() );
-		assertTrue( target.delete() );
+		assertTrue( source.exists() );
+		assertTrue( target.exists() );
+
+		source.deleteOnExit();
+		target.deleteOnExit();
 	}
 
 	public void testCopyFolderToFolder() throws Exception {
@@ -191,6 +221,9 @@ public class FileUtilTest extends TestCase {
 		assertTrue( new File( target, leaf1.getName() ).exists() );
 		assertTrue( new File( target1, leaf2.getName() ).exists() );
 		assertTrue( new File( target1, leaf3.getName() ).exists() );
+
+		parent0.deleteOnExit();
+		parent1.deleteOnExit();
 	}
 
 	public void testCopyFolderToFolderWithSourceFolder() throws Exception {
@@ -215,6 +248,9 @@ public class FileUtilTest extends TestCase {
 		assertTrue( new File( target0, leaf1.getName() ).exists() );
 		assertTrue( new File( target1, leaf2.getName() ).exists() );
 		assertTrue( new File( target1, leaf3.getName() ).exists() );
+
+		parent0.deleteOnExit();
+		parent1.deleteOnExit();
 	}
 
 	public void testDeleteTree() throws Exception {
