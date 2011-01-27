@@ -60,7 +60,7 @@ public class Log {
 
 	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
 
-	private static boolean showTag;
+	private static boolean showTag = true;
 
 	private static boolean showDate;
 
