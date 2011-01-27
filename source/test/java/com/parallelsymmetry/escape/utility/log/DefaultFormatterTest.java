@@ -20,24 +20,24 @@ public class DefaultFormatterTest extends TestCase {
 	}
 
 	public void testFormatWithEmptyInfoRecord() {
-		assertEquals( "\n", formatter.format( new LogRecord( Log.INFO, "" ) ) );
+		assertEquals( "[I] \n", formatter.format( new LogRecord( Log.INFO, "" ) ) );
 	}
 
 	public void testFormatWithNonEmptyRecord() {
-		assertEquals( "Test message.\n", formatter.format( new LogRecord( Log.ERROR, "Test message." ) ) );
-		assertEquals( "Test message.\n", formatter.format( new LogRecord( Log.WARN, "Test message." ) ) );
-		assertEquals( "Test message.\n", formatter.format( new LogRecord( Log.INFO, "Test message." ) ) );
-		assertEquals( "Test message.\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
-		assertEquals( "Test message.\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
+		assertEquals( "[E] Test message.\n", formatter.format( new LogRecord( Log.ERROR, "Test message." ) ) );
+		assertEquals( "[W] Test message.\n", formatter.format( new LogRecord( Log.WARN, "Test message." ) ) );
+		assertEquals( "[I] Test message.\n", formatter.format( new LogRecord( Log.INFO, "Test message." ) ) );
+		assertEquals( "[T] Test message.\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
+		assertEquals( "[D] Test message.\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
 	}
 
 	public void testColorFormatWithNonEmptyRecord() {
 		Log.setShowColor( true );
-		assertEquals( "\u001b[1m\u001b[31mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.ERROR, "Test message." ) ) );
-		assertEquals( "\u001b[1m\u001b[33mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.WARN, "Test message." ) ) );
-		assertEquals( "\u001b[0mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.INFO, "Test message." ) ) );
-		assertEquals( "\u001b[36mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
-		assertEquals( "\u001b[1m\u001b[30mTest message.\u001b[0m\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
+		assertEquals( "\u001b[1m\u001b[31m[E] Test message.\u001b[0m\n", formatter.format( new LogRecord( Log.ERROR, "Test message." ) ) );
+		assertEquals( "\u001b[1m\u001b[33m[W] Test message.\u001b[0m\n", formatter.format( new LogRecord( Log.WARN, "Test message." ) ) );
+		assertEquals( "\u001b[0m[I] Test message.\u001b[0m\n", formatter.format( new LogRecord( Log.INFO, "Test message." ) ) );
+		assertEquals( "\u001b[36m[T] Test message.\u001b[0m\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
+		assertEquals( "\u001b[1m\u001b[30m[D] Test message.\u001b[0m\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
 	}
 
 	public void testGetPrefix() throws Exception {

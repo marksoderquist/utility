@@ -76,7 +76,7 @@ public class LogTest extends TestCase {
 			LogRecord record = handler.getLogRecord();
 			assertNotNull( "Log record is null.", record );
 			assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
-			assertEquals( "Incorrect log message.", "\u001b[0m" + message + "\u001b[0m\n", output.toString() );
+			assertEquals( "Incorrect log message.", "\u001b[0m[I] " + message + "\u001b[0m\n", output.toString() );
 		} finally {
 			Log.setShowColor( false );
 			Log.setDefaultHandler( oldHandler );
