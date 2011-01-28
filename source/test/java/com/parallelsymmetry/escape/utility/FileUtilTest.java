@@ -30,11 +30,19 @@ public class FileUtilTest extends TestCase {
 	}
 
 	public void testConstants() throws Exception {
-		assertEquals( 1024L, FileUtil.KILOBYTE );
-		assertEquals( 1048576L, FileUtil.MEGABYTE );
-		assertEquals( 1073741824L, FileUtil.GIGABYTE );
-		assertEquals( 1099511627776L, FileUtil.TERABYTE );
-		assertEquals( 1125899906842624L, FileUtil.PETABYTE );
+		assertEquals( 1000L, FileUtil.KB );
+		assertEquals( 1000000L, FileUtil.MB );
+		assertEquals( 1000000000L, FileUtil.GB );
+		assertEquals( 1000000000000L, FileUtil.TB );
+		assertEquals( 1000000000000000L, FileUtil.PB );
+		assertEquals( 1000000000000000000L, FileUtil.EB );
+
+		assertEquals( 1024L, FileUtil.KiB );
+		assertEquals( 1048576L, FileUtil.MiB );
+		assertEquals( 1073741824L, FileUtil.GiB );
+		assertEquals( 1099511627776L, FileUtil.TiB );
+		assertEquals( 1125899906842624L, FileUtil.PiB );
+		assertEquals( 1152921504606846976L, FileUtil.EiB );
 	}
 
 	public void testGetExtensionWithFile() throws Exception {
@@ -49,6 +57,54 @@ public class FileUtilTest extends TestCase {
 		assertEquals( "Incorrect extension.", "txt", FileUtil.getExtension( "test.txt" ) );
 	}
 
+	public void testGetHumanSize() throws Exception {
+		assertEquals( "0B", FileUtil.getHumanSize( 0 ) );
+		assertEquals( "1B", FileUtil.getHumanSize( 1 ) );
+		assertEquals( "12B", FileUtil.getHumanSize( 12 ) );
+		assertEquals( "123B", FileUtil.getHumanSize( 123 ) );
+		assertEquals( "1.2KB", FileUtil.getHumanSize( 1234 ) );
+		assertEquals( "12KB", FileUtil.getHumanSize( 12345 ) );
+		assertEquals( "123KB", FileUtil.getHumanSize( 123456 ) );
+		assertEquals( "1.2MB", FileUtil.getHumanSize( 1234567 ) );
+		assertEquals( "12MB", FileUtil.getHumanSize( 12345678 ) );
+		assertEquals( "123MB", FileUtil.getHumanSize( 123456789 ) );
+		assertEquals( "1.2EB", FileUtil.getHumanSize( 1152921504606846976L ));
+
+		assertEquals( "999B", FileUtil.getHumanSize( 999 ));
+		assertEquals( "1.0KB", FileUtil.getHumanSize( 1000 ));
+
+		assertEquals( "999KB", FileUtil.getHumanSize( 999999 ));
+		assertEquals( "1.0MB", FileUtil.getHumanSize( 1000000 ));
+
+		assertEquals( "999MB", FileUtil.getHumanSize( 999999999 ));
+		assertEquals( "1.0GB", FileUtil.getHumanSize( 1000000000 ));
+
+		assertEquals( "999GB", FileUtil.getHumanSize( 999999999999L ));
+		assertEquals( "1.0TB", FileUtil.getHumanSize( 1000000000000L ));
+
+		assertEquals( "999TB", FileUtil.getHumanSize( 999999999999999L ));
+		assertEquals( "1.0PB", FileUtil.getHumanSize( 1000000000000000L ));
+
+		assertEquals( "999PB", FileUtil.getHumanSize( 999999999999999999L ));
+		assertEquals( "1.0EB", FileUtil.getHumanSize( 1000000000000000000L ));
+}
+
+	public void testGetHumanBinSize() throws Exception {
+		assertEquals( "0B", FileUtil.getHumanBinSize( 0 ) );
+		assertEquals( "1B", FileUtil.getHumanBinSize( 1 ) );
+		assertEquals( "12B", FileUtil.getHumanBinSize( 12 ) );
+		assertEquals( "123B", FileUtil.getHumanBinSize( 123 ) );
+		assertEquals( "1.2KiB", FileUtil.getHumanBinSize( 1234 ) );
+		assertEquals( "12KiB", FileUtil.getHumanBinSize( 12345 ) );
+		assertEquals( "120KiB", FileUtil.getHumanBinSize( 123456 ) );
+		assertEquals( "1.2MiB", FileUtil.getHumanBinSize( 1234567 ) );
+		assertEquals( "11MiB", FileUtil.getHumanBinSize( 12345678 ) );
+		assertEquals( "117MiB", FileUtil.getHumanBinSize( 123456789 ) );
+		
+		assertEquals( "1023PiB", FileUtil.getHumanBinSize( 1152921504606846975L ));
+		assertEquals( "1.0EiB", FileUtil.getHumanBinSize( 1152921504606846976L ));
+	}
+	
 	public void testRemoveExtensionWithFile() throws Exception {
 		assertEquals( "Incorrect file name.", null, FileUtil.removeExtension( (File)null ) );
 		assertEquals( "Incorrect file name.", new File( "test" ), FileUtil.removeExtension( new File( "test" ) ) );
@@ -118,7 +174,7 @@ public class FileUtilTest extends TestCase {
 		for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
 			assertTrue( new File( targetData, entries.nextElement().getName() ).exists() );
 		}
-		
+
 		targetData.deleteOnExit();
 	}
 

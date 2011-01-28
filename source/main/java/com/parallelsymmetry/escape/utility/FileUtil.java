@@ -14,15 +14,29 @@ import java.util.zip.ZipOutputStream;
 
 public class FileUtil {
 
-	public static final long KILOBYTE = 1L << 10;
+	public static final long KB = 1000;
 
-	public static final long MEGABYTE = 1L << 20;
+	public static final long MB = KB * 1000;
 
-	public static final long GIGABYTE = 1L << 30;
+	public static final long GB = MB * 1000;
 
-	public static final long TERABYTE = 1L << 40;
+	public static final long TB = GB * 1000;
 
-	public static final long PETABYTE = 1L << 50;
+	public static final long PB = TB * 1000;
+
+	public static final long EB = PB * 1000;
+
+	public static final long KiB = 1L << 10;
+
+	public static final long MiB = 1L << 20;
+
+	public static final long GiB = 1L << 30;
+
+	public static final long TiB = 1L << 40;
+
+	public static final long PiB = 1L << 50;
+
+	public static final long EiB = 1L << 60;
 
 	public static final File TEMP_FOLDER = new File( System.getProperty( "java.io.tmpdir" ) );
 
@@ -40,6 +54,102 @@ public class FileUtil {
 		int index = name.lastIndexOf( '.' );
 		if( index < 0 ) return "";
 		return name.substring( index + 1 );
+	}
+
+	public static final String getHumanSize( long size ) {
+		long exponent = 0;
+		long coefficient = size;
+		while( coefficient >= KB ) {
+			coefficient /= KB;
+			exponent++;
+		}
+
+		System.out.println( "C: " + coefficient );
+
+		String unit = "B";
+		switch( (int)exponent ) {
+			case 1: {
+				unit = "KB";
+				break;
+			}
+			case 2: {
+				unit = "MB";
+				break;
+			}
+			case 3: {
+				unit = "GB";
+				break;
+			}
+			case 4: {
+				unit = "TB";
+				break;
+			}
+			case 5: {
+				unit = "PB";
+				break;
+			}
+			case 6: {
+				unit = "EB";
+				break;
+			}
+		}
+
+		if( size >= KB && coefficient < 10 ) {
+			long precise = size;
+			while( precise >= MB ) {
+				precise /= KB;
+			}
+			return String.format( "%3.1f", (float)precise / KB ) + unit;
+		}
+
+		return String.valueOf( coefficient ) + unit;
+	}
+
+	public static final String getHumanBinSize( long size ) {
+		long exponent = 0;
+		long coefficient = size;
+		while( coefficient >= KiB ) {
+			coefficient /= KiB;
+			exponent++;
+		}
+
+		String unit = "B";
+		switch( (int)exponent ) {
+			case 1: {
+				unit = "KiB";
+				break;
+			}
+			case 2: {
+				unit = "MiB";
+				break;
+			}
+			case 3: {
+				unit = "GiB";
+				break;
+			}
+			case 4: {
+				unit = "TiB";
+				break;
+			}
+			case 5: {
+				unit = "PiB";
+				break;
+			}
+			case 6: {
+				unit = "EiB";
+				break;
+			}
+		}
+
+		if( size >= KiB && coefficient < 10 ) {
+			long precise = size;
+			while( precise >= MiB ) {
+				precise /= KiB;
+			}
+			return String.format( "%3.1f", (float)precise / KiB ) + unit;
+		}
+
+		return String.valueOf( coefficient ) + unit;
 	}
 
 	public static final File removeExtension( File file ) {
