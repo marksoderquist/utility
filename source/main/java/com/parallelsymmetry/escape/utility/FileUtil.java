@@ -57,14 +57,12 @@ public class FileUtil {
 	}
 
 	public static final String getHumanSize( long size ) {
-		long exponent = 0;
+		int exponent = 0;
 		long coefficient = size;
 		while( coefficient >= KB ) {
 			coefficient /= KB;
 			exponent++;
 		}
-
-		System.out.println( "C: " + coefficient );
 
 		String unit = "B";
 		switch( (int)exponent ) {
@@ -94,7 +92,8 @@ public class FileUtil {
 			}
 		}
 
-		if( size >= KB && coefficient < 10 ) {
+		// Should be, at most, five characters long; three numbers, two units.
+		if( exponent > 0 && coefficient < 10 ) {
 			long precise = size;
 			while( precise >= MB ) {
 				precise /= KB;
@@ -106,7 +105,7 @@ public class FileUtil {
 	}
 
 	public static final String getHumanBinSize( long size ) {
-		long exponent = 0;
+		int exponent = 0;
 		long coefficient = size;
 		while( coefficient >= KiB ) {
 			coefficient /= KiB;
@@ -141,7 +140,8 @@ public class FileUtil {
 			}
 		}
 
-		if( size >= KiB && coefficient < 10 ) {
+		// Should be, at most, seven characters long; four numbers, three units.
+		if( exponent > 0 && coefficient < 10 ) {
 			long precise = size;
 			while( precise >= MiB ) {
 				precise /= KiB;
