@@ -9,7 +9,7 @@ import java.util.TimeZone;
  * 
  * @author Mark Soderquist
  */
-public class Release {
+public class Release implements Comparable<Release> {
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -25,6 +25,14 @@ public class Release {
 		if( version == null ) throw new NullPointerException( "Version cannot be null." );
 		this.version = version;
 		this.date = date;
+	}
+
+	public Release( String version ) {
+		this( new Version( version ), null );
+	}
+
+	public Release( String version, String timestamp ) {
+		this( new Version( version ), DateUtil.parse( timestamp, DATE_FORMAT ) );
 	}
 
 	public Version getVersion() {
@@ -56,6 +64,17 @@ public class Release {
 		}
 
 		return buffer.toString();
+	}
+
+	@Override
+	public int compareTo( Release that ) {
+		int result = this.getVersion().compareTo( that.getVersion() );
+		if( result != 0 ) return result;
+
+		if( this.date == null && that.date == null ) return 0;
+		if( this.date == null && that.date != null ) return -1;
+		if( this.date != null && that.date == null ) return 1;
+		return this.date.compareTo( that.date );
 	}
 
 }
