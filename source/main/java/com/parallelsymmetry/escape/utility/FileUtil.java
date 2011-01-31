@@ -224,10 +224,14 @@ public class FileUtil {
 
 		String line = null;
 		List<String> list = new ArrayList<String>();
-		while( ( line = reader.readLine() ) != null ) {
-			list.add( line );
+		try {
+			while( ( line = reader.readLine() ) != null ) {
+				list.add( line );
+			}
+		} finally {
+			if( reader != null ) reader.close();
 		}
-		
+
 		return list;
 	}
 

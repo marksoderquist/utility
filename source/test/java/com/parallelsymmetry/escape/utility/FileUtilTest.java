@@ -153,6 +153,7 @@ public class FileUtilTest extends TestCase {
 		FileUtil.save( content, file );
 
 		List<String> lines = FileUtil.loadAsLines( file );
+		assertEquals( 3, lines.size() );
 		assertEquals( "A", lines.get( 0 ) );
 		assertEquals( "B", lines.get( 1 ) );
 		assertEquals( "C", lines.get( 2 ) );
