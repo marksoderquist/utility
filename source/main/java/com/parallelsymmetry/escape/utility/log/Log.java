@@ -58,6 +58,8 @@ public class Log {
 
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
+	public static final String DEFAULT_LOG_FILE_NAME = "program.log";
+
 	private static Map<Logger, Handler> defaultHandlers = new HashMap<Logger, Handler>();
 
 	private static boolean showTag = true;
@@ -93,7 +95,7 @@ public class Log {
 		if( parameters.isSet( "log.file" ) ) {
 			try {
 				String pattern = parameters.get( "log.file" );
-				if( parameters.isTrue( "log.file" ) ) pattern = "log.txt";
+				if( parameters.isTrue( "log.file" ) ) pattern = DEFAULT_LOG_FILE_NAME;
 				FileHandler handler = new FileHandler( pattern );
 				handler.setFormatter( new DefaultFormatter() );
 				addHandler( handler );
