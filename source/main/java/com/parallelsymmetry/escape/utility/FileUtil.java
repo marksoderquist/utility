@@ -1,10 +1,12 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,6 +213,22 @@ public class FileUtil {
 
 	public static final String load( File source, String encoding ) throws IOException {
 		return IoUtil.load( new FileInputStream( source ), encoding );
+	}
+
+	public static final List<String> loadAsLines( File source ) throws IOException {
+		return loadAsLines( source, "UTF-8" );
+	}
+
+	public static final List<String> loadAsLines( File source, String encoding ) throws IOException {
+		BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( source ), encoding ) );
+
+		String line = null;
+		List<String> list = new ArrayList<String>();
+		while( ( line = reader.readLine() ) != null ) {
+			list.add( line );
+		}
+		
+		return list;
 	}
 
 	public static final void zip( File source, File target ) throws IOException {

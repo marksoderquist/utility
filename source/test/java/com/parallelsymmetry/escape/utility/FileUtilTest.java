@@ -147,6 +147,17 @@ public class FileUtilTest extends TestCase {
 		assertEquals( file.toString(), FileUtil.load( file ) );
 	}
 
+	public void testSaveAndLoadAsLines() throws Exception {
+		String content = "A\nB\nC";
+		File file = File.createTempFile( "FileUtil", "Test" );
+		FileUtil.save( content, file );
+
+		List<String> lines = FileUtil.loadAsLines( file );
+		assertEquals( "A", lines.get( 0 ) );
+		assertEquals( "B", lines.get( 1 ) );
+		assertEquals( "C", lines.get( 2 ) );
+	}
+
 	public void testZipAndUnzip() throws Exception {
 		File sourceData = new File( "source/test/java" );
 		File zip = new File( "target/test.source.zip" );
