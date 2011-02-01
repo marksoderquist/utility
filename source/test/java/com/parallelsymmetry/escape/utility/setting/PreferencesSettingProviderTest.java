@@ -14,7 +14,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		preferences = Preferences.userNodeForPackage( getClass() );
 		provider = new PreferencesSettingProvider( preferences );
 
-		preferences.node( "/test" ).put( "path1", "value1" );
+		preferences.node( "test" ).put( "path1", "value1" );
 	}
 
 	public void testGet() {
@@ -23,7 +23,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 
 	public void testPut() {
 		// Because preferences are persistent the value needs to be removed.
-		preferences.node( "/test" ).remove( "path2" );
+		preferences.node( "test" ).remove( "path2" );
 		assertNull( provider.get( "/test/path2" ) );
 
 		// Put the value.

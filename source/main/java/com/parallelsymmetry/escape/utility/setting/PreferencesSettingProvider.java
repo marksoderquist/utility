@@ -16,7 +16,7 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 	@Override
 	public boolean nodeExists( String path ) {
 		try {
-			return preferences.nodeExists( path );
+			return preferences.nodeExists( path.substring( 1 ) );
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
@@ -25,16 +25,18 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public String get( String path ) {
+		path = path.substring( 1 );
 		int index = path.lastIndexOf( "/" );
-		String prefPath = path.substring( 0, index );
+		String prefPath = index < 0 ? "." : path.substring( 0, index );
 		String prefKey = path.substring( index + 1 );
 		return preferences.node( prefPath ).get( prefKey, null );
 	}
 
 	@Override
 	public void put( String path, String value ) {
+		path = path.substring( 1 );
 		int index = path.lastIndexOf( "/" );
-		String prefPath = path.substring( 0, index );
+		String prefPath = index < 0 ? "." : path.substring( 0, index );
 		String prefKey = path.substring( index + 1 );
 		if( value == null ) {
 			preferences.node( prefPath ).remove( prefKey );
@@ -51,15 +53,10 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 	@Override
 	public void removeNode( String path ) {
 		try {
-			preferences.node( path ).removeNode();
+			preferences.node( path.substring( 1 ) ).removeNode();
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
-	}
-
-	@Override
-	public void renameNode( String oldPath, String newPath ) {
-		preferences.node( oldPath );
 	}
 
 }

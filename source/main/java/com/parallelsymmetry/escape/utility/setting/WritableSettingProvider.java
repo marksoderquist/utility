@@ -6,6 +6,4 @@ public interface WritableSettingProvider extends SettingProvider {
 
 	void removeNode( String path );
 
-	void renameNode( String oldPath, String newPath );
-
 }

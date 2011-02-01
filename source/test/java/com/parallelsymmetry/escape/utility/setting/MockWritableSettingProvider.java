@@ -32,19 +32,4 @@ public class MockWritableSettingProvider extends MockSettingProvider implements 
 		}
 	}
 
-	@Override
-	public void renameNode( String oldPath, String newPath ) {
-		String oldNode = oldPath + "/";
-		Iterator<String> iterator = values.keySet().iterator();
-
-		while( iterator.hasNext() ) {
-			String key = iterator.next();
-			if( key.startsWith( oldNode ) ) {
-				String newKey = key.replace( oldPath, newPath );
-				values.put( newKey, values.get( key ) );
-				values.remove( key );
-			}
-		}
-	}
-
 }
