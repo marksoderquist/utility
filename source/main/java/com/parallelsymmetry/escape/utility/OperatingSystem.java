@@ -162,5 +162,16 @@ public class OperatingSystem {
 
 		return null;
 	}
+	
+	public static final Process runElevated( ProcessBuilder builder ) {
+		// Elevate does not come with Windows it must be provided.
+		// In Windows: elevate <program>
+		return null;
+	}
+	
+	public static final Process runNormally( ProcessBuilder builder )  {
+		// In Windows: runas /trustlevel:0x20000 <program>
+		return null;
+	}
 
 }

@@ -13,12 +13,13 @@ public final class ConsoleReader extends Thread {
 
 	private OutputStream output;
 
-	public ConsoleReader( InputStream input ) {
-		this( input, System.out );
+	public ConsoleReader( Process process ) {
+		this( process, System.out );
 	}
 
-	public ConsoleReader( InputStream input, OutputStream output ) {
-		this.input = input;
+	public ConsoleReader( Process process, OutputStream output ) {
+		super( "Console Reader" );
+		this.input = process.getInputStream();
 		this.output = output;
 		setDaemon( true );
 	}
@@ -35,4 +36,5 @@ public final class ConsoleReader extends Thread {
 			exception.printStackTrace();
 		}
 	}
+	
 }
