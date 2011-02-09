@@ -54,6 +54,7 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 	public void removeNode( String path ) {
 		try {
 			preferences.node( path.substring( 1 ) ).removeNode();
+			preferences.flush();
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
