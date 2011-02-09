@@ -134,6 +134,12 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Get the settings list at the specified path.
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public List<Settings> getList( String path ) {
 		int count = getInt( path + ITEM_COUNT, 0 );
 
