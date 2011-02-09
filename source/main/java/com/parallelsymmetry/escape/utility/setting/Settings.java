@@ -139,7 +139,7 @@ public class Settings {
 
 		List<Settings> list = new ArrayList<Settings>( count );
 		for( int index = 0; index < count; index++ ) {
-			list.add( getListNode( path, index ) );
+			list.add( getNode( getItemPath( path, index ) ) );
 		}
 
 		return list;
