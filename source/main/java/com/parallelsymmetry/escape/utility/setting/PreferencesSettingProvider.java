@@ -15,11 +15,15 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public boolean nodeExists( String path ) {
+		path = path.substring( 1 );
+
 		try {
-			return preferences.nodeExists( path.substring( 1 ) );
+			preferences.sync();
+			return preferences.nodeExists( path );
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
+		
 		return false;
 	}
 
@@ -29,7 +33,15 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		int index = path.lastIndexOf( "/" );
 		String prefPath = index < 0 ? "." : path.substring( 0, index );
 		String prefKey = path.substring( index + 1 );
-		return preferences.node( prefPath ).get( prefKey, null );
+		
+		Preferences node = preferences.node( prefPath );
+		try {
+			node.sync();
+		} catch( BackingStoreException exception ) {
+			Log.write( exception );
+		}
+		
+		return node.get( prefKey, null );
 	}
 
 	@Override
@@ -38,13 +50,15 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		int index = path.lastIndexOf( "/" );
 		String prefPath = index < 0 ? "." : path.substring( 0, index );
 		String prefKey = path.substring( index + 1 );
+
+		Preferences node = preferences.node( prefPath );
 		if( value == null ) {
-			preferences.node( prefPath ).remove( prefKey );
+			node.remove( prefKey );
 		} else {
-			preferences.node( prefPath ).put( prefKey, value );
+			node.put( prefKey, value );
 		}
 		try {
-			preferences.flush();
+			node.flush();
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
@@ -52,10 +66,11 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public void removeNode( String path ) {
+		Preferences node = this.preferences.node( path.substring( 1 ) );
+
 		try {
-			Preferences preferences = this.preferences.node( path.substring( 1 ) );
-			preferences.removeNode();
-			preferences.flush();
+			node.removeNode();
+			node.flush();
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
