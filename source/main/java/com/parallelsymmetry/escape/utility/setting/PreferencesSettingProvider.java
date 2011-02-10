@@ -14,27 +14,12 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 	}
 
 	@Override
-	public boolean nodeExists( String path ) {
-		path = path.substring( 1 );
-
-		try {
-			preferences.sync();
-			return preferences.nodeExists( path );
-		} catch( BackingStoreException exception ) {
-			Log.write( exception );
-		}
-		
-		return false;
-	}
-
-	@Override
 	public String get( String path ) {
 		path = path.substring( 1 );
 		int index = path.lastIndexOf( "/" );
-		String prefPath = index < 0 ? "." : path.substring( 0, index );
 		String prefKey = path.substring( index + 1 );
 		
-		Preferences node = preferences.node( prefPath );
+		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
 		try {
 			node.sync();
 		} catch( BackingStoreException exception ) {
@@ -48,10 +33,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 	public void put( String path, String value ) {
 		path = path.substring( 1 );
 		int index = path.lastIndexOf( "/" );
-		String prefPath = index < 0 ? "." : path.substring( 0, index );
 		String prefKey = path.substring( index + 1 );
 
-		Preferences node = preferences.node( prefPath );
+		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
 		if( value == null ) {
 			node.remove( prefKey );
 		} else {
@@ -62,6 +46,20 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
+	}
+
+	@Override
+	public boolean nodeExists( String path ) {
+		path = path.substring( 1 );
+
+		try {
+			preferences.sync();
+			return preferences.nodeExists( path );
+		} catch( BackingStoreException exception ) {
+			Log.write( exception );
+		}
+		
+		return false;
 	}
 
 	@Override
