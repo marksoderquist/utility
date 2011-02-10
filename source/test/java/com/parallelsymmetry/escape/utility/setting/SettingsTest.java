@@ -171,7 +171,7 @@ public class SettingsTest extends TestCase {
 			assertEquals( index, targetList.get( index ).getValue() );
 		}
 	}
-	
+
 	public void testRemoveList() {
 		int count = 5;
 		String path = "/test/lists/list1";
@@ -189,10 +189,11 @@ public class SettingsTest extends TestCase {
 		for( int index = 0; index < count; index++ ) {
 			assertEquals( index, targetList.get( index ).getValue() );
 		}
-		
+
 		settings.putList( path, null );
-		
-		assertFalse( settings.nodeExists( path ) );
+
+		assertTrue( settings.nodeExists( path ) );
+		assertEquals( 0, settings.getList( MockPersistent.class, path ).size() );
 	}
 
 	protected void showProviderData( Settings settings ) {

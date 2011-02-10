@@ -261,17 +261,13 @@ public class Settings {
 	}
 
 	public <T extends Persistent<?>> void putList( String path, List<T> list ) {
-		if( list == null ) {
-			removeNode( path );
-			return;
-		}
 
 		int oldCount = getInt( path + ITEM_COUNT, 0 );
 		for( int index = 0; index < oldCount; index++ ) {
 			removeNode( getItemPath( path, index ) );
 		}
 
-		int newCount = list.size();
+		int newCount = list == null ? 0 : list.size();
 		for( int index = 0; index < newCount; index++ ) {
 			list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 		}
