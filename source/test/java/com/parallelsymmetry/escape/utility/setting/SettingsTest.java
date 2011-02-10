@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -146,64 +147,52 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", node.get( "/path/D" ) );
 	}
 
-	public void testRemoveNode() {
-		int count = 3;
+	public void testGetEmptyList() {
+		List<MockPersistent> list = settings.getList( MockPersistent.class, "/test/lists/list0" );
+		assertNotNull( list );
+		assertEquals( 0, list.size() );
+	}
 
-		String listPath = "/test/path/list";
+	public void testPutGetList() {
+		int count = 5;
+		String path = "/test/lists/list1";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
 		for( int index = 0; index < count; index++ ) {
-			settings.addListNode( listPath );
+			sourceList.add( new MockPersistent( index ) );
 		}
 
-		List<Settings> list = settings.getList( listPath );
-		assertEquals( count, list.size() );
+		settings.putList( path, sourceList );
 
-		int index = 0;
-		for( Settings item : list ) {
-			assertEquals( listPath + Settings.ITEM_PREFIX + ( index++ ), item.getPath() );
-		}
+		List<MockPersistent> targetList = settings.getList( MockPersistent.class, path );
 
-		settings.removeNode( listPath );
-		assertFalse( settings.nodeExists( listPath ) );
-	}
-
-	public void testAddListNode() {
-		String listPath = "/test/path/list";
-		Settings next = settings.addListNode( listPath );
-		assertEquals( listPath + Settings.ITEM_PREFIX + "0", next.getPath() );
-		assertEquals( 1, settings.getInt( listPath + Settings.ITEM_COUNT ) );
-
-		next.put( "/test", "value1" );
-		assertEquals( "value1", settings.get( listPath + Settings.ITEM_PREFIX + "0/test" ) );
-	}
-
-	public void testGetListNode() {
-		String listPath = "/test/path/list";
-		Settings next = settings.addListNode( listPath );
-		next.put( "/test", "value1" );
-
-		Settings node = settings.getListNode( listPath, 0 );
-		assertEquals( listPath + Settings.ITEM_PREFIX + "0", node.getPath() );
-		assertEquals( "value1", node.get( "/test" ) );
-	}
-
-	public void testGetList() {
-		List<Settings> empty = settings.getList( "/test/empty" );
-		assertEquals( 0, empty.size() );
-
-		int count = 3;
-
-		String listPath = "/test/path/list";
+		assertEquals( count, targetList.size() );
 		for( int index = 0; index < count; index++ ) {
-			settings.addListNode( listPath );
+			assertEquals( index, targetList.get( index ).getValue() );
+		}
+	}
+	
+	public void testRemoveList() {
+		int count = 5;
+		String path = "/test/lists/list1";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceList.add( new MockPersistent( index ) );
 		}
 
-		List<Settings> list = settings.getList( listPath );
-		assertEquals( count, list.size() );
+		settings.putList( path, sourceList );
 
-		int index = 0;
-		for( Settings item : list ) {
-			assertEquals( listPath + Settings.ITEM_PREFIX + ( index++ ), item.getPath() );
+		List<MockPersistent> targetList = settings.getList( MockPersistent.class, path );
+
+		assertEquals( count, targetList.size() );
+		for( int index = 0; index < count; index++ ) {
+			assertEquals( index, targetList.get( index ).getValue() );
 		}
+		
+		settings.putList( path, null );
+		
+		assertFalse( settings.nodeExists( path ) );
 	}
 
 	protected void showProviderData( Settings settings ) {
@@ -212,6 +201,36 @@ public class SettingsTest extends TestCase {
 			SettingProvider provider = settings.getProvider( pIndex );
 			( (MockSettingProvider)provider ).show();
 			System.out.println();
+		}
+	}
+
+	private static final class MockPersistent implements Persistent<MockPersistent> {
+
+		private int value;
+
+		@SuppressWarnings( "unused" )
+		public MockPersistent() {
+			this( 0 );
+		}
+
+		public MockPersistent( int value ) {
+			this.value = value;
+		}
+
+		public int getValue() {
+			return value;
+		}
+
+		@Override
+		public MockPersistent loadSettings( Settings settings ) {
+			value = settings.getInt( "/value", 0 );
+			return this;
+		}
+
+		@Override
+		public MockPersistent saveSettings( Settings settings ) {
+			settings.putInt( "/value", value );
+			return this;
 		}
 
 	}

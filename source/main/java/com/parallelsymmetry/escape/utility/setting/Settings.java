@@ -1,10 +1,14 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public class Settings {
 
@@ -134,47 +138,6 @@ public class Settings {
 		}
 	}
 
-	/**
-	 * Get the settings list at the specified path.
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public List<Settings> getList( String path ) {
-		int count = getInt( path + ITEM_COUNT, 0 );
-
-		List<Settings> list = new ArrayList<Settings>( count );
-		for( int index = 0; index < count; index++ ) {
-			list.add( getNode( getItemPath( path, index ) ) );
-		}
-
-		return list;
-	}
-
-	/**
-	 * This method works in conjunction with nodeList to provide some ability to
-	 * handle lists of setting nodes more conveniently. This method is used to add
-	 * a setting node to the specified path.
-	 * 
-	 * @param path
-	 * @return
-	 */
-	public Settings addListNode( String path ) {
-		validatePath( path );
-
-		int count = getInt( path + ITEM_COUNT, 0 );
-
-		Settings node = getNode( getItemPath( path, count ) );
-		putInt( path + ITEM_COUNT, count + 1 );
-
-		return node;
-	}
-
-	public Settings getListNode( String path, int index ) {
-		validateIndex( path, index );
-		return getNode( getItemPath( path, index ) );
-	}
-
 	public String get( String path ) {
 		return get( path, null );
 	}
@@ -268,6 +231,54 @@ public class Settings {
 		put( path, String.valueOf( value ) );
 	}
 
+	public <T extends Persistent<T>> List<T> getList( Class<T> type, String path ) {
+		int count = getInt( path + ITEM_COUNT, 0 );
+
+		List<T> list = new ArrayList<T>( count );
+		for( int index = 0; index < count; index++ ) {
+			try {
+				Constructor<T> constructor = type.getConstructor();
+				constructor.setAccessible( true );
+				T object = constructor.newInstance();
+				Settings node = getNode( getItemPath( path, index ) );
+				list.add( type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
+			} catch( InstantiationException exception ) {
+				Log.write( exception );
+			} catch( IllegalAccessException exception ) {
+				Log.write( exception );
+			} catch( SecurityException exception ) {
+				Log.write( exception );
+			} catch( NoSuchMethodException exception ) {
+				Log.write( exception );
+			} catch( IllegalArgumentException exception ) {
+				Log.write( exception );
+			} catch( InvocationTargetException exception ) {
+				Log.write( exception );
+			}
+		}
+
+		return list;
+	}
+
+	public <T extends Persistent<?>> void putList( String path, List<T> list ) {
+		if( list == null ) {
+			removeNode( path );
+			return;
+		}
+
+		int oldCount = getInt( path + ITEM_COUNT, 0 );
+		for( int index = 0; index < oldCount; index++ ) {
+			removeNode( getItemPath( path, index ) );
+		}
+
+		int newCount = list.size();
+		for( int index = 0; index < newCount; index++ ) {
+			list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
+		}
+
+		putInt( path + ITEM_COUNT, newCount );
+	}
+
 	private String getProviderPath( SettingProvider provider, String path ) {
 		String full = getAbsolutePath( path );
 		String mount = root.mounts.get( provider );
@@ -289,12 +300,6 @@ public class Settings {
 
 	private String getItemPath( String path, int index ) {
 		return path + "/item-" + index;
-	}
-
-	private void validateIndex( String path, int index ) {
-		if( index < 0 ) throw new IndexOutOfBoundsException( "Index less than zero: " + index );
-		int count = getInt( path + ITEM_COUNT, 0 );
-		if( index >= count ) throw new IndexOutOfBoundsException( "Index >= count: " + index + " >= " + count );
 	}
 
 }
