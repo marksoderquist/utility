@@ -329,6 +329,7 @@ public class Settings {
 	}
 
 	private void validatePath( String path ) {
+		if( "/".equals( path ) ) return;
 		if( !path.startsWith( "/" ) ) throw new IllegalArgumentException( "Path should start with '/': " + path );
 		if( path.endsWith( "/" ) ) throw new IllegalArgumentException( "Path should not end with '/': " + path );
 	}
