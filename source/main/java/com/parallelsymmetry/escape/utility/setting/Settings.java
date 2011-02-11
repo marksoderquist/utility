@@ -142,6 +142,10 @@ public class Settings {
 		}
 	}
 
+	public void flush() {
+		flush( "/" );
+	}
+
 	public void flush( String path ) {
 		try {
 			for( SettingProvider provider : root.providers ) {
@@ -153,6 +157,10 @@ public class Settings {
 		} catch( SettingsStoreException exception ) {
 			Log.write( exception );
 		}
+	}
+
+	public void sync() {
+		sync( "/" );
 	}
 
 	public void sync( String path ) {
