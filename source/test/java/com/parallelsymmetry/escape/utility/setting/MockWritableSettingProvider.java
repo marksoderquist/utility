@@ -32,4 +32,10 @@ public class MockWritableSettingProvider extends MockSettingProvider implements 
 		}
 	}
 
+	@Override
+	public void flush( String path ) throws SettingsStoreException {}
+
+	@Override
+	public void sync( String path ) throws SettingsStoreException {}
+
 }

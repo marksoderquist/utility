@@ -130,12 +130,43 @@ public class Settings {
 	}
 
 	public void removeNode( String path ) {
-		for( SettingProvider provider : root.providers ) {
-			if( provider instanceof WritableSettingProvider ) {
-				String full = getProviderPath( provider, path );
-				if( full != null ) ( (WritableSettingProvider)provider ).removeNode( full );
+		try {
+			for( SettingProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingProvider ) {
+					String full = getProviderPath( provider, path );
+					if( full != null ) ( (WritableSettingProvider)provider ).removeNode( full );
+				}
 			}
+		} catch( SettingsStoreException exception ) {
+			Log.write( exception );
 		}
+	}
+
+	public void flush( String path ) {
+		try {
+			for( SettingProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingProvider ) {
+					String full = getProviderPath( provider, path );
+					if( full != null ) ( (WritableSettingProvider)provider ).flush( full );
+				}
+			}
+		} catch( SettingsStoreException exception ) {
+			Log.write( exception );
+		}
+	}
+
+	public void sync( String path ) {
+		try {
+			for( SettingProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingProvider ) {
+					String full = getProviderPath( provider, path );
+					if( full != null ) ( (WritableSettingProvider)provider ).sync( full );
+				}
+			}
+		} catch( SettingsStoreException exception ) {
+			Log.write( exception );
+		}
+
 	}
 
 	public String get( String path ) {

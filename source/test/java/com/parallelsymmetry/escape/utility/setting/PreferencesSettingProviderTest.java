@@ -35,15 +35,15 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertNull( provider.get( "/test/path2" ) );
 	}
 
-	public void testNodeExists() {
+	public void testNodeExists() throws Exception {
 		// Clear the node if it exists.
 		provider.removeNode( "/test/node" );
 		assertFalse( provider.nodeExists( "/test/node" ) );
-		
+
 		// Get a value the same name as the node.
 		provider.get( "/test/node" );
 		assertFalse( provider.nodeExists( "/test/node" ) );
-		
+
 		// Get a value in the node.
 		provider.get( "/test/node/exists" );
 		assertTrue( provider.nodeExists( "/test/node" ) );
@@ -51,10 +51,10 @@ public class PreferencesSettingProviderTest extends TestCase {
 
 	public void testRemoveNode() throws Exception {
 		String path = "/test/remove/node";
-		provider.put( path +"/value", "true" );
+		provider.put( path + "/value", "true" );
 		assertTrue( provider.nodeExists( path ) );
 		provider.removeNode( path );
 		assertFalse( provider.nodeExists( path ) );
 	}
-	
+
 }

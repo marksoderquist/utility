@@ -19,15 +19,14 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		int index = path.lastIndexOf( "/" );
 		String prefKey = path.substring( index + 1 );
 
-		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
 		try {
-			// For some reason two calls to sync() are necessary to pick up changes made in a separate VM.
-			node.sync();
-			node.sync();
+			preferences.sync();
+			preferences.sync();
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
 
+		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
 		return node.get( prefKey, null );
 	}
 
@@ -52,29 +51,38 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public boolean nodeExists( String path ) {
-		path = path.substring( 1 );
-
 		try {
-			// For some reason two calls to sync() are necessary to pick up changes made in a separate VM.
-			preferences.sync();
-			preferences.sync();
-			return preferences.nodeExists( path );
+			return preferences.nodeExists( path.substring( 1 ) );
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
+			return false;
 		}
-
-		return false;
 	}
 
 	@Override
-	public void removeNode( String path ) {
-		Preferences node = this.preferences.node( path.substring( 1 ) );
-
+	public void removeNode( String path ) throws SettingsStoreException {
 		try {
-			node.removeNode();
-			node.flush();
+			preferences.node( path.substring( 1 ) ).removeNode();
 		} catch( BackingStoreException exception ) {
-			Log.write( exception );
+			throw new SettingsStoreException( exception );
+		}
+	}
+
+	@Override
+	public void flush( String path ) throws SettingsStoreException {
+		try {
+			preferences.node( path.substring( 1 ) ).flush();
+		} catch( BackingStoreException exception ) {
+			throw new SettingsStoreException( exception );
+		}
+	}
+
+	@Override
+	public void sync( String path ) throws SettingsStoreException {
+		try {
+			preferences.node( path.substring( 1 ) ).sync();
+		} catch( BackingStoreException exception ) {
+			throw new SettingsStoreException( exception );
 		}
 	}
 
