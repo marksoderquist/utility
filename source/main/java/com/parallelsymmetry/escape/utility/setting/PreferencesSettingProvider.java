@@ -15,6 +15,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public String get( String path ) {
+		// Incoming paths should always be absolute.
+		path = path.substring( 1 );
+		
 		int index = path.lastIndexOf( "/" );
 		String prefKey = path.substring( index + 1 );
 
@@ -24,6 +27,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public void put( String path, String value ) {
+		// Incoming paths should always be absolute.
+		path = path.substring( 1 );
+
 		int index = path.lastIndexOf( "/" );
 		String prefKey = path.substring( index + 1 );
 
@@ -37,6 +43,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public boolean nodeExists( String path ) {
+		// Incoming paths should always be absolute.
+		path = path.substring( 1 );
+
 		try {
 			return preferences.nodeExists( path );
 		} catch( BackingStoreException exception ) {
@@ -47,6 +56,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public void removeNode( String path ) throws SettingsStoreException {
+		// Incoming paths should always be absolute.
+		path = path.substring( 1 );
+
 		try {
 			preferences.node( path ).removeNode();
 		} catch( BackingStoreException exception ) {
@@ -56,6 +68,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public void flush( String path ) throws SettingsStoreException {
+		// Incoming paths should always be absolute.
+		path = path.substring( 1 );
+
 		try {
 			preferences.node( path ).flush();
 		} catch( BackingStoreException exception ) {
@@ -68,6 +83,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public void sync( String path ) throws SettingsStoreException {
+		// Incoming paths should always be absolute.
+		path = path.substring( 1 );
+
 		try {
 			preferences.node( path ).sync();
 		} catch( BackingStoreException exception ) {

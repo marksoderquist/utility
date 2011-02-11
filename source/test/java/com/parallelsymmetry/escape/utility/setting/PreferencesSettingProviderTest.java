@@ -18,39 +18,39 @@ public class PreferencesSettingProviderTest extends TestCase {
 	}
 
 	public void testGet() {
-		assertEquals( "value1", provider.get( "test/path1" ) );
+		assertEquals( "value1", provider.get( "/test/path1" ) );
 	}
 
 	public void testPut() {
 		// Because preferences are persistent the value needs to be removed.
 		preferences.node( "test" ).remove( "path2" );
-		assertNull( provider.get( "test/path2" ) );
+		assertNull( provider.get( "/test/path2" ) );
 
 		// Put the value.
-		provider.put( "test/path2", "value2" );
-		assertEquals( "value2", provider.get( "test/path2" ) );
+		provider.put( "/test/path2", "value2" );
+		assertEquals( "value2", provider.get( "/test/path2" ) );
 
 		// Remove the value.
-		provider.put( "test/path2", null );
-		assertNull( provider.get( "test/path2" ) );
+		provider.put( "/test/path2", null );
+		assertNull( provider.get( "/test/path2" ) );
 	}
 
 	public void testNodeExists() throws Exception {
 		// Clear the node if it exists.
-		provider.removeNode( "test/node" );
-		assertFalse( provider.nodeExists( "test/node" ) );
+		provider.removeNode( "/test/node" );
+		assertFalse( provider.nodeExists( "/test/node" ) );
 
 		// Get a value the same name as the node.
-		provider.get( "test/node" );
-		assertFalse( provider.nodeExists( "test/node" ) );
+		provider.get( "/test/node" );
+		assertFalse( provider.nodeExists( "/test/node" ) );
 
 		// Get a value in the node.
-		provider.get( "test/node/exists" );
-		assertTrue( provider.nodeExists( "test/node" ) );
+		provider.get( "/test/node/exists" );
+		assertTrue( provider.nodeExists( "/test/node" ) );
 	}
 
 	public void testRemoveNode() throws Exception {
-		String path = "test/remove/node";
+		String path = "/test/remove/node";
 		provider.put( path + "/value", "true" );
 		assertTrue( provider.nodeExists( path ) );
 		provider.removeNode( path );
