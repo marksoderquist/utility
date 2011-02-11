@@ -18,14 +18,16 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		path = path.substring( 1 );
 		int index = path.lastIndexOf( "/" );
 		String prefKey = path.substring( index + 1 );
-		
+
 		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
 		try {
+			// For some reason two calls to sync() are necessary to pick up changes made in a separate VM.
+			node.sync();
 			node.sync();
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
-		
+
 		return node.get( prefKey, null );
 	}
 
@@ -53,12 +55,14 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		path = path.substring( 1 );
 
 		try {
+			// For some reason two calls to sync() are necessary to pick up changes made in a separate VM.
+			preferences.sync();
 			preferences.sync();
 			return preferences.nodeExists( path );
 		} catch( BackingStoreException exception ) {
 			Log.write( exception );
 		}
-		
+
 		return false;
 	}
 
