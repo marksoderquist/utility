@@ -8,19 +8,55 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.parallelsymmetry.escape.utility.TextUtil;
 import com.parallelsymmetry.escape.utility.log.Log;
 
+/**
+ * A node in a hierarchical collection of setting data. This class allows
+ * applications to store and retrieve user settings using different setting
+ * providers. The setting providers are configured in order of precedence and
+ * some providers even provide the ability to store settings. Settings are
+ * stored in the highest precedence writable provider.
+ * <p>
+ * Nodes in a settings tree are named in a similar fashion to directories in a
+ * hierarchical file system. Every node in a settings tree has a <i>name</i>
+ * (which is not necessarily unique) and a unique <i>absolute path</i>.
+ * <p>
+ * The root node has a name of the empty string (""). Every other node has an
+ * arbitrary node name, specified at the time it is created. The only
+ * restrictions on this name are that it cannot be the empty string, and it
+ * cannot contain the slash character ('/').
+ * <p>
+ * The root node has an absolute path of <tt>"/"</tt>. Children of the root node
+ * have absolute path of <tt>"/" + </tt><i>&lt;node name&gt;</i>. All other
+ * nodes have absolute paths of <i>&lt;parent's absolute path&gt;</i>
+ * <tt> + "/" + </tt><i>&lt;node name&gt;</i>. Note that all absolute paths
+ * begin with the slash character.
+ * 
+ * @author Mark Soderquist
+ */
 public class Settings {
 
 	/**
-	 * The path name prefix to list items. Do not change the value of this field,
-	 * it will break backward compatibility with previously created setting lists.
+	 * The settings path separator character.
+	 */
+	public static final String SEPARATOR = "/";
+
+	/**
+	 * The node name prefix for list items.
+	 */
+	/*
+	 * Do not change the value of this field, it will break backward compatibility
+	 * with previously created setting lists.
 	 */
 	public static final String ITEM_PREFIX = "/item-";
 
 	/**
-	 * The path name to list item counts. Do not change the value of this field,
-	 * it will break backward compatibility with previously created setting lists.
+	 * The key name for list item counts.
+	 */
+	/*
+	 * Do not change the value of this field, it will break backward compatibility
+	 * with previously created setting lists.
 	 */
 	public static final String ITEM_COUNT = ITEM_PREFIX + "count";
 
@@ -38,7 +74,7 @@ public class Settings {
 		this.providers = new CopyOnWriteArrayList<SettingProvider>();
 		this.mounts = new ConcurrentHashMap<SettingProvider, String>();
 		this.root = this;
-		this.path = "";
+		this.path = "/";
 	}
 
 	private Settings( Settings root, String path ) {
@@ -143,7 +179,7 @@ public class Settings {
 	}
 
 	public void flush() {
-		flush( "/" );
+		flush( "" );
 	}
 
 	public void flush( String path ) {
@@ -160,7 +196,7 @@ public class Settings {
 	}
 
 	public void sync() {
-		sync( "/" );
+		sync( "" );
 	}
 
 	public void sync( String path ) {
@@ -324,14 +360,16 @@ public class Settings {
 	}
 
 	private String getAbsolutePath( String path ) {
-		validatePath( path );
-		return this.path + path;
-	}
+		// If the path is already absolute, return the specified path.
+		if( path.startsWith( SEPARATOR ) ) return path;
 
-	private void validatePath( String path ) {
-		if( "/".equals( path ) ) return;
-		if( !path.startsWith( "/" ) ) throw new IllegalArgumentException( "Path should start with '/': " + path );
-		if( path.endsWith( "/" ) ) throw new IllegalArgumentException( "Path should not end with '/': " + path );
+		// If the path is empty, return this node's path.
+		if( TextUtil.isEmpty( path ) ) return this.path;
+
+		// If this node's path is the root.
+		if( "/".equals( this.path ) ) return this.path + path;
+
+		return this.path + SEPARATOR + path;
 	}
 
 	private String getItemPath( String path, int index ) {

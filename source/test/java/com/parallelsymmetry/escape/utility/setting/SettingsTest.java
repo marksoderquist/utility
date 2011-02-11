@@ -61,7 +61,6 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testMounts() {
-		settings = new Settings();
 		settings.addProvider( provider1, "/1" );
 		settings.addProvider( provider2, "/2" );
 		settings.addProvider( provider3, "/3" );
@@ -129,22 +128,24 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/test/path/3", "D" );
 		providerD.set( "/test/path/D", "D" );
 
-		Settings node = settings.getNode( "/test" );
+		Settings node = settings.getNode( "test" );
 
-		assertEquals( "1", node.get( "/path/1" ) );
-		assertEquals( "2", node.get( "/path/2" ) );
-		assertEquals( "3", node.get( "/path/3" ) );
-		assertEquals( "D", node.get( "/path/D" ) );
+		assertEquals( "/test", node.getPath() );
 
-		node.put( "/path/1", "A" );
-		node.put( "/path/2", "B" );
-		node.put( "/path/3", "C" );
+		assertEquals( "1", node.get( "path/1" ) );
+		assertEquals( "2", node.get( "path/2" ) );
+		assertEquals( "3", node.get( "path/3" ) );
+		assertEquals( "D", node.get( "path/D" ) );
+
+		node.put( "path/1", "A" );
+		node.put( "path/2", "B" );
+		node.put( "path/3", "C" );
 
 		// Remember that provider2 is the only one writable.
-		assertEquals( "1", node.get( "/path/1" ) );
-		assertEquals( "B", node.get( "/path/2" ) );
-		assertEquals( "C", node.get( "/path/3" ) );
-		assertEquals( "D", node.get( "/path/D" ) );
+		assertEquals( "1", node.get( "path/1" ) );
+		assertEquals( "B", node.get( "path/2" ) );
+		assertEquals( "C", node.get( "path/3" ) );
+		assertEquals( "D", node.get( "path/D" ) );
 	}
 
 	public void testGetEmptyList() {
@@ -174,7 +175,7 @@ public class SettingsTest extends TestCase {
 
 	public void testRemoveList() {
 		int count = 5;
-		String path = "/test/lists/list1";
+		String path = "/test/lists/list2";
 		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
 
 		for( int index = 0; index < count; index++ ) {
@@ -224,13 +225,13 @@ public class SettingsTest extends TestCase {
 
 		@Override
 		public MockPersistent loadSettings( Settings settings ) {
-			value = settings.getInt( "/value", 0 );
+			value = settings.getInt( "value", 0 );
 			return this;
 		}
 
 		@Override
 		public MockPersistent saveSettings( Settings settings ) {
-			settings.putInt( "/value", value );
+			settings.putInt( "value", value );
 			return this;
 		}
 
