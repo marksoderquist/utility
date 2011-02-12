@@ -280,7 +280,11 @@ public abstract class Agent {
 	protected final void fireEvent( AgentEvent event ) {
 		Log.write( Log.DEBUG, getName(), " Event: ", event.getState() );
 		for( AgentListener listener : listeners ) {
-			listener.agentEventOccurred( event );
+			try {
+				listener.agentEventOccurred( event );
+			} catch( Throwable throwable ) {
+				Log.write( throwable );
+			}
 		}
 	}
 
