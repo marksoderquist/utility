@@ -161,7 +161,11 @@ public class ServerAgent extends PipeAgent {
 					handleSocket( socket );
 				} catch( SocketException exception ) {
 					String message = exception.getMessage();
-					if( message == null || !"socket closed".equals( message.toLowerCase() ) ) Log.write( exception );
+					if( message != null ) {
+						if( "socket closed".equals( message.toLowerCase() ) ) continue;
+						if( "socket is closed".equals( message.toLowerCase() ) ) continue;
+					}
+					Log.write( exception );
 				} catch( IOException exception ) {
 					Log.write( exception );
 				}
