@@ -31,8 +31,8 @@ public class Release implements Comparable<Release> {
 		this( new Version( version ), null );
 	}
 
-	public Release( String version, String timestamp ) {
-		this( new Version( version ), DateUtil.parse( timestamp, DATE_FORMAT ) );
+	public Release( String version, Date timestamp ) {
+		this( new Version( version ), timestamp );
 	}
 
 	public Version getVersion() {
