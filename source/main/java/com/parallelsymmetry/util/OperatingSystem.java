@@ -84,10 +84,11 @@ public class OperatingSystem {
 		switch( family ) {
 			case WINDOWS: {
 				if( name != null ) {
-					if( "Windows Vista".equals( OperatingSystem.name ) ) {
-						return new File( System.getProperty( "user.home" ), "AppData/Local/" + name );
-					} else {
+					float version = Float.parseFloat( System.getProperty( "os.version" ) );
+					if( version < 6 ) {
 						return new File( System.getProperty( "user.home" ), "Application Data/" + name );
+					} else {
+						return new File( System.getProperty( "user.home" ), "AppData/Local/" + name );
 					}
 				}
 			}
@@ -96,5 +97,4 @@ public class OperatingSystem {
 			}
 		}
 	}
-
 }
