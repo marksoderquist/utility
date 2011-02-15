@@ -71,6 +71,10 @@ public class OperatingSystem {
 			OperatingSystem.architecture = Architecture.UNKNOWN;
 		}
 	}
+	
+	public static final String getName() {
+		return name;
+	}
 
 	public static final Family getFamily() {
 		return family;
@@ -83,14 +87,7 @@ public class OperatingSystem {
 	public static final File getApplicationDataFolder( String identifier, String name ) {
 		switch( family ) {
 			case WINDOWS: {
-				if( name != null ) {
-					float version = Float.parseFloat( System.getProperty( "os.version" ) );
-					if( version < 6 ) {
-						return new File( System.getProperty( "user.home" ), "Application Data/" + name );
-					} else {
-						return new File( System.getProperty( "user.home" ), "AppData/Local/" + name );
-					}
-				}
+				return new File( System.getenv( "APPDATA" ), name );
 			}
 			default: {
 				return new File( System.getProperty( "user.home" ), "." + identifier );
