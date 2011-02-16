@@ -17,6 +17,8 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( OperatingSystem.Family.LINUX, OperatingSystem.getFamily() );
 		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
 		assertEquals( new File( "/usr/local/share/data" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
+		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
+		assertEquals( new File( "/usr/local/share/data", "test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
 	public void testMac() throws Exception {
@@ -29,6 +31,8 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( OperatingSystem.Family.MAC, OperatingSystem.getFamily() );
 		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
 		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
+		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
+		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
 	public void testWindows() throws Exception {
@@ -41,6 +45,8 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( OperatingSystem.Family.WINDOWS, OperatingSystem.getFamily() );
 		assertEquals( new File( System.getenv( "appdata" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
 		assertEquals( new File( System.getenv( "allusersprofile" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
+		assertEquals( new File( System.getenv( "appdata" ), "Test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
+		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
 	private void init( String name, String arch, String version ) throws Exception {

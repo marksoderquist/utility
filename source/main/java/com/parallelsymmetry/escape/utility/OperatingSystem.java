@@ -128,9 +128,8 @@ public class OperatingSystem {
 	}
 
 	/**
-	 * Get the program data folder for the operating system. On Windows
-	 * systems this is the %APPDATA% location. On Linux systems this is
-	 * $HOME.
+	 * Get the program data folder for the operating system. On Windows systems
+	 * this is the %APPDATA% location. On Linux systems this is $HOME.
 	 * <p>
 	 * Exapmles:
 	 * <p>
@@ -148,12 +147,30 @@ public class OperatingSystem {
 				folder = new File( System.getenv( "appdata" ) );
 				break;
 			}
-			case LINUX: {
+			default: {
 				folder = new File( System.getProperty( "user.home" ) );
 				break;
 			}
+		}
+
+		try {
+			return folder.getCanonicalFile();
+		} catch( IOException exception ) {
+			Log.write( exception );
+		}
+
+		return null;
+	}
+
+	public static final File getProgramDataFolder( String identifier, String name ) {
+		File folder = null;
+		switch( family ) {
+			case WINDOWS: {
+				folder = new File( System.getenv( "appdata" ), name );
+				break;
+			}
 			default: {
-				folder = new File( System.getProperty( "user.home" ) );
+				folder = new File( System.getProperty( "user.home" ), "." + identifier );
 				break;
 			}
 		}
@@ -194,6 +211,32 @@ public class OperatingSystem {
 			}
 			default: {
 				folder = new File( System.getProperty( "user.home" ) );
+				break;
+			}
+		}
+
+		try {
+			return folder.getCanonicalFile();
+		} catch( IOException exception ) {
+			Log.write( exception );
+		}
+
+		return null;
+	}
+
+	public static final File getSharedProgramDataFolder( String identifier, String name ) {
+		File folder = null;
+		switch( family ) {
+			case WINDOWS: {
+				folder = new File( System.getenv( "allusersprofile" ), name );
+				break;
+			}
+			case LINUX: {
+				folder = new File( "/usr/local/share/data", identifier );
+				break;
+			}
+			default: {
+				folder = new File( System.getProperty( "user.home" ), "." + identifier );
 				break;
 			}
 		}
