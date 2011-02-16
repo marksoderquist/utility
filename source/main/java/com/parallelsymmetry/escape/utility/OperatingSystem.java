@@ -94,7 +94,7 @@ public class OperatingSystem {
 	public static final Architecture getArchitecture() {
 		return architecture;
 	}
-	
+
 	public static final String getSystemArchitecture() {
 		return arch;
 	}
@@ -128,9 +128,9 @@ public class OperatingSystem {
 	}
 
 	/**
-	 * Get the application data folder for the operating system. On Windows
-	 * systems this is the %ALLUSERSPROFILE% location. On Linux systems this is
-	 * /usr/local/share/data.
+	 * Get the program data folder for the operating system. On Windows
+	 * systems this is the %APPDATA% location. On Linux systems this is
+	 * $HOME.
 	 * <p>
 	 * Exapmles:
 	 * <p>
@@ -141,11 +141,15 @@ public class OperatingSystem {
 	 * @param product The product name to include in the path.
 	 * @return
 	 */
-	public static final File getApplicationDataFolder() {
+	public static final File getProgramDataFolder() {
 		File folder = null;
 		switch( family ) {
 			case WINDOWS: {
-				folder = new File( System.getenv( "allusersprofile" ) );
+				folder = new File( System.getenv( "appdata" ) );
+				break;
+			}
+			case LINUX: {
+				folder = new File( System.getProperty( "user.home" ) );
 				break;
 			}
 			default: {
@@ -162,14 +166,54 @@ public class OperatingSystem {
 
 		return null;
 	}
-	
+
+	/**
+	 * Get the shared program data folder for the operating system. On Windows
+	 * systems this is the %ALLUSERSPROFILE% location. On Linux systems this is
+	 * /usr/local/share/data.
+	 * <p>
+	 * Exapmles:
+	 * <p>
+	 * Windows 7: C:/ProgramData/<br/>
+	 * Linux: /usr/local/share/data/
+	 * 
+	 * @param vendor The vendor name to include in the path.
+	 * @param product The product name to include in the path.
+	 * @return
+	 */
+	public static final File getSharedProgramDataFolder() {
+		File folder = null;
+		switch( family ) {
+			case WINDOWS: {
+				folder = new File( System.getenv( "allusersprofile" ) );
+				break;
+			}
+			case LINUX: {
+				folder = new File( "/usr/local/share/data" );
+				break;
+			}
+			default: {
+				folder = new File( System.getProperty( "user.home" ) );
+				break;
+			}
+		}
+
+		try {
+			return folder.getCanonicalFile();
+		} catch( IOException exception ) {
+			Log.write( exception );
+		}
+
+		return null;
+	}
+
 	public static final Process runElevated( ProcessBuilder builder ) {
 		// Elevate does not come with Windows it must be provided.
 		// In Windows: elevate <program>
 		return null;
 	}
-	
-	public static final Process runNormally( ProcessBuilder builder )  {
+
+	public static final Process runNormally( ProcessBuilder builder ) {
 		// In Windows: runas /trustlevel:0x20000 <program>
 		return null;
 	}
