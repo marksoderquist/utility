@@ -1,6 +1,5 @@
 package com.parallelsymmetry.escape.utility;
 
-import java.io.File;
 import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
