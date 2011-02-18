@@ -3,10 +3,12 @@ package com.parallelsymmetry.escape.utility.agent;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+import com.parallelsymmetry.escape.utility.Controllable;
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public abstract class Agent {
+public abstract class Agent implements Controllable {
 
 	public enum State {
 		STARTING, STARTED, STOPPING, STOPPED, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED
@@ -85,7 +87,7 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void startAndWait() throws InterruptedException {
-		startAndWait( 0 );
+		startAndWait( 0, TimeUnit.SECONDS );
 	}
 
 	/**
@@ -97,10 +99,10 @@ public abstract class Agent {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public final void startAndWait( int timeout ) throws InterruptedException {
+	public final void startAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			start();
-			waitForStartup( timeout );
+			waitForStartup( timeout, unit );
 		}
 	}
 
@@ -126,11 +128,10 @@ public abstract class Agent {
 	 * changes the agent state to STOPPING and waits for the agent state to be set
 	 * to STOPPED before returning.
 	 * 
-	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public final void stopAndWait() throws Exception {
-		stopAndWait( 0 );
+	public final void stopAndWait() throws InterruptedException {
+		stopAndWait( 0, TimeUnit.SECONDS );
 	}
 
 	/**
@@ -140,39 +141,39 @@ public abstract class Agent {
 	 * will wait indefinitely.
 	 * 
 	 * @param timeout
-	 * @throws Exception
+	 * @throws InterruptedException
 	 */
-	public final void stopAndWait( int timeout ) throws Exception {
+	public final void stopAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			stop();
-			waitForShutdown( timeout );
+			waitForShutdown( timeout, unit );
 		}
 	}
 
 	/**
 	 * Restart the agent.
 	 * 
-	 * @throws IOException
+	 * @throws InterruptedException
 	 */
-	public final void restart() throws Exception {
-		restart( 0 );
+	public final void restart() throws InterruptedException {
+		restart( 0, TimeUnit.SECONDS );
 	}
 
 	/**
 	 * Restart the agent.
 	 * 
 	 * @param timeout
-	 * @throws Exception
+	 * @throws InterruptedException
 	 */
-	public final void restart( int timeout ) throws Exception {
+	public final void restart( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			startingFlag = true;
 			stoppingFlag = true;
 			operationLock.notifyAll();
 
 			// Don't use start() and stop() because they are asynchronous.
-			stopAndWait( timeout / 2 );
-			startAndWait( timeout / 2 );
+			stopAndWait( timeout / 2, unit );
+			startAndWait( timeout / 2, unit );
 		}
 	}
 
@@ -200,7 +201,7 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void waitForStartup() throws InterruptedException {
-		waitForStartup( 0 );
+		waitForStartup( 0, TimeUnit.SECONDS );
 	}
 
 	/**
@@ -210,7 +211,7 @@ public abstract class Agent {
 	 * @param timeout
 	 * @throws InterruptedException
 	 */
-	public final void waitForStartup( int timeout ) throws InterruptedException {
+	public final void waitForStartup( long timeout, TimeUnit unit ) throws InterruptedException {
 		//waitForStateChange( State.STARTING, timeout );
 		synchronized( operationLock ) {
 			while( startingFlag ) {
@@ -226,7 +227,7 @@ public abstract class Agent {
 	 * @throws InterruptedException
 	 */
 	public final void waitForShutdown() throws InterruptedException {
-		waitForShutdown( 0 );
+		waitForShutdown( 0, TimeUnit.SECONDS );
 	}
 
 	/**
@@ -236,7 +237,7 @@ public abstract class Agent {
 	 * @param timeout
 	 * @throws InterruptedException
 	 */
-	public final void waitForShutdown( int timeout ) throws InterruptedException {
+	public final void waitForShutdown( long timeout, TimeUnit unit ) throws InterruptedException {
 		//waitForStateChange( State.STOPPING, timeout );
 		synchronized( operationLock ) {
 			while( stoppingFlag ) {
