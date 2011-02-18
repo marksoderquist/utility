@@ -268,10 +268,6 @@ public class Settings {
 		}
 	}
 
-	public boolean getBoolean( String path ) {
-		return Boolean.parseBoolean( get( path ) );
-	}
-
 	public boolean getBoolean( String path, boolean defaultValue ) {
 		String value = get( path );
 		if( value == null ) return defaultValue;
@@ -284,10 +280,6 @@ public class Settings {
 
 	public void putBoolean( String path, boolean value ) {
 		put( path, value ? "true" : "false" );
-	}
-
-	public int getInt( String path ) {
-		return Integer.parseInt( get( path ) );
 	}
 
 	public int getInt( String path, int defaultValue ) {
