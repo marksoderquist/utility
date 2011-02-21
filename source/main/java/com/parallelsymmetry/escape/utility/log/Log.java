@@ -96,7 +96,7 @@ public class Log {
 			try {
 				String pattern = parameters.get( "log.file" );
 				if( parameters.isTrue( "log.file" ) ) pattern = DEFAULT_LOG_FILE_NAME;
-				FileHandler handler = new FileHandler( pattern, parameters.isTrue( "log.append" ) );
+				FileHandler handler = new FileHandler( pattern, parameters.isTrue( "log.file.append" ) );
 				handler.setLevel( Log.INFO );
 				if( parameters.isSet( "log.file.level" ) ) handler.setLevel( Log.parseLevel( parameters.get( "log.file.level" ) ) );
 				handler.setFormatter( new DefaultFormatter() );
