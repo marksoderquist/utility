@@ -141,6 +141,43 @@ public abstract class AbstractIcon implements Icon {
 
 	public abstract void render( Graphics2D graphics );
 
+	public void save( File target, String name ) {
+		save( target, name, getIconWidth(), getIconHeight() );
+	}
+
+	public void save( File target, String name, int size ) {
+		save( target, name, size, size, null );
+	}
+
+	public void save( File target, String name, int width, int height ) {
+		save( target, name, width, height, null );
+	}
+
+	public void save( File target, String name, int width, int height, RGBImageFilter filter ) {
+		if( !target.isDirectory() ) target = target.getParentFile();
+		if( !target.exists() && target.mkdirs() ) {
+			System.err.println( "Could not create target: " + target );
+			return;
+		}
+
+		BufferedImage image = new BufferedImage( getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+		paintIcon( null, image.getGraphics(), 0, 0 );
+
+		// Scale the icon.
+		if( getIconWidth() != width || getIconHeight() != height ) image = Images.scale( image, width, height );
+
+		// Filter the icon.
+		filter( image, filter );
+
+		try {
+			File file = new File( target, name + ".png" );
+			ImageIO.write( image, "png", file );
+			System.out.println( "Image created: " + file.toString() );
+		} catch( IOException exception ) {
+			exception.printStackTrace();
+		}
+	}
+
 	public static void showSample( Icon icon ) {
 		showSample( icon, null );
 	}
@@ -438,43 +475,6 @@ public abstract class AbstractIcon implements Icon {
 		}
 
 		return currentFont;
-	}
-
-	protected void save( File target, String name ) {
-		save( target, name, getIconWidth(), getIconHeight() );
-	}
-
-	protected void save( File target, String name, int size ) {
-		save( target, name, size, size, null );
-	}
-
-	protected void save( File target, String name, int width, int height ) {
-		save( target, name, width, height, null );
-	}
-
-	protected void save( File target, String name, int width, int height, RGBImageFilter filter ) {
-		if( !target.isDirectory() ) target = target.getParentFile();
-		if( !target.exists() && target.mkdirs() ) {
-			System.err.println( "Could not create target: " + target );
-			return;
-		}
-
-		BufferedImage image = new BufferedImage( getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-		paintIcon( null, image.getGraphics(), 0, 0 );
-
-		// Scale the icon.
-		if( getIconWidth() != width || getIconHeight() != height ) image = Images.scale( image, width, height );
-
-		// Filter the icon.
-		filter( image, filter );
-
-		try {
-			File file = new File( target, name + ".png" );
-			ImageIO.write( image, "png", file );
-			System.out.println( "Image created: " + file.toString() );
-		} catch( IOException exception ) {
-			exception.printStackTrace();
-		}
 	}
 
 	private void filter( BufferedImage image, RGBImageFilter filter ) {
