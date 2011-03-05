@@ -299,7 +299,11 @@ public class Settings {
 	}
 
 	public <T extends Persistent<T>> List<T> getList( Class<T> type, String path ) {
-		int count = getInt( path + ITEM_COUNT, 0 );
+		return getList( type, path, 0 );
+	}
+
+	public <T extends Persistent<T>> List<T> getList( Class<T> type, String path, int size ) {
+		int count = getInt( path + ITEM_COUNT, size );
 
 		List<T> list = new ArrayList<T>( count );
 		for( int index = 0; index < count; index++ ) {
