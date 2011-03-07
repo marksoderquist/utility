@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,23 +30,23 @@ public class SettingsTest extends TestCase {
 
 	public void testGet() {
 		String path = "/test/get/value";
-		assertNull( settings.get( path ) );
+		assertNull( settings.get( path, null ) );
 
 		// Setting the value in the default provider should give us a default value.
 		providerD.set( path, "D" );
-		assertEquals( "D", settings.get( path ) );
+		assertEquals( "D", settings.get( path, null ) );
 
 		// Setting the value in provider 2 should override the default provider.
 		provider2.set( path, "2" );
-		assertEquals( "2", settings.get( path ) );
+		assertEquals( "2", settings.get( path, null ) );
 
 		// Setting the value in provider 3 should not override provider 2.
 		provider3.set( path, "3" );
-		assertEquals( "2", settings.get( path ) );
+		assertEquals( "2", settings.get( path, null ) );
 
 		// Setting the value in provider 1 should override provider 2.
 		provider1.set( path, "1" );
-		assertEquals( "1", settings.get( path ) );
+		assertEquals( "1", settings.get( path, null ) );
 	}
 
 	public void testPut() {
@@ -60,6 +61,12 @@ public class SettingsTest extends TestCase {
 		assertNull( providerD.get( path ) );
 	}
 
+	public void testPutGetColor() {
+		settings.putColor( "color", new Color( 73, 74, 99, 128 ) );
+		assertEquals( "#80494a63", settings.get( "color", null ) );
+		assertEquals( new Color( 73, 74, 99, 128 ), settings.getColor( "color", null ) );
+	}
+
 	public void testMounts() {
 		settings.addProvider( provider1, "/1" );
 		settings.addProvider( provider2, "/2" );
@@ -71,10 +78,10 @@ public class SettingsTest extends TestCase {
 		provider3.set( "/value", "3" );
 		providerD.set( "/value", "D" );
 
-		assertEquals( "1", settings.get( "/1/value" ) );
-		assertEquals( "2", settings.get( "/2/value" ) );
-		assertEquals( "3", settings.get( "/3/value" ) );
-		assertEquals( "D", settings.get( "/D/value" ) );
+		assertEquals( "1", settings.get( "/1/value", null ) );
+		assertEquals( "2", settings.get( "/2/value", null ) );
+		assertEquals( "3", settings.get( "/3/value", null ) );
+		assertEquals( "D", settings.get( "/D/value", null ) );
 
 		settings.put( "/1/value", "A" );
 		settings.put( "/2/value", "B" );
@@ -82,14 +89,14 @@ public class SettingsTest extends TestCase {
 		settings.put( "/D/value", "D" );
 
 		// Remember that provider2 is the only one writable.
-		assertEquals( "1", settings.get( "/1/value" ) );
-		assertEquals( "B", settings.get( "/2/value" ) );
-		assertEquals( "3", settings.get( "/3/value" ) );
-		assertEquals( "D", settings.get( "/D/value" ) );
+		assertEquals( "1", settings.get( "/1/value", null ) );
+		assertEquals( "B", settings.get( "/2/value", null ) );
+		assertEquals( "3", settings.get( "/3/value", null ) );
+		assertEquals( "D", settings.get( "/D/value", null ) );
 	}
 
 	public void testNoProviders() {
-		assertNull( new Settings().get( "/test" ) );
+		assertNull( new Settings().get( "/test", null ) );
 	}
 
 	public void testProviderOverride() {
@@ -107,10 +114,10 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/test/path/3", "D" );
 		providerD.set( "/test/path/D", "D" );
 
-		assertEquals( "1", settings.get( "/test/path/1" ) );
-		assertEquals( "2", settings.get( "/test/path/2" ) );
-		assertEquals( "3", settings.get( "/test/path/3" ) );
-		assertEquals( "D", settings.get( "/test/path/D" ) );
+		assertEquals( "1", settings.get( "/test/path/1", null ) );
+		assertEquals( "2", settings.get( "/test/path/2", null ) );
+		assertEquals( "3", settings.get( "/test/path/3", null ) );
+		assertEquals( "D", settings.get( "/test/path/D", null ) );
 	}
 
 	public void testGetNode() {
@@ -132,20 +139,20 @@ public class SettingsTest extends TestCase {
 
 		assertEquals( "/test", node.getPath() );
 
-		assertEquals( "1", node.get( "path/1" ) );
-		assertEquals( "2", node.get( "path/2" ) );
-		assertEquals( "3", node.get( "path/3" ) );
-		assertEquals( "D", node.get( "path/D" ) );
+		assertEquals( "1", node.get( "path/1", null ) );
+		assertEquals( "2", node.get( "path/2", null ) );
+		assertEquals( "3", node.get( "path/3", null ) );
+		assertEquals( "D", node.get( "path/D", null ) );
 
 		node.put( "path/1", "A" );
 		node.put( "path/2", "B" );
 		node.put( "path/3", "C" );
 
 		// Remember that provider2 is the only one writable.
-		assertEquals( "1", node.get( "path/1" ) );
-		assertEquals( "B", node.get( "path/2" ) );
-		assertEquals( "C", node.get( "path/3" ) );
-		assertEquals( "D", node.get( "path/D" ) );
+		assertEquals( "1", node.get( "path/1", null ) );
+		assertEquals( "B", node.get( "path/2", null ) );
+		assertEquals( "C", node.get( "path/3", null ) );
+		assertEquals( "D", node.get( "path/D", null ) );
 	}
 
 	public void testGetEmptyList() {

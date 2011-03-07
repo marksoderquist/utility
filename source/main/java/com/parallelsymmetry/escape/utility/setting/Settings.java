@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.parallelsymmetry.escape.utility.TextUtil;
 import com.parallelsymmetry.escape.utility.log.Log;
+import com.parallelsymmetry.escape.utility.ui.Colors;
 
 /**
  * A node in a hierarchical collection of setting data. This class allows
@@ -213,10 +215,6 @@ public class Settings {
 
 	}
 
-	public String get( String path ) {
-		return get( path, null );
-	}
-
 	/**
 	 * Get a value. If the value is not defined in the settings return the
 	 * specified default value.
@@ -269,7 +267,7 @@ public class Settings {
 	}
 
 	public boolean getBoolean( String path, boolean defaultValue ) {
-		String value = get( path );
+		String value = get( path, null );
 		if( value == null ) return defaultValue;
 		return Boolean.parseBoolean( value );
 	}
@@ -284,7 +282,7 @@ public class Settings {
 
 	public int getInt( String path, int defaultValue ) {
 		try {
-			return Integer.parseInt( get( path ) );
+			return Integer.parseInt( get( path, null ) );
 		} catch( Throwable throwable ) {
 			return defaultValue;
 		}
@@ -296,6 +294,19 @@ public class Settings {
 
 	public void putInt( String path, int value ) {
 		put( path, String.valueOf( value ) );
+	}
+
+	public Color getColor( String path, Color value ) {
+		String code = get( path, null );
+		return code != null ? Colors.decode( code ) : value;
+	}
+
+	public Color getDefaultColor( String path ) {
+		return Colors.decode( getDefault( path ) );
+	}
+
+	public void putColor( String path, Color color ) {
+		put( path, Colors.encode( color ) );
 	}
 
 	public <T extends Persistent<T>> List<T> getList( Class<T> type, String path ) {
