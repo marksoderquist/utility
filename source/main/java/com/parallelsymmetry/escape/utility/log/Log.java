@@ -47,20 +47,6 @@ public class Log {
 	public static final Level DEBUG = new CustomLevel( "DEBUG", DEBUG_VALUE );
 
 	public static final Level ALL = new CustomLevel( "ALL", Integer.MIN_VALUE );
-	
-	public static final String PARAMETER_LOG_LEVEL = "log.level";
-
-	public static final String PARAMETER_LOG_TAG = "log.tag";
-
-	public static final String PARAMETER_LOG_COLOR = "log.color";
-
-	public static final String PARAMETER_LOG_PREFIX = "log.prefix";
-
-	public static final String PARAMETER_LOG_FILE = "log.file";
-
-	public static final String PARAMETER_LOG_FILE_LEVEL = "log.file.level";
-
-	public static final String PARAMETER_LOG_FILE_APPEND = "log.file.append";
 
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
@@ -101,18 +87,18 @@ public class Log {
 	 * @return
 	 */
 	public static final void init( Parameters parameters ) {
-		if( parameters.isSet( PARAMETER_LOG_TAG ) ) Log.setShowTag( parameters.isTrue( PARAMETER_LOG_TAG ) );
-		if( parameters.isSet( PARAMETER_LOG_COLOR ) ) Log.setShowColor( parameters.isTrue( PARAMETER_LOG_COLOR ) );
-		if( parameters.isSet( PARAMETER_LOG_PREFIX ) ) Log.setShowPrefix( parameters.isTrue( PARAMETER_LOG_PREFIX ) );
-		if( parameters.isSet( PARAMETER_LOG_LEVEL ) ) Log.setLevel( Log.parseLevel( parameters.get( PARAMETER_LOG_LEVEL ) ) );
+		if( parameters.isSet( LogParameter.LOG_TAG ) ) Log.setShowTag( parameters.isTrue( LogParameter.LOG_TAG ) );
+		if( parameters.isSet( LogParameter.LOG_COLOR ) ) Log.setShowColor( parameters.isTrue( LogParameter.LOG_COLOR ) );
+		if( parameters.isSet( LogParameter.LOG_PREFIX ) ) Log.setShowPrefix( parameters.isTrue( LogParameter.LOG_PREFIX ) );
+		if( parameters.isSet( LogParameter.LOG_LEVEL ) ) Log.setLevel( Log.parseLevel( parameters.get( LogParameter.LOG_LEVEL ) ) );
 
-		if( parameters.isSet( PARAMETER_LOG_FILE ) ) {
+		if( parameters.isSet( LogParameter.LOG_FILE ) ) {
 			try {
-				String pattern = parameters.get( PARAMETER_LOG_FILE );
-				if( parameters.isTrue( PARAMETER_LOG_FILE ) ) pattern = DEFAULT_LOG_FILE_NAME;
-				FileHandler handler = new FileHandler( pattern, parameters.isTrue( PARAMETER_LOG_FILE_APPEND ) );
+				String pattern = parameters.get( LogParameter.LOG_FILE );
+				if( parameters.isTrue( LogParameter.LOG_FILE ) ) pattern = DEFAULT_LOG_FILE_NAME;
+				FileHandler handler = new FileHandler( pattern, parameters.isTrue( LogParameter.LOG_FILE_APPEND ) );
 				handler.setLevel( Log.INFO );
-				if( parameters.isSet( PARAMETER_LOG_FILE_LEVEL ) ) handler.setLevel( Log.parseLevel( parameters.get( PARAMETER_LOG_FILE_LEVEL ) ) );
+				if( parameters.isSet( LogParameter.LOG_FILE_LEVEL ) ) handler.setLevel( Log.parseLevel( parameters.get( LogParameter.LOG_FILE_LEVEL ) ) );
 				handler.setFormatter( new DefaultFormatter() );
 				addHandler( handler );
 			} catch( IOException exception ) {
