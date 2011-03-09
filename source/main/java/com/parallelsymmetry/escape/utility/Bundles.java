@@ -14,8 +14,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class Bundles {
 
-	public static final String MESSAGES = "messages";
-
 	private static final Set<ClassLoader> loaders = new CopyOnWriteArraySet<ClassLoader>();
 
 	private static final Map<String, MappedResourceBundle> bundles = new ConcurrentHashMap<String, MappedResourceBundle>();
@@ -110,19 +108,22 @@ public class Bundles {
 		return string;
 	}
 
-	private static ResourceBundle getBundle( String name, Locale locale ) {
-		StringBuilder builder = new StringBuilder( name );
-		builder.append( "_" );
-		builder.append( locale.getLanguage() );
+	private static ResourceBundle getBundle( String path, Locale locale ) {
+		StringBuilder builder = new StringBuilder( path );
+		builder.append( "." );
+		builder.append( locale.toString() );
 		String key = builder.toString();
 
 		// If already known not to be available return null.
 		if( missing.contains( key ) ) return null;
 
+		// Get the resource bundle.
 		MappedResourceBundle bundle = bundles.get( key );
+
+		// Load the bundle if it does not exist.
 		if( bundle == null ) {
 			for( ClassLoader loader : loaders ) {
-				InputStream input = getResourceAsStream( name, locale, loader );
+				InputStream input = getResourceAsStream( path, locale, loader );
 
 				if( input != null ) {
 					if( bundle == null ) bundle = new MappedResourceBundle();
@@ -144,25 +145,53 @@ public class Bundles {
 		return bundle;
 	}
 
-	private static InputStream getResourceAsStream( String name, Locale locale, ClassLoader loader ) {
+	private static String[] getLocaleParts( Locale locale ) {
+		String language = locale.getLanguage();
+		String country = locale.getCountry();
+		String variant = locale.getVariant();
+
+		boolean l = language.length() != 0;
+		boolean c = country.length() != 0;
+		boolean v = variant.length() != 0;
+
+		int count = 0;
+		if( l ) count++;
+		if( c ) count++;
+		if( v ) count++;
+
+		String[] parts = new String[count];
+
+		int index = 0;
+		if( l ) parts[index++] = language;
+		if( c ) parts[index++] = country;
+		if( v ) parts[index++] = variant;
+
+		return parts;
+	}
+
+	private static InputStream getResourceAsStream( String path, Locale locale, ClassLoader loader ) {
 		InputStream input = null;
 
+		String[] parts = getLocaleParts( locale );
+		
+		for( int count = parts.length; count > -1; count--) {
+			if( input == null ) {
+				StringBuilder builder = new StringBuilder( path );
+				builder.append( "." );
+				builder.append( TextUtil.toString( parts, "_", 0, count ) );
+				builder.append( ".properties" );
+				input = loader.getResourceAsStream( builder.toString() );
+			}
+		}
+		
 		if( input == null ) {
-			StringBuilder builder = new StringBuilder( name );
-			builder.append( "_" );
-			builder.append( locale.getISO3Language() );
-			builder.append( ".properties" );
+			StringBuilder builder = new StringBuilder( path );
+			builder.append( ".en.properties" );
 			input = loader.getResourceAsStream( builder.toString() );
 		}
 
 		if( input == null ) {
-			StringBuilder builder = new StringBuilder( name );
-			builder.append( "_en.properties" );
-			input = loader.getResourceAsStream( builder.toString() );
-		}
-
-		if( input == null ) {
-			StringBuilder builder = new StringBuilder( name );
+			StringBuilder builder = new StringBuilder( path );
 			builder.append( ".properties" );
 			input = loader.getResourceAsStream( builder.toString() );
 		}

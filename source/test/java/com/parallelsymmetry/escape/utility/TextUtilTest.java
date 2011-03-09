@@ -252,6 +252,78 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "id est laborum.", parser.next() );
 	}
 
+	public void testArrayToString() {
+		Integer[] array = new Integer[5];
+
+		array[0] = 0;
+		array[1] = 1;
+		array[2] = 2;
+		array[3] = 3;
+		array[4] = 4;
+
+		assertEquals( "[0] [1] [2] [3] [4]", TextUtil.toString( array ) );
+	}
+
+	public void testArrayToStringWithOffset() {
+		Integer[] array = new Integer[5];
+
+		array[0] = 0;
+		array[1] = 1;
+		array[2] = 2;
+		array[3] = 3;
+		array[4] = 4;
+
+		assertEquals( "[2] [3] [4]", TextUtil.toString( array, 2 ) );
+	}
+
+	public void testArrayToStringWithOffsetAndLength() {
+		Integer[] array = new Integer[5];
+
+		array[0] = 0;
+		array[1] = 1;
+		array[2] = 2;
+		array[3] = 3;
+		array[4] = 4;
+
+		assertEquals( "[1] [2] [3]", TextUtil.toString( array, 1, 3 ) );
+	}
+
+	public void testArrayToStringWithDelimiter() {
+		Integer[] array = new Integer[5];
+
+		array[0] = 0;
+		array[1] = 1;
+		array[2] = 2;
+		array[3] = 3;
+		array[4] = 4;
+
+		assertEquals( "0_1_2_3_4", TextUtil.toString( array, "_" ) );
+	}
+
+	public void testArrayToStringWithDelimiterAndOffset() {
+		Integer[] array = new Integer[5];
+
+		array[0] = 0;
+		array[1] = 1;
+		array[2] = 2;
+		array[3] = 3;
+		array[4] = 4;
+
+		assertEquals( "2_3_4", TextUtil.toString( array, "_", 2 ) );
+	}
+
+	public void testArrayToStringWithDelimiterLengthAndOffset() {
+		Integer[] array = new Integer[5];
+
+		array[0] = 0;
+		array[1] = 1;
+		array[2] = 2;
+		array[3] = 3;
+		array[4] = 4;
+
+		assertEquals( "1_2_3", TextUtil.toString( array, "_", 1, 3 ) );
+	}
+
 	public void testListToString() {
 		List<Integer> list = new ArrayList<Integer>();
 

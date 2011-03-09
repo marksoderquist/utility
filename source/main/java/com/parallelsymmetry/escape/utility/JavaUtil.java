@@ -24,8 +24,16 @@ public class JavaUtil {
 		return name.substring( name.lastIndexOf( '.' ) + 1 );
 	}
 
-	public static List<URI> parseSystemClasspath( String classpath ) throws URISyntaxException {
-		return parseSystemClasspath( classpath, File.pathSeparator );
+	public static List<URI> getClasspath() {
+		try {
+			return parseClasspath( System.getProperty( "class.path" ) );
+		} catch( URISyntaxException exception ) {
+			return null;
+		}
+	}
+
+	public static List<URI> parseClasspath( String classpath ) throws URISyntaxException {
+		return parseClasspath( classpath, File.pathSeparator );
 	}
 
 	/**
@@ -36,7 +44,7 @@ public class JavaUtil {
 	 * "http://java.sun.com/javase/6/docs/technotes/tools/solaris/classpath.html"
 	 * >Setting the Unix Classpath</a>
 	 */
-	public static List<URI> parseSystemClasspath( String classpath, String separator ) throws URISyntaxException {
+	public static List<URI> parseClasspath( String classpath, String separator ) throws URISyntaxException {
 		ArrayList<URI> list = new ArrayList<URI>();
 		if( classpath == null ) return list;
 

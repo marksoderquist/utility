@@ -97,6 +97,34 @@ public final class TextUtil {
 		}
 	}
 
+	public static String toString( Object[] array ) {
+		return toString( Arrays.asList( array ) );
+	}
+
+	public static String toString( Object[] array, int offset ) {
+		return toString( array, offset, array.length - offset );
+	}
+
+	public static String toString( Object[] array, int offset, int length ) {
+		Object[] items = new Object[ length ];
+		System.arraycopy( array, offset, items, 0, length );
+		return toString( Arrays.asList( items ) );
+	}
+
+	public static String toString( Object[] array, String delimiter ) {
+		return toString( Arrays.asList( array ), delimiter );
+	}
+
+	public static String toString( Object[] array, String delimiter, int offset ) {
+		return toString( array, delimiter, offset, array.length - offset );
+	}
+
+	public static String toString( Object[] array, String delimiter, int offset, int length ) {
+		Object[] items = new Object[ length ];
+		System.arraycopy( array, offset, items, 0, length );
+		return toString( Arrays.asList( items ), delimiter );
+	}
+
 	public static String toString( List<? extends Object> list ) {
 		return toString( list, "[", "]" );
 	}

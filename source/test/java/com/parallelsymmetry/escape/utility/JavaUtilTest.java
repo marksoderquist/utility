@@ -14,15 +14,15 @@ public class JavaUtilTest extends TestCase {
 		assertEquals( "Object", JavaUtil.getSimpleClassName( "java.lang.Object" ) );
 	}
 
-	public void testParseSystemClasspath() throws Exception {
-		List<URI> entries = JavaUtil.parseSystemClasspath( null );
+	public void testParseClasspath() throws Exception {
+		List<URI> entries = JavaUtil.parseClasspath( null );
 		assertEquals( 0, entries.size() );
 
 		String separator = ";";
 		String classpath = "test1.jar";
 		classpath += separator + "test2.jar";
 		classpath += separator + URLEncoder.encode( "http://www.parallelsymmetry.com/software/test3.jar", "UTF-8" );
-		entries = JavaUtil.parseSystemClasspath( classpath, separator );
+		entries = JavaUtil.parseClasspath( classpath, separator );
 
 		assertEquals( new File( "test1.jar" ).toURI(), entries.get( 0 ) );
 		assertEquals( new File( "test2.jar" ).toURI(), entries.get( 1 ) );
@@ -32,7 +32,7 @@ public class JavaUtilTest extends TestCase {
 		classpath = "test1.jar";
 		classpath += separator + "test2.jar";
 		classpath += separator + URLEncoder.encode( "http://www.parallelsymmetry.com/software/test3.jar", "UTF-8" );
-		entries = JavaUtil.parseSystemClasspath( classpath, separator );
+		entries = JavaUtil.parseClasspath( classpath, separator );
 
 		assertEquals( new File( "test1.jar" ).toURI(), entries.get( 0 ) );
 		assertEquals( new File( "test2.jar" ).toURI(), entries.get( 1 ) );
