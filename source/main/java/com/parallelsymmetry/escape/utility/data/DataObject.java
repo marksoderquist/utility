@@ -1,6 +1,5 @@
 package com.parallelsymmetry.escape.utility.data;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +11,8 @@ import com.parallelsymmetry.escape.utility.log.Log;
 public abstract class DataObject {
 
 	private static final Object NULL = new Object();
+	
+	private static final String MODIFIED = "modified";
 
 	private boolean modified;
 
@@ -26,9 +27,18 @@ public abstract class DataObject {
 	public boolean isModified() {
 		return modified;
 	}
+	
+	private void setModified( boolean modified ) {
+		if( this.modified == modified ) return;
+		
+		this.modified = modified;
+		
+		// Notify listeners of modified change events.
+		fireMetaAttributeChanged( new MetaAttributeEvent( this, MODIFIED, modified, !modified ) );
+	}
 
 	public void commit() {
-		modified = false;
+		setModified( false );
 		modifiedAttributes = null;
 		modifiedAttributeCount = 0;
 	}
@@ -76,10 +86,10 @@ public abstract class DataObject {
 		}
 
 		// Update the modified flag.
-		modified = modifiedAttributeCount != 0;
+		setModified( modifiedAttributeCount != 0 );
 
 		// Notify listeners of data attribute change.
-		fireDataAttributeChanged( new DataEvent( this, name, newValue, oldValue ) );
+		fireDataAttributeChanged( new DataAttributeEvent( this, name, newValue, oldValue ) );
 	}
 
 	public int getModifiedAttributeCount() {
@@ -94,9 +104,15 @@ public abstract class DataObject {
 		listeners.remove( listener );
 	}
 
-	protected void fireDataAttributeChanged( DataEvent event ) {
+	protected void fireDataAttributeChanged( DataAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.dataAttributeChanged( event );
+		}
+	}
+
+	protected void fireMetaAttributeChanged( MetaAttributeEvent event ) {
+		for( DataListener listener : listeners ) {
+			listener.metaAttributeChanged( event );
 		}
 	}
 

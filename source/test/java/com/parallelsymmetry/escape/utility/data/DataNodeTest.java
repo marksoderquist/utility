@@ -148,30 +148,79 @@ public class DataNodeTest extends TestCase {
 		DataHandler handler = new DataHandler();
 		MockData data = new MockData();
 		data.addDataListener( handler );
-		assertFalse( data.isModified() );
-		assertEquals( 0, handler.getEvents().size() );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
 
-		data.setAttribute( "attribute", "value" );
-		assertTrue( data.isModified() );
-		assertEquals( 1, data.getModifiedAttributeCount() );
-		assertEquals( 1, handler.getEvents().size() );
+		// Change an attribute and assert.
+		data.setAttribute( "attribute", "value0" );
+		assertDataState( data, true, 1, 0 );
+		assertEventCounts( handler, 0, 1, 1 );
 
-		DataEvent event0 = handler.getEvents().get( 0 );
-		assertEquals( data, event0.getData() );
-		assertEquals( null, event0.getOldValue() );
-		assertEquals( "attribute", event0.getAttributeName() );
-		assertEquals( "value", event0.getNewValue() );
-		
+		// Change the attribute value to something else and assert.
+		data.setAttribute( "attribute", "value1" );
+		assertDataState( data, true, 1, 0 );
+		assertEventCounts( handler, 0, 2, 1 );
+
+		// Reset the attribute and assert.
 		data.setAttribute( "attribute", null );
-		assertFalse( data.isModified() );
-		assertEquals( 0, data.getModifiedAttributeCount() );
-		assertEquals( 2, handler.getEvents().size() );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 3, 2 );
 
-		DataEvent event1 = handler.getEvents().get( 1 );
+		assertEventState( handler, 0, data, "modified", false, true );
+		//assertEventState( handler, 0, data, "attribute", null, "value0" );
+		//		DataAttributeEvent event0 = handler.getDataAttributeEvents().get( 0 );
+		//		assertEquals( data, event0.getData() );
+		//		assertEquals( "attribute", event0.getAttributeName() );
+		//		assertEquals( null, event0.getOldValue() );
+		//		assertEquals( "value0", event0.getNewValue() );
+
+		DataAttributeEvent event1 = handler.getDataAttributeEvents().get( 1 );
 		assertEquals( data, event1.getData() );
-		assertEquals( "value", event1.getOldValue() );
 		assertEquals( "attribute", event1.getAttributeName() );
-		assertEquals( null, event1.getNewValue() );
+		assertEquals( "value0", event1.getOldValue() );
+		assertEquals( "value1", event1.getNewValue() );
+
+		DataAttributeEvent event2 = handler.getDataAttributeEvents().get( 2 );
+		assertEquals( data, event2.getData() );
+		assertEquals( "attribute", event2.getAttributeName() );
+		assertEquals( "value1", event2.getOldValue() );
+		assertEquals( null, event2.getNewValue() );
+	}
+
+	private void assertDataState( DataObject node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
+		assertEquals( modified, node.isModified() );
+		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
+		//assertEquals( modifiedChildCount, node.getModifiedChildCount() );
+	}
+
+	private void assertEventCounts( DataHandler handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount ) {
+		int total = dataEventCount + dataAttributeEventCount + metaAttributeEventCount;
+		assertEquals( total, handler.getEvents().size() );
+
+		assertEquals( dataEventCount, handler.getDataEvents().size() );
+		assertEquals( dataAttributeEventCount, handler.getDataAttributeEvents().size() );
+		assertEquals( metaAttributeEventCount, handler.getMetaAttributeEvents().size() );
+	}
+
+	private void assertEventState( DataHandler handler, int index, DataObject data ) {
+		assertEventState( handler, index, data, null, null, null );
+	}
+
+	private void assertEventState( DataHandler handler, int index, DataObject data, String name, Object oldValue, Object newValue ) {
+		DataEvent event = handler.getEvents().get( index );
+		assertEquals( data, event.getData() );
+
+		if( event instanceof DataAttributeEvent ) {
+			DataAttributeEvent dataEvent = (DataAttributeEvent)event;
+			assertEquals( name, dataEvent.getAttributeName() );
+			assertEquals( oldValue, dataEvent.getOldValue() );
+			assertEquals( newValue, dataEvent.getNewValue() );
+		} else if( event instanceof MetaAttributeEvent ) {
+			MetaAttributeEvent metaEvent = (MetaAttributeEvent)event;
+			assertEquals( name, metaEvent.getAttributeName() );
+			assertEquals( oldValue, metaEvent.getOldValue() );
+			assertEquals( newValue, metaEvent.getNewValue() );
+		}
 	}
 
 	private static class MockData extends DataObject {
@@ -209,13 +258,47 @@ public class DataNodeTest extends TestCase {
 
 		private List<DataEvent> events = new ArrayList<DataEvent>();
 
+		private List<DataEvent> dataChangedEvents = new ArrayList<DataEvent>();
+
+		private List<DataAttributeEvent> dataAttributeEvents = new ArrayList<DataAttributeEvent>();
+
+		private List<MetaAttributeEvent> metaAttributeEvents = new ArrayList<MetaAttributeEvent>();
+
 		@Override
-		public void dataAttributeChanged( DataEvent event ) {
+		public void dataChanged( DataEvent event ) {
+			Log.write( Log.TRACE, "Data change event received." );
+			dataChangedEvents.add( event );
+			events.add( event );
+		}
+
+		@Override
+		public void dataAttributeChanged( DataAttributeEvent event ) {
+			Log.write( Log.TRACE, "Data attribute change event received." );
+			dataAttributeEvents.add( event );
+			events.add( event );
+		}
+
+		@Override
+		public void metaAttributeChanged( MetaAttributeEvent event ) {
+			Log.write( Log.TRACE, "Meta attribute change event received." );
+			metaAttributeEvents.add( event );
 			events.add( event );
 		}
 
 		public List<DataEvent> getEvents() {
 			return events;
+		}
+
+		public List<DataEvent> getDataEvents() {
+			return dataChangedEvents;
+		}
+
+		public List<DataAttributeEvent> getDataAttributeEvents() {
+			return dataAttributeEvents;
+		}
+
+		public List<MetaAttributeEvent> getMetaAttributeEvents() {
+			return metaAttributeEvents;
 		}
 
 	}
