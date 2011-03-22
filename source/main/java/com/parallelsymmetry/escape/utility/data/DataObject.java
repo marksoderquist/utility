@@ -9,9 +9,9 @@ import com.parallelsymmetry.escape.utility.ObjectUtil;
 
 public abstract class DataObject {
 
-	private static final Object NULL = new Object();
+	public static final String MODIFIED = "modified";
 
-	private static final String MODIFIED = "modified";
+	private static final Object NULL = new Object();
 
 	private boolean modified;
 

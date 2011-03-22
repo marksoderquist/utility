@@ -172,12 +172,12 @@ public class DataNodeTest extends TestCase {
 
 		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", false, true );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.MODIFY, data, "attribute", "value0", "value1" );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.REMOVE, data, "attribute", "value1", null );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", true, false );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, true, false );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
@@ -207,9 +207,9 @@ public class DataNodeTest extends TestCase {
 		
 		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", false, true );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", true, false );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, true, false );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
