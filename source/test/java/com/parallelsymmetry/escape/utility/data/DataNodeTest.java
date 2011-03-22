@@ -143,6 +143,24 @@ public class DataNodeTest extends TestCase {
 		assertFalse( data.isModified() );
 	}
 
+	public void testResources() {
+		DataHandler handler = new DataHandler();
+		MockData data = new MockData();
+		data.addDataListener( handler );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		data.putResource( "name", "value" );
+		assertEquals( "value", data.getResource( "name" ) );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		data.putResource( "name", null );
+		assertNull( data.getResource( "name" ) );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+	}
+
 	public void testDataEventNotification() {
 		DataHandler handler = new DataHandler();
 		MockData data = new MockData();
@@ -154,7 +172,7 @@ public class DataNodeTest extends TestCase {
 		data.setAttribute( "attribute", "value0" );
 		assertDataState( data, true, 1, 0 );
 		assertEventCounts( handler, 1, 1, 1 );
-		
+
 		// Modify the attribute to the same value. Should do nothing.
 		data.setAttribute( "attribute", "value0" );
 		assertDataState( data, true, 1, 0 );
@@ -181,7 +199,7 @@ public class DataNodeTest extends TestCase {
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
-	
+
 	public void testEventsWithCommit() {
 		Log.setLevel( Log.DEBUG );
 		DataHandler handler = new DataHandler();
@@ -189,22 +207,22 @@ public class DataNodeTest extends TestCase {
 		data.addDataListener( handler );
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
-		
+
 		// Change an attribute.
 		data.setAttribute( "attribute", "value0" );
 		assertDataState( data, true, 1, 0 );
 		assertEventCounts( handler, 1, 1, 1 );
-		
+
 		// Commit the changes.
 		data.commit();
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
-		
+
 		// Commit again. Should do nothing.
 		data.commit();
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
-		
+
 		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
 		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, false, true );

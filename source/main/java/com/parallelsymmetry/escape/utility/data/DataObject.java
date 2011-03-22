@@ -20,6 +20,8 @@ public abstract class DataObject {
 	private int modifiedAttributeCount;
 
 	private Map<String, Object> modifiedAttributes;
+	
+	private Map<String, Object> resources;
 
 	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
@@ -36,15 +38,6 @@ public abstract class DataObject {
 	
 		// Notify listeners of the data change.
 		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
-	}
-
-	private void setModified( boolean modified ) {
-		if( this.modified == modified ) return;
-
-		this.modified = modified;
-
-		// Notify listeners of modified change events.
-		fireMetaAttributeChanged( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, modified, !modified ) );
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -106,6 +99,35 @@ public abstract class DataObject {
 		return modifiedAttributeCount;
 	}
 
+	/**
+	 * Get a stored resource.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	@SuppressWarnings( "unchecked" )
+	public <T> T getResource( String key ) {
+		if( resources == null ) return null;
+		return (T)resources.get( key );
+	}
+
+	/**
+	 * Store a resource. Setting or removing a resource will not modify
+	 * the data. A resource is removed by setting the resource value to null.
+	 * 
+	 * @param value
+	 */
+	public void putResource( String key, Object value ) {
+		if( value == null ) {
+			if( resources == null ) return;
+			resources.remove( key );
+			cleanupResourceMap();
+		} else {
+			ensureResourceMap();
+			resources.put( key, value );
+		}
+	}
+
 	public void addDataListener( DataListener listener ) {
 		listeners.add( listener );
 	}
@@ -130,6 +152,23 @@ public abstract class DataObject {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
+	}
+
+	private void setModified( boolean modified ) {
+		if( this.modified == modified ) return;
+	
+		this.modified = modified;
+	
+		// Notify listeners of modified change events.
+		fireMetaAttributeChanged( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, modified, !modified ) );
+	}
+
+	private void ensureResourceMap() {
+		if( resources == null ) resources = new ConcurrentHashMap<String, Object>();
+	}
+
+	private void cleanupResourceMap() {
+		if( resources.size() == 0 ) resources = null;
 	}
 
 }
