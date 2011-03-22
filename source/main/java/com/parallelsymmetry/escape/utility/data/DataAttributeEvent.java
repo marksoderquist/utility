@@ -8,8 +8,8 @@ public class DataAttributeEvent extends DataEvent {
 
 	private Object oldValue;
 
-	public DataAttributeEvent( DataObject data, String name, Object newValue, Object oldValue ) {
-		super( data );
+	public DataAttributeEvent( DataEvent.Type type, DataObject data, String name, Object newValue, Object oldValue ) {
+		super( type, data );
 		this.name = name;
 		this.newValue = newValue;
 		this.oldValue = oldValue;

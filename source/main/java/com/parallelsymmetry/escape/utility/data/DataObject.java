@@ -11,7 +11,7 @@ import com.parallelsymmetry.escape.utility.log.Log;
 public abstract class DataObject {
 
 	private static final Object NULL = new Object();
-	
+
 	private static final String MODIFIED = "modified";
 
 	private boolean modified;
@@ -27,12 +27,12 @@ public abstract class DataObject {
 	public boolean isModified() {
 		return modified;
 	}
-	
+
 	private void setModified( boolean modified ) {
 		if( this.modified == modified ) return;
-		
+
 		this.modified = modified;
-		
+
 		// Notify listeners of modified change events.
 		fireMetaAttributeChanged( new MetaAttributeEvent( this, MODIFIED, modified, !modified ) );
 	}
@@ -41,6 +41,9 @@ public abstract class DataObject {
 		setModified( false );
 		modifiedAttributes = null;
 		modifiedAttributeCount = 0;
+
+		// Notify listeners of the data change.
+		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -85,11 +88,17 @@ public abstract class DataObject {
 			modifiedAttributeCount++;
 		}
 
+		// Notify listeners of data attribute change.
+		DataEvent.Type type = DataEvent.Type.MODIFY;
+		type = oldValue == null ? DataEvent.Type.INSERT : type;
+		type = newValue == null ? DataEvent.Type.REMOVE : type;
+		fireDataAttributeChanged( new DataAttributeEvent( type, this, name, newValue, oldValue ) );
+
 		// Update the modified flag.
 		setModified( modifiedAttributeCount != 0 );
 
-		// Notify listeners of data attribute change.
-		fireDataAttributeChanged( new DataAttributeEvent( this, name, newValue, oldValue ) );
+		// Notify listeners of the data change.
+		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
 	}
 
 	public int getModifiedAttributeCount() {
@@ -102,6 +111,12 @@ public abstract class DataObject {
 
 	public void removeDataListener( DataListener listener ) {
 		listeners.remove( listener );
+	}
+
+	protected void fireDataChanged( DataEvent event ) {
+		for( DataListener listener : this.listeners ) {
+			listener.dataChanged( event );
+		}
 	}
 
 	protected void fireDataAttributeChanged( DataAttributeEvent event ) {

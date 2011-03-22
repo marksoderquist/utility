@@ -9,7 +9,7 @@ public class MetaAttributeEvent extends DataEvent {
 	private Object oldValue;
 
 	public MetaAttributeEvent( DataObject data, String name, Object newValue, Object oldValue ) {
-		super( data );
+		super( DataEvent.Type.MODIFY, data );
 		this.name = name;
 		this.newValue = newValue;
 		this.oldValue = oldValue;
