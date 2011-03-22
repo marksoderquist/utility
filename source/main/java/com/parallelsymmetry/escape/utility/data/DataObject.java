@@ -27,6 +27,17 @@ public abstract class DataObject {
 		return modified;
 	}
 
+	public void commit() {
+		if( !modified ) return;
+		
+		setModified( false );
+		modifiedAttributes = null;
+		modifiedAttributeCount = 0;
+	
+		// Notify listeners of the data change.
+		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
+	}
+
 	private void setModified( boolean modified ) {
 		if( this.modified == modified ) return;
 
@@ -34,15 +45,6 @@ public abstract class DataObject {
 
 		// Notify listeners of modified change events.
 		fireMetaAttributeChanged( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, modified, !modified ) );
-	}
-
-	public void commit() {
-		setModified( false );
-		modifiedAttributes = null;
-		modifiedAttributeCount = 0;
-
-		// Notify listeners of the data change.
-		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
 	}
 
 	@SuppressWarnings( "unchecked" )

@@ -144,24 +144,28 @@ public class DataNodeTest extends TestCase {
 	}
 
 	public void testDataEventNotification() {
-		Log.setLevel( Log.DEBUG );
 		DataHandler handler = new DataHandler();
 		MockData data = new MockData();
 		data.addDataListener( handler );
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		// Change an attribute and assert.
+		// Insert an attribute.
+		data.setAttribute( "attribute", "value0" );
+		assertDataState( data, true, 1, 0 );
+		assertEventCounts( handler, 1, 1, 1 );
+		
+		// Modify the attribute to the same value. Should do nothing.
 		data.setAttribute( "attribute", "value0" );
 		assertDataState( data, true, 1, 0 );
 		assertEventCounts( handler, 1, 1, 1 );
 
-		// Change the attribute value to something else and assert.
+		// Modify the attribute.
 		data.setAttribute( "attribute", "value1" );
 		assertDataState( data, true, 1, 0 );
 		assertEventCounts( handler, 2, 2, 1 );
 
-		// Reset the attribute and assert.
+		// Remove the attribute.
 		data.setAttribute( "attribute", null );
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 3, 3, 2 );
@@ -175,6 +179,39 @@ public class DataNodeTest extends TestCase {
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.REMOVE, data, "attribute", "value1", null );
 		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", true, false );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
+		assertEquals( index++, handler.getEvents().size() );
+	}
+	
+	public void testEventsWithCommit() {
+		Log.setLevel( Log.DEBUG );
+		DataHandler handler = new DataHandler();
+		MockData data = new MockData();
+		data.addDataListener( handler );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+		
+		// Change an attribute.
+		data.setAttribute( "attribute", "value0" );
+		assertDataState( data, true, 1, 0 );
+		assertEventCounts( handler, 1, 1, 1 );
+		
+		// Commit the changes.
+		data.commit();
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 2, 1, 2 );
+		
+		// Commit again. Should do nothing.
+		data.commit();
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 2, 1, 2 );
+		
+		int index = 0;
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", false, true );
+		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, "modified", true, false );
+		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
+		assertEquals( index++, handler.getEvents().size() );
 	}
 
 	private void assertDataState( DataObject node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
