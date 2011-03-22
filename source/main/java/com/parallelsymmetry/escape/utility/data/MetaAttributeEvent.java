@@ -8,8 +8,8 @@ public class MetaAttributeEvent extends DataEvent {
 
 	private Object oldValue;
 
-	public MetaAttributeEvent( DataObject data, String name, Object newValue, Object oldValue ) {
-		super( DataEvent.Type.MODIFY, data );
+	public MetaAttributeEvent( DataEvent.Type type, DataObject data, String name, Object newValue, Object oldValue ) {
+		super( type, data );
 		this.name = name;
 		this.newValue = newValue;
 		this.oldValue = oldValue;

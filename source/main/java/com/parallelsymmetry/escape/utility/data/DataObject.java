@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
-import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class DataObject {
 
@@ -34,7 +33,7 @@ public abstract class DataObject {
 		this.modified = modified;
 
 		// Notify listeners of modified change events.
-		fireMetaAttributeChanged( new MetaAttributeEvent( this, MODIFIED, modified, !modified ) );
+		fireMetaAttributeChanged( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, modified, !modified ) );
 	}
 
 	public void commit() {
