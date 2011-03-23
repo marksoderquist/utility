@@ -20,7 +20,7 @@ public abstract class DataObject {
 	private int modifiedAttributeCount;
 
 	private Map<String, Object> modifiedAttributes;
-	
+
 	private Map<String, Object> resources;
 
 	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
@@ -31,11 +31,11 @@ public abstract class DataObject {
 
 	public void commit() {
 		if( !modified ) return;
-		
+
 		setModified( false );
 		modifiedAttributes = null;
 		modifiedAttributeCount = 0;
-	
+
 		// Notify listeners of the data change.
 		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
 	}
@@ -86,13 +86,13 @@ public abstract class DataObject {
 		DataEvent.Type type = DataEvent.Type.MODIFY;
 		type = oldValue == null ? DataEvent.Type.INSERT : type;
 		type = newValue == null ? DataEvent.Type.REMOVE : type;
-		fireDataAttributeChanged( new DataAttributeEvent( type, this, name, newValue, oldValue ) );
+		dispatchDataEvent( new DataAttributeEvent( type, this, name, oldValue, newValue ) );
 
 		// Update the modified flag.
 		setModified( modifiedAttributeCount != 0 );
 
 		// Notify listeners of the data change.
-		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
+		dispatchDataEvent( new DataEvent( DataEvent.Type.MODIFY, this ) );
 	}
 
 	public int getModifiedAttributeCount() {
@@ -112,8 +112,8 @@ public abstract class DataObject {
 	}
 
 	/**
-	 * Store a resource. Setting or removing a resource will not modify
-	 * the data. A resource is removed by setting the resource value to null.
+	 * Store a resource. Setting or removing a resource will not modify the data.
+	 * A resource is removed by setting the resource value to null.
 	 * 
 	 * @param value
 	 */
@@ -136,19 +136,29 @@ public abstract class DataObject {
 		listeners.remove( listener );
 	}
 
-	protected void fireDataChanged( DataEvent event ) {
+	protected void dispatchDataEvent( DataEvent event ) {
+		if( event instanceof DataAttributeEvent ) {
+			fireDataAttributeChanged( (DataAttributeEvent)event );
+		} else if( event instanceof MetaAttributeEvent ) {
+			fireMetaAttributeChanged( (MetaAttributeEvent)event );
+		} else {
+			fireDataChanged( event );
+		}
+	}
+
+	private void fireDataChanged( DataEvent event ) {
 		for( DataListener listener : this.listeners ) {
 			listener.dataChanged( event );
 		}
 	}
 
-	protected void fireDataAttributeChanged( DataAttributeEvent event ) {
+	private void fireDataAttributeChanged( DataAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.dataAttributeChanged( event );
 		}
 	}
 
-	protected void fireMetaAttributeChanged( MetaAttributeEvent event ) {
+	private void fireMetaAttributeChanged( MetaAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
@@ -156,11 +166,11 @@ public abstract class DataObject {
 
 	private void setModified( boolean modified ) {
 		if( this.modified == modified ) return;
-	
+
 		this.modified = modified;
-	
+
 		// Notify listeners of modified change events.
-		fireMetaAttributeChanged( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, modified, !modified ) );
+		dispatchDataEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, !modified, modified ) );
 	}
 
 	private void ensureResourceMap() {

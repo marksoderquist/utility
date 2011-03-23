@@ -1,16 +1,12 @@
 package com.parallelsymmetry.escape.utility.data;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.junit.Test;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public class DataNodeTest extends TestCase {
+public class DataNodeTest extends DataTestCase {
 
 	@Override
 	public void setUp() {
@@ -230,126 +226,6 @@ public class DataNodeTest extends TestCase {
 		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, true, false );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
-	}
-
-	private void assertDataState( DataObject node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
-		assertEquals( modified, node.isModified() );
-		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
-		//assertEquals( modifiedChildCount, node.getModifiedChildCount() );
-	}
-
-	private void assertEventCounts( DataHandler handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount ) {
-		int total = dataEventCount + dataAttributeEventCount + metaAttributeEventCount;
-		assertEquals( total, handler.getEvents().size() );
-
-		assertEquals( dataEventCount, handler.getDataEvents().size() );
-		assertEquals( dataAttributeEventCount, handler.getDataAttributeEvents().size() );
-		assertEquals( metaAttributeEventCount, handler.getMetaAttributeEvents().size() );
-	}
-
-	private void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataObject data ) {
-		assertEventState( handler, index, clazz, type, data, null, null, null );
-	}
-
-	private void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataObject data, String name, Object oldValue, Object newValue ) {
-		DataEvent event = handler.getEvents().get( index );
-		assertEquals( clazz, event.getClass() );
-		assertEquals( type, event.getType() );
-		assertEquals( data, event.getData() );
-
-		if( name == null ) return;
-
-		if( event instanceof DataAttributeEvent ) {
-			DataAttributeEvent dataEvent = (DataAttributeEvent)event;
-			assertEquals( name, dataEvent.getAttributeName() );
-			assertEquals( oldValue, dataEvent.getOldValue() );
-			assertEquals( newValue, dataEvent.getNewValue() );
-		} else if( event instanceof MetaAttributeEvent ) {
-			MetaAttributeEvent metaEvent = (MetaAttributeEvent)event;
-			assertEquals( name, metaEvent.getAttributeName() );
-			assertEquals( oldValue, metaEvent.getOldValue() );
-			assertEquals( newValue, metaEvent.getNewValue() );
-		}
-	}
-
-	private static class MockData extends DataObject {
-
-		public int getX() {
-			Integer x = getAttribute( "x" );
-			return x == null ? 0 : x;
-		}
-
-		public void setX( int x ) {
-			setAttribute( "x", x == 0 ? null : x );
-		}
-
-		public int getY() {
-			Integer y = getAttribute( "y" );
-			return y == null ? 0 : y;
-		}
-
-		public void setY( int y ) {
-			setAttribute( "y", y == 0 ? null : y );
-		}
-
-		public int getZ() {
-			Integer z = getAttribute( "z" );
-			return z == null ? 0 : z;
-		}
-
-		public void setZ( int z ) {
-			setAttribute( "z", z == 0 ? null : z );
-		}
-
-	}
-
-	private static class DataHandler implements DataListener {
-
-		private List<DataEvent> events = new ArrayList<DataEvent>();
-
-		private List<DataEvent> dataChangedEvents = new ArrayList<DataEvent>();
-
-		private List<DataAttributeEvent> dataAttributeEvents = new ArrayList<DataAttributeEvent>();
-
-		private List<MetaAttributeEvent> metaAttributeEvents = new ArrayList<MetaAttributeEvent>();
-
-		@Override
-		public void dataChanged( DataEvent event ) {
-			Log.write( Log.TRACE, "Data change event received." );
-			dataChangedEvents.add( event );
-			events.add( event );
-		}
-
-		@Override
-		public void dataAttributeChanged( DataAttributeEvent event ) {
-			Log.write( Log.TRACE, "Data attribute change event received." );
-			dataAttributeEvents.add( event );
-			events.add( event );
-		}
-
-		@Override
-		public void metaAttributeChanged( MetaAttributeEvent event ) {
-			Log.write( Log.TRACE, "Meta attribute change event received." );
-			metaAttributeEvents.add( event );
-			events.add( event );
-		}
-
-		public List<DataEvent> getEvents() {
-			return events;
-		}
-
-		public List<DataEvent> getDataEvents() {
-			return dataChangedEvents;
-		}
-
-		public List<DataAttributeEvent> getDataAttributeEvents() {
-			return dataAttributeEvents;
-		}
-
-		public List<MetaAttributeEvent> getMetaAttributeEvents() {
-			return metaAttributeEvents;
-		}
-
 	}
 
 }
