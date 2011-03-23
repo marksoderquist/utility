@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
 
-public abstract class DataObject {
+public abstract class DataNode {
 
 	public static final String MODIFIED = "modified";
 
@@ -23,13 +23,15 @@ public abstract class DataObject {
 
 	private Map<String, Object> resources;
 
+	private Transaction transaction;
+
 	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
 	public boolean isModified() {
 		return modified;
 	}
 
-	public void commit() {
+	public void clearModified() {
 		if( !modified ) return;
 
 		setModified( false );
@@ -126,6 +128,22 @@ public abstract class DataObject {
 			ensureResourceMap();
 			resources.put( key, value );
 		}
+	}
+
+	public Transaction getTransaction() {
+		return transaction;
+	}
+
+	protected void setTransaction( Transaction transaction ) {
+		this.transaction = transaction;
+	}
+
+	public void startTransaction() {
+		if( transaction == null ) transaction = new Transaction();
+	}
+
+	public boolean isTransactionActive() {
+		return transaction != null;
 	}
 
 	public void addDataListener( DataListener listener ) {

@@ -24,7 +24,7 @@ public class TransactionTest extends DataTestCase {
 
 	private class MockAction extends Action {
 
-		public MockAction( DataObject data ) {
+		public MockAction( DataNode data ) {
 			super( data );
 		}
 

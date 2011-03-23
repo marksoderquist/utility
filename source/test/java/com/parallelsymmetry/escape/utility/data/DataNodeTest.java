@@ -15,7 +15,7 @@ public class DataNodeTest extends DataTestCase {
 
 	@Test
 	public void testDataNodeIsAbstract() {
-		assertTrue( "DataNode class is not abstract.", ( DataObject.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
+		assertTrue( "DataNode class is not abstract.", ( DataNode.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
 	}
 
 	@Test
@@ -28,7 +28,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( 1, data.getModifiedAttributeCount() );
 		assertTrue( data.isModified() );
 
-		data.commit();
+		data.clearModified();
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
 	}
@@ -134,7 +134,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( 3, data.getModifiedAttributeCount() );
 		assertTrue( data.isModified() );
 
-		data.commit();
+		data.clearModified();
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
 	}
@@ -186,12 +186,12 @@ public class DataNodeTest extends DataTestCase {
 
 		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, false, true );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.MODIFY, data, "attribute", "value0", "value1" );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.REMOVE, data, "attribute", "value1", null );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, true, false );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, true, false );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
@@ -210,20 +210,20 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( handler, 1, 1, 1 );
 
 		// Commit the changes.
-		data.commit();
+		data.clearModified();
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
 
 		// Commit again. Should do nothing.
-		data.commit();
+		data.clearModified();
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
 
 		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, false, true );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataObject.MODIFIED, true, false );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, true, false );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}

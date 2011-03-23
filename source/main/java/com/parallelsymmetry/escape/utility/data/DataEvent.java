@@ -8,9 +8,9 @@ public class DataEvent {
 
 	private Type type;
 
-	private DataObject data;
+	private DataNode data;
 
-	public DataEvent( Type type, DataObject data ) {
+	public DataEvent( Type type, DataNode data ) {
 		this.type = type;
 		this.data = data;
 	}
@@ -19,7 +19,7 @@ public class DataEvent {
 		return type;
 	}
 
-	public DataObject getData() {
+	public DataNode getData() {
 		return data;
 	}
 

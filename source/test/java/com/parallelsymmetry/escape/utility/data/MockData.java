@@ -1,6 +1,6 @@
 package com.parallelsymmetry.escape.utility.data;
 
-class MockData extends DataObject {
+class MockData extends DataNode {
 
 	public int getX() {
 		Integer x = getAttribute( "x" );

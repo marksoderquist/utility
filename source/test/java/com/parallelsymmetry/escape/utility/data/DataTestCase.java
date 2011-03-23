@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 
 public abstract class DataTestCase extends TestCase {
 
-	protected void assertDataState( DataObject node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
+	protected void assertDataState( DataNode node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
 		assertEquals( modified, node.isModified() );
 		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
 		//assertEquals( modifiedChildCount, node.getModifiedChildCount() );
@@ -19,11 +19,11 @@ public abstract class DataTestCase extends TestCase {
 		assertEquals( metaAttributeEventCount, handler.getMetaAttributeEvents().size() );
 	}
 
-	protected void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataObject data ) {
+	protected void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data ) {
 		assertEventState( handler, index, clazz, type, data, null, null, null );
 	}
 
-	protected void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataObject data, String name, Object oldValue, Object newValue ) {
+	protected void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data, String name, Object oldValue, Object newValue ) {
 		DataEvent event = handler.getEvents().get( index );
 		assertEquals( clazz, event.getClass() );
 		assertEquals( type, event.getType() );

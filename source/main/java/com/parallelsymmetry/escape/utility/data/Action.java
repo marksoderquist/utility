@@ -3,13 +3,13 @@ package com.parallelsymmetry.escape.utility.data;
 
 abstract class Action {
 	
-	private DataObject data;
+	private DataNode data;
 	
-	public Action( DataObject data ) {
+	public Action( DataNode data ) {
 		this.data = data;
 	}
 	
-	public DataObject getData() {
+	public DataNode getData() {
 		return data;
 	}
 	
