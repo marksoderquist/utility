@@ -1,7 +1,7 @@
 package com.parallelsymmetry.escape.utility.data;
 
 
-abstract class Action {
+public abstract class Action {
 	
 	private DataNode data;
 	
@@ -13,6 +13,6 @@ abstract class Action {
 		return data;
 	}
 	
-	abstract ActionResult process();
+	protected abstract ActionResult process();
 	
 }

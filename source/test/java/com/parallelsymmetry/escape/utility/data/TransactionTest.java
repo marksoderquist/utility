@@ -29,7 +29,7 @@ public class TransactionTest extends DataTestCase {
 		}
 
 		@Override
-		ActionResult process() {
+		public ActionResult process() {
 			ActionResult result = new ActionResult( this );
 
 			result.addEvent( new DataAttributeEvent( DataEvent.Type.MODIFY, getData(), "name", "value0", "value1" ) );

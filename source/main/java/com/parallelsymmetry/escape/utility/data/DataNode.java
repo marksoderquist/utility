@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
+import com.parallelsymmetry.escape.utility.data.action.SetAttributeAction;
 
 public abstract class DataNode {
 
@@ -51,6 +52,10 @@ public abstract class DataNode {
 	}
 
 	public void setAttribute( String name, Object newValue ) {
+		submitAction( new SetAttributeAction( this, name, newValue ) );
+	}
+
+	public void doSetAttribute( String name, Object newValue ) {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Attribute name cannot be null." );
 
@@ -88,13 +93,13 @@ public abstract class DataNode {
 		DataEvent.Type type = DataEvent.Type.MODIFY;
 		type = oldValue == null ? DataEvent.Type.INSERT : type;
 		type = newValue == null ? DataEvent.Type.REMOVE : type;
-		dispatchDataEvent( new DataAttributeEvent( type, this, name, oldValue, newValue ) );
+		//dispatchDataEvent( new DataAttributeEvent( type, this, name, oldValue, newValue ) );
 
 		// Update the modified flag.
 		setModified( modifiedAttributeCount != 0 );
 
 		// Notify listeners of the data change.
-		dispatchDataEvent( new DataEvent( DataEvent.Type.MODIFY, this ) );
+		//dispatchDataEvent( new DataEvent( DataEvent.Type.MODIFY, this ) );
 	}
 
 	public int getModifiedAttributeCount() {
@@ -138,8 +143,9 @@ public abstract class DataNode {
 		this.transaction = transaction;
 	}
 
-	public void startTransaction() {
+	public Transaction startTransaction() {
 		if( transaction == null ) transaction = new Transaction();
+		return transaction;
 	}
 
 	public boolean isTransactionActive() {
@@ -152,6 +158,18 @@ public abstract class DataNode {
 
 	public void removeDataListener( DataListener listener ) {
 		listeners.remove( listener );
+	}
+
+	protected final boolean submitAction( Action action ) {
+		if( isTransactionActive() ) {
+			getTransaction().add( action );
+			return true;
+		}
+
+		Transaction transaction = startTransaction();
+		submitAction( action );
+		transaction.commit();
+		return false;
 	}
 
 	protected void dispatchDataEvent( DataEvent event ) {

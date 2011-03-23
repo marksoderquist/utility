@@ -3,7 +3,7 @@ package com.parallelsymmetry.escape.utility.data;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-class ActionResult {
+public class ActionResult {
 
 	private Action action;
 
