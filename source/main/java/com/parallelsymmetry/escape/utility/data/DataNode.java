@@ -81,9 +81,9 @@ public abstract class DataNode {
 		if( value == null ) {
 			if( resources == null ) return;
 			resources.remove( key );
-			cleanupResourceMap();
+			if( resources.size() == 0 ) resources = null;
 		} else {
-			ensureResourceMap();
+			if( resources == null ) resources = new ConcurrentHashMap<String, Object>();
 			resources.put( key, value );
 		}
 	}
@@ -136,7 +136,7 @@ public abstract class DataNode {
 		this.transaction = transaction;
 	}
 
-	void doSetModified( boolean modified ) {
+	private void doSetModified( boolean modified ) {
 		this.modified = modified;
 
 		if( !modified ) {
@@ -145,7 +145,7 @@ public abstract class DataNode {
 		}
 	}
 
-	void doSetAttribute( String name, Object oldValue, Object newValue ) {
+	private void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
 		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
 
@@ -192,14 +192,6 @@ public abstract class DataNode {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
-	}
-
-	private void ensureResourceMap() {
-		if( resources == null ) resources = new ConcurrentHashMap<String, Object>();
-	}
-
-	private void cleanupResourceMap() {
-		if( resources.size() == 0 ) resources = null;
 	}
 
 	private static class SetAttributeAction extends Action {
