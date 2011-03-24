@@ -109,16 +109,15 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
-	protected boolean submitAction( Action action ) {
+	protected void submitAction( Action action ) {
 		if( isTransactionActive() ) {
 			getTransaction().add( action );
-			return true;
+			return;
 		}
 
 		Transaction transaction = startTransaction();
 		submitAction( action );
 		transaction.commit();
-		return false;
 	}
 
 	protected void dispatchDataEvent( DataEvent event ) {
