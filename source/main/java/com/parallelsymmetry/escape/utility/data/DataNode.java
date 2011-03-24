@@ -36,15 +36,6 @@ public abstract class DataNode {
 		submitAction( new ClearModifiedAction( this ) );
 	}
 
-	void doSetModified( boolean modified ) {
-		this.modified = modified;
-
-		if( !modified ) {
-			modifiedAttributes = null;
-			modifiedAttributeCount = 0;
-		}
-	}
-
 	@SuppressWarnings( "unchecked" )
 	public <T> T getAttribute( String name ) {
 		// Null attribute names are not allowed.
@@ -62,37 +53,6 @@ public abstract class DataNode {
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
 		submitAction( new SetAttributeAction( this, name, oldValue, newValue ) );
-	}
-
-	void doSetAttribute( String name, Object oldValue, Object newValue ) {
-		// Create the attribute map if necessary.
-		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
-
-		// Set the attribute value.
-		if( newValue == null ) {
-			attributes.remove( name );
-		} else {
-			attributes.put( name, newValue );
-		}
-
-		// Remove the attribute map if necessary.
-		if( attributes.size() == 0 ) attributes = null;
-
-		// Update the modified attribute value map.
-		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
-		if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
-			modifiedAttributes.remove( name );
-			modifiedAttributeCount--;
-			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
-		} else if( preValue == null ) {
-			// Only add the value if there is not an existing previous value.
-			if( modifiedAttributes == null ) modifiedAttributes = new ConcurrentHashMap<String, Object>();
-			modifiedAttributes.put( name, oldValue == null ? NULL : oldValue );
-			modifiedAttributeCount++;
-		}
-
-		// Update the modified flag.
-		doSetModified( modifiedAttributeCount != 0 );
 	}
 
 	public int getModifiedAttributeCount() {
@@ -132,12 +92,8 @@ public abstract class DataNode {
 		return transaction;
 	}
 
-	protected void setTransaction( Transaction transaction ) {
-		this.transaction = transaction;
-	}
-
 	public Transaction startTransaction() {
-		if( transaction == null ) transaction = new Transaction();
+		setTransaction( new Transaction() );
 		return transaction;
 	}
 
@@ -153,7 +109,7 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
-	protected final boolean submitAction( Action action ) {
+	protected boolean submitAction( Action action ) {
 		if( isTransactionActive() ) {
 			getTransaction().add( action );
 			return true;
@@ -173,6 +129,51 @@ public abstract class DataNode {
 		} else {
 			fireDataChanged( event );
 		}
+	}
+
+	protected void setTransaction( Transaction transaction ) {
+		if( transaction != null && this.transaction != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
+		this.transaction = transaction;
+	}
+
+	void doSetModified( boolean modified ) {
+		this.modified = modified;
+
+		if( !modified ) {
+			modifiedAttributes = null;
+			modifiedAttributeCount = 0;
+		}
+	}
+
+	void doSetAttribute( String name, Object oldValue, Object newValue ) {
+		// Create the attribute map if necessary.
+		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
+
+		// Set the attribute value.
+		if( newValue == null ) {
+			attributes.remove( name );
+		} else {
+			attributes.put( name, newValue );
+		}
+
+		// Remove the attribute map if necessary.
+		if( attributes.size() == 0 ) attributes = null;
+
+		// Update the modified attribute value map.
+		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
+		if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
+			modifiedAttributes.remove( name );
+			modifiedAttributeCount--;
+			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
+		} else if( preValue == null ) {
+			// Only add the value if there is not an existing previous value.
+			if( modifiedAttributes == null ) modifiedAttributes = new ConcurrentHashMap<String, Object>();
+			modifiedAttributes.put( name, oldValue == null ? NULL : oldValue );
+			modifiedAttributeCount++;
+		}
+
+		// Update the modified flag.
+		doSetModified( modifiedAttributeCount != 0 );
 	}
 
 	private void fireDataChanged( DataEvent event ) {
