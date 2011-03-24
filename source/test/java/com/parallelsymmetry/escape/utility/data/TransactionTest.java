@@ -15,9 +15,39 @@ public class TransactionTest extends DataTestCase {
 		transaction.commit();
 		assertDataState( data, false, 0, 0 );
 		assertEventCounts( handler, 1, 1, 0 );
-		
-		int index  = 0;
+
+		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.MODIFY, data, "name", "value0", "value1" );
+		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
+		assertEquals( index++, handler.getEvents().size() );
+	}
+
+	public void testTransaction() {
+		MockData data = new MockData();
+		DataHandler handler = new DataHandler();
+		data.addDataListener( handler );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		Transaction transaction = data.startTransaction();
+		assertTrue( data.isTransactionActive() );
+
+		data.setAttribute( "attribute0", "value0" );
+		data.setAttribute( "attribute1", "value1" );
+		data.setAttribute( "attribute2", "value2" );
+		assertDataState( data, false, 0, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		transaction.commit();
+		assertFalse( data.isTransactionActive() );
+		assertDataState( data, true, 3, 0 );
+		assertEventCounts( handler, 1, 3, 1 );
+
+		int index = 0;
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute0", null, "value0" );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute1", null, "value1" );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute2", null, "value2" );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}

@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
-import com.parallelsymmetry.escape.utility.data.action.SetAttributeAction;
 
 public abstract class DataNode {
 
@@ -34,13 +33,16 @@ public abstract class DataNode {
 
 	public void clearModified() {
 		if( !modified ) return;
+		submitAction( new ClearModifiedAction( this ) );
+	}
 
-		setModified( false );
-		modifiedAttributes = null;
-		modifiedAttributeCount = 0;
+	void doSetModified( boolean modified ) {
+		this.modified = modified;
 
-		// Notify listeners of the data change.
-		fireDataChanged( new DataEvent( DataEvent.Type.MODIFY, this ) );
+		if( !modified ) {
+			modifiedAttributes = null;
+			modifiedAttributeCount = 0;
+		}
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -52,10 +54,6 @@ public abstract class DataNode {
 	}
 
 	public void setAttribute( String name, Object newValue ) {
-		submitAction( new SetAttributeAction( this, name, newValue ) );
-	}
-
-	public void doSetAttribute( String name, Object newValue ) {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Attribute name cannot be null." );
 
@@ -63,6 +61,10 @@ public abstract class DataNode {
 		Object oldValue = getAttribute( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
+		submitAction( new SetAttributeAction( this, name, oldValue, newValue ) );
+	}
+
+	void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
 		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
 
@@ -89,17 +91,8 @@ public abstract class DataNode {
 			modifiedAttributeCount++;
 		}
 
-		// Notify listeners of data attribute change.
-		DataEvent.Type type = DataEvent.Type.MODIFY;
-		type = oldValue == null ? DataEvent.Type.INSERT : type;
-		type = newValue == null ? DataEvent.Type.REMOVE : type;
-		//dispatchDataEvent( new DataAttributeEvent( type, this, name, oldValue, newValue ) );
-
 		// Update the modified flag.
-		setModified( modifiedAttributeCount != 0 );
-
-		// Notify listeners of the data change.
-		//dispatchDataEvent( new DataEvent( DataEvent.Type.MODIFY, this ) );
+		doSetModified( modifiedAttributeCount != 0 );
 	}
 
 	public int getModifiedAttributeCount() {
@@ -198,15 +191,6 @@ public abstract class DataNode {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
-	}
-
-	private void setModified( boolean modified ) {
-		if( this.modified == modified ) return;
-
-		this.modified = modified;
-
-		// Notify listeners of modified change events.
-		dispatchDataEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, this, MODIFIED, !modified, modified ) );
 	}
 
 	private void ensureResourceMap() {

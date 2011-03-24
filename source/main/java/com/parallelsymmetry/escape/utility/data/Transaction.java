@@ -66,7 +66,7 @@ public class Transaction {
 				boolean newModified = datum.isModified();
 				if( newModified != oldModified ) {
 					// A meta attribute change event needs to be sent.
-					datum.dispatchDataEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, newModified, oldModified ) );
+					datum.dispatchDataEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
 					changed = true;
 				}
 
