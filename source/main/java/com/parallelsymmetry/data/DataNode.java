@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.parallelsymmetry.log.Log;
 import com.parallelsymmetry.util.ObjectUtil;
 
 public class DataNode implements Comparable<DataNode> {
@@ -452,7 +451,7 @@ public class DataNode implements Comparable<DataNode> {
 					break;
 				}
 			}
-		} else if( parent instanceof DataList && ( (DataList)parent ).children != null ) {
+		} else if( parent instanceof DataList && ( (DataList<?>)parent ).children != null ) {
 			// If the node is a child.
 			( (DataList<DataNode>)parent ).remove( node );
 		}
