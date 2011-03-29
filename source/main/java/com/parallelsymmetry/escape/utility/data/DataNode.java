@@ -25,7 +25,7 @@ public abstract class DataNode {
 	private Map<String, Object> resources;
 
 	private Transaction transaction;
-	
+
 	private DataNode parent;
 
 	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
@@ -61,7 +61,7 @@ public abstract class DataNode {
 	public int getModifiedAttributeCount() {
 		return modifiedAttributeCount;
 	}
-	
+
 	public DataNode getParent() {
 		return parent;
 	}
@@ -104,6 +104,12 @@ public abstract class DataNode {
 		return transaction;
 	}
 
+	public void setTransaction( Transaction transaction ) {
+		if( ObjectUtil.areEqual( this.transaction, transaction ) ) return;
+		if( transaction != null && this.transaction != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
+		this.transaction = transaction;
+	}
+
 	public boolean isTransactionActive() {
 		return transaction != null;
 	}
@@ -137,11 +143,6 @@ public abstract class DataNode {
 		}
 	}
 
-	protected void setTransaction( Transaction transaction ) {
-		if( transaction != null && this.transaction != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
-		this.transaction = transaction;
-	}
-	
 	/**
 	 * This method removes the specified node from any parent nodes.
 	 */
@@ -150,13 +151,10 @@ public abstract class DataNode {
 		DataNode parent = node.getParent();
 
 		if( parent == null ) return;
-		
-		// FIXME What about events?
 
 		if( parent.attributes != null && parent.attributes.containsValue( node ) ) {
-			
 			parent.setTransaction( getTransaction() );
-			
+
 			// If the node is an attribute.
 			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
 			while( iterator.hasNext() ) {
@@ -166,9 +164,9 @@ public abstract class DataNode {
 					break;
 				}
 			}
-//		} else if( parent instanceof DataList && ( (DataList<?>)parent ).children != null ) {
-//			// If the node is a child.
-//			( (DataList<DataNode>)parent ).remove( node );
+		} else if( parent instanceof DataList ) {
+			parent.setTransaction( getTransaction() );
+			( (DataList<DataNode>)parent ).remove( node );
 		}
 
 		//getTransaction().nodeModified( parent );
@@ -266,7 +264,7 @@ public abstract class DataNode {
 		}
 
 	}
-	
+
 	private static class ClearModifiedAction extends Action {
 
 		public ClearModifiedAction( DataNode data ) {
@@ -282,6 +280,5 @@ public abstract class DataNode {
 			return result;
 		}
 	}
-	
-	
+
 }

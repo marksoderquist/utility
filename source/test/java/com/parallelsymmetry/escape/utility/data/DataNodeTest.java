@@ -234,4 +234,21 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
+	public void testNodeIsolationEvent() {
+		MockDataNode parent0 = new MockDataNode();
+		MockDataNode child = new MockDataNode();
+		MockDataNode parent1 = new MockDataNode();
+
+		parent0.setAttribute( "child", child );
+		assertDataNodeState( parent0, true, 1 );
+
+		parent0.clearModified();
+		assertDataNodeState( parent0, false, 0 );
+
+		parent1.setAttribute( "child", child );
+		assertDataNodeState( parent0, true, 1 );
+		assertDataNodeState( parent1, true, 1 );
+		assertNull( parent0.getAttribute( "child" ) );
+	}
+
 }
