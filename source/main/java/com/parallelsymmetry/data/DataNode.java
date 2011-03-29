@@ -96,10 +96,30 @@ public class DataNode implements Comparable<DataNode> {
 		submitAction( new SetAttributeAction( this, key, value ) );
 	}
 
+	/**
+	 * Add an element to a collection that is an attribute in this node with the
+	 * specified key. This allows the node to track changes to the collection as a
+	 * convenience method instead of getting the collection, adding the element
+	 * and setting the attribute again.
+	 * 
+	 * @param <E>
+	 * @param key
+	 * @param element
+	 */
 	public <E> void addElement( String key, E element ) {
 		submitAction( new AddElementAction<E>( this, key, element ) );
 	}
 
+	/**
+	 * Remove an element from a collection that is an attribute in this node node
+	 * with the specified key. This allows the node to track changes to the
+	 * collection as a convenience method instead of getting the collection,
+	 * adding the element and setting the attribute again.
+	 * 
+	 * @param <E>
+	 * @param key
+	 * @param element
+	 */
 	public <E> void removeElement( String key, E element ) {
 		submitAction( new RemoveElementAction<E>( this, key, element ) );
 	}
