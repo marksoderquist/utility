@@ -4,9 +4,13 @@ import junit.framework.TestCase;
 
 public abstract class DataTestCase extends TestCase {
 
-	protected void assertDataState( DataNode node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
+	protected void assertDataNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
 		assertEquals( modified, node.isModified() );
 		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
+	}
+
+	protected void assertDataListState( DataNode node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
+		assertDataNodeState( node, modified, modifiedAttributeCount );
 		//assertEquals( modifiedChildCount, node.getModifiedChildCount() );
 	}
 

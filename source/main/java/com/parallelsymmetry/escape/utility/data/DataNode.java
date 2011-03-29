@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.data;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,6 +25,8 @@ public abstract class DataNode {
 	private Map<String, Object> resources;
 
 	private Transaction transaction;
+	
+	private DataNode parent;
 
 	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
@@ -57,6 +60,10 @@ public abstract class DataNode {
 
 	public int getModifiedAttributeCount() {
 		return modifiedAttributeCount;
+	}
+	
+	public DataNode getParent() {
+		return parent;
 	}
 
 	/**
@@ -133,6 +140,42 @@ public abstract class DataNode {
 	protected void setTransaction( Transaction transaction ) {
 		if( transaction != null && this.transaction != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
 		this.transaction = transaction;
+	}
+	
+	/**
+	 * This method removes the specified node from any parent nodes.
+	 */
+	@SuppressWarnings( "unchecked" )
+	void isolateNode( DataNode node ) {
+		DataNode parent = node.getParent();
+
+		if( parent == null ) return;
+		
+		// FIXME What about events?
+
+		if( parent.attributes != null && parent.attributes.containsValue( node ) ) {
+			
+			parent.setTransaction( getTransaction() );
+			
+			// If the node is an attribute.
+			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
+			while( iterator.hasNext() ) {
+				Map.Entry<String, Object> entry = iterator.next();
+				if( entry.getValue().equals( node ) ) {
+					parent.setAttribute( entry.getKey(), null );
+					break;
+				}
+			}
+//		} else if( parent instanceof DataList && ( (DataList<?>)parent ).children != null ) {
+//			// If the node is a child.
+//			( (DataList<DataNode>)parent ).remove( node );
+		}
+
+		//getTransaction().nodeModified( parent );
+	}
+
+	void setParent( DataNode parent ) {
+		this.parent = parent;
 	}
 
 	private void doSetModified( boolean modified ) {

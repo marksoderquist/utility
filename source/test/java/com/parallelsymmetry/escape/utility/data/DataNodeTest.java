@@ -20,7 +20,7 @@ public class DataNodeTest extends DataTestCase {
 
 	@Test
 	public void testIsModified() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
 
@@ -35,7 +35,7 @@ public class DataNodeTest extends DataTestCase {
 
 	@Test
 	public void testSetAttributeWithNullName() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 
 		try {
 			data.setAttribute( null, "value" );
@@ -47,7 +47,7 @@ public class DataNodeTest extends DataTestCase {
 
 	@Test
 	public void testGetAttributeWithNullName() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 
 		try {
 			data.getAttribute( null );
@@ -59,7 +59,7 @@ public class DataNodeTest extends DataTestCase {
 
 	@Test
 	public void testNullAttributeValues() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		assertNull( data.getAttribute( "attribute" ) );
 
 		data.setAttribute( "attribute", null );
@@ -80,57 +80,63 @@ public class DataNodeTest extends DataTestCase {
 
 	@Test
 	public void testGetAndSetAttribute() {
-		MockData data = new MockData();
-		assertEquals( 0, data.getX() );
-		assertEquals( 0, data.getY() );
-		assertEquals( 0, data.getZ() );
+		MockDataNode data = new MockDataNode();
+		assertEquals( null, data.getAttribute( "x" ) );
+		assertEquals( null, data.getAttribute( "y" ) );
+		assertEquals( null, data.getAttribute( "z" ) );
 
-		data.setX( 1 );
-		assertEquals( 1, data.getX() );
-		assertEquals( 0, data.getY() );
-		assertEquals( 0, data.getZ() );
+		data.setAttribute( "x", 1 );
+		assertEquals( 1, data.getAttribute( "x" ) );
+		assertEquals( null, data.getAttribute( "y" ) );
+		assertEquals( null, data.getAttribute( "z" ) );
 
-		data.setX( 0 );
-		assertEquals( 0, data.getX() );
-		assertEquals( 0, data.getY() );
-		assertEquals( 0, data.getZ() );
+		data.setAttribute( "x", 0 );
+		assertEquals( 0, data.getAttribute( "x" ) );
+		assertEquals( null, data.getAttribute( "y" ) );
+		assertEquals( null, data.getAttribute( "z" ) );
 	}
 
 	@Test
 	public void testSetAttributeSetsModifiedFlag() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		assertFalse( data.isModified() );
 
-		data.setX( 1 );
-		data.setY( 2 );
-		data.setZ( 3 );
+		data.setAttribute( "x", 1 );
+		data.setAttribute( "y", 2 );
+		data.setAttribute( "z", 3 );
 		assertTrue( data.isModified() );
 	}
 
 	@Test
 	public void testUnmodifyAttributeClearsModifiedFlag() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		assertFalse( data.isModified() );
 
-		data.setX( 1 );
-		data.setY( 2 );
-		data.setZ( 3 );
+		data.setAttribute( "x", 0 );
+		data.setAttribute( "y", 0 );
+		data.setAttribute( "z", 0 );
+		data.clearModified();
+		assertFalse( data.isModified() );
+
+		data.setAttribute( "x", 1 );
+		data.setAttribute( "y", 2 );
+		data.setAttribute( "z", 3 );
 		assertTrue( data.isModified() );
 
-		data.setX( 0 );
-		data.setY( 0 );
-		data.setZ( 0 );
+		data.setAttribute( "x", 0 );
+		data.setAttribute( "y", 0 );
+		data.setAttribute( "z", 0 );
 		assertFalse( data.isModified() );
 	}
 
 	@Test
 	public void testCommitClearsModifiedAttributeCount() {
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		assertFalse( data.isModified() );
 
-		data.setX( 1 );
-		data.setY( 2 );
-		data.setZ( 3 );
+		data.setAttribute( "x", 1 );
+		data.setAttribute( "y", 2 );
+		data.setAttribute( "z", 3 );
 		assertEquals( 3, data.getModifiedAttributeCount() );
 		assertTrue( data.isModified() );
 
@@ -141,47 +147,47 @@ public class DataNodeTest extends DataTestCase {
 
 	public void testResources() {
 		DataHandler handler = new DataHandler();
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		data.addDataListener( handler );
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		data.putResource( "name", "value" );
 		assertEquals( "value", data.getResource( "name" ) );
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		data.putResource( "name", null );
 		assertNull( data.getResource( "name" ) );
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 	}
 
 	public void testDataEventNotification() {
 		DataHandler handler = new DataHandler();
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		data.addDataListener( handler );
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		// Insert an attribute.
 		data.setAttribute( "attribute", "value0" );
-		assertDataState( data, true, 1, 0 );
+		assertDataNodeState( data, true, 1 );
 		assertEventCounts( handler, 1, 1, 1 );
 
 		// Modify the attribute to the same value. Should do nothing.
 		data.setAttribute( "attribute", "value0" );
-		assertDataState( data, true, 1, 0 );
+		assertDataNodeState( data, true, 1 );
 		assertEventCounts( handler, 1, 1, 1 );
 
 		// Modify the attribute.
 		data.setAttribute( "attribute", "value1" );
-		assertDataState( data, true, 1, 0 );
+		assertDataNodeState( data, true, 1 );
 		assertEventCounts( handler, 2, 2, 1 );
 
 		// Remove the attribute.
 		data.setAttribute( "attribute", null );
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 3, 3, 2 );
 
 		int index = 0;
@@ -199,24 +205,24 @@ public class DataNodeTest extends DataTestCase {
 	public void testEventsWithCommit() {
 		Log.setLevel( Log.DEBUG );
 		DataHandler handler = new DataHandler();
-		MockData data = new MockData();
+		MockDataNode data = new MockDataNode();
 		data.addDataListener( handler );
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		// Change an attribute.
 		data.setAttribute( "attribute", "value0" );
-		assertDataState( data, true, 1, 0 );
+		assertDataNodeState( data, true, 1 );
 		assertEventCounts( handler, 1, 1, 1 );
 
 		// Commit the changes.
 		data.clearModified();
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
 
 		// Commit again. Should do nothing.
 		data.clearModified();
-		assertDataState( data, false, 0, 0 );
+		assertDataNodeState( data, false, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
 
 		int index = 0;
