@@ -35,12 +35,11 @@ public class TransactionTest extends DataTestCase {
 		data.setAttribute( "attribute0", "value0" );
 		data.setAttribute( "attribute1", "value1" );
 		data.setAttribute( "attribute2", "value2" );
-		assertNodeState( data, false, 0 );
+		assertNodeState( data, false, 0, true );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		transaction.commit();
-		assertFalse( data.isTransactionActive() );
-		assertNodeState( data, true, 3 );
+		assertNodeState( data, true, 3, false );
 		assertEventCounts( handler, 1, 3, 1 );
 
 		int index = 0;

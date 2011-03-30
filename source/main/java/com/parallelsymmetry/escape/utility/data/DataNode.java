@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
-import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class DataNode {
 
@@ -197,25 +196,26 @@ public abstract class DataNode {
 
 		if( parent == null ) return;
 
-		if( parent.attributes != null && parent.attributes.containsValue( node ) ) {
-			parent.setTransaction( transaction );
-
-			// If the node is an attribute.
+		if( parent.attributes != null ) {
+			// Because Map.containsValue() traverses the map it only decreases performance.
+			String key = null;
 			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
 			while( iterator.hasNext() ) {
 				Map.Entry<String, Object> entry = iterator.next();
 				if( entry.getValue().equals( node ) ) {
-					Log.write( Log.WARN, "Found entry: " + entry.getKey() );
-					parent.setAttribute( entry.getKey(), null );
+					key = entry.getKey();
 					break;
 				}
+			}
+
+			if( key != null ) {
+				parent.setTransaction( transaction );
+				parent.setAttribute( key, null );
 			}
 		} else if( parent instanceof DataList ) {
 			parent.setTransaction( getTransaction() );
 			( (DataList<DataNode>)parent ).remove( node );
 		}
-
-		//getTransaction().nodeModified( parent );
 	}
 
 	private void updateModifiedFlag() {
@@ -300,7 +300,6 @@ public abstract class DataNode {
 		protected ActionResult process() {
 			ActionResult result = new ActionResult( this );
 
-			Log.write( Log.WARN, "Set attribute: " + name + " from " + oldValue + " to " + newValue );
 			getData().doSetAttribute( name, oldValue, newValue );
 
 			DataEvent.Type type = DataEvent.Type.MODIFY;
