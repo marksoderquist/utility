@@ -4,8 +4,6 @@ import java.lang.reflect.Modifier;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.escape.utility.log.Log;
-
 public class DataNodeTest extends DataTestCase {
 
 	@Test
@@ -373,7 +371,6 @@ public class DataNodeTest extends DataTestCase {
 	}
 
 	public void testClearModifiedClearsChildAttributes() {
-		Log.setLevel( Log.DEBUG );
 		MockDataNode child = new MockDataNode( "child" );
 		MockDataNode parent = new MockDataNode( "parent" );
 		DataEventHandler childHandler = child.getDataEventHandler();

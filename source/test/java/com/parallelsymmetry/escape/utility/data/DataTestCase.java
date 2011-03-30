@@ -27,9 +27,15 @@ public abstract class DataTestCase extends TestCase {
 	}
 
 	protected void assertEventCounts( DataEventHandler handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount ) {
+		assertEventCounts( handler, dataEventCount, dataAttributeEventCount, metaAttributeEventCount, 0, 0 );
+	}
+
+	protected void assertEventCounts( DataEventHandler handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount, int childInsertEventCount, int childRemoveEventCount ) {
 		assertEquals( dataEventCount, handler.getDataEvents().size() );
 		assertEquals( dataAttributeEventCount, handler.getDataAttributeEvents().size() );
 		assertEquals( metaAttributeEventCount, handler.getMetaAttributeEvents().size() );
+		assertEquals( childInsertEventCount, handler.getChildInsertedEvents().size() );
+		assertEquals( childRemoveEventCount, handler.getChildRemovedEvents().size() );
 	}
 
 	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data ) {

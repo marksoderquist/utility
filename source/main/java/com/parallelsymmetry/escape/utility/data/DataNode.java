@@ -13,11 +13,13 @@ public abstract class DataNode {
 
 	public static final String MODIFIED = "modified";
 
+	protected boolean modified;
+
 	protected Transaction transaction;
 
-	private static final Object NULL = new Object();
+	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
-	private boolean modified;
+	private static final Object NULL = new Object();
 
 	private Map<String, Object> attributes;
 
@@ -30,8 +32,6 @@ public abstract class DataNode {
 	private Map<String, Object> resources;
 
 	private DataNode parent;
-
-	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
 	/**
 	 * Is the node modified. The node is modified if any attribute has been
@@ -54,7 +54,7 @@ public abstract class DataNode {
 		if( autoCommit ) startTransaction();
 		transaction.add( new ClearModifiedAction( this ) );
 
-		// Clear the modified flag of any children.
+		// Clear the modified flag of any attribute nodes.
 		if( attributes != null ) {
 			for( Object child : attributes.values() ) {
 				if( child instanceof DataNode ) {
@@ -233,6 +233,10 @@ public abstract class DataNode {
 		}
 	}
 
+	protected void updateModifiedFlag() {
+		modified = modifiedAttributeCount != 0 | modifiedChildCount != 0;
+	}
+
 	void setParent( DataNode parent ) {
 		this.parent = parent;
 	}
@@ -267,10 +271,6 @@ public abstract class DataNode {
 			parent.setTransaction( transaction );
 			( (DataList<DataNode>)parent ).remove( node );
 		}
-	}
-
-	protected void updateModifiedFlag() {
-		modified = modifiedAttributeCount != 0 | modifiedChildCount != 0;
 	}
 
 	private void doClearModified() {

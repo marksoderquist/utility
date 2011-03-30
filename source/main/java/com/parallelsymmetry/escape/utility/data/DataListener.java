@@ -8,4 +8,8 @@ public interface DataListener {
 
 	void metaAttributeChanged( MetaAttributeEvent event );
 
+	void childInserted( DataChildEvent event );
+
+	void childRemoved( DataChildEvent event );
+
 }

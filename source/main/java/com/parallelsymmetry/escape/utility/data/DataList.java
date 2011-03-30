@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
@@ -11,6 +12,8 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	private List<T> children;
 
 	public DataList() {}
+
+	private Map<String, Object> modifiedChildren;
 
 	public DataList( T[] children ) {
 		for( T child : children ) {
@@ -24,6 +27,31 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 			add( child );
 		}
 		clearModified();
+	}
+
+	@Override
+	public void clearModified() {
+		if( !modified ) return;
+
+		boolean autoCommit = !isTransactionActive();
+		if( autoCommit ) startTransaction();
+
+		super.clearModified();
+
+		// Clear the modified flag of any child nodes.
+		if( children != null ) {
+			for( Object child : children ) {
+				if( child instanceof DataNode ) {
+					DataNode childNode = (DataNode)child;
+					if( childNode.isModified() ) {
+						childNode.setTransaction( transaction );
+						childNode.clearModified();
+					}
+				}
+			}
+		}
+
+		if( autoCommit ) transaction.commit();
 	}
 
 	@Override
@@ -63,8 +91,8 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	@Override
 	public void add( int index, T element ) {
-		if( element == null || contains( element ) )  return;
-		
+		if( element == null || contains( element ) ) return;
+
 		boolean autoCommit = !isTransactionActive();
 		if( autoCommit ) startTransaction();
 		if( element instanceof DataNode ) isolateNode( (DataNode)element );
@@ -166,13 +194,39 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		return children.subList( fromIndex, toIndex );
 	}
 
-	private void doAddChild( int index, T child ) {
-		child.setParent( this );
+	protected void dispatchEvent( DataEvent event ) {
+		if( event instanceof DataChildEvent ) {
+			switch( event.getType() ) {
+				case INSERT: {
+					fireChildInsertedEvent( (DataChildEvent)event );
+					return;
+				}
+				case REMOVE: {
+					fireChildRemovedEvent( (DataChildEvent)event );
+					return;
+				}
+			}
+		}
+		super.dispatchEvent( event );
+	}
 
+	private void fireChildInsertedEvent( DataChildEvent event ) {
+		for( DataListener listener : listeners ) {
+			listener.childInserted( event );
+		}
+	}
+
+	private void fireChildRemovedEvent( DataChildEvent event ) {
+		for( DataListener listener : listeners ) {
+			listener.childRemoved( event );
+		}
+	}
+
+	private void doAddChild( int index, T child ) {
 		if( children == null ) children = new CopyOnWriteArrayList<T>();
+
 		children.add( index, child );
-		
-		
+		child.setParent( this );
 
 		updateModifiedFlag();
 	}
