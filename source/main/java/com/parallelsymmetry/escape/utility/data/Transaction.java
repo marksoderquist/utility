@@ -58,19 +58,35 @@ public class Transaction {
 				boolean changed = false;
 
 				for( DataEvent event : events.get( datum ) ) {
-					datum.dispatchDataEvent( event );
+					datum.dispatchEvent( event );
 					changed = true;
 				}
 
 				boolean oldModified = modified.get( datum );
 				boolean newModified = datum.isModified();
 				if( newModified != oldModified ) {
+					// Notify the parent.
+					DataNode parent = datum.getParent();
+					while( parent != null ) {
+						boolean parentOldModified = parent.isModified();
+						parent.attributeModified( newModified );
+						boolean parentNewModified = parent.isModified();
+
+						// Dispatch events for parent.
+						if( parentNewModified != parentOldModified ) {
+							parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
+							parent.dispatchEvent( new DataEvent( DataEvent.Type.MODIFY, datum ) );
+						}
+
+						parent = parent.getParent();
+					}
+
 					// A meta attribute change event needs to be sent.
-					datum.dispatchDataEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
+					datum.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
 					changed = true;
 				}
 
-				if( changed ) datum.dispatchDataEvent( new DataEvent( DataEvent.Type.MODIFY, datum ) );
+				if( changed ) datum.dispatchEvent( new DataEvent( DataEvent.Type.MODIFY, datum ) );
 			}
 		} finally {
 			cleanup();

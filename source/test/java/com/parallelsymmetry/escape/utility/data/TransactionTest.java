@@ -4,16 +4,16 @@ public class TransactionTest extends DataTestCase {
 
 	public void testTransactionAction() {
 		MockDataNode data = new MockDataNode();
-		DataHandler handler = new DataHandler();
+		DataEventHandler handler = new DataEventHandler();
 		data.addDataListener( handler );
-		assertDataNodeState( data, false, 0 );
+		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		Transaction transaction = new Transaction();
 		transaction.add( new MockAction( data ) );
 
 		transaction.commit();
-		assertDataNodeState( data, false, 0 );
+		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 1, 1, 0 );
 
 		int index = 0;
@@ -24,9 +24,9 @@ public class TransactionTest extends DataTestCase {
 
 	public void testTransaction() {
 		MockDataNode data = new MockDataNode();
-		DataHandler handler = new DataHandler();
+		DataEventHandler handler = new DataEventHandler();
 		data.addDataListener( handler );
-		assertDataNodeState( data, false, 0 );
+		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		Transaction transaction = data.startTransaction();
@@ -35,12 +35,12 @@ public class TransactionTest extends DataTestCase {
 		data.setAttribute( "attribute0", "value0" );
 		data.setAttribute( "attribute1", "value1" );
 		data.setAttribute( "attribute2", "value2" );
-		assertDataNodeState( data, false, 0 );
+		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		transaction.commit();
 		assertFalse( data.isTransactionActive() );
-		assertDataNodeState( data, true, 3 );
+		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 1, 3, 1 );
 
 		int index = 0;

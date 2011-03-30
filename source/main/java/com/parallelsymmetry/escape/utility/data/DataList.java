@@ -4,14 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private List<T> children;
-
-	private int modifiedChildCount;
 
 	public DataList() {}
 
@@ -64,7 +61,7 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	@Override
 	public boolean add( T child ) {
-		submitAction( new AddChildAction<T>( this, size(), child ) );
+		// TODO Auto-generated method stub
 		return true;
 	}
 
@@ -192,8 +189,6 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 			ActionResult result = new ActionResult( this );
 
 			list.doAddChild( index, child );
-
-			DataEvent.Type type = DataEvent.Type.MODIFY;
 			result.addEvent( new DataChildEvent( DataEvent.Type.INSERT, getData(), index, child ) );
 
 			// getTransaction().nodeModified( this );

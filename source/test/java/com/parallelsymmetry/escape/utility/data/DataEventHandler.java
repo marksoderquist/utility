@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
-class DataHandler implements DataListener {
+class DataEventHandler implements DataListener {
 
 	private List<DataEvent> events = new ArrayList<DataEvent>();
 

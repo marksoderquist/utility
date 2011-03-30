@@ -4,30 +4,27 @@ import junit.framework.TestCase;
 
 public abstract class DataTestCase extends TestCase {
 
-	protected void assertDataNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
+	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
 		assertEquals( modified, node.isModified() );
 		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
 	}
 
-	protected void assertDataListState( DataNode node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
-		assertDataNodeState( node, modified, modifiedAttributeCount );
+	protected void assertListState( DataNode node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
+		assertNodeState( node, modified, modifiedAttributeCount );
 		//assertEquals( modifiedChildCount, node.getModifiedChildCount() );
 	}
 
-	protected void assertEventCounts( DataHandler handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount ) {
-		int total = dataEventCount + dataAttributeEventCount + metaAttributeEventCount;
-		assertEquals( total, handler.getEvents().size() );
-
+	protected void assertEventCounts( DataEventHandler handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount ) {
 		assertEquals( dataEventCount, handler.getDataEvents().size() );
 		assertEquals( dataAttributeEventCount, handler.getDataAttributeEvents().size() );
 		assertEquals( metaAttributeEventCount, handler.getMetaAttributeEvents().size() );
 	}
 
-	protected void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data ) {
+	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data ) {
 		assertEventState( handler, index, clazz, type, data, null, null, null );
 	}
 
-	protected void assertEventState( DataHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data, String name, Object oldValue, Object newValue ) {
+	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data, String name, Object oldValue, Object newValue ) {
 		DataEvent event = handler.getEvents().get( index );
 		assertEquals( clazz, event.getClass() );
 		assertEquals( type, event.getType() );

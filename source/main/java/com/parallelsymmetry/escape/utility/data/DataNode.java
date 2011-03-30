@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class DataNode {
 
@@ -19,6 +20,8 @@ public abstract class DataNode {
 	private Map<String, Object> attributes;
 
 	private int modifiedAttributeCount;
+
+	private int modifiedChildCount;
 
 	private Map<String, Object> modifiedAttributes;
 
@@ -36,7 +39,13 @@ public abstract class DataNode {
 
 	public void clearModified() {
 		if( !modified ) return;
-		submitAction( new ClearModifiedAction( this ) );
+
+		boolean autoCommit = !isTransactionActive();
+		if( autoCommit ) startTransaction();
+
+		transaction.add( new ClearModifiedAction( this ) );
+
+		if( autoCommit ) transaction.commit();
 	}
 
 	@SuppressWarnings( "unchecked" )
@@ -55,7 +64,16 @@ public abstract class DataNode {
 		Object oldValue = getAttribute( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
-		submitAction( new SetAttributeAction( this, name, oldValue, newValue ) );
+		boolean autoCommit = !isTransactionActive();
+		if( autoCommit ) startTransaction();
+
+		// If the new value is a data node it must be isolated.
+		if( newValue instanceof DataNode ) isolateNode( (DataNode)newValue );
+
+		// Submit the change action.
+		transaction.add( new SetAttributeAction( this, name, oldValue, newValue ) );
+
+		if( autoCommit ) transaction.commit();
 	}
 
 	public int getModifiedAttributeCount() {
@@ -122,18 +140,40 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
-	protected void submitAction( Action action ) {
-		if( isTransactionActive() ) {
-			getTransaction().add( action );
-			return;
+	//	protected void submitAction( Action action ) {
+	//		if( isTransactionActive() ) {
+	//			getTransaction().add( action );
+	//			return;
+	//		}
+	//
+	//		Transaction transaction = startTransaction();
+	//		submitAction( action );
+	//		transaction.commit();
+	//	}
+
+	protected void attributeModified( boolean modified ) {
+		if( modified ) {
+			modifiedAttributeCount++;
+		} else {
+			modifiedAttributeCount--;
+			if( modifiedAttributeCount < 0 ) throw new RuntimeException( "Modified attribute count less than zero." );
 		}
 
-		Transaction transaction = startTransaction();
-		submitAction( action );
-		transaction.commit();
+		updateModifiedFlag();
 	}
 
-	protected void dispatchDataEvent( DataEvent event ) {
+	protected void childModified( boolean modified ) {
+		if( modified ) {
+			modifiedChildCount++;
+		} else {
+			modifiedChildCount--;
+			if( modifiedChildCount < 0 ) throw new RuntimeException( "Modified child count less than zero." );
+		}
+
+		updateModifiedFlag();
+	}
+
+	protected void dispatchEvent( DataEvent event ) {
 		if( event instanceof DataAttributeEvent ) {
 			fireDataAttributeChanged( (DataAttributeEvent)event );
 		} else if( event instanceof MetaAttributeEvent ) {
@@ -143,23 +183,29 @@ public abstract class DataNode {
 		}
 	}
 
+	void setParent( DataNode parent ) {
+		this.parent = parent;
+	}
+
 	/**
 	 * This method removes the specified node from any parent nodes.
 	 */
 	@SuppressWarnings( "unchecked" )
 	void isolateNode( DataNode node ) {
+		if( transaction == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
 		DataNode parent = node.getParent();
 
 		if( parent == null ) return;
 
 		if( parent.attributes != null && parent.attributes.containsValue( node ) ) {
-			parent.setTransaction( getTransaction() );
+			parent.setTransaction( transaction );
 
 			// If the node is an attribute.
 			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
 			while( iterator.hasNext() ) {
 				Map.Entry<String, Object> entry = iterator.next();
 				if( entry.getValue().equals( node ) ) {
+					Log.write( Log.WARN, "Found entry: " + entry.getKey() );
 					parent.setAttribute( entry.getKey(), null );
 					break;
 				}
@@ -172,17 +218,14 @@ public abstract class DataNode {
 		//getTransaction().nodeModified( parent );
 	}
 
-	void setParent( DataNode parent ) {
-		this.parent = parent;
+	private void updateModifiedFlag() {
+		modified = modifiedAttributeCount != 0 | modifiedChildCount != 0;
 	}
 
-	private void doSetModified( boolean modified ) {
-		this.modified = modified;
-
-		if( !modified ) {
-			modifiedAttributes = null;
-			modifiedAttributeCount = 0;
-		}
+	private void doClearModified() {
+		this.modified = false;
+		modifiedAttributes = null;
+		modifiedAttributeCount = 0;
 	}
 
 	private void doSetAttribute( String name, Object oldValue, Object newValue ) {
@@ -196,24 +239,28 @@ public abstract class DataNode {
 			attributes.put( name, newValue );
 		}
 
+		// Handle data nodes in attributes.
+		if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
+		if( newValue instanceof DataNode ) ( (DataNode)newValue ).setParent( this );
+
 		// Remove the attribute map if necessary.
 		if( attributes.size() == 0 ) attributes = null;
 
 		// Update the modified attribute value map.
 		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
-		if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
-			modifiedAttributes.remove( name );
-			modifiedAttributeCount--;
-			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
-		} else if( preValue == null ) {
+		if( preValue == null ) {
 			// Only add the value if there is not an existing previous value.
 			if( modifiedAttributes == null ) modifiedAttributes = new ConcurrentHashMap<String, Object>();
 			modifiedAttributes.put( name, oldValue == null ? NULL : oldValue );
 			modifiedAttributeCount++;
+		} else if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
+			modifiedAttributes.remove( name );
+			modifiedAttributeCount--;
+			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
 		}
 
 		// Update the modified flag.
-		doSetModified( modifiedAttributeCount != 0 );
+		updateModifiedFlag();
 	}
 
 	private void fireDataChanged( DataEvent event ) {
@@ -253,6 +300,7 @@ public abstract class DataNode {
 		protected ActionResult process() {
 			ActionResult result = new ActionResult( this );
 
+			Log.write( Log.WARN, "Set attribute: " + name + " from " + oldValue + " to " + newValue );
 			getData().doSetAttribute( name, oldValue, newValue );
 
 			DataEvent.Type type = DataEvent.Type.MODIFY;
@@ -275,7 +323,7 @@ public abstract class DataNode {
 		protected ActionResult process() {
 			ActionResult result = new ActionResult( this );
 
-			getData().doSetModified( false );
+			getData().doClearModified();
 
 			return result;
 		}

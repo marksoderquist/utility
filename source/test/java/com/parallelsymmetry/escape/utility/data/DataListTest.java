@@ -13,7 +13,7 @@ public class DataListTest extends DataTestCase {
 
 	public void testConstructor() {
 		MockDataList list = new MockDataList();
-		assertDataListState( list, false, 0, 0 );
+		assertListState( list, false, 0, 0 );
 	}
 
 	public void testAdd() {
