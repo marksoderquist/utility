@@ -7,10 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class DataNode {
 
 	public static final String MODIFIED = "modified";
+
+	protected Transaction transaction;
 
 	private static final Object NULL = new Object();
 
@@ -26,27 +29,70 @@ public abstract class DataNode {
 
 	private Map<String, Object> resources;
 
-	private Transaction transaction;
-
 	private DataNode parent;
 
 	private Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
+	/**
+	 * Is the node modified. The node is modified if any attribute has been
+	 * modified or any child node has been modified since the last time
+	 * {@link #clearModified()} was called.
+	 * 
+	 * @return true if this node or any child nodes are modified, false otherwise.
+	 */
 	public boolean isModified() {
 		return modified;
 	}
 
+	/**
+	 * Clear the modified state for this node and all child nodes.
+	 */
 	public void clearModified() {
 		if( !modified ) return;
 
 		boolean autoCommit = !isTransactionActive();
 		if( autoCommit ) startTransaction();
-
 		transaction.add( new ClearModifiedAction( this ) );
+
+		// Clear the modified flag of any children.
+		if( attributes != null ) {
+			for( Object child : attributes.values() ) {
+				if( child instanceof DataNode ) {
+					DataNode childNode = (DataNode)child;
+					if( childNode.isModified() ) {
+						childNode.setTransaction( transaction );
+						childNode.clearModified();
+					}
+				}
+			}
+		}
 
 		if( autoCommit ) transaction.commit();
 	}
 
+	/**
+	 * Get an attribute value. Normally this method is not called directly but is
+	 * wrapped by an attribute getter method. Example:
+	 * 
+	 * <pre>
+	 * public String getName() {
+	 * 	return getAttribute( &quot;name&quot; );
+	 * }
+	 * </pre>
+	 * 
+	 * Note: Be sure to handle primitives correctly by checking for null values:
+	 * 
+	 * <pre>
+	 * public int getLimit() {
+	 * 	Integer result = getAttribute( &quot;limit&quot; );
+	 * 	return result == null ? 0 : result;
+	 * }
+	 * </pre>
+	 * 
+	 * @param <T> The return value type.
+	 * @param name The attribute name.
+	 * @return The attribute value or null if it does not exist.
+	 */
 	@SuppressWarnings( "unchecked" )
 	public <T> T getAttribute( String name ) {
 		// Null attribute names are not allowed.
@@ -55,6 +101,19 @@ public abstract class DataNode {
 		return (T)( attributes == null ? null : attributes.get( name ) );
 	}
 
+	/**
+	 * Set an attribute value. Normally this method is not called directly but is
+	 * wrapped by an attribute setter method. Example:
+	 * 
+	 * <pre>
+	 * public void setName( String string ) {
+	 * 	setAttribute( &quot;name&quot;, string );
+	 * }
+	 * </pre>
+	 * 
+	 * @param name The attribute name.
+	 * @param newValue The attribute value.
+	 */
 	public void setAttribute( String name, Object newValue ) {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Attribute name cannot be null." );
@@ -65,13 +124,8 @@ public abstract class DataNode {
 
 		boolean autoCommit = !isTransactionActive();
 		if( autoCommit ) startTransaction();
-
-		// If the new value is a data node it must be isolated.
 		if( newValue instanceof DataNode ) isolateNode( (DataNode)newValue );
-
-		// Submit the change action.
 		transaction.add( new SetAttributeAction( this, name, oldValue, newValue ) );
-
 		if( autoCommit ) transaction.commit();
 	}
 
@@ -84,7 +138,8 @@ public abstract class DataNode {
 	}
 
 	/**
-	 * Get a stored resource.
+	 * Get a stored resource. Putting or removing a resource will not modify the
+	 * data.
 	 * 
 	 * @param key
 	 * @return
@@ -96,7 +151,7 @@ public abstract class DataNode {
 	}
 
 	/**
-	 * Store a resource. Setting or removing a resource will not modify the data.
+	 * Store a resource. Putting or removing a resource will not modify the data.
 	 * A resource is removed by setting the resource value to null.
 	 * 
 	 * @param value
@@ -139,34 +194,30 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
-	//	protected void submitAction( Action action ) {
-	//		if( isTransactionActive() ) {
-	//			getTransaction().add( action );
-	//			return;
-	//		}
-	//
-	//		Transaction transaction = startTransaction();
-	//		submitAction( action );
-	//		transaction.commit();
-	//	}
-
-	protected void attributeModified( boolean modified ) {
+	protected void attributeNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedAttributeCount++;
 		} else {
 			modifiedAttributeCount--;
-			if( modifiedAttributeCount < 0 ) throw new RuntimeException( "Modified attribute count less than zero." );
+
+			// The reason for the following line is that doClearModifed() is 
+			// processed by transactions before processing child and parent nodes.
+			if( modifiedAttributeCount < 0 ) modifiedAttributeCount = 0;
 		}
 
+		Log.write( Log.WARN, "Modified attribute count( " + toString() + "): " + modifiedAttributeCount );
 		updateModifiedFlag();
 	}
 
-	protected void childModified( boolean modified ) {
+	protected void childNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedChildCount++;
 		} else {
 			modifiedChildCount--;
-			if( modifiedChildCount < 0 ) throw new RuntimeException( "Modified child count less than zero." );
+
+			// The reason for the following line is that doClearModifed() is 
+			// processed by transactions before processing child and parent nodes.
+			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
 		}
 
 		updateModifiedFlag();
@@ -192,8 +243,8 @@ public abstract class DataNode {
 	@SuppressWarnings( "unchecked" )
 	void isolateNode( DataNode node ) {
 		if( transaction == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
-		DataNode parent = node.getParent();
 
+		DataNode parent = node.getParent();
 		if( parent == null ) return;
 
 		if( parent.attributes != null ) {
@@ -213,17 +264,17 @@ public abstract class DataNode {
 				parent.setAttribute( key, null );
 			}
 		} else if( parent instanceof DataList ) {
-			parent.setTransaction( getTransaction() );
+			parent.setTransaction( transaction );
 			( (DataList<DataNode>)parent ).remove( node );
 		}
 	}
 
-	private void updateModifiedFlag() {
+	protected void updateModifiedFlag() {
 		modified = modifiedAttributeCount != 0 | modifiedChildCount != 0;
 	}
 
 	private void doClearModified() {
-		this.modified = false;
+		modified = false;
 		modifiedAttributes = null;
 		modifiedAttributeCount = 0;
 	}
@@ -259,7 +310,6 @@ public abstract class DataNode {
 			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
 		}
 
-		// Update the modified flag.
 		updateModifiedFlag();
 	}
 
@@ -278,6 +328,22 @@ public abstract class DataNode {
 	private void fireMetaAttributeChanged( MetaAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
+		}
+	}
+
+	private static class ClearModifiedAction extends Action {
+
+		public ClearModifiedAction( DataNode data ) {
+			super( data );
+		}
+
+		@Override
+		protected ActionResult process() {
+			ActionResult result = new ActionResult( this );
+
+			getData().doClearModified();
+
+			return result;
 		}
 	}
 
@@ -310,22 +376,6 @@ public abstract class DataNode {
 			return result;
 		}
 
-	}
-
-	private static class ClearModifiedAction extends Action {
-
-		public ClearModifiedAction( DataNode data ) {
-			super( data );
-		}
-
-		@Override
-		protected ActionResult process() {
-			ActionResult result = new ActionResult( this );
-
-			getData().doClearModified();
-
-			return result;
-		}
 	}
 
 }

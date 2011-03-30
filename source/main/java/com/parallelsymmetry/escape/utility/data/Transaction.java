@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.parallelsymmetry.escape.utility.log.Log;
+
 public class Transaction {
 
 	private List<Action> actions;
@@ -26,6 +28,7 @@ public class Transaction {
 	}
 
 	public void commit() {
+		Log.write( Log.INFO, "Committing transaction..." );
 		try {
 			// Store the current modified state of each data object.
 			Map<DataNode, Boolean> modified = new HashMap<DataNode, Boolean>();
@@ -36,6 +39,7 @@ public class Transaction {
 			// Process the actions.
 			List<ActionResult> results = new ArrayList<ActionResult>();
 			for( Action action : actions ) {
+				Log.write( Log.INFO, "Processing action (" + action.getData() + "): " + action );
 				results.add( action.process() );
 			}
 
@@ -69,7 +73,7 @@ public class Transaction {
 					DataNode parent = datum.getParent();
 					while( parent != null ) {
 						boolean parentOldModified = parent.isModified();
-						parent.attributeModified( newModified );
+						parent.attributeNodeModified( newModified );
 						boolean parentNewModified = parent.isModified();
 
 						// Dispatch events for parent.
@@ -90,6 +94,7 @@ public class Transaction {
 			}
 		} finally {
 			cleanup();
+			Log.write( Log.WARN, "Transaction committed!" );
 		}
 	}
 

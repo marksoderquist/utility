@@ -8,11 +8,6 @@ import com.parallelsymmetry.escape.utility.log.Log;
 
 public class DataNodeTest extends DataTestCase {
 
-	@Override
-	public void setUp() {
-		Log.setLevel( Log.NONE );
-	}
-
 	@Test
 	public void testDataNodeIsAbstract() {
 		assertTrue( "DataNode class is not abstract.", ( DataNode.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
@@ -316,6 +311,8 @@ public class DataNodeTest extends DataTestCase {
 		DataEventHandler nodeHandler = node.getDataEventHandler();
 		DataEventHandler attributeHandler = attribute.getDataEventHandler();
 		assertNodeState( node, false, 0 );
+		assertEventCounts( nodeHandler, 0, 0, 0 );
+		assertEventCounts( attributeHandler, 0, 0, 0 );
 
 		node.setAttribute( "attribute", attribute );
 		assertNodeState( node, true, 1 );
@@ -373,6 +370,38 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( childHandler, 0, 0, 0 );
 		assertEventCounts( parent0Handler, 3, 2, 3 );
 		assertEventCounts( parent1Handler, 1, 1, 1 );
+	}
+
+	public void testClearModifiedClearsChildAttributes() {
+		Log.setLevel( Log.DEBUG );
+		MockDataNode child = new MockDataNode( "child" );
+		MockDataNode parent = new MockDataNode( "parent" );
+		DataEventHandler childHandler = child.getDataEventHandler();
+		DataEventHandler parentHandler = parent.getDataEventHandler();
+		assertNodeState( child, false, 0 );
+		assertEventCounts( childHandler, 0, 0, 0 );
+		assertNodeState( parent, false, 0 );
+		assertEventCounts( parentHandler, 0, 0, 0 );
+
+		parent.setAttribute( "child", child );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 1, 1, 1 );
+
+		parent.clearModified();
+		assertNodeState( parent, false, 0 );
+		assertEventCounts( parentHandler, 2, 1, 2 );
+
+		child.setAttribute( "attribute", "value" );
+		assertNodeState( child, true, 1 );
+		assertEventCounts( childHandler, 1, 1, 1 );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 3, 1, 3 );
+
+		parent.clearModified();
+		assertNodeState( child, false, 0 );
+		assertEventCounts( childHandler, 2, 1, 2 );
+		assertNodeState( parent, false, 0 );
+		assertEventCounts( parentHandler, 4, 1, 4 );
 	}
 
 }

@@ -1,8 +1,15 @@
 package com.parallelsymmetry.escape.utility.data;
 
+import com.parallelsymmetry.escape.utility.log.Log;
+
 import junit.framework.TestCase;
 
 public abstract class DataTestCase extends TestCase {
+
+	@Override
+	public void setUp() {
+		Log.setLevel( Log.NONE );
+	}
 
 	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
 		assertNodeState( node, modified, modifiedAttributeCount, false );
