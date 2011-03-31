@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
@@ -13,7 +14,7 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	public DataList() {}
 
-	private Map<String, Object> modifiedChildren;
+	private Map<DataNode, DataEvent.Type> modifiedChildren;
 
 	public DataList( T[] children ) {
 		for( T child : children ) {
@@ -194,6 +195,11 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		return children.subList( fromIndex, toIndex );
 	}
 
+	protected void updateModifiedFlag() {
+		super.updateModifiedFlag();
+		modified = modified | modifiedChildren.size() != 0;
+	}
+
 	protected void dispatchEvent( DataEvent event ) {
 		if( event instanceof DataChildEvent ) {
 			switch( event.getType() ) {
@@ -227,6 +233,9 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 		children.add( index, child );
 		child.setParent( this );
+
+		if( modifiedChildren == null ) modifiedChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
+		modifiedChildren.put( child, DataEvent.Type.INSERT );
 
 		updateModifiedFlag();
 	}

@@ -29,7 +29,8 @@ public class DataListTest extends DataTestCase {
 
 		MockDataNode node = new MockDataNode();
 		list.add( node );
-		//assertEventCounts( handler, 1, 0, 1, 1, 0 );
+		assertListState( list, true, 0, 1 );
+		assertEventCounts( handler, 1, 0, 1, 1, 0 );
 	}
 
 	@Test
