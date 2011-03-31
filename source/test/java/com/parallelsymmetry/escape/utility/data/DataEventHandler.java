@@ -77,4 +77,13 @@ class DataEventHandler implements DataListener {
 	public List<DataChildEvent> getChildRemovedEvents() {
 		return childRemovedEvents;
 	}
+	
+	public void reset() {
+		dataChangedEvents.clear();
+		metaAttributeEvents.clear();
+		dataAttributeEvents.clear();
+		childInsertedEvents.clear();
+		childRemovedEvents.clear();
+	}
+	
 }

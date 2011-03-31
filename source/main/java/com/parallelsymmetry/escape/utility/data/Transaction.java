@@ -4,31 +4,46 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
 public class Transaction {
 
-	private List<Action> actions;
+	private Queue<Action> actions;
 
 	private List<DataNode> nodes;
+	
+	private boolean commitInProgress;
+
+	private AtomicInteger depth = new AtomicInteger();
 
 	public Transaction() {
-		actions = new CopyOnWriteArrayList<Action>();
+		actions = new ConcurrentLinkedQueue<Action>();
 		nodes = new CopyOnWriteArrayList<DataNode>();
 	}
 
 	public void add( Action action ) {
+		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
+		
+		Log.write( Log.DEBUG, "Transaction: " + toString() + " adding action: " + action );
+
 		DataNode data = action.getData();
 
-		actions.add( action );
+		actions.offer( action );
 
 		if( !this.nodes.contains( data ) ) this.nodes.add( data );
 	}
 
 	public void commit() {
-		Log.write( Log.INFO, "Committing transaction..." );
+		int depth = decrementDepth();
+		if( depth > 0 ) return;
+
+		commitInProgress = true;
+		Log.write( Log.DEBUG, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
 		try {
 			// Store the current modified state of each data object.
 			Map<DataNode, Boolean> modified = new HashMap<DataNode, Boolean>();
@@ -37,11 +52,15 @@ public class Transaction {
 			}
 
 			// Process the actions.
+			Action action = null;
 			List<ActionResult> results = new ArrayList<ActionResult>();
-			for( Action action : actions ) {
-				Log.write( Log.INFO, "Processing action (" + action.getData() + "): " + action );
+			while( !actions.isEmpty() ) {
+				action = actions.poll();
+				Log.write( Log.DEBUG, "Transaction: " + toString() + " processing action: " + action );
 				results.add( action.process() );
 			}
+
+			Log.write( actions.isEmpty() ? Log.DEBUG : Log.WARN, "Action pending: " + actions.size() );
 
 			// Collect events from the action results.
 			Map<DataNode, List<DataEvent>> events = new HashMap<DataNode, List<DataEvent>>();
@@ -74,7 +93,7 @@ public class Transaction {
 					while( parent != null ) {
 						boolean parentOldModified = parent.isModified();
 						if( parent instanceof DataList ) {
-							((DataList<?>)parent).childNodeModified( newModified );
+							( (DataList<?>)parent ).childNodeModified( newModified );
 						} else {
 							parent.attributeNodeModified( newModified );
 						}
@@ -98,12 +117,29 @@ public class Transaction {
 			}
 		} finally {
 			cleanup();
-			Log.write( Log.WARN, "Transaction committed!" );
+			Log.write( Log.TRACE, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
+			commitInProgress = false;
 		}
 	}
 
 	public void cancel() {
 		cleanup();
+	}
+
+	public int getDepth() {
+		return depth.get();
+	}
+
+	public int incrementDepth() {
+		return depth.incrementAndGet();
+	}
+
+	public int decrementDepth() {
+		return depth.decrementAndGet();
+	}
+
+	public String toString() {
+		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
 	}
 
 	private void cleanup() {

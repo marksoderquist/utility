@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.data;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -131,8 +132,95 @@ public abstract class DataNode {
 		return modifiedAttributeCount;
 	}
 
+	/**
+	 * Copy all attributes and resources from the specified node.
+	 * 
+	 * @param node
+	 */
+	public void copy( DataNode node ) {
+		for( String key : getAttributeKeys() ) {
+			setAttribute( key, node.getAttribute( key ) );
+		}
+		for( String key : getResourceKeys() ) {
+			putResource( key, node.getResource( key ) );
+		}
+	}
+
+	/**
+	 * Fill in any missing attributes and resources from the specified node.
+	 * 
+	 * @param node
+	 */
+	public void fill( DataNode node ) {
+		for( String key : node.getAttributeKeys() ) {
+			if( getAttribute( key ) == null ) setAttribute( key, node.getAttribute( key ) );
+		}
+		for( String key : node.getResourceKeys() ) {
+			if( getResource( key ) == null ) putResource( key, node.getResource( key ) );
+		}
+	}
+
+	/**
+	 * Get the set of attribute keys.
+	 * 
+	 * @return The attribute key set.
+	 */
+	public Set<String> getAttributeKeys() {
+		return attributes == null ? new HashSet<String>() : attributes.keySet();
+	}
+
+	/**
+	 * Get the set of resource keys.
+	 * 
+	 * @return The resource key set.
+	 */
+	public Set<String> getResourceKeys() {
+		return resources == null ? new HashSet<String>() : resources.keySet();
+	}
+
+	/**
+	 * Get the parent node.
+	 * 
+	 * @return The parent node or null if there is no parent.
+	 */
 	public DataNode getParent() {
 		return parent;
+	}
+
+	/**
+	 * Get tree path of this node. Element zero is the root node and the last
+	 * element is this node.
+	 * 
+	 * @return The tree path of this node.
+	 */
+	public DataNode[] getTreePath() {
+		return getTreePath( null );
+	}
+
+	/**
+	 * Get tree path of this node. Element zero is the root node and the last
+	 * element is this node.
+	 * 
+	 * @return The tree path of this node.
+	 */
+	public DataNode[] getTreePath( DataNode stop ) {
+		int count = 0;
+		DataNode parent = this;
+		while( parent != stop ) {
+			count++;
+			parent = parent.getParent();
+		}
+
+		if( stop != null ) count++;
+
+		parent = this;
+		DataNode[] path = new DataNode[count];
+		for( int index = count - 1; index > -1; index-- ) {
+			path[index] = parent;
+			parent = parent.getParent();
+		}
+
+		return path;
 	}
 
 	/**
@@ -165,12 +253,26 @@ public abstract class DataNode {
 		}
 	}
 
-	public Transaction getTransaction() {
+	/**
+	 * Note: This method is not thread safe for performance reasons.
+	 */
+	public final boolean isTransactionActive() {
+		return transaction != null || ( parent != null && parent.isTransactionActive() );
+	}
+
+	/**
+	 * Note: This method is not thread safe for performance reasons.
+	 */
+	public final Transaction startTransaction() {
+		if( !isTransactionActive() ) setTransaction( new Transaction() );
+
+		Transaction transaction = getTransaction();
+		transaction.incrementDepth();
 		return transaction;
 	}
 
-	public Transaction startTransaction() {
-		setTransaction( new Transaction() );
+	public final Transaction getTransaction() {
+		if( transaction == null && parent != null ) return parent.getTransaction();
 		return transaction;
 	}
 
@@ -178,10 +280,6 @@ public abstract class DataNode {
 		if( ObjectUtil.areEqual( this.transaction, transaction ) ) return;
 		if( transaction != null && this.transaction != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
 		this.transaction = transaction;
-	}
-
-	public boolean isTransactionActive() {
-		return transaction != null;
 	}
 
 	public void addDataListener( DataListener listener ) {
@@ -234,7 +332,6 @@ public abstract class DataNode {
 	/**
 	 * This method removes the specified node from any parent nodes.
 	 */
-	@SuppressWarnings( "unchecked" )
 	void isolateNode( DataNode node ) {
 		if( transaction == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
 
@@ -259,7 +356,7 @@ public abstract class DataNode {
 			}
 		} else if( parent instanceof DataList ) {
 			parent.setTransaction( transaction );
-			( (DataList<DataNode>)parent ).remove( node );
+			( (DataList<?>)parent ).remove( node );
 		}
 	}
 

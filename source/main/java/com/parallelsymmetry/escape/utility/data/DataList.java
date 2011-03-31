@@ -11,10 +11,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private List<T> children;
+	
+	private boolean selfModified;
+	
+	private boolean treeModified;
 
 	public DataList() {}
 
-	private Map<DataNode, DataEvent.Type> modifiedChildren;
+	private Map<DataNode, DataEvent.Type> addRemoveChildren;
 
 	private int modifiedChildCount;
 
@@ -30,6 +34,14 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 			add( child );
 		}
 		clearModified();
+	}
+	
+	public boolean isSelfModified() {
+		return selfModified;
+	}
+	
+	public boolean isTreeModified() {
+		return treeModified;
 	}
 
 	@Override
@@ -235,8 +247,12 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	protected void updateModifiedFlag() {
 		super.updateModifiedFlag();
-		int addRemoveChildCount = modifiedChildren == null ? 0 : modifiedChildren.size();
-		modified = modified | modifiedChildCount != 0 | addRemoveChildCount != 0;
+		selfModified = modified;
+		
+		int addRemoveChildCount = addRemoveChildren == null ? 0 : addRemoveChildren.size();
+		treeModified = modifiedChildCount != 0 | addRemoveChildCount != 0;
+		
+		modified = selfModified | treeModified;
 	}
 
 	protected void dispatchEvent( DataEvent event ) {
@@ -268,7 +284,7 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	}
 
 	protected void doClearModified() {
-		modifiedChildren = null;
+		addRemoveChildren = null;
 		modifiedChildCount = 0;
 		super.doClearModified();
 	}
@@ -279,8 +295,17 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		children.add( index, child );
 		child.setParent( this );
 
-		if( modifiedChildren == null ) modifiedChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
-		modifiedChildren.put( child, DataEvent.Type.INSERT );
+		if( addRemoveChildren == null ) {
+			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
+			addRemoveChildren.put( child, DataEvent.Type.INSERT );
+		} else {
+			if( addRemoveChildren.get( child ) == DataEvent.Type.REMOVE ) {
+				addRemoveChildren.remove( child );
+				if( addRemoveChildren.size() == 0 ) addRemoveChildren = null;
+			} else {
+				addRemoveChildren.put( child, DataEvent.Type.INSERT );
+			}
+		}
 
 		updateModifiedFlag();
 	}
@@ -289,8 +314,17 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		children.remove( child );
 		child.setParent( null );
 
-		if( modifiedChildren != null && modifiedChildren.get( child ) == DataEvent.Type.INSERT ) modifiedChildren.remove( child );
-		if( modifiedChildren.size() == 0 ) modifiedChildren = null;
+		if( addRemoveChildren == null ) {
+			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
+			addRemoveChildren.put( child, DataEvent.Type.REMOVE );
+		} else {
+			if( addRemoveChildren.get( child ) == DataEvent.Type.INSERT ) {
+				addRemoveChildren.remove( child );
+				if( addRemoveChildren.size() == 0 ) addRemoveChildren = null;
+			} else {
+				addRemoveChildren.put( child, DataEvent.Type.REMOVE );
+			}
+		}
 
 		if( children.size() == 0 ) children = null;
 

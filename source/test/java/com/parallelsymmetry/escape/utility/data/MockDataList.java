@@ -7,10 +7,26 @@ public class MockDataList extends DataList<DataNode> {
 	private DataEventHandler handler;
 
 	public MockDataList() {
-		this( null );
+		super();
+		init( null );
 	}
 
 	public MockDataList( String name ) {
+		super();
+		init( name );
+	}
+
+	public MockDataList( DataNode[] children ) {
+		super( children );
+		init( null );
+	}
+
+	public MockDataList( String name, DataNode[] children ) {
+		super( children );
+		init( name );
+	}
+
+	private void init( String name ) {
 		this.name = name;
 		handler = new DataEventHandler();
 		addDataListener( handler );
