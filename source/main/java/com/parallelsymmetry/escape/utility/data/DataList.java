@@ -16,6 +16,8 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	private Map<DataNode, DataEvent.Type> modifiedChildren;
 
+	private int modifiedChildCount;
+
 	public DataList( T[] children ) {
 		for( T child : children ) {
 			add( child );
@@ -34,8 +36,8 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	public void clearModified() {
 		if( !modified ) return;
 
-		boolean autoCommit = !isTransactionActive();
-		if( autoCommit ) startTransaction();
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
 
 		super.clearModified();
 
@@ -52,7 +54,7 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 			}
 		}
 
-		if( autoCommit ) transaction.commit();
+		if( atomic ) transaction.commit();
 	}
 
 	@Override
@@ -94,11 +96,11 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	public void add( int index, T element ) {
 		if( element == null || contains( element ) ) return;
 
-		boolean autoCommit = !isTransactionActive();
-		if( autoCommit ) startTransaction();
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
 		if( element instanceof DataNode ) isolateNode( (DataNode)element );
 		transaction.add( new AddChildAction<T>( this, index, element ) );
-		if( autoCommit ) transaction.commit();
+		if( atomic ) transaction.commit();
 	}
 
 	@Override
@@ -115,20 +117,38 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	@Override
 	public T set( int index, T element ) {
-		// TODO Auto-generated method stub
-		return null;
+		if( index < 0 || index >= size() ) throw new ArrayIndexOutOfBoundsException( index );
+		if( element == null ) throw new NullPointerException();
+
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+		if( element instanceof DataNode ) isolateNode( (DataNode)element );
+		T result = get( index );
+		transaction.add( new RemoveChildAction<T>( this, result ) );
+		transaction.add( new AddChildAction<T>( this, index, element ) );
+		if( atomic ) transaction.commit();
+
+		return result;
 	}
 
 	@Override
-	public boolean remove( Object o ) {
-		// TODO Auto-generated method stub
-		return false;
+	@SuppressWarnings( "unchecked" )
+	public boolean remove( Object object ) {
+		if( object == null || !( object instanceof DataNode ) || !contains( object ) ) return false;
+
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+		transaction.add( new RemoveChildAction<T>( this, (T)object ) );
+		if( atomic ) transaction.commit();
+
+		return true;
 	}
 
 	@Override
 	public T remove( int index ) {
-		// TODO Auto-generated method stub
-		return null;
+		T child = children.get( index );
+		remove( child );
+		return child;
 	}
 
 	@Override
@@ -157,6 +177,10 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	@Override
 	public boolean isEmpty() {
 		return children == null;
+	}
+
+	public int getModifiedChildCount() {
+		return modifiedChildCount;
 	}
 
 	@Override
@@ -195,9 +219,24 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		return children.subList( fromIndex, toIndex );
 	}
 
+	protected void childNodeModified( boolean modified ) {
+		if( modified ) {
+			modifiedChildCount++;
+		} else {
+			modifiedChildCount--;
+
+			// The reason for the following line is that doClearModifed() is 
+			// processed by transactions before processing child and parent nodes.
+			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
+		}
+
+		updateModifiedFlag();
+	}
+
 	protected void updateModifiedFlag() {
 		super.updateModifiedFlag();
-		modified = modified | modifiedChildren.size() != 0;
+		int addRemoveChildCount = modifiedChildren == null ? 0 : modifiedChildren.size();
+		modified = modified | modifiedChildCount != 0 | addRemoveChildCount != 0;
 	}
 
 	protected void dispatchEvent( DataEvent event ) {
@@ -228,6 +267,12 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		}
 	}
 
+	protected void doClearModified() {
+		modifiedChildren = null;
+		modifiedChildCount = 0;
+		super.doClearModified();
+	}
+
 	private void doAddChild( int index, T child ) {
 		if( children == null ) children = new CopyOnWriteArrayList<T>();
 
@@ -240,6 +285,18 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		updateModifiedFlag();
 	}
 
+	private void doRemoveChild( T child ) {
+		children.remove( child );
+		child.setParent( null );
+
+		if( modifiedChildren != null && modifiedChildren.get( child ) == DataEvent.Type.INSERT ) modifiedChildren.remove( child );
+		if( modifiedChildren.size() == 0 ) modifiedChildren = null;
+
+		if( children.size() == 0 ) children = null;
+
+		updateModifiedFlag();
+	}
+
 	private static class AddChildAction<T extends DataNode> extends Action {
 
 		private DataList<T> list;
@@ -248,9 +305,9 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 		private T child;
 
-		public AddChildAction( DataList<T> data, int index, T child ) {
-			super( data );
-			this.list = data;
+		public AddChildAction( DataList<T> list, int index, T child ) {
+			super( list );
+			this.list = list;
 			this.index = index;
 			this.child = child;
 		}
@@ -261,6 +318,31 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 			list.doAddChild( index, child );
 			result.addEvent( new DataChildEvent( DataEvent.Type.INSERT, getData(), index, child ) );
+
+			return result;
+		}
+
+	}
+
+	private static class RemoveChildAction<T extends DataNode> extends Action {
+
+		private DataList<T> list;
+
+		private T child;
+
+		public RemoveChildAction( DataList<T> list, T child ) {
+			super( list );
+			this.list = list;
+			this.child = child;
+		}
+
+		@Override
+		protected ActionResult process() {
+			ActionResult result = new ActionResult( this );
+
+			int index = list.children.indexOf( child );
+			list.doRemoveChild( child );
+			result.addEvent( new DataChildEvent( DataEvent.Type.REMOVE, list, index, child ) );
 
 			return result;
 		}

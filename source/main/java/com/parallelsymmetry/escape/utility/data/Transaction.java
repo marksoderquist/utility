@@ -73,7 +73,11 @@ public class Transaction {
 					DataNode parent = datum.getParent();
 					while( parent != null ) {
 						boolean parentOldModified = parent.isModified();
-						parent.attributeNodeModified( newModified );
+						if( parent instanceof DataList ) {
+							((DataList<?>)parent).childNodeModified( newModified );
+						} else {
+							parent.attributeNodeModified( newModified );
+						}
 						boolean parentNewModified = parent.isModified();
 
 						// Dispatch events for parent.

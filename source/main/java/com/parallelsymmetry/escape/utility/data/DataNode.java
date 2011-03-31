@@ -25,8 +25,6 @@ public abstract class DataNode {
 
 	private int modifiedAttributeCount;
 
-	private int modifiedChildCount;
-
 	private Map<String, Object> modifiedAttributes;
 
 	private Map<String, Object> resources;
@@ -50,8 +48,8 @@ public abstract class DataNode {
 	public void clearModified() {
 		if( !modified ) return;
 
-		boolean autoCommit = !isTransactionActive();
-		if( autoCommit ) startTransaction();
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
 		transaction.add( new ClearModifiedAction( this ) );
 
 		// Clear the modified flag of any attribute nodes.
@@ -67,7 +65,7 @@ public abstract class DataNode {
 			}
 		}
 
-		if( autoCommit ) transaction.commit();
+		if( atomic ) transaction.commit();
 	}
 
 	/**
@@ -122,11 +120,11 @@ public abstract class DataNode {
 		Object oldValue = getAttribute( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
-		boolean autoCommit = !isTransactionActive();
-		if( autoCommit ) startTransaction();
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
 		if( newValue instanceof DataNode ) isolateNode( (DataNode)newValue );
 		transaction.add( new SetAttributeAction( this, name, oldValue, newValue ) );
-		if( autoCommit ) transaction.commit();
+		if( atomic ) transaction.commit();
 	}
 
 	public int getModifiedAttributeCount() {
@@ -209,20 +207,6 @@ public abstract class DataNode {
 		updateModifiedFlag();
 	}
 
-	protected void childNodeModified( boolean modified ) {
-		if( modified ) {
-			modifiedChildCount++;
-		} else {
-			modifiedChildCount--;
-
-			// The reason for the following line is that doClearModifed() is 
-			// processed by transactions before processing child and parent nodes.
-			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
-		}
-
-		updateModifiedFlag();
-	}
-
 	protected void dispatchEvent( DataEvent event ) {
 		if( event instanceof DataAttributeEvent ) {
 			fireDataAttributeChanged( (DataAttributeEvent)event );
@@ -233,8 +217,14 @@ public abstract class DataNode {
 		}
 	}
 
+	protected void doClearModified() {
+		modifiedAttributes = null;
+		modifiedAttributeCount = 0;
+		updateModifiedFlag();
+	}
+
 	protected void updateModifiedFlag() {
-		modified = modifiedAttributeCount != 0 | modifiedChildCount != 0;
+		modified = modifiedAttributeCount != 0;
 	}
 
 	void setParent( DataNode parent ) {
@@ -271,12 +261,6 @@ public abstract class DataNode {
 			parent.setTransaction( transaction );
 			( (DataList<DataNode>)parent ).remove( node );
 		}
-	}
-
-	private void doClearModified() {
-		modified = false;
-		modifiedAttributes = null;
-		modifiedAttributeCount = 0;
 	}
 
 	private void doSetAttribute( String name, Object oldValue, Object newValue ) {
