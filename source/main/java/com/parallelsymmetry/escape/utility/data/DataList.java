@@ -11,9 +11,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private List<T> children;
-	
+
 	private boolean selfModified;
-	
+
 	private boolean treeModified;
 
 	public DataList() {}
@@ -35,11 +35,11 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		}
 		clearModified();
 	}
-	
+
 	public boolean isSelfModified() {
 		return selfModified;
 	}
-	
+
 	public boolean isTreeModified() {
 		return treeModified;
 	}
@@ -100,7 +100,7 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	@Override
 	public boolean add( T element ) {
 		if( element == null || contains( element ) ) return false;
-		add( size(), element );
+		add( Integer.MAX_VALUE, element );
 		return true;
 	}
 
@@ -248,10 +248,10 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	protected void updateModifiedFlag() {
 		super.updateModifiedFlag();
 		selfModified = modified;
-		
+
 		int addRemoveChildCount = addRemoveChildren == null ? 0 : addRemoveChildren.size();
 		treeModified = modifiedChildCount != 0 | addRemoveChildCount != 0;
-		
+
 		modified = selfModified | treeModified;
 	}
 
@@ -291,6 +291,8 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	private void doAddChild( int index, T child ) {
 		if( children == null ) children = new CopyOnWriteArrayList<T>();
+
+		if( index > children.size() ) index = children.size();
 
 		children.add( index, child );
 		child.setParent( this );

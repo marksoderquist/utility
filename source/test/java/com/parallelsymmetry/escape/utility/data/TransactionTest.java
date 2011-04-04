@@ -2,8 +2,6 @@ package com.parallelsymmetry.escape.utility.data;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.escape.utility.log.Log;
-
 public class TransactionTest extends DataTestCase {
 
 	@Test
@@ -94,7 +92,6 @@ public class TransactionTest extends DataTestCase {
 
 	@Test
 	public void testTransactionWithModifingEvent() {
-		Log.setLevel( Log.DEBUG );
 		MockDataNode node = new MockDataNode();
 		node.addDataListener( new ModifyingDataHandler() );
 		try {

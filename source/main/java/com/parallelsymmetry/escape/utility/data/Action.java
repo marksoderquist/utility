@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility.data;
 
+import com.parallelsymmetry.escape.utility.JavaUtil;
+
 public abstract class Action {
 
 	private DataNode data;
@@ -13,7 +15,8 @@ public abstract class Action {
 	}
 
 	public String toString() {
-		return String.valueOf( "action[" + System.identityHashCode( this ) + "]" );
+		String name = JavaUtil.getSimpleClassName( getClass().getName() );
+		return name + "[" + System.identityHashCode( this ) + "]";
 	}
 
 	protected abstract ActionResult process();

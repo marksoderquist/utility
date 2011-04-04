@@ -4,6 +4,8 @@ import java.lang.reflect.Modifier;
 
 import org.junit.Test;
 
+import com.parallelsymmetry.escape.utility.log.Log;
+
 public class DataListTest extends DataTestCase {
 
 	@Test
@@ -142,6 +144,57 @@ public class DataListTest extends DataTestCase {
 	}
 
 	@Test
+	public void testAddMultipleChildren() {
+		MockDataList node = new MockDataList();
+		DataEventHandler handler = node.getDataEventHandler();
+		MockDataList child0 = new MockDataList();
+		MockDataList child1 = new MockDataList();
+		MockDataList child2 = new MockDataList();
+
+		node.add( child0 );
+		assertEquals( node, child0.getParent() );
+		assertSame( child0, node.get( 0 ) );
+		assertListState( node, true, 0, 1 );
+		assertEventCounts( handler, 1, 0, 1, 1, 0 );
+
+		node.add( child1 );
+		assertEquals( node, child1.getParent() );
+		assertSame( child1, node.get( 1 ) );
+		assertListState( node, true, 0, 2 );
+		assertEventCounts( handler, 2, 0, 1, 2, 0 );
+
+		node.add( child2 );
+		assertEquals( node, child2.getParent() );
+		assertSame( child2, node.get( 2 ) );
+		assertListState( node, true, 0, 3 );
+		assertEventCounts( handler, 3, 0, 1, 3, 0 );
+	}
+
+	@Test
+	public void testAddUsingTransaction() {
+		Log.setLevel( Log.DEBUG );
+		MockDataList node = new MockDataList();
+		MockDataNode child0 = new MockDataNode();
+		MockDataNode child1 = new MockDataNode();
+		MockDataNode child2 = new MockDataNode();
+
+		Transaction transaction = node.startTransaction();
+		node.add( child0 );
+		node.add( child1 );
+		node.add( child2 );
+		transaction.commit();
+
+		assertEquals( node, child0.getParent() );
+		assertSame( child0, node.get( 0 ) );
+
+		assertEquals( node, child1.getParent() );
+		assertSame( child1, node.get( 1 ) );
+
+		assertEquals( node, child2.getParent() );
+		assertSame( child2, node.get( 2 ) );
+	}
+
+	@Test
 	public void testRemove() {
 		MockDataList list = new MockDataList();
 		DataEventHandler handler = list.getDataEventHandler();
@@ -193,6 +246,16 @@ public class DataListTest extends DataTestCase {
 		list.clearModified();
 		assertListState( list, false, 0, 0 );
 		assertEventCounts( handler, 2, 0, 2, 1, 0 );
+	}
+
+	@Test
+	public void testIndexOf() {
+		MockDataList parent = new MockDataList();
+		MockDataList child = new MockDataList();
+		assertEquals( -1, parent.indexOf( child ) );
+
+		parent.add( child );
+		assertEquals( 0, parent.indexOf( child ) );
 	}
 
 	@Test

@@ -16,7 +16,7 @@ public class Transaction {
 	private Queue<Action> actions;
 
 	private List<DataNode> nodes;
-	
+
 	private boolean commitInProgress;
 
 	private AtomicInteger depth = new AtomicInteger();
@@ -28,7 +28,7 @@ public class Transaction {
 
 	public void add( Action action ) {
 		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
-		
+
 		Log.write( Log.DEBUG, "Transaction: " + toString() + " adding action: " + action );
 
 		DataNode data = action.getData();
@@ -59,8 +59,6 @@ public class Transaction {
 				Log.write( Log.DEBUG, "Transaction: " + toString() + " processing action: " + action );
 				results.add( action.process() );
 			}
-
-			Log.write( actions.isEmpty() ? Log.DEBUG : Log.WARN, "Action pending: " + actions.size() );
 
 			// Collect events from the action results.
 			Map<DataNode, List<DataEvent>> events = new HashMap<DataNode, List<DataEvent>>();
