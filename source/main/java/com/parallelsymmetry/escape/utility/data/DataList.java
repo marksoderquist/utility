@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -116,15 +117,33 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	}
 
 	@Override
-	public boolean addAll( Collection<? extends T> c ) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean addAll( Collection<? extends T> collection ) {
+		return addAll( size(), collection );
 	}
 
 	@Override
-	public boolean addAll( int index, Collection<? extends T> c ) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean addAll( int index, Collection<? extends T> collection ) {
+		if( collection == null ) return false;
+
+		// Figure out if nodes need to be added.
+		List<T> list = new ArrayList<T>();
+		for( T node : collection ) {
+			if( !contains( node ) ) list.add( node );
+		}
+		if( list.size() == 0 ) return false;
+
+		// Add the nodes.
+		int count = 0;
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+		for( T node : list ) {
+			if( contains( node ) ) continue;
+			transaction.add( new AddChildAction<T>( this, index++, node ) );
+			count++;
+		}
+		if( atomic ) transaction.commit();
+
+		return true;
 	}
 
 	@Override

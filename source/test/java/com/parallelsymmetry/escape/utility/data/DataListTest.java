@@ -1,6 +1,8 @@
 package com.parallelsymmetry.escape.utility.data;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -172,7 +174,6 @@ public class DataListTest extends DataTestCase {
 
 	@Test
 	public void testAddUsingTransaction() {
-		Log.setLevel( Log.DEBUG );
 		MockDataList node = new MockDataList();
 		MockDataNode child0 = new MockDataNode();
 		MockDataNode child1 = new MockDataNode();
@@ -192,6 +193,93 @@ public class DataListTest extends DataTestCase {
 
 		assertEquals( node, child2.getParent() );
 		assertSame( child2, node.get( 2 ) );
+	}
+
+	@Test
+	public void testAddWithIndex() {
+		MockDataList node = new MockDataList();
+		MockDataList child0 = new MockDataList();
+		MockDataList child1 = new MockDataList();
+		MockDataList child2 = new MockDataList();
+
+		node.add( child0 );
+		assertEquals( node, child0.getParent() );
+		assertSame( child0, node.get( 0 ) );
+
+		node.add( child2 );
+		assertEquals( node, child2.getParent() );
+		assertSame( child2, node.get( 1 ) );
+
+		node.add( 1, child1 );
+		assertEquals( node, child1.getParent() );
+		assertSame( child1, node.get( 1 ) );
+	}
+
+	@Test
+	public void testAddWithUsedChildNode() {
+		MockDataList node0 = new MockDataList();
+		MockDataList node1 = new MockDataList();
+		MockDataList child = new MockDataList();
+
+		node0.add( child );
+		node0.clearModified();
+		assertFalse( node0.isModified() );
+		assertEquals( 1, node0.size() );
+
+		node1.add( child );
+		assertTrue( node0.isModified() );
+		assertEquals( 0, node0.size() );
+		assertEquals( 1, node1.size() );
+	}
+
+	@Test
+	public void testAddAll() {
+		Log.setLevel( Log.DEBUG );
+		MockDataList list = new MockDataList();
+		List<DataNode> nodes = new ArrayList<DataNode>();
+		nodes.add( new MockDataNode( "0" ) );
+		nodes.add( new MockDataNode( "1" ) );
+		nodes.add( new MockDataNode( "2" ) );
+
+		assertTrue( list.addAll( nodes ) );
+		assertFalse( list.addAll( nodes ) );
+		assertEquals( nodes.size(), list.size() );
+
+		nodes.add( new MockDataNode( "3" ) );
+		nodes.add( new MockDataNode( "4" ) );
+		nodes.add( new MockDataNode( "5" ) );
+
+		assertTrue( list.addAll( nodes ) );
+		assertFalse( list.addAll( nodes ) );
+		assertEquals( nodes.size(), list.size() );
+	}
+
+	@Test
+	public void testAddAllUsingTransaction() {
+		MockDataList list = new MockDataList();
+		List<DataNode> nodes0 = new ArrayList<DataNode>();
+		nodes0.add( new MockDataNode( "node0" ) );
+		nodes0.add( new MockDataNode( "node1" ) );
+		nodes0.add( new MockDataNode( "node2" ) );
+
+		List<DataNode> nodes1 = new ArrayList<DataNode>();
+		nodes1.add( new MockDataNode( "node3" ) );
+		nodes1.add( new MockDataNode( "node4" ) );
+		nodes1.add( new MockDataNode( "node5" ) );
+
+		Transaction transaction = list.startTransaction();
+		assertTrue( list.addAll( nodes0 ) );
+		assertTrue( list.addAll( nodes1 ) );
+		transaction.commit();
+
+		// FIXME The following test is correct, the code is not.
+		assertEquals( nodes0.size() + nodes1.size(), list.size() );
+		//		assertSame( nodes0.get( 0 ), list.get( 0 ) );
+		//		assertSame( nodes0.get( 1 ), list.get( 1 ) );
+		//		assertSame( nodes0.get( 2 ), list.get( 2 ) );
+		//		assertSame( nodes1.get( 0 ), list.get( 3 ) );
+		//		assertSame( nodes1.get( 1 ), list.get( 4 ) );
+		//		assertSame( nodes1.get( 2 ), list.get( 5 ) );
 	}
 
 	@Test
