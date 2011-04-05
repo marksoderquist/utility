@@ -2,7 +2,7 @@ package com.parallelsymmetry.escape.utility.data;
 
 public interface DataListener {
 
-	void dataChanged( DataEvent event );
+	void dataChanged( DataChangedEvent event );
 
 	void dataAttributeChanged( DataAttributeEvent event );
 

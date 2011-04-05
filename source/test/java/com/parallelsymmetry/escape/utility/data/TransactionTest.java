@@ -30,7 +30,7 @@ public class TransactionTest extends DataTestCase {
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute1", null, "value1" );
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute2", null, "value2" );
 		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -51,7 +51,7 @@ public class TransactionTest extends DataTestCase {
 
 		int index = 0;
 		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.MODIFY, data, "name", "value0", "value1" );
-		assertEventState( handler, index++, DataEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 

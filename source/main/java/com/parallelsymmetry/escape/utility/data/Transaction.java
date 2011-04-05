@@ -98,10 +98,7 @@ public class Transaction {
 						boolean parentNewModified = parent.isModified();
 
 						// Dispatch events for parent.
-						if( parentNewModified != parentOldModified ) {
-							parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
-							parent.dispatchEvent( new DataEvent( DataEvent.Type.MODIFY, datum ) );
-						}
+						if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
 
 						parent = parent.getParent();
 					}
@@ -111,7 +108,7 @@ public class Transaction {
 					changed = true;
 				}
 
-				if( changed ) datum.dispatchEvent( new DataEvent( DataEvent.Type.MODIFY, datum ) );
+				if( changed ) datum.dispatchEvent( new DataChangedEvent( DataEvent.Type.MODIFY, datum ) );
 			}
 		} finally {
 			cleanup();

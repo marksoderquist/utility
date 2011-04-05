@@ -9,7 +9,7 @@ class DataEventHandler implements DataListener {
 
 	private List<DataEvent> events = new ArrayList<DataEvent>();
 
-	private List<DataEvent> dataChangedEvents = new ArrayList<DataEvent>();
+	private List<DataChangedEvent> dataChangedEvents = new ArrayList<DataChangedEvent>();
 
 	private List<DataAttributeEvent> dataAttributeEvents = new ArrayList<DataAttributeEvent>();
 
@@ -20,7 +20,7 @@ class DataEventHandler implements DataListener {
 	private List<DataChildEvent> childRemovedEvents = new ArrayList<DataChildEvent>();
 
 	@Override
-	public void dataChanged( DataEvent event ) {
+	public void dataChanged( DataChangedEvent event ) {
 		Log.write( Log.TRACE, "Data change event received." );
 		dataChangedEvents.add( event );
 		events.add( event );
@@ -58,7 +58,7 @@ class DataEventHandler implements DataListener {
 		return events;
 	}
 
-	public List<DataEvent> getDataEvents() {
+	public List<DataChangedEvent> getDataChangedEvents() {
 		return dataChangedEvents;
 	}
 
@@ -77,7 +77,7 @@ class DataEventHandler implements DataListener {
 	public List<DataChildEvent> getChildRemovedEvents() {
 		return childRemovedEvents;
 	}
-	
+
 	public void reset() {
 		dataChangedEvents.clear();
 		metaAttributeEvents.clear();
@@ -85,5 +85,5 @@ class DataEventHandler implements DataListener {
 		childInsertedEvents.clear();
 		childRemovedEvents.clear();
 	}
-	
+
 }

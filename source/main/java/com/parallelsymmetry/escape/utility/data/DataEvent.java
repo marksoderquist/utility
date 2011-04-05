@@ -1,6 +1,6 @@
 package com.parallelsymmetry.escape.utility.data;
 
-public class DataEvent {
+public abstract class DataEvent {
 
 	public enum Type {
 		INSERT, REMOVE, MODIFY

@@ -3,7 +3,7 @@ package com.parallelsymmetry.escape.utility.data;
 public class DataAdapter implements DataListener {
 
 	@Override
-	public void dataChanged( DataEvent event ) {}
+	public void dataChanged( DataChangedEvent event ) {}
 
 	@Override
 	public void dataAttributeChanged( DataAttributeEvent event ) {}

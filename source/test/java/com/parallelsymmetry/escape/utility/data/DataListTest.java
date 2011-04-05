@@ -481,7 +481,7 @@ public class DataListTest extends DataTestCase {
 		child.setAttribute( "attribute", "value" );
 		assertListState( list, true, 0, 1 );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( listHandler, 3, 0, 3, 1, 0 );
+		assertEventCounts( listHandler, 3, 1, 3, 1, 0 );
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1, 0, 0 );
 	}
@@ -512,13 +512,13 @@ public class DataListTest extends DataTestCase {
 
 		child.setAttribute( "attribute", "value" );
 		assertListState( list, true, 0, 1 );
-		assertEventCounts( listHandler, 3, 0, 3, 1, 0 );
+		assertEventCounts( listHandler, 3, 1, 3, 1, 0 );
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1, 0, 0 );
 
 		list.clearModified();
 		assertListState( list, false, 0, 0 );
-		assertEventCounts( listHandler, 4, 0, 4, 1, 0 );
+		assertEventCounts( listHandler, 5, 1, 4, 1, 0 );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 2, 1, 2, 0, 0 );
 	}
@@ -735,28 +735,28 @@ public class DataListTest extends DataTestCase {
 		assertTrue( node.isModified() );
 	}
 
-	//	public void testDataChangedEventTriggering() throws Exception {
-	//		MockDataList parent = new MockDataList();
-	//		MockDataNode child = new MockDataNode();
-	//		DataEventHandler handler = parent.getDataEventHandler();
-	//		parent.add( child );
-	//		parent.clearModified();
-	//		assertFalse( parent.isModified() );
-	//		assertFalse( child.isModified() );
-	//		assertEventCounts( handler, 2, 0, 2, 1, 0 );
-	//		handler.reset();
-	//
-	//		child.setAttribute( "key1", "value1" );
-	//		assertEventCounts( handler, 1, 1, 1, 0, 0 );
-	//		handler.reset();
-	//
-	//		child.setAttribute( "key1", "value1" );
-	//		assertEventCounts( handler, 0, 0, 0, 0, 0 );
-	//		handler.reset();
-	//
-	//		child.setAttribute( "key1", "value2" );
-	//		assertEventCounts( handler, 1, 1, 0, 0, 0 );
-	//		handler.reset();
-	//	}
+	public void testDataChangedEventTriggering() throws Exception {
+		MockDataList parent = new MockDataList();
+		MockDataNode child = new MockDataNode();
+		DataEventHandler handler = parent.getDataEventHandler();
+		parent.add( child );
+		parent.clearModified();
+		assertFalse( parent.isModified() );
+		assertFalse( child.isModified() );
+		assertEventCounts( handler, 2, 0, 2, 1, 0 );
+		handler.reset();
+
+		child.setAttribute( "key1", "value1" );
+		assertEventCounts( handler, 1, 1, 1, 0, 0 );
+		handler.reset();
+
+		child.setAttribute( "key1", "value1" );
+		assertEventCounts( handler, 0, 0, 0, 0, 0 );
+		handler.reset();
+
+		child.setAttribute( "key1", "value2" );
+		assertEventCounts( handler, 1, 1, 0, 0, 0 );
+		handler.reset();
+	}
 
 }

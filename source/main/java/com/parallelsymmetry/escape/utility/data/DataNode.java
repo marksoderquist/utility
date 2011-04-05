@@ -306,12 +306,14 @@ public abstract class DataNode {
 	}
 
 	protected void dispatchEvent( DataEvent event ) {
-		if( event instanceof DataAttributeEvent ) {
+		if( event instanceof DataChangedEvent ) {
+			fireDataChanged( (DataChangedEvent)event );
+			if( parent != null ) parent.fireDataChanged( (DataChangedEvent)event );
+		} else if( event instanceof DataAttributeEvent ) {
 			fireDataAttributeChanged( (DataAttributeEvent)event );
+			if( parent != null ) parent.fireDataAttributeChanged( (DataAttributeEvent)event );
 		} else if( event instanceof MetaAttributeEvent ) {
 			fireMetaAttributeChanged( (MetaAttributeEvent)event );
-		} else {
-			fireDataChanged( event );
 		}
 	}
 
@@ -394,7 +396,7 @@ public abstract class DataNode {
 		updateModifiedFlag();
 	}
 
-	private void fireDataChanged( DataEvent event ) {
+	private void fireDataChanged( DataChangedEvent event ) {
 		for( DataListener listener : this.listeners ) {
 			listener.dataChanged( event );
 		}
