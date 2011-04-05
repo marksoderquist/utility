@@ -290,6 +290,22 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
+	@Override
+	public boolean equals( Object object ) {
+		return equalsUsingAttributes( object );
+	}
+
+	/**
+	 * Compares the object using the class and attributes for equality testing.
+	 */
+	protected boolean equalsUsingAttributes( Object object ) {
+		if( !( object instanceof DataNode ) ) return false;
+
+		DataNode that = (DataNode)object;
+
+		return this.getClass() == that.getClass() && ObjectUtil.areEqual( this.attributes, that.attributes );
+	}
+
 	protected void attributeNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedAttributeCount++;

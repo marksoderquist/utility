@@ -102,6 +102,75 @@ public class TransactionTest extends DataTestCase {
 		}
 	}
 
+	@Test
+	public void testTransactionByModifyingChild() {
+		MockDataList parent = new MockDataList();
+		MockDataNode child = new MockDataNode();
+		DataEventHandler watcher = parent.getDataEventHandler();
+
+		parent.add( child );
+		parent.clearModified();
+		assertFalse( parent.isModified() );
+		assertFalse( child.isModified() );
+		watcher.reset();
+
+		Transaction transaction = parent.startTransaction();
+		child.setAttribute( "key1", "value1" );
+		assertFalse( parent.isModified() );
+		assertFalse( child.isModified() );
+		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
+		watcher.reset();
+
+		transaction.commit();
+		assertTrue( parent.isModified() );
+		assertTrue( child.isModified() );
+		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		watcher.reset();
+
+		transaction = parent.startTransaction();
+		child.setAttribute( "key1", null );
+		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
+		watcher.reset();
+
+		transaction.commit();
+		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		watcher.reset();
+	}
+
+	@Test
+	public void testTransactionByModifyingGrandChild() {
+		MockDataList parent = new MockDataList( "parent" );
+		MockDataList child = new MockDataList( "child" );
+		MockDataNode grandchild = new MockDataNode( "grandchild" );
+		DataEventHandler watcher = parent.getDataEventHandler();
+
+		parent.add( child );
+		child.add( grandchild );
+		parent.clearModified();
+		assertFalse( parent.isModified() );
+		assertFalse( child.isModified() );
+		assertFalse( grandchild.isModified() );
+		watcher.reset();
+
+		Transaction transaction = parent.startTransaction();
+		grandchild.setAttribute( "key1", "value1" );
+		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
+		watcher.reset();
+
+		transaction.commit();
+		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		watcher.reset();
+
+		transaction = parent.startTransaction();
+		grandchild.setAttribute( "key1", null );
+		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
+		watcher.reset();
+
+		transaction.commit();
+		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		watcher.reset();
+	}
+
 	private class MockAction extends Action {
 
 		public MockAction( DataNode data ) {

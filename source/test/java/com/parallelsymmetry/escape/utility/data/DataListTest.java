@@ -33,8 +33,8 @@ public class DataListTest extends DataTestCase {
 		MockDataList parent = new MockDataList( children );
 
 		assertFalse( parent.isModified() );
-		assertEquals( child1, parent.get( 0 ) );
-		assertEquals( child2, parent.get( 1 ) );
+		assertSame( child1, parent.get( 0 ) );
+		assertSame( child2, parent.get( 1 ) );
 	}
 
 	@Test
@@ -885,6 +885,158 @@ public class DataListTest extends DataTestCase {
 		list.remove( child );
 		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
 		watcher.reset();
+	}
+
+	@Test
+	public void testNodeModifiedEventFiredByChildAttributeChild() {
+		MockDataList node = new MockDataList();
+		MockDataList child1 = new MockDataList();
+		MockDataList list = new MockDataList();
+		MockDataList child2 = new MockDataList();
+		DataEventHandler watcher = node.getDataEventHandler();
+
+		node.add( child1 );
+		child1.setAttribute( "list", list );
+		node.clearModified();
+		assertFalse( "The node should not be modified.", node.isModified() );
+		assertFalse( "The child1 should not be modified.", child1.isModified() );
+		assertFalse( "The list should not be modified.", list.isModified() );
+		watcher.reset();
+
+		list.add( child2 );
+		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		watcher.reset();
+
+		list.remove( child2 );
+		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		watcher.reset();
+	}
+
+	@Test
+	public void testChildAddedEventFiredByChild() {
+		MockDataList node = new MockDataList();
+		MockDataList child = new MockDataList();
+		DataEventHandler watcher = node.getDataEventHandler();
+
+		node.clearModified();
+		assertFalse( "The node should not be modified.", node.isModified() );
+		watcher.reset();
+
+		node.add( child );
+		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		watcher.reset();
+
+		node.remove( child );
+		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		watcher.reset();
+	}
+
+	@Test
+	public void testEquals() {
+		MockDataList node1 = null;
+		MockDataList node2 = null;
+		MockDataNode child1 = null;
+		MockDataNode child2 = null;
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		assertTrue( node1.equals( node2 ) );
+		assertTrue( node2.equals( node1 ) );
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		node1.setAttribute( "key", "value" );
+		node2.setAttribute( "key", "value" );
+		assertTrue( node1.equals( node2 ) );
+		assertTrue( node2.equals( node1 ) );
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		child1 = new MockDataNode();
+		child2 = new MockDataNode();
+		child1.setAttribute( "key", "a" );
+		child2.setAttribute( "key", "a" );
+		node1.add( child1 );
+		node2.add( child2 );
+		assertTrue( node1.equals( node2 ) );
+		assertTrue( node2.equals( node1 ) );
+
+		child1.setAttribute( "key", "a" );
+		child2.setAttribute( "key", "b" );
+		assertFalse( node1.equals( node2 ) );
+		assertFalse( node2.equals( node1 ) );
+	}
+
+	@Test
+	public void testEqualsUsingChildren() {
+		MockDataList node1 = null;
+		MockDataList node2 = null;
+		MockDataNode child1 = null;
+		MockDataNode child2 = null;
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		assertTrue( node1.equalsUsingChildren( node2 ) );
+		assertTrue( node2.equalsUsingChildren( node1 ) );
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		node1.setAttribute( "key", "value" );
+		node2.setAttribute( "key", "value" );
+		assertTrue( node1.equalsUsingChildren( node2 ) );
+		assertTrue( node2.equalsUsingChildren( node1 ) );
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		child1 = new MockDataNode();
+		child2 = new MockDataNode();
+		child1.setAttribute( "key", "a" );
+		child2.setAttribute( "key", "a" );
+		node1.add( child1 );
+		node2.add( child2 );
+		assertTrue( node1.equalsUsingChildren( node2 ) );
+		assertTrue( node2.equalsUsingChildren( node1 ) );
+
+		child1.setAttribute( "key", "a" );
+		child2.setAttribute( "key", "b" );
+		assertFalse( node1.equalsUsingChildren( node2 ) );
+		assertFalse( node2.equalsUsingChildren( node1 ) );
+	}
+
+	@Test
+	public void testEqualsUsingAttributesAndChildren() {
+		MockDataList node1 = null;
+		MockDataList node2 = null;
+		MockDataNode child1 = null;
+		MockDataNode child2 = null;
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		assertTrue( node1.equalsUsingAttributesAndChildren( node2 ) );
+		assertTrue( node2.equalsUsingAttributesAndChildren( node1 ) );
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		node1.setAttribute( "key", "value" );
+		node2.setAttribute( "key", "value" );
+		assertTrue( node1.equalsUsingAttributesAndChildren( node2 ) );
+		assertTrue( node2.equalsUsingAttributesAndChildren( node1 ) );
+
+		node1 = new MockDataList();
+		node2 = new MockDataList();
+		child1 = new MockDataNode();
+		child2 = new MockDataNode();
+		child1.setAttribute( "key", "a" );
+		child2.setAttribute( "key", "a" );
+		node1.add( child1 );
+		node2.add( child2 );
+		assertTrue( node1.equalsUsingAttributesAndChildren( node2 ) );
+		assertTrue( node2.equalsUsingAttributesAndChildren( node1 ) );
+
+		child1.setAttribute( "key", "a" );
+		child2.setAttribute( "key", "b" );
+		assertFalse( node1.equalsUsingAttributesAndChildren( node2 ) );
+		assertFalse( node2.equalsUsingAttributesAndChildren( node1 ) );
 	}
 
 }

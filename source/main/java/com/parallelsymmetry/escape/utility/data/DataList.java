@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.parallelsymmetry.escape.utility.ObjectUtil;
+
 public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private List<T> children;
@@ -100,14 +102,14 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	@Override
 	public boolean add( T element ) {
-		if( element == null || contains( element ) ) return false;
+		if( element == null ) return false;
 		add( Integer.MAX_VALUE, element );
 		return true;
 	}
 
 	@Override
 	public void add( int index, T element ) {
-		if( element == null || contains( element ) ) return;
+		if( element == null ) return;
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
@@ -137,7 +139,6 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
 		for( T node : list ) {
-			if( contains( node ) ) continue;
 			getTransaction().add( new AddChildAction<T>( this, index, node ) );
 			if( index < Integer.MAX_VALUE ) index++;
 			count++;
@@ -261,6 +262,22 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	public List<T> subList( int fromIndex, int toIndex ) {
 		if( children == null ) return new CopyOnWriteArrayList<T>();
 		return children.subList( fromIndex, toIndex );
+	}
+
+	@Override
+	public boolean equals( Object object ) {
+		return equalsUsingAttributesAndChildren( object );
+	}
+
+	protected boolean equalsUsingChildren( Object object ) {
+		if( !( object instanceof DataList<?> ) ) return false;
+
+		DataList<?> that = (DataList<?>)object;
+		return ObjectUtil.areEqual( this.children, that.children );
+	}
+
+	protected boolean equalsUsingAttributesAndChildren( Object object ) {
+		return equalsUsingAttributes( object ) & equalsUsingChildren( object );
 	}
 
 	protected void childNodeModified( boolean modified ) {
