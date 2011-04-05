@@ -60,14 +60,14 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
 					if( childNode.isModified() ) {
-						childNode.setTransaction( transaction );
+						childNode.setTransaction( getTransaction() );
 						childNode.clearModified();
 					}
 				}
 			}
 		}
 
-		if( atomic ) transaction.commit();
+		if( atomic ) getTransaction().commit();
 	}
 
 	@Override
@@ -112,13 +112,13 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
 		if( element instanceof DataNode ) isolateNode( (DataNode)element );
-		transaction.add( new AddChildAction<T>( this, index, element ) );
-		if( atomic ) transaction.commit();
+		getTransaction().add( new AddChildAction<T>( this, index, element ) );
+		if( atomic ) getTransaction().commit();
 	}
 
 	@Override
 	public boolean addAll( Collection<? extends T> collection ) {
-		return addAll( size(), collection );
+		return addAll( Integer.MAX_VALUE, collection );
 	}
 
 	@Override
@@ -138,10 +138,11 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		if( atomic ) startTransaction();
 		for( T node : list ) {
 			if( contains( node ) ) continue;
-			transaction.add( new AddChildAction<T>( this, index++, node ) );
+			getTransaction().add( new AddChildAction<T>( this, index, node ) );
+			if( index < Integer.MAX_VALUE ) index++;
 			count++;
 		}
-		if( atomic ) transaction.commit();
+		if( atomic ) getTransaction().commit();
 
 		return true;
 	}
@@ -155,9 +156,9 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		if( atomic ) startTransaction();
 		if( element instanceof DataNode ) isolateNode( (DataNode)element );
 		T result = get( index );
-		transaction.add( new RemoveChildAction<T>( this, result ) );
-		transaction.add( new AddChildAction<T>( this, index, element ) );
-		if( atomic ) transaction.commit();
+		getTransaction().add( new RemoveChildAction<T>( this, result ) );
+		getTransaction().add( new AddChildAction<T>( this, index, element ) );
+		if( atomic ) getTransaction().commit();
 
 		return result;
 	}
@@ -169,29 +170,41 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
-		transaction.add( new RemoveChildAction<T>( this, (T)object ) );
-		if( atomic ) transaction.commit();
+		getTransaction().add( new RemoveChildAction<T>( this, (T)object ) );
+		if( atomic ) getTransaction().commit();
 
 		return true;
 	}
 
 	@Override
 	public T remove( int index ) {
+		if( index < 0 || index >= size() ) throw new ArrayIndexOutOfBoundsException( index );
 		T child = children.get( index );
 		remove( child );
 		return child;
 	}
 
 	@Override
-	public boolean removeAll( Collection<?> c ) {
-		// TODO Auto-generated method stub
-		return false;
+	@SuppressWarnings( "unchecked" )
+	public boolean removeAll( Collection<?> collection ) {
+		if( collection == null ) return false;
+
+		int count = 0;
+		boolean needsTransaction = !isTransactionActive();
+		if( needsTransaction ) startTransaction();
+		for( Object node : collection ) {
+			if( !( node instanceof DataNode ) ) continue;
+			getTransaction().add( new RemoveChildAction<T>( this, (T)node ) );
+			count++;
+		}
+		if( needsTransaction ) getTransaction().commit();
+
+		return count > 0;
 	}
 
 	@Override
 	public boolean retainAll( Collection<?> c ) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException( "DataList.retainAll() is not supported." );
 	}
 
 	@Override

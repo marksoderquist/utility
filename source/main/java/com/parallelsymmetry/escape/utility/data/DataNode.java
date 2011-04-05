@@ -51,7 +51,7 @@ public abstract class DataNode {
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
-		transaction.add( new ClearModifiedAction( this ) );
+		getTransaction().add( new ClearModifiedAction( this ) );
 
 		// Clear the modified flag of any attribute nodes.
 		if( attributes != null ) {
@@ -59,14 +59,14 @@ public abstract class DataNode {
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
 					if( childNode.isModified() ) {
-						childNode.setTransaction( transaction );
+						childNode.setTransaction( getTransaction() );
 						childNode.clearModified();
 					}
 				}
 			}
 		}
 
-		if( atomic ) transaction.commit();
+		if( atomic ) getTransaction().commit();
 	}
 
 	/**
@@ -124,8 +124,8 @@ public abstract class DataNode {
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
 		if( newValue instanceof DataNode ) isolateNode( (DataNode)newValue );
-		transaction.add( new SetAttributeAction( this, name, oldValue, newValue ) );
-		if( atomic ) transaction.commit();
+		getTransaction().add( new SetAttributeAction( this, name, oldValue, newValue ) );
+		if( atomic ) getTransaction().commit();
 	}
 
 	public int getModifiedAttributeCount() {
@@ -257,7 +257,7 @@ public abstract class DataNode {
 	 * Note: This method is not thread safe for performance reasons.
 	 */
 	public final boolean isTransactionActive() {
-		return transaction != null || ( parent != null && parent.isTransactionActive() );
+		return getTransaction() != null;
 	}
 
 	/**
@@ -277,8 +277,8 @@ public abstract class DataNode {
 	}
 
 	public void setTransaction( Transaction transaction ) {
-		if( ObjectUtil.areEqual( this.transaction, transaction ) ) return;
-		if( transaction != null && this.transaction != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
+		if( ObjectUtil.areEqual( getTransaction(), transaction ) ) return;
+		if( transaction != null && getTransaction() != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
 		this.transaction = transaction;
 	}
 
@@ -333,7 +333,7 @@ public abstract class DataNode {
 	 * This method removes the specified node from any parent nodes.
 	 */
 	void isolateNode( DataNode node ) {
-		if( transaction == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
+		if( getTransaction() == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
 
 		DataNode parent = node.getParent();
 		if( parent == null ) return;
@@ -351,11 +351,11 @@ public abstract class DataNode {
 			}
 
 			if( key != null ) {
-				parent.setTransaction( transaction );
+				parent.setTransaction( getTransaction() );
 				parent.setAttribute( key, null );
 			}
 		} else if( parent instanceof DataList ) {
-			parent.setTransaction( transaction );
+			parent.setTransaction( getTransaction() );
 			( (DataList<?>)parent ).remove( node );
 		}
 	}
