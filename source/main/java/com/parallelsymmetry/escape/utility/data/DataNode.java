@@ -14,13 +14,15 @@ public abstract class DataNode {
 
 	public static final String MODIFIED = "modified";
 
+	private static final Object NULL = new Object();
+
 	protected boolean modified;
+
+	protected DataNode parent;
 
 	protected Transaction transaction;
 
 	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
-
-	private static final Object NULL = new Object();
 
 	private Map<String, Object> attributes;
 
@@ -29,8 +31,6 @@ public abstract class DataNode {
 	private Map<String, Object> modifiedAttributes;
 
 	private Map<String, Object> resources;
-
-	private DataNode parent;
 
 	/**
 	 * Is the node modified. The node is modified if any attribute has been
@@ -308,10 +308,8 @@ public abstract class DataNode {
 	protected void dispatchEvent( DataEvent event ) {
 		if( event instanceof DataChangedEvent ) {
 			fireDataChanged( (DataChangedEvent)event );
-			if( parent != null ) parent.fireDataChanged( (DataChangedEvent)event );
 		} else if( event instanceof DataAttributeEvent ) {
 			fireDataAttributeChanged( (DataAttributeEvent)event );
-			if( parent != null ) parent.fireDataAttributeChanged( (DataAttributeEvent)event );
 		} else if( event instanceof MetaAttributeEvent ) {
 			fireMetaAttributeChanged( (MetaAttributeEvent)event );
 		}
@@ -400,18 +398,21 @@ public abstract class DataNode {
 		for( DataListener listener : this.listeners ) {
 			listener.dataChanged( event );
 		}
+		if( parent != null ) parent.dispatchEvent( event );
 	}
 
 	private void fireDataAttributeChanged( DataAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.dataAttributeChanged( event );
 		}
+		if( parent != null ) parent.dispatchEvent( event );
 	}
 
 	private void fireMetaAttributeChanged( MetaAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
+		// Do not propagate the meta attribute events to parents.
 	}
 
 	private static class ClearModifiedAction extends Action {

@@ -288,6 +288,8 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	}
 
 	protected void dispatchEvent( DataEvent event ) {
+		super.dispatchEvent( event );
+
 		if( event instanceof DataChildEvent ) {
 			switch( event.getType() ) {
 				case INSERT: {
@@ -300,19 +302,20 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 				}
 			}
 		}
-		super.dispatchEvent( event );
 	}
 
 	private void fireChildInsertedEvent( DataChildEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.childInserted( event );
 		}
+		if( parent != null ) parent.dispatchEvent( event );
 	}
 
 	private void fireChildRemovedEvent( DataChildEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.childRemoved( event );
 		}
+		if( parent != null ) parent.dispatchEvent( event );
 	}
 
 	protected void doClearModified() {
