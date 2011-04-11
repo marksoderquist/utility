@@ -11,7 +11,7 @@ public class IconLibraryTest extends TestCase {
 		assertNotNull( new IconLibrary() );
 	}
 
-	public void testGetIcon() throws Exception {
+	public void testGetIconUrl() throws Exception {
 		IconLibrary library = new IconLibrary();
 		library.addPath( JavaUtil.getPackagePath( getClass() ) );
 
