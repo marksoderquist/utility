@@ -36,7 +36,7 @@ public class ThreadUtil {
 
 		for( StackTraceElement element : trace ) {
 			if( element.getClassName().equals( className ) && element.getMethodName().equals( methodName ) ) return true;
-			if( JavaUtil.getSimpleClassName( element.getClassName() ).equals( JavaUtil.getSimpleClassName( className ) ) && element.getMethodName().equals( methodName ) ) return true;
+			if( JavaUtil.getClassName( element.getClassName() ).equals( JavaUtil.getClassName( className ) ) && element.getMethodName().equals( methodName ) ) return true;
 		}
 
 		return false;

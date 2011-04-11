@@ -20,10 +20,30 @@ public class JavaUtil {
 	 * @param name
 	 * @return
 	 */
-	public static final String getSimpleClassName( String name ) {
+	public static final String getClassName( String name ) {
 		return name.substring( name.lastIndexOf( '.' ) + 1 );
 	}
 
+	public static final String getClassName( Class<?> type ) {
+		return ( getClassName( type.getName() ) );
+	}
+
+	public static final String getPackageName( String name ) {
+		return name.substring( 0, name.lastIndexOf( '.' ) );
+	}
+
+	public static final String getPackageName( Class<?> type ) {
+		return ( getPackageName( type.getName() ) );
+	}
+	
+	public static final String getPackagePath( String name ) {
+		return "/" + getPackageName( name).replace( '.', '/' );
+	}
+
+	public static final String getPackagePath( Class<?> type ) {
+		return ( getPackagePath( type.getName() ) );
+	}
+	
 	public static List<URI> getClasspath() {
 		try {
 			return parseClasspath( System.getProperty( "class.path" ) );

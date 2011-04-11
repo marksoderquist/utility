@@ -1,0 +1,26 @@
+package com.parallelsymmetry.escape.utility.ui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+public class BrokenIcon extends AbstractIcon {
+
+	public void render( Graphics2D graphics ) {
+		int penWidth = DEFAULT_PEN_WIDTH * 4;
+		int near = penWidth / 2 + 24;
+		int far = grid - penWidth / 2 - 24;
+
+		Path path = new Path();
+		path.moveTo( near, near );
+		path.lineTo( far, far );
+		path.moveTo( near, far );
+		path.lineTo( far, near );
+		draw( path, Color.RED.darker(), new BasicStroke( penWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND ) );
+	}
+
+	public static void main( String[] parameters ) {
+		showSample( new BrokenIcon() );
+	}
+
+}

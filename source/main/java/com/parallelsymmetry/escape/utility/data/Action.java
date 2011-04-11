@@ -15,7 +15,7 @@ public abstract class Action {
 	}
 
 	public String toString() {
-		String name = JavaUtil.getSimpleClassName( getClass().getName() );
+		String name = JavaUtil.getClassName( getClass().getName() );
 		return name + "[" + System.identityHashCode( this ) + "]";
 	}
 

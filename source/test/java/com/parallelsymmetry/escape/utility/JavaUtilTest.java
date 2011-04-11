@@ -10,8 +10,28 @@ import junit.framework.TestCase;
 
 public class JavaUtilTest extends TestCase {
 
-	public void testGetSimpleClassName() {
-		assertEquals( "Object", JavaUtil.getSimpleClassName( "java.lang.Object" ) );
+	public void testGetClassNameWithString() {
+		assertEquals( "Object", JavaUtil.getClassName( "java.lang.Object" ) );
+	}
+	
+	public void testGetClassNameWithClass() {
+		assertEquals( "Object", JavaUtil.getClassName( Object.class ) );
+	}
+	
+	public void testGetPackageNameWithString() {
+		assertEquals( "java.lang", JavaUtil.getPackageName( "java.lang.Object" ) );
+	}
+
+	public void testGetPackageNameWithClass() {
+		assertEquals( "java.lang", JavaUtil.getPackageName( Object.class ) );
+	}
+
+	public void testGetPackagePathWithString() {
+		assertEquals( "/java/lang", JavaUtil.getPackagePath( "java.lang.Object" ) );
+	}
+
+	public void testGetPackagePathWithClass() {
+		assertEquals( "/java/lang", JavaUtil.getPackagePath( Object.class ) );
 	}
 
 	public void testParseClasspath() throws Exception {
