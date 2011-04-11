@@ -1,0 +1,289 @@
+package com.parallelsymmetry.escape.utility.ui;
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.Deque;
+import java.util.StringTokenizer;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+
+import com.parallelsymmetry.escape.utility.log.Log;
+
+/**
+ * <p>
+ * This class is used to handle the visual aspects of actions. Since components
+ * may treat an action specifically this class allows a component specific
+ * action to be set as the acting action.
+ * <p>
+ * The idea being that when a component gains focus it will register the actions
+ * that it handles with the appropriate instance of this class. When the
+ * component looses focus then the component will unregister the actions that it
+ * handles. This works fine in theory but is a little problematic in reality.
+ * The most noticeable issue is when a menu item gains the focus it will cause
+ * the component that was focused to loose focus and therefore disable the
+ * actions it can handle by the time the user selects the menu item.
+ */
+public class ActionDeque extends AbstractAction {
+
+	private static final long serialVersionUID = -9144908291833751044L;
+
+	public static final int NONE = -1;
+
+	public static final String SHORTCUT_KEY_DISPLAY = "shortcut.key.display";
+
+	public static final String SHORTCUT_KEY_SEQUENCE = "shortcut.key.sequence";
+
+	private Deque<ActionHandler> handlers;
+
+	public ActionDeque( String command, String name ) {
+		this( command, name, null );
+	}
+
+	public ActionDeque( String command, String name, Icon icon ) {
+		this( command, name, icon, NONE );
+	}
+
+	public ActionDeque( String command, String name, Icon icon, int mnemonic ) {
+		this( command, name, icon, mnemonic, null );
+	}
+
+	public ActionDeque( String command, String name, Icon icon, int mnemonic, String shortcut ) {
+		this( command, name, icon, mnemonic, shortcut, null );
+	}
+
+	public ActionDeque( String command, String name, Icon icon, int mnemonic, String shortcut, String display ) {
+		super( name, icon );
+		enabled = false;
+		putValue( Action.SHORT_DESCRIPTION, name );
+		putValue( Action.ACTION_COMMAND_KEY, command );
+		handlers = new LinkedBlockingDeque<ActionHandler>();
+
+		int mnemonicKey = -1;
+		if( mnemonic > -1 && mnemonic < name.length() ) {
+			char mnemonicChar = name.charAt( mnemonic );
+			mnemonicKey = getMnemonicKey( mnemonicChar );
+		}
+
+		// Set the mnemonic value.
+		if( mnemonic != NONE ) {
+			putValue( MNEMONIC_KEY, mnemonicKey );
+			putValue( DISPLAYED_MNEMONIC_INDEX_KEY, mnemonic );
+		}
+
+		// Set the shortcut sequence value.
+		if( shortcut != null ) {
+			putValue( SHORTCUT_KEY_SEQUENCE, shortcut );
+			putValue( SHORTCUT_KEY_DISPLAY, getShortcutDisplayText( shortcut ) );
+		}
+
+		// Set the shortcut display value.
+		if( display != null ) {
+			putValue( SHORTCUT_KEY_DISPLAY, display );
+		}
+	}
+
+	public void actionPerformed( ActionEvent event ) {
+		performAction( event );
+	}
+
+	/**
+	 * Called by the <code>ActionShortcutWatcher</code>.
+	 * 
+	 * @return Whether the event was dispatched to any listeners.
+	 */
+	public boolean performAction( ActionEvent event ) {
+		ActionHandler handler = peekHandler();
+
+		if( handler != null && handler.isEnabled() ) {
+			handler.actionPerformed( new ActionEvent( event.getSource(), event.getID(), (String)getValue( Action.ACTION_COMMAND_KEY ) ) );
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Set the enabled flag. This method is safe to call from any thread.
+	 */
+	public void setEnabled( boolean enabled ) {
+		Log.write( new Throwable( "Please use action handlers to enable/disable the action." ) );
+	}
+
+	/**
+	 * Add an <code>XActionHandler</code>.
+	 * 
+	 * @param handler The XActionHandler that will handle this action.
+	 */
+	public void pushHandler( ActionHandler handler ) {
+		if( handler == null ) throw new IllegalArgumentException( "Null ActionListener not allowed." );
+		pushHandler( handler, handler.isEnabled() );
+	}
+
+	/**
+	 * Add an <code>XActionHandler</code>.
+	 * 
+	 * @param handler The XActionHandler that will handle this action.
+	 */
+	public void pushHandler( ActionHandler handler, boolean enabled ) {
+		if( handler == null ) throw new IllegalArgumentException( "Null ActionListener not allowed." );
+		handlers.remove( handler );
+		handlers.push( handler );
+		handler.addActionCallback( this );
+		handler.setEnabled( enabled );
+		new SetEnabled( enabled );
+	}
+
+	/**
+	 * Get the current <code>XActionHandler</code>.
+	 * 
+	 * @return The <code>XActionHandler</code> that is handling this action.
+	 */
+	public ActionHandler peekHandler() {
+		return handlers.peek();
+	}
+
+	/**
+	 * Remove an <code>XActionHandler</code>.
+	 * 
+	 * @param handler The XActionHandler to remove.
+	 */
+	public ActionListener pullHandler( ActionHandler handler ) {
+		handler.removeActionCallback( this );
+		handlers.remove( handler );
+
+		ActionHandler next = peekHandler();
+		if( next == null ) {
+			new SetEnabled( false );
+		} else {
+			new SetEnabled( next.isEnabled() );
+		}
+
+		return handler;
+	}
+
+	/**
+	 * Get a virtual key from a specified character. This method is intended to
+	 * only be used on characters between 'A'-'Z' and 'a'-'z'.
+	 * 
+	 * @param mnemonic
+	 * @return The virtual key mnemonic for the character.
+	 */
+	public static final int getMnemonicKey( char mnemonic ) {
+		int vk = (int)mnemonic;
+		if( vk >= 'a' && vk <= 'z' ) vk -= ( 'a' - 'A' );
+		return vk;
+	}
+
+	/**
+	 * Create a key stroke string for a key event.
+	 */
+	public static final String encodeKeyEvent( KeyEvent event ) {
+		StringBuffer buffer = new StringBuffer();
+
+		if( event.isControlDown() ) buffer.append( "c" );
+		if( event.isAltDown() ) buffer.append( "a" );
+		if( event.isShiftDown() ) buffer.append( "s" );
+		if( event.isMetaDown() ) buffer.append( "m" );
+
+		if( buffer.length() > 0 ) buffer.append( "-" );
+
+		String text = KeyEvent.getKeyText( event.getKeyCode() ).toLowerCase();
+
+		buffer.append( text );
+
+		return buffer.toString();
+	}
+
+	/**
+	 * Get the displayable text for a shortcut.
+	 */
+	public static final String getShortcutDisplayText( String shortcut ) {
+		if( shortcut == null || shortcut == "" ) return "";
+
+		StringBuffer buffer = new StringBuffer();
+		StringTokenizer tokenizer = new StringTokenizer( shortcut );
+
+		while( tokenizer.hasMoreTokens() ) {
+			String keystroke = tokenizer.nextToken();
+
+			int dashIndex = keystroke.indexOf( "-" );
+			if( dashIndex > 0 ) {
+				String modifiers = keystroke.substring( 0, dashIndex );
+				int length = modifiers.length();
+				for( int index = 0; index < length; index++ ) {
+					char modifier = modifiers.charAt( index );
+
+					switch( modifier ) {
+						case 'c': {
+							buffer.append( "Ctl" );
+							break;
+						}
+						case 'a': {
+							buffer.append( "Alt" );
+							break;
+						}
+						case 's': {
+							buffer.append( "Shift" );
+							break;
+						}
+						case 'm': {
+							buffer.append( "Meta" );
+							break;
+						}
+					}
+
+					if( index < length - 1 ) buffer.append( "+" );
+				}
+
+				buffer.append( "+" );
+			}
+
+			buffer.append( keystroke.substring( dashIndex + 1 ).toUpperCase() );
+			if( tokenizer.hasMoreTokens() ) buffer.append( " " );
+		}
+
+		return buffer.toString();
+	}
+
+	void handlerEnabledChanged( ActionHandler handler, boolean enabled ) {
+		new SetEnabled( peekHandler().isEnabled() );
+	}
+
+	/**
+	 * The class to set the enabled flag from the event dispatch thread.
+	 */
+	private class SetEnabled implements Runnable {
+
+		/**
+		 * The enabled state.
+		 */
+		private boolean enabled;
+
+		/**
+		 * Create the <code>SetEnabled</code> class.
+		 */
+		public SetEnabled( boolean enabled ) {
+			this.enabled = enabled;
+
+			if( EventQueue.isDispatchThread() ) {
+				run();
+			} else {
+				EventQueue.invokeLater( this );
+			}
+		}
+
+		/**
+		 * Called by the thread.
+		 */
+		public void run() {
+			ActionDeque.super.setEnabled( enabled );
+		}
+
+	}
+
+}
