@@ -155,6 +155,51 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", node.get( "path/D", null ) );
 	}
 
+	public void testRemoveNode() {
+		Settings node = settings.getNode( "/test/path/remove" );
+		assertEquals( "/test/path/remove", node.getPath() );
+
+		node.put( "key", "value" );
+		assertTrue( settings.nodeExists( "/test/path/remove" ) );
+		assertTrue( settings.nodeExists( "/test/path" ) );
+		assertTrue( settings.nodeExists( "/test" ) );
+
+		node.removeNode();
+		assertFalse( settings.nodeExists( "/test/path/remove" ) );
+		assertFalse( settings.nodeExists( "/test/path" ) );
+		assertFalse( settings.nodeExists( "/test" ) );
+	}
+
+	public void testRemoveNodeWithPath() {
+		Settings node = settings.getNode( "/test/path/remove" );
+		assertEquals( "/test/path/remove", node.getPath() );
+
+		node.put( "key", "value" );
+		assertTrue( settings.nodeExists( "/test/path/remove" ) );
+		assertTrue( settings.nodeExists( "/test/path" ) );
+		assertTrue( settings.nodeExists( "/test" ) );
+
+		settings.removeNode("/test/path/remove");
+		assertFalse( settings.nodeExists( "/test/path/remove" ) );
+		assertFalse( settings.nodeExists( "/test/path" ) );
+		assertFalse( settings.nodeExists( "/test" ) );
+	}
+
+	public void testRemoveNodeWithParentPath() {
+		Settings node = settings.getNode( "/test/path/remove" );
+		assertEquals( "/test/path/remove", node.getPath() );
+
+		node.put( "key", "value" );
+		assertTrue( settings.nodeExists( "/test/path/remove" ) );
+		assertTrue( settings.nodeExists( "/test/path" ) );
+		assertTrue( settings.nodeExists( "/test" ) );
+
+		settings.removeNode("/test/path");
+		assertFalse( settings.nodeExists( "/test/path/remove" ) );
+		assertFalse( settings.nodeExists( "/test/path" ) );
+		assertFalse( settings.nodeExists( "/test" ) );
+	}
+
 	public void testGetEmptyList() {
 		List<MockPersistent> list = settings.getList( MockPersistent.class, "/test/lists/list0" );
 		assertNotNull( list );

@@ -166,6 +166,10 @@ public class Settings {
 	public Settings getNode( String path ) {
 		return new Settings( root, getAbsolutePath( path ) );
 	}
+	
+	public void removeNode() {
+		removeNode( getPath() );
+	}
 
 	public void removeNode( String path ) {
 		try {
