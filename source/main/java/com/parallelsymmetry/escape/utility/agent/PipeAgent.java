@@ -164,7 +164,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 					break;
 				}
 				Log.write( getName() + " failed to connect! Waiting " + (int)( reconnectDelay / 1000.0 ) + " seconds..." );
-				Log.write( Log.TRACE, exception );
+				Log.write( Log.ERROR, exception );
 				try {
 					Thread.sleep( reconnectDelay );
 				} catch( InterruptedException sleepException ) {
