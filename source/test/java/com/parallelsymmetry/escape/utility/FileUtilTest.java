@@ -142,14 +142,14 @@ public class FileUtilTest extends TestCase {
 	}
 
 	public void testSaveAndLoad() throws Exception {
-		File file = File.createTempFile( "FileUtil", "Test" );
+		File file = File.createTempFile( PREFIX, "Test" );
 		FileUtil.save( file.toString(), file );
 		assertEquals( file.toString(), FileUtil.load( file ) );
 	}
 
 	public void testSaveAndLoadAsLines() throws Exception {
 		String content = "A\nB\nC";
-		File file = File.createTempFile( "FileUtil", "Test" );
+		File file = File.createTempFile( PREFIX, "Test" );
 		FileUtil.save( content, file );
 
 		List<String> lines = FileUtil.loadAsLines( file );
