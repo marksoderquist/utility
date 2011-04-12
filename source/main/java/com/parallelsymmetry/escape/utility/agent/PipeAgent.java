@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.parallelsymmetry.escape.utility.ThreadUtil;
 import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class PipeAgent extends Agent implements Pipe {
@@ -161,15 +162,12 @@ public abstract class PipeAgent extends Agent implements Pipe {
 			} catch( Exception exception ) {
 				if( start && ( connectOnce || stopOnConnectException ) ) {
 					Log.write( getName() + " failed to connect!" );
-					break;
+				} else {
+					Log.write( getName() + " failed to connect! Waiting " + (int)( reconnectDelay / 1000.0 ) + " seconds..." );
+					ThreadUtil.pause( reconnectDelay );
 				}
-				Log.write( getName() + " failed to connect! Waiting " + (int)( reconnectDelay / 1000.0 ) + " seconds..." );
+
 				Log.write( Log.ERROR, exception );
-				try {
-					Thread.sleep( reconnectDelay );
-				} catch( InterruptedException sleepException ) {
-					// Intentionally ignore exception.
-				}
 			}
 		}
 		Log.write( Log.TRACE, getName(), " reconnected." );
