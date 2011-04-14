@@ -22,7 +22,7 @@ public class SocketAgentTest extends TestCase {
 
 	@Override
 	public void setUp() throws Exception {
-		Log.setLevel( Log.INFO );
+		Log.setLevel( Log.NONE );
 		server.startAndWait();
 		assertTrue( server.isRunning() );
 		int localPort = server.getLocalPort();
