@@ -7,13 +7,22 @@ import junit.framework.TestCase;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
+/**
+ * When using the AnyConnect VPN Client IPv6 is disabled and causes problems
+ * with these tests. A workaround it to set -Djava.net.preferIPv4Stack=true.
+ * This can be done globally in Eclipse by adding it to the default VM arguments
+ * under Preferences>Java/Installed JREs:Select the JRE, Click the Edit button,
+ * add to Default VM Arguments.
+ * 
+ * @author SoderquistMV
+ */
 public class SocketAgentTest extends TestCase {
 
 	private TestServerAgent server = new TestServerAgent();
 
 	@Override
 	public void setUp() throws Exception {
-		Log.setLevel( Log.NONE );
+		Log.setLevel( Log.INFO );
 		server.startAndWait();
 		assertTrue( server.isRunning() );
 		int localPort = server.getLocalPort();
