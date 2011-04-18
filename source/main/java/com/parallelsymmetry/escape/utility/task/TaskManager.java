@@ -38,20 +38,18 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	}
 
 	public void setThreadCount( int count ) {
+		if( count < 1 ) count = 1;
 		this.threadCount = count;
 		saveSettings( settings );
-		try {
-			stopAndWait();
-		} catch( InterruptedException exception ) {
-			Log.write( exception );
-		}
-		start();
+		if( isRunning() ) restart();
 	}
 
 	@Override
 	public synchronized void start() {
 		if( isRunning() ) return;
-		service = new ThreadPoolExecutor( 0, threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
+		int min = Math.min( Runtime.getRuntime().availableProcessors(), threadCount );
+		int max = Math.max( Runtime.getRuntime().availableProcessors(), threadCount );
+		service = new ThreadPoolExecutor( min, max, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
 	}
 
 	@Override
@@ -61,6 +59,15 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 
 	@Override
 	public synchronized void startAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
+		start();
+	}
+
+	public void restart() {
+		try {
+			stopAndWait();
+		} catch( InterruptedException exception ) {
+			Log.write( exception );
+		}
 		start();
 	}
 
@@ -188,6 +195,8 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 
 	@Override
 	public TaskManager saveSettings( Settings settings ) {
+		if( settings == null ) return this;
+
 		settings.putInt( "thread-count", threadCount );
 
 		return this;

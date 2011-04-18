@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility.task;
 
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -55,7 +56,7 @@ public class TaskManagerTest extends TestCase {
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
 
-		MockTask task = new MockTask();
+		MockTask task = new MockTask( manager );
 		Future<Object> future = manager.submit( task );
 		assertNull( future.get() );
 		assertTrue( task.isDone() );
@@ -71,7 +72,7 @@ public class TaskManagerTest extends TestCase {
 		assertTrue( manager.isRunning() );
 
 		Object result = new Object();
-		MockTask task = new MockTask( result );
+		MockTask task = new MockTask( manager, result );
 		Future<Object> future = manager.submit( task );
 		assertEquals( result, future.get() );
 		assertTrue( task.isDone() );
@@ -86,7 +87,7 @@ public class TaskManagerTest extends TestCase {
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
 
-		MockTask task = new MockTask( null, true );
+		MockTask task = new MockTask( manager, null, MockTask.Mode.FAIL );
 		Future<Object> future = manager.submit( task );
 		try {
 			assertNull( future.get() );
@@ -103,7 +104,7 @@ public class TaskManagerTest extends TestCase {
 	public void testSubmitBeforeStart() throws Exception {
 		assertFalse( manager.isRunning() );
 
-		MockTask task = new MockTask();
+		MockTask task = new MockTask( manager );
 
 		try {
 			manager.submit( task );
@@ -126,45 +127,68 @@ public class TaskManagerTest extends TestCase {
 		assertTrue( manager.isRunning() );
 
 		Object result = new Object();
-		MockTask task = new MockTask( result );
+		MockTask task = new MockTask( manager, result );
 		manager.submit( task );
 		assertEquals( result, task.get() );
 		assertTrue( task.isDone() );
 		assertFalse( task.isRunning() );
-
-		// Intermittently fails.
 		assertTrue( task.isSuccess() );
 		assertFalse( task.isCancelled() );
 	}
 
 	public void testNestedTasks() throws Exception {
+		// FIXME If there is only one thread then this fails.
+		manager.setThreadCount( 2 );
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
 
+		Object result = new Object();
+		MockTask task = new MockTask( manager, result, MockTask.Mode.NEST );
+		manager.submit( task );
+		assertEquals( result, task.get( 100, TimeUnit.MILLISECONDS ) );
+		assertTrue( task.isDone() );
+		assertFalse( task.isRunning() );
+		assertTrue( task.isSuccess() );
+		assertFalse( task.isCancelled() );
 	}
 
 	private static final class MockTask extends Task<Object> {
 
+		public enum Mode {
+			NONE, FAIL, NEST
+		};
+
+		private TaskManager manager;
+
 		private Object object;
 
-		private boolean fail;
+		private Mode mode;
 
-		public MockTask() {
-			this( null, false );
+		public MockTask( TaskManager manager ) {
+			this( manager, null, Mode.NONE );
 		}
 
-		public MockTask( Object object ) {
-			this( object, false );
+		public MockTask( TaskManager manager, Object object ) {
+			this( manager, object, Mode.NONE );
 		}
 
-		public MockTask( Object object, boolean fail ) {
+		public MockTask( TaskManager manager, Object object, Mode mode ) {
+			this.manager = manager;
 			this.object = object;
-			this.fail = fail;
+			this.mode = mode;
 		}
 
 		@Override
 		public Object execute() throws Exception {
-			if( fail ) throw new Exception( "Intentionally fail task." );
+			switch( mode ) {
+				case FAIL: {
+					throw new Exception( "Intentionally fail task." );
+				}
+				case NEST: {
+					manager.invoke( new MockTask( manager ) );
+					break;
+				}
+			}
 			return object;
 		}
 
