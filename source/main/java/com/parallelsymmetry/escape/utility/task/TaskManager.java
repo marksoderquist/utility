@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.parallelsymmetry.escape.utility.Controllable;
 import com.parallelsymmetry.escape.utility.log.Log;
@@ -102,9 +102,6 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	 */
 	public <T> Future<T> submit( Task<T> task ) {
 		checkNullService();
-
-		// If submitted on a task thread then just execute the task.
-
 		return service.submit( task );
 	}
 
@@ -135,9 +132,15 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> Future<T> invoke( Task<T> task ) throws InterruptedException {
-		List<Task<T>> tasks = new ArrayList<Task<T>>();
-		tasks.add( task );
-		return invokeAll( tasks ).get( 0 );
+		if( Thread.currentThread() instanceof TaskThread ) {
+			synchronousExecute( task );
+		} else {
+			List<Task<T>> tasks = new ArrayList<Task<T>>();
+			tasks.add( task );
+			invokeAll( tasks );
+		}
+
+		return task;
 	}
 
 	/**
@@ -151,9 +154,14 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> Future<T> invoke( Task<T> task, long timeout, TimeUnit unit ) throws InterruptedException {
-		List<Task<T>> tasks = new ArrayList<Task<T>>();
-		tasks.add( task );
-		return invokeAll( tasks, timeout, unit ).get( 0 );
+		if( Thread.currentThread() instanceof TaskThread ) {
+			synchronousExecute( task, timeout, unit );
+		} else {
+			List<Task<T>> tasks = new ArrayList<Task<T>>();
+			tasks.add( task );
+			invokeAll( tasks, timeout, unit );
+		}
+		return task;
 	}
 
 	/**
@@ -166,7 +174,12 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks ) throws InterruptedException {
 		checkNullService();
-		return service.invokeAll( tasks );
+		if( Thread.currentThread() instanceof TaskThread ) {
+			synchronousExecute( tasks );
+		} else {
+			service.invokeAll( tasks );
+		}
+		return new ArrayList<Future<T>>( tasks );
 	}
 
 	/**
@@ -181,7 +194,12 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks, long timeout, TimeUnit unit ) throws InterruptedException {
 		checkNullService();
-		return service.invokeAll( tasks, timeout, unit );
+		if( Thread.currentThread() instanceof TaskThread ) {
+			synchronousExecute( tasks, timeout, unit );
+		} else {
+			service.invokeAll( tasks, timeout, unit );
+		}
+		return new ArrayList<Future<T>>( tasks );
 	}
 
 	@Override
@@ -202,20 +220,69 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		return this;
 	}
 
+	private <T> void synchronousExecute( Task<T> task ) {
+		try {
+			task.invoke();
+		} catch( Exception exception ) {
+			// Exceptions should be retrieved by calling get().
+		}
+	}
+
+	private <T> void synchronousExecute( Task<T> task, long timeout, TimeUnit unit ) {
+		try {
+			task.invoke( timeout, unit );
+		} catch( Exception exception ) {
+			// Exceptions should be retrieved by calling get().
+		}
+	}
+
+	private <T> void synchronousExecute( Collection<? extends Task<T>> tasks ) {
+		for( Task<T> task : tasks ) {
+			synchronousExecute( task );
+		}
+	}
+
+	private <T> void synchronousExecute( Collection<? extends Task<T>> tasks, long timeout, TimeUnit unit ) {
+		for( Task<T> task : tasks ) {
+			synchronousExecute( task, timeout, unit );
+		}
+	}
+
 	private void checkNullService() {
 		if( service == null ) throw new RuntimeException( "TaskManager has not been started." );
 	}
 
-	private static final class TaskThreadFactory implements ThreadFactory {
+	private static final class TaskThread extends Thread {
 
-		private final ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+		public TaskThread( ThreadGroup group, Runnable target, String name, long stackSize ) {
+			super( group, target, name, stackSize );
+		}
 
-		public Thread newThread( final Runnable runnable ) {
-			Thread thread = defaultFactory.newThread( runnable );
-			thread.setName( "TaskQueue-" + thread.getName() );
-			thread.setDaemon( true );
+	}
+
+	private static class TaskThreadFactory implements ThreadFactory {
+
+		private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
+
+		private final AtomicInteger threadNumber = new AtomicInteger( 1 );
+
+		private final ThreadGroup group;
+
+		private final String prefix;
+
+		public TaskThreadFactory() {
+			SecurityManager securityManager = System.getSecurityManager();
+			group = ( securityManager != null ) ? securityManager.getThreadGroup() : Thread.currentThread().getThreadGroup();
+			prefix = "TaskPool-" + poolNumber.getAndIncrement() + "-Thread-";
+		}
+
+		public Thread newThread( Runnable r ) {
+			Thread thread = new TaskThread( group, r, prefix + threadNumber.getAndIncrement(), 0 );
+			if( thread.getPriority() != Thread.NORM_PRIORITY ) thread.setPriority( Thread.NORM_PRIORITY );
+			if( !thread.isDaemon() ) thread.setDaemon( true );
 			return thread;
 		}
+
 	}
 
 }

@@ -1,13 +1,14 @@
 package com.parallelsymmetry.escape.utility.task;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
-import com.parallelsymmetry.escape.utility.log.Log;
-
 public class TaskManagerTest extends TestCase {
+
+	private static final String EXCEPTION_MESSAGE = "Intentionally fail task.";
 
 	private TaskManager manager;
 
@@ -50,7 +51,6 @@ public class TaskManagerTest extends TestCase {
 	}
 
 	public void testSubmitNullResult() throws Exception {
-		Log.setLevel( Log.DEBUG );
 		assertFalse( manager.isRunning() );
 
 		manager.startAndWait();
@@ -87,13 +87,13 @@ public class TaskManagerTest extends TestCase {
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
 
-		MockTask task = new MockTask( manager, null, MockTask.Mode.FAIL );
-		Future<Object> future = manager.submit( task );
+		MockTask task = new MockTask( manager, null, true );
+		manager.submit( task );
 		try {
-			assertNull( future.get() );
+			assertNull( task.get() );
 			fail();
-		} catch( Exception exception ) {
-			assertNotNull( exception );
+		} catch( ExecutionException exception ) {
+			assertEquals( EXCEPTION_MESSAGE, exception.getCause().getMessage() );
 		}
 		assertTrue( task.isDone() );
 		assertFalse( task.isRunning() );
@@ -136,14 +136,15 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
-	public void testNestedTasks() throws Exception {
-		// FIXME If there is only one thread then this fails.
-		manager.setThreadCount( 2 );
+	public void testNestedTask() throws Exception {
+		manager.setThreadCount( 1 );
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
 
+		Object nestedResult = new Object();
+		MockTask nestedTask = new MockTask( manager, nestedResult );
 		Object result = new Object();
-		MockTask task = new MockTask( manager, result, MockTask.Mode.NEST );
+		MockTask task = new MockTask( manager, result, nestedTask );
 		manager.submit( task );
 		assertEquals( result, task.get( 100, TimeUnit.MILLISECONDS ) );
 		assertTrue( task.isDone() );
@@ -152,43 +153,73 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	public void testNestedTaskWithException() throws Exception {
+		manager.setThreadCount( 1 );
+		manager.startAndWait();
+		assertTrue( manager.isRunning() );
+
+		Object nestedResult = new Object();
+		MockTask nestedTask = new MockTask( manager, nestedResult, true );
+		Object result = new Object();
+		MockTask task = new MockTask( manager, result, nestedTask );
+
+		manager.submit( task );
+
+		// Check the parent task.
+		task.get();
+		assertTrue( task.isDone() );
+		assertFalse( task.isRunning() );
+		assertTrue( task.isSuccess() );
+		assertFalse( task.isCancelled() );
+
+		// Check the nested task.
+		try {
+			assertNull( nestedTask.get() );
+			fail();
+		} catch( ExecutionException exception ) {
+			assertEquals( EXCEPTION_MESSAGE, exception.getCause().getMessage() );
+		}
+		assertTrue( nestedTask.isDone() );
+		assertFalse( nestedTask.isRunning() );
+		assertFalse( nestedTask.isSuccess() );
+		assertFalse( nestedTask.isCancelled() );
+	}
+
 	private static final class MockTask extends Task<Object> {
 
-		public enum Mode {
-			NONE, FAIL, NEST
-		};
+		private boolean fail;
+
+		private Task<?> nest;
 
 		private TaskManager manager;
 
 		private Object object;
 
-		private Mode mode;
-
 		public MockTask( TaskManager manager ) {
-			this( manager, null, Mode.NONE );
+			this( manager, null );
 		}
 
 		public MockTask( TaskManager manager, Object object ) {
-			this( manager, object, Mode.NONE );
-		}
-
-		public MockTask( TaskManager manager, Object object, Mode mode ) {
 			this.manager = manager;
 			this.object = object;
-			this.mode = mode;
+		}
+
+		public MockTask( TaskManager manager, Object object, boolean fail ) {
+			this.manager = manager;
+			this.object = object;
+			this.fail = fail;
+		}
+
+		public MockTask( TaskManager manager, Object object, Task<?> nest ) {
+			this.manager = manager;
+			this.object = object;
+			this.nest = nest;
 		}
 
 		@Override
 		public Object execute() throws Exception {
-			switch( mode ) {
-				case FAIL: {
-					throw new Exception( "Intentionally fail task." );
-				}
-				case NEST: {
-					manager.invoke( new MockTask( manager ) );
-					break;
-				}
-			}
+			if( fail ) throw new Exception( EXCEPTION_MESSAGE );
+			if( nest != null ) manager.invoke( nest );
 			return object;
 		}
 

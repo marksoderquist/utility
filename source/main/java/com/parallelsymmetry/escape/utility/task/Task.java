@@ -31,18 +31,12 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		future = new TaskFuture<V>( new TaskExecute<V>( this ) );
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public V call() throws Exception {
-		running = true;
-		fireTaskEvent();
-
-		try {
-			future.run();
-			return future.get();
-		} finally {
-			running = false;
-			fireTaskEvent();
-		}
+		return invoke();
 	}
 
 	public abstract V execute() throws Exception;
@@ -78,6 +72,32 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	@Override
 	public V get( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
 		return future.get( timeout, unit );
+	}
+
+	V invoke() throws InterruptedException, ExecutionException {
+		running = true;
+		fireTaskEvent();
+	
+		try {
+			future.run();
+			return future.get();
+		} finally {
+			running = false;
+			fireTaskEvent();
+		}
+	}
+
+	V invoke( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
+		running = true;
+		fireTaskEvent();
+	
+		try {
+			future.run();
+			return future.get( timeout, unit );
+		} finally {
+			running = false;
+			fireTaskEvent();
+		}
 	}
 
 	protected void fireTaskEvent() {
