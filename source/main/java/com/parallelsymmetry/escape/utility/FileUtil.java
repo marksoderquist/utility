@@ -317,7 +317,12 @@ public class FileUtil {
 		if( source.isFile() && target.isFile() ) {
 			FileInputStream input = new FileInputStream( source );
 			FileOutputStream output = new FileOutputStream( target );
-			IoUtil.copy( input, output );
+			try {
+				IoUtil.copy( input, output );
+			} finally {
+				if( output != null ) output.close();
+				if( input != null ) input.close();
+			}
 			return true;
 		}
 
