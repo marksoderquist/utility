@@ -47,7 +47,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	@Override
 	public synchronized void start() {
 		if( isRunning() ) return;
-		service = new ThreadPoolExecutor( threadCount, 2 * threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy() );
+		service = new TaskExecutor( threadCount, 2 * threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
 	}
 
 	@Override
@@ -254,6 +254,14 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 
 		public TaskThread( ThreadGroup group, Runnable target, String name, long stackSize ) {
 			super( group, target, name, stackSize );
+		}
+
+	}
+
+	private static final class TaskExecutor extends ThreadPoolExecutor {
+
+		public TaskExecutor( int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory ) {
+			super( corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, new ThreadPoolExecutor.CallerRunsPolicy() );
 		}
 
 	}
