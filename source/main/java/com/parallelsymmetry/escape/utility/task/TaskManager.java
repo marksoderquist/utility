@@ -19,7 +19,7 @@ import com.parallelsymmetry.escape.utility.setting.Settings;
 
 public class TaskManager implements Persistent<TaskManager>, Controllable {
 
-	private static final int DEFAULT_THREAD_COUNT = 5;
+	private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
 
 	private ExecutorService service;
 
@@ -47,9 +47,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	@Override
 	public synchronized void start() {
 		if( isRunning() ) return;
-		int min = Math.min( Runtime.getRuntime().availableProcessors(), threadCount );
-		int max = Math.max( Runtime.getRuntime().availableProcessors(), threadCount );
-		service = new ThreadPoolExecutor( min, max, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy() );
+		service = new ThreadPoolExecutor( threadCount, 2 * threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy() );
 	}
 
 	@Override
