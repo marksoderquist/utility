@@ -17,6 +17,19 @@ public class TaskManagerTest extends TestCase {
 		manager = new TaskManager();
 	}
 
+	public void testStartAndWait() throws Exception {
+		manager.startAndWait();
+		assertTrue( manager.isRunning() );
+		manager.stopAndWait();
+	}
+
+	public void testStopAndWait() throws Exception {
+		manager.startAndWait();
+		assertTrue( manager.isRunning() );
+		manager.stopAndWait();
+		assertFalse( manager.isRunning() );
+	}
+
 	public void testStartAndStop() throws Exception {
 		assertFalse( manager.isRunning() );
 
