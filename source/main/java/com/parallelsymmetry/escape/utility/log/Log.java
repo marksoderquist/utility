@@ -87,18 +87,18 @@ public class Log {
 	 * @return
 	 */
 	public static final void init( Parameters parameters ) {
-		if( parameters.isSet( LogParameter.LOG_TAG ) ) Log.setShowTag( parameters.isTrue( LogParameter.LOG_TAG ) );
-		if( parameters.isSet( LogParameter.LOG_COLOR ) ) Log.setShowColor( parameters.isTrue( LogParameter.LOG_COLOR ) );
-		if( parameters.isSet( LogParameter.LOG_PREFIX ) ) Log.setShowPrefix( parameters.isTrue( LogParameter.LOG_PREFIX ) );
-		if( parameters.isSet( LogParameter.LOG_LEVEL ) ) Log.setLevel( Log.parseLevel( parameters.get( LogParameter.LOG_LEVEL ) ) );
+		if( parameters.isSet( LogFlag.LOG_TAG ) ) Log.setShowTag( parameters.isTrue( LogFlag.LOG_TAG ) );
+		if( parameters.isSet( LogFlag.LOG_COLOR ) ) Log.setShowColor( parameters.isTrue( LogFlag.LOG_COLOR ) );
+		if( parameters.isSet( LogFlag.LOG_PREFIX ) ) Log.setShowPrefix( parameters.isTrue( LogFlag.LOG_PREFIX ) );
+		if( parameters.isSet( LogFlag.LOG_LEVEL ) ) Log.setLevel( Log.parseLevel( parameters.get( LogFlag.LOG_LEVEL ) ) );
 
-		if( parameters.isSet( LogParameter.LOG_FILE ) ) {
+		if( parameters.isSet( LogFlag.LOG_FILE ) ) {
 			try {
-				String pattern = parameters.get( LogParameter.LOG_FILE );
-				if( parameters.isTrue( LogParameter.LOG_FILE ) ) pattern = DEFAULT_LOG_FILE_NAME;
-				FileHandler handler = new FileHandler( pattern, parameters.isTrue( LogParameter.LOG_FILE_APPEND ) );
+				String pattern = parameters.get( LogFlag.LOG_FILE );
+				if( parameters.isTrue( LogFlag.LOG_FILE ) ) pattern = DEFAULT_LOG_FILE_NAME;
+				FileHandler handler = new FileHandler( pattern, parameters.isTrue( LogFlag.LOG_FILE_APPEND ) );
 				handler.setLevel( Log.INFO );
-				if( parameters.isSet( LogParameter.LOG_FILE_LEVEL ) ) handler.setLevel( Log.parseLevel( parameters.get( LogParameter.LOG_FILE_LEVEL ) ) );
+				if( parameters.isSet( LogFlag.LOG_FILE_LEVEL ) ) handler.setLevel( Log.parseLevel( parameters.get( LogFlag.LOG_FILE_LEVEL ) ) );
 				handler.setFormatter( new DefaultFormatter() );
 				addHandler( handler );
 			} catch( IOException exception ) {
