@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -21,7 +20,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 
 	private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
 
-	private ExecutorService service;
+	private TaskExecutor executor;
 
 	private int threadCount = DEFAULT_THREAD_COUNT;
 
@@ -47,7 +46,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	@Override
 	public synchronized void start() {
 		if( isRunning() ) return;
-		service = new TaskExecutor( threadCount, 2 * threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
+		executor = new TaskExecutor( threadCount, 2 * threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
 	}
 
 	@Override
@@ -71,24 +70,25 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 
 	@Override
 	public synchronized void stop() {
-		if( service == null || service.isShutdown() ) return;
-		service.shutdown();
+		if( executor == null || executor.isShutdown() ) return;
+		executor.shutdown();
 	}
 
 	@Override
 	public synchronized void stopAndWait() throws InterruptedException {
-		stopAndWait( 0, TimeUnit.SECONDS );
+		stop();
+		if( executor != null ) executor.awaitTermination();
 	}
 
 	@Override
 	public synchronized void stopAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
 		stop();
-		if( service != null ) service.awaitTermination( timeout, unit );
+		if( executor != null ) executor.awaitTermination( timeout, unit );
 	}
 
 	@Override
 	public boolean isRunning() {
-		return service != null && !service.isTerminated();
+		return executor != null && !executor.isTerminated();
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	 */
 	public <T> Future<T> submit( Task<T> task ) {
 		checkNullService();
-		return service.submit( task );
+		return executor.submit( task );
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		List<Future<T>> futures = new ArrayList<Future<T>>();
 
 		for( Task<T> task : tasks ) {
-			futures.add( service.submit( task ) );
+			futures.add( executor.submit( task ) );
 		}
 
 		return futures;
@@ -175,7 +175,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks );
 		} else {
-			service.invokeAll( tasks );
+			executor.invokeAll( tasks );
 		}
 		return new ArrayList<Future<T>>( tasks );
 	}
@@ -195,7 +195,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks, timeout, unit );
 		} else {
-			service.invokeAll( tasks, timeout, unit );
+			executor.invokeAll( tasks, timeout, unit );
 		}
 		return new ArrayList<Future<T>>( tasks );
 	}
@@ -247,7 +247,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	}
 
 	private void checkNullService() {
-		if( service == null ) throw new RuntimeException( "TaskManager has not been started." );
+		if( executor == null ) throw new RuntimeException( "TaskManager has not been started." );
 	}
 
 	private static final class TaskThread extends Thread {
@@ -262,6 +262,10 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 
 		public TaskExecutor( int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory ) {
 			super( corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, new ThreadPoolExecutor.CallerRunsPolicy() );
+		}
+
+		public boolean awaitTermination() throws InterruptedException {
+			return awaitTermination( Long.MAX_VALUE, TimeUnit.DAYS );
 		}
 
 	}
