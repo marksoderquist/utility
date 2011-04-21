@@ -237,6 +237,14 @@ public class ParametersTest extends TestCase {
 		assertEquals( null, parameters.get( "none" ) );
 		assertEquals( "true", parameters.get( "flag" ) );
 		assertEquals( "value", parameters.get( "key" ) );
+
+		assertEquals( null, parameters.get( "-none" ) );
+		assertEquals( "true", parameters.get( "-flag" ) );
+		assertEquals( "value", parameters.get( "-key" ) );
+
+		assertEquals( null, parameters.get( "--none" ) );
+		assertEquals( "true", parameters.get( "--flag" ) );
+		assertEquals( "value", parameters.get( "--key" ) );
 	}
 
 	@Test
@@ -257,6 +265,14 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value0", parameters.getValues( "flag" ).get( 0 ) );
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
+
+		assertEquals( "value0", parameters.getValues( "-flag" ).get( 0 ) );
+		assertEquals( "value1", parameters.getValues( "-flag" ).get( 1 ) );
+		assertEquals( "value2", parameters.getValues( "-flag" ).get( 2 ) );
+
+		assertEquals( "value0", parameters.getValues( "--flag" ).get( 0 ) );
+		assertEquals( "value1", parameters.getValues( "--flag" ).get( 1 ) );
+		assertEquals( "value2", parameters.getValues( "--flag" ).get( 2 ) );
 	}
 
 	@Test
@@ -314,6 +330,30 @@ public class ParametersTest extends TestCase {
 
 		assertTrue( parameters.isSet( "flag3" ) );
 		assertTrue( parameters.isTrue( "flag3" ) );
+
+		assertFalse( parameters.isSet( "-flag0" ) );
+		assertFalse( parameters.isTrue( "-flag0" ) );
+
+		assertTrue( parameters.isSet( "-flag1" ) );
+		assertFalse( parameters.isTrue( "-flag1" ) );
+
+		assertTrue( parameters.isSet( "-flag2" ) );
+		assertTrue( parameters.isTrue( "-flag2" ) );
+
+		assertTrue( parameters.isSet( "-flag3" ) );
+		assertTrue( parameters.isTrue( "-flag3" ) );
+
+		assertFalse( parameters.isSet( "--flag0" ) );
+		assertFalse( parameters.isTrue( "--flag0" ) );
+
+		assertTrue( parameters.isSet( "--flag1" ) );
+		assertFalse( parameters.isTrue( "--flag1" ) );
+
+		assertTrue( parameters.isSet( "--flag2" ) );
+		assertTrue( parameters.isTrue( "--flag2" ) );
+
+		assertTrue( parameters.isSet( "--flag3" ) );
+		assertTrue( parameters.isTrue( "--flag3" ) );
 	}
 
 	@Test

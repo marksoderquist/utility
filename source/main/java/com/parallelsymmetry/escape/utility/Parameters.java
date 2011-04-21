@@ -170,7 +170,7 @@ public class Parameters {
 	}
 
 	public String get( String name ) {
-		List<String> values = this.values.get( name );
+		List<String> values = this.values.get( cleanup( name ) );
 		return values == null ? null : values.get( 0 );
 	}
 
@@ -208,7 +208,7 @@ public class Parameters {
 	}
 
 	public List<String> getValues( String name ) {
-		return values.get( name );
+		return values.get( cleanup( name ) );
 	}
 
 	/**
@@ -231,6 +231,15 @@ public class Parameters {
 
 	public String[] getCommands() {
 		return commands;
+	}
+
+	private String cleanup( String name ) {
+		if( name.startsWith( MULTIPLE ) ) {
+			return name.substring( MULTIPLE.length() );
+		} else if( name.startsWith( SINGLE ) ) {
+			return name.substring( SINGLE.length() );
+		}
+		return name;
 	}
 
 	public String toString() {
