@@ -49,7 +49,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		if( isRunning() ) return;
 		int min = Math.min( Runtime.getRuntime().availableProcessors(), threadCount );
 		int max = Math.max( Runtime.getRuntime().availableProcessors(), threadCount );
-		service = new ThreadPoolExecutor( min, max, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
+		service = new ThreadPoolExecutor( min, max, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory(), new ThreadPoolExecutor.CallerRunsPolicy() );
 	}
 
 	@Override
