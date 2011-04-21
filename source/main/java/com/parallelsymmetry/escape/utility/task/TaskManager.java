@@ -46,7 +46,7 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	@Override
 	public synchronized void start() {
 		if( isRunning() ) return;
-		executor = new TaskExecutor( threadCount, 2 * threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
+		executor = new TaskExecutor( 0, threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
 	}
 
 	@Override
