@@ -166,7 +166,11 @@ public class Settings {
 	public Settings getNode( String path ) {
 		return new Settings( root, getAbsolutePath( path ) );
 	}
-	
+
+	public void reset() {
+		removeNode();
+	}
+
 	public void removeNode() {
 		removeNode( getPath() );
 	}
@@ -185,7 +189,7 @@ public class Settings {
 	}
 
 	public void flush() {
-		flush( "" );
+		flush( getPath() );
 	}
 
 	public void flush( String path ) {
@@ -202,7 +206,7 @@ public class Settings {
 	}
 
 	public void sync() {
-		sync( "" );
+		sync( getPath() );
 	}
 
 	public void sync( String path ) {

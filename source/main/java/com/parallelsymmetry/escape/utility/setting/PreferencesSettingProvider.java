@@ -1,27 +1,33 @@
 package com.parallelsymmetry.escape.utility.setting;
 
-import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
 public class PreferencesSettingProvider implements WritableSettingProvider {
 
-	private Preferences preferences;
+	private String path;
 
 	public PreferencesSettingProvider( Preferences preferences ) {
-		this.preferences = preferences;
+		this.path = preferences.absolutePath();
 	}
 
 	@Override
 	public String get( String path ) {
 		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
-		
+
 		int index = path.lastIndexOf( "/" );
 		String prefKey = path.substring( index + 1 );
 
-		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
+		Preferences node = null;
+		Preferences preferences = getPreferences();
+		try {
+			node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
+		} catch( Exception exception ) {
+			Log.write( Log.ERROR, "Path: " + path.substring( 0, index ) );
+			Log.write( exception );
+		}
 		return node.get( prefKey, null );
 	}
 
@@ -33,6 +39,7 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		int index = path.lastIndexOf( "/" );
 		String prefKey = path.substring( index + 1 );
 
+		Preferences preferences = getPreferences();
 		Preferences node = index < 0 ? preferences : preferences.node( path.substring( 0, index ) );
 		if( value == null ) {
 			node.remove( prefKey );
@@ -46,9 +53,10 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
 
+		Preferences preferences = getPreferences();
 		try {
 			return preferences.nodeExists( path );
-		} catch( BackingStoreException exception ) {
+		} catch( Exception exception ) {
 			Log.write( exception );
 			return false;
 		}
@@ -59,9 +67,10 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
 
+		Preferences preferences = getPreferences();
 		try {
 			preferences.node( path ).removeNode();
-		} catch( BackingStoreException exception ) {
+		} catch( Exception exception ) {
 			throw new SettingsStoreException( exception );
 		}
 	}
@@ -71,13 +80,15 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
 
+		Preferences preferences = getPreferences();
 		try {
+			if( !preferences.nodeExists( path ) ) return;
 			preferences.node( path ).flush();
-		} catch( BackingStoreException exception ) {
-			throw new SettingsStoreException( exception );
 		} catch( IllegalArgumentException exception ) {
 			Log.write( Log.ERROR, "Path: " + path );
 			Log.write( exception );
+		} catch( Exception exception ) {
+			throw new SettingsStoreException( exception );
 		}
 	}
 
@@ -86,11 +97,21 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
 
+		Preferences preferences = getPreferences();
 		try {
 			preferences.node( path ).sync();
-		} catch( BackingStoreException exception ) {
+		} catch( Exception exception ) {
 			throw new SettingsStoreException( exception );
 		}
+	}
+
+	/**
+	 * This ensures a fresh instance of the preferences node is used.
+	 * 
+	 * @return
+	 */
+	private Preferences getPreferences() {
+		return Preferences.userRoot().node( path );
 	}
 
 }

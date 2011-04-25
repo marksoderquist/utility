@@ -57,4 +57,44 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertFalse( provider.nodeExists( path ) );
 	}
 
+	public void testResetNode() throws Exception {
+		String path = "/test/reset/node";
+		provider.put( path + "/value", "true" );
+		assertTrue( provider.nodeExists( path ) );
+
+		provider.removeNode( path );
+		assertFalse( provider.nodeExists( path ) );
+
+		provider.put( path + "/value", "true" );
+		assertTrue( provider.nodeExists( path ) );
+	}
+
+	public void testFlushAfterRemoveDoesNotRecreateNode() throws Exception {
+		String path = "/test/remove/node";
+		provider.put( path + "/value", "true" );
+		assertTrue( provider.nodeExists( path ) );
+		provider.removeNode( path );
+		assertFalse( provider.nodeExists( path ) );
+		provider.flush( path );
+		assertFalse( provider.nodeExists( path ) );
+	}
+
+	public void testPreferencesRemove() throws Exception {
+		Preferences a = preferences.node( "a" );
+		a.put( "key", "a" );
+		assertEquals( "a", a.get( "key", null ) );
+
+		a.removeNode();
+		try {
+			a.put( "key", "a" );
+			fail();
+		} catch( IllegalStateException exception ) {
+			// 
+		}
+		
+		a = preferences.node( "a" );
+		a.put( "key", "a" );
+		assertEquals( "a", a.get( "key", null ) );
+	}
+
 }

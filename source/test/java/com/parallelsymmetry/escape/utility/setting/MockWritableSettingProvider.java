@@ -23,12 +23,12 @@ public class MockWritableSettingProvider extends MockSettingProvider implements 
 
 	@Override
 	public void removeNode( String path ) {
-		String node = path + "/";
+		if( !path.endsWith( "/" ) ) path += "/";
 		Iterator<String> iterator = values.keySet().iterator();
 
 		while( iterator.hasNext() ) {
 			String key = iterator.next();
-			if( key.startsWith( node ) ) values.remove( key );
+			if( key.startsWith( path ) ) values.remove( key );
 		}
 	}
 

@@ -248,6 +248,27 @@ public class SettingsTest extends TestCase {
 		assertTrue( settings.nodeExists( path ) );
 		assertEquals( 0, settings.getList( MockPersistent.class, path ).size() );
 	}
+	
+	public void testReset() {
+		Log.setLevel( Log.DEBUG );
+		assertFalse( settings.nodeExists( "/test/path/remove" ) );
+		assertFalse( settings.nodeExists( "/test/path" ) );
+		assertFalse( settings.nodeExists( "/test" ) );
+
+		Settings node = settings.getNode( "/test/path/remove" );
+		assertEquals( "/test/path/remove", node.getPath() );
+
+		node.put( "key", "value" );
+		assertTrue( settings.nodeExists( "/test/path/remove" ) );
+		assertTrue( settings.nodeExists( "/test/path" ) );
+		assertTrue( settings.nodeExists( "/test" ) );
+
+		settings.reset();
+		assertFalse( settings.nodeExists( "/test/path/remove" ) );
+		assertFalse( settings.nodeExists( "/test/path" ) );
+		assertFalse( settings.nodeExists( "/test" ) );
+
+	}
 
 	protected void showProviderData( Settings settings ) {
 		int pCount = settings.getProviderCount();
