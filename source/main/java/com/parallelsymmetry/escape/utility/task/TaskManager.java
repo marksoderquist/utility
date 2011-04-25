@@ -40,7 +40,11 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		if( count < 1 ) count = 1;
 		this.threadCount = count;
 		saveSettings( settings );
-		if( isRunning() ) restart();
+		if( isRunning() ) try {
+			restart();
+		} catch( InterruptedException exception ) {
+			Log.write( exception );
+		}
 	}
 
 	@Override
@@ -59,13 +63,16 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 		start();
 	}
 
-	public void restart() {
-		try {
-			stopAndWait();
-		} catch( InterruptedException exception ) {
-			Log.write( exception );
-		}
-		start();
+	public void restart() throws InterruptedException {
+		stopAndWait();
+		startAndWait();
+	}
+
+	@Override
+	public void restart( long timeout, TimeUnit unit ) throws InterruptedException {
+		// Don't use start() and stop() because they are asynchronous.
+		stopAndWait( timeout / 2, unit );
+		startAndWait( timeout / 2, unit );
 	}
 
 	@Override

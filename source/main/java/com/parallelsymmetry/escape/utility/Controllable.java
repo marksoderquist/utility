@@ -11,6 +11,10 @@ public interface Controllable {
 	void startAndWait() throws InterruptedException;
 
 	void startAndWait( long timeout, TimeUnit unit ) throws InterruptedException;
+	
+	void restart() throws InterruptedException;
+	
+	void restart( long timeout, TimeUnit unit ) throws InterruptedException;
 
 	void stop();
 

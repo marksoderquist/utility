@@ -212,7 +212,6 @@ public abstract class Agent implements Controllable {
 	 * @throws InterruptedException
 	 */
 	public final void waitForStartup( long timeout, TimeUnit unit ) throws InterruptedException {
-		//waitForStateChange( State.STARTING, timeout );
 		synchronized( operationLock ) {
 			while( startingFlag ) {
 				operationLock.wait( timeout );
@@ -238,7 +237,6 @@ public abstract class Agent implements Controllable {
 	 * @throws InterruptedException
 	 */
 	public final void waitForShutdown( long timeout, TimeUnit unit ) throws InterruptedException {
-		//waitForStateChange( State.STOPPING, timeout );
 		synchronized( operationLock ) {
 			while( stoppingFlag ) {
 				operationLock.wait( timeout );
@@ -359,7 +357,6 @@ public abstract class Agent implements Controllable {
 
 	private final void waitForStateChange( State state, int timeout ) throws InterruptedException {
 		synchronized( statelock ) {
-			//Log.write( Log.TRACE, "Waiting for " + state + " to change..." );
 			long mark = System.currentTimeMillis();
 			while( this.state == state ) {
 				statelock.wait( timeout );
