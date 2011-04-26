@@ -1,5 +1,8 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.parallelsymmetry.escape.utility.Descriptor;
 
 public class DescriptorSettingProvider implements SettingProvider {
@@ -20,6 +23,15 @@ public class DescriptorSettingProvider implements SettingProvider {
 	@Override
 	public String get( String path ) {
 		return descriptor.getValue( root + path );
+	}
+
+	@Override
+	public Set<String> getNames( String path ) {
+		Set<String> names = new HashSet<String>();
+
+		names.addAll( descriptor.getNames( root + path ) );
+
+		return names;
 	}
 
 	@Override

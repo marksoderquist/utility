@@ -4,8 +4,11 @@ import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -144,6 +147,27 @@ public class Settings {
 
 	public void removeProvider( int index ) {
 		mounts.remove( providers.remove( index ) );
+	}
+
+	public String[] getNames() {
+		//List<String> names = new ArrayList<String>();
+
+		Set<String> nameSet = new HashSet<String>();
+
+		for( SettingProvider provider : root.providers ) {
+			String full = getProviderPath( provider, path );
+			if( full != null ) nameSet.addAll( provider.getNames( full ) );
+		}
+
+		if( root.defaultProvider != null ) {
+			String full = getProviderPath( root.defaultProvider, path );
+			if( full != null ) nameSet.addAll( root.defaultProvider.getNames( full ) );
+		}
+
+		List<String> nameList = new ArrayList<String>( nameSet );
+		Collections.sort( nameList );
+
+		return nameList.toArray( new String[nameList.size()] );
 	}
 
 	public boolean nodeExists( String path ) {
@@ -351,7 +375,6 @@ public class Settings {
 	}
 
 	public <T extends Persistent<?>> void putList( String path, List<T> list ) {
-
 		int oldCount = getInt( path + ITEM_COUNT, 0 );
 		for( int index = 0; index < oldCount; index++ ) {
 			removeNode( getItemPath( path, index ) );
@@ -363,6 +386,10 @@ public class Settings {
 		}
 
 		putInt( path + ITEM_COUNT, newCount );
+	}
+
+	public <T extends Persistent<?>> void putMap( String path, Map<String, T> map ) {
+
 	}
 
 	private String getProviderPath( SettingProvider provider, String path ) {

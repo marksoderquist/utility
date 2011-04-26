@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,10 +19,9 @@ public class MockSettingProvider implements SettingProvider {
 	public boolean nodeExists( String path ) {
 		Set<String> keys = values.keySet();
 
-		String node = path + "/";
+		if( !path.endsWith( "/" ) ) path += "/";
 		for( String key : keys ) {
-			//System.out.println( "Key: " + key + "  Node: " + node );
-			if( key.startsWith( node ) ) return true;
+			if( key.startsWith( path ) ) return true;
 		}
 
 		return false;
@@ -30,6 +30,19 @@ public class MockSettingProvider implements SettingProvider {
 	@Override
 	public String get( String path ) {
 		return values.get( path );
+	}
+
+	@Override
+	public Set<String> getNames( String path ) {
+		Set<String> names = new HashSet<String>();
+
+		Set<String> keys = values.keySet();
+		if( !path.endsWith( "/" ) ) path += "/";
+		for( String key : keys ) {
+			if( key.startsWith( path ) ) names.add( key.substring( path.length(), key.indexOf( "/", path.length() ) ) );
+		}
+
+		return names;
 	}
 
 	public void set( String key, String value ) {

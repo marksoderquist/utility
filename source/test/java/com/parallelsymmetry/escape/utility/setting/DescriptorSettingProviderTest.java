@@ -23,6 +23,10 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
 
+	public void testGetNames() {
+		assertEquals( 6, provider.getNames( "" ).size() );
+	}
+
 	public void testNodeExists() {
 		assertFalse( provider.nodeExists( "/path/invalid" ) );
 		assertFalse( rootedProvider.nodeExists( "/test/path/invalid" ) );

@@ -13,6 +13,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -25,6 +26,8 @@ public class Descriptor {
 	private String source;
 
 	private Node node;
+
+	private List<String> names;
 
 	private List<String> paths;
 
@@ -75,6 +78,11 @@ public class Descriptor {
 
 	public Node getNode() {
 		return node;
+	}
+
+	public List<String> getNames( String path ) {
+		if( names == null ) names = listNames( getNode( path ) );
+		return names;
 	}
 
 	public List<String> getPaths() {
@@ -200,6 +208,21 @@ public class Descriptor {
 	public static String getAttribute( Node node, String name ) {
 		Node attribute = node.getAttributes().getNamedItem( name );
 		return attribute == null ? null : attribute.getNodeValue();
+	}
+
+	private List<String> listNames( Node parent ) {
+		List<String> names = new ArrayList<String>();
+		if( parent == null ) return names;
+
+		Node node = null;
+		NodeList list = parent.getChildNodes();
+		int count = list.getLength();
+		for( int index = 0; index < count; index++ ) {
+			node = list.item( index );
+			if( node instanceof Element ) names.add( node.getNodeName() );
+		}
+
+		return names;
 	}
 
 	private List<String> listPaths( Node parent ) {

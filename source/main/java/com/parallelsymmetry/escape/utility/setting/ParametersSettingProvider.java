@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.parallelsymmetry.escape.utility.Parameters;
@@ -17,6 +18,15 @@ public class ParametersSettingProvider implements SettingProvider {
 		if( parameters == null ) return null;
 
 		return parameters.get( getName( path ) );
+	}
+
+	@Override
+	public Set<String> getNames( String path ) {
+		Set<String> names = new HashSet<String>();
+
+		// NEXT Implement ParametersSettingProvider.getNames().
+
+		return names;
 	}
 
 	@Override

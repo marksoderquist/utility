@@ -83,6 +83,21 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
 	}
 
+	public void testGetNames() throws Exception {
+		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
+		assertNotNull( input );
+		Descriptor descriptor = new Descriptor( input );
+
+		List<String> names = descriptor.getNames( "/test" );
+		assertEquals( 6, names.size() );
+		assertTrue( names.contains( "name" ) );
+		assertTrue( names.contains( "alias" ) );
+		assertTrue( names.contains( "path" ) );
+		assertTrue( names.contains( "integer" ) );
+		assertTrue( names.contains( "list" ) );
+		assertTrue( names.contains( "nodes" ) );
+	}
+
 	public void testGetPaths() throws Exception {
 		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
 		assertNotNull( input );

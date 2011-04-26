@@ -2,7 +2,9 @@ package com.parallelsymmetry.escape.utility.setting;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -120,6 +122,19 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", settings.get( "/test/path/D", null ) );
 	}
 
+	public void testGetNames() {
+		provider1.set( "/test/path1/value", "1" );
+		// Intentionally skip provider 2.
+		provider3.set( "/test/path3/value", "3" );
+		providerD.set( "/test/pathD/value", "D" );
+
+		String[] names = settings.getNode( "/test" ).getNames();
+		assertEquals( 3, names.length );
+		assertEquals( "path1", names[0] );
+		assertEquals( "path3", names[1] );
+		assertEquals( "pathD", names[2] );
+	}
+
 	public void testGetNode() {
 		provider1.set( "/test/path/1", "1" );
 
@@ -179,7 +194,7 @@ public class SettingsTest extends TestCase {
 		assertTrue( settings.nodeExists( "/test/path" ) );
 		assertTrue( settings.nodeExists( "/test" ) );
 
-		settings.removeNode("/test/path/remove");
+		settings.removeNode( "/test/path/remove" );
 		assertFalse( settings.nodeExists( "/test/path/remove" ) );
 		assertFalse( settings.nodeExists( "/test/path" ) );
 		assertFalse( settings.nodeExists( "/test" ) );
@@ -194,7 +209,7 @@ public class SettingsTest extends TestCase {
 		assertTrue( settings.nodeExists( "/test/path" ) );
 		assertTrue( settings.nodeExists( "/test" ) );
 
-		settings.removeNode("/test/path");
+		settings.removeNode( "/test/path" );
 		assertFalse( settings.nodeExists( "/test/path/remove" ) );
 		assertFalse( settings.nodeExists( "/test/path" ) );
 		assertFalse( settings.nodeExists( "/test" ) );
@@ -248,7 +263,25 @@ public class SettingsTest extends TestCase {
 		assertTrue( settings.nodeExists( path ) );
 		assertEquals( 0, settings.getList( MockPersistent.class, path ).size() );
 	}
-	
+
+	public void testPutGetMap() {
+		int count = 5;
+		String path = "/test/maps/map1";
+		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceMap.put( String.valueOf( index ), new MockPersistent( String.valueOf( index ) ) );
+		}
+
+		settings.putMap( path, sourceMap );
+
+		//Map<String, MockPersistent> targetMap = settings.getMap( path );
+	}
+
+	public void testRemoveMap() {
+
+	}
+
 	public void testReset() {
 		Log.setLevel( Log.DEBUG );
 		assertFalse( settings.nodeExists( "/test/path/remove" ) );
@@ -283,6 +316,8 @@ public class SettingsTest extends TestCase {
 
 		private int value;
 
+		private String key;
+
 		@SuppressWarnings( "unused" )
 		public MockPersistent() {
 			this( 0 );
@@ -292,8 +327,16 @@ public class SettingsTest extends TestCase {
 			this.value = value;
 		}
 
+		public MockPersistent( String key ) {
+			this.key = key;
+		}
+
 		public int getValue() {
 			return value;
+		}
+
+		public String getKey() {
+			return key;
 		}
 
 		@Override

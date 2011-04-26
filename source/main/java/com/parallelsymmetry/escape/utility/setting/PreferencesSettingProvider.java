@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 import com.parallelsymmetry.escape.utility.log.Log;
@@ -46,6 +48,15 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		} else {
 			node.put( prefKey, value );
 		}
+	}
+
+	@Override
+	public Set<String> getNames( String path ) {
+		Set<String> names = new HashSet<String>();
+
+		// NEXT Implement PreferencesSettingProvider.getNames().
+
+		return names;
 	}
 
 	@Override
