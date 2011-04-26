@@ -15,22 +15,31 @@ public class ParametersSettingProvider implements SettingProvider {
 
 	@Override
 	public String get( String path ) {
+		// Incoming paths should always be absolute.
 		if( parameters == null ) return null;
 
 		return parameters.get( getName( path ) );
 	}
 
 	@Override
-	public Set<String> getNames( String path ) {
+	public Set<String> getChildNames( String path ) {
+		// Incoming paths should always be absolute.
+		String node = getName( path + "/" );
 		Set<String> names = new HashSet<String>();
 
-		// NEXT Implement ParametersSettingProvider.getNames().
+		for( String name : parameters.getNames() ) {
+			if( name.startsWith( node ) ) {
+				int index = name.indexOf( ".", node.length() );
+				if( index > 0 ) names.add( name.substring( node.length(), index ) );
+			}
+		}
 
 		return names;
 	}
 
 	@Override
 	public boolean nodeExists( String path ) {
+		// Incoming paths should always be absolute.
 		String node = getName( path + "/" );
 
 		Set<String> names = parameters.getNames();

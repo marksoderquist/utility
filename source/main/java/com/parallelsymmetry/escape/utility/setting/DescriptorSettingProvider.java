@@ -22,20 +22,19 @@ public class DescriptorSettingProvider implements SettingProvider {
 
 	@Override
 	public String get( String path ) {
+		// Incoming paths should always be absolute.
 		return descriptor.getValue( root + path );
 	}
 
 	@Override
-	public Set<String> getNames( String path ) {
-		Set<String> names = new HashSet<String>();
-
-		names.addAll( descriptor.getNames( root + path ) );
-
-		return names;
+	public Set<String> getChildNames( String path ) {
+		// Incoming paths should always be absolute.
+		return new HashSet<String>( descriptor.getNames( root + path ) );
 	}
 
 	@Override
 	public boolean nodeExists( String path ) {
+		// Incoming paths should always be absolute.
 		return descriptor.getNode( root + path ) != null;
 	}
 

@@ -10,7 +10,7 @@ public class MockWritableSettingProvider extends MockSettingProvider implements 
 
 	@Override
 	public void put( String path, String value ) {
-		values.put( path, value );
+		set( path, value );
 	}
 
 	public void set( String key, String value ) {

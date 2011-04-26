@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.Set;
 import java.util.prefs.Preferences;
 
 import junit.framework.TestCase;
@@ -33,6 +34,24 @@ public class PreferencesSettingProviderTest extends TestCase {
 		// Remove the value.
 		provider.put( "/test/path2", null );
 		assertNull( provider.get( "/test/path2" ) );
+	}
+
+	public void testGetChildNames() throws Exception {
+		String parent = "/test/children";
+		provider.removeNode( parent );
+		assertFalse( provider.nodeExists( parent + "/child1" ) );
+		assertFalse( provider.nodeExists( parent + "/child2" ) );
+
+		provider.put( parent + "/child1/value1", "value1" );
+		provider.put( parent + "/child2/value2", "value2" );
+		assertTrue( provider.nodeExists( parent + "/child1" ) );
+		assertTrue( provider.nodeExists( parent + "/child2" ) );
+
+		Set<String> names = provider.getChildNames( parent );
+
+		assertEquals( 2, names.size() );
+		assertTrue( names.contains( "child1" ) );
+		assertTrue( names.contains( "child2" ) );
 	}
 
 	public void testNodeExists() throws Exception {
@@ -91,7 +110,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		} catch( IllegalStateException exception ) {
 			// 
 		}
-		
+
 		a = preferences.node( "a" );
 		a.put( "key", "a" );
 		assertEquals( "a", a.get( "key", null ) );

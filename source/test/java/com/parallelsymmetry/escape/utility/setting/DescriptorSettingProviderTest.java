@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility.setting;
 
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 import com.parallelsymmetry.escape.utility.Descriptor;
@@ -23,8 +25,16 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
 
-	public void testGetNames() {
-		assertEquals( 6, provider.getNames( "" ).size() );
+	public void testGetChildNames() {
+		Set<String> names = provider.getChildNames( "" );
+
+		assertEquals( 6, names.size() );
+		assertTrue( names.contains( "name" ) );
+		assertTrue( names.contains( "alias" ) );
+		assertTrue( names.contains( "path" ) );
+		assertTrue( names.contains( "integer" ) );
+		assertTrue( names.contains( "list" ) );
+		assertTrue( names.contains( "nodes" ) );
 	}
 
 	public void testNodeExists() {

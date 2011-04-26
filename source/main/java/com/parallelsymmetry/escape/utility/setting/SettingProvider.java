@@ -6,7 +6,7 @@ public interface SettingProvider {
 
 	String get( String path );
 
-	Set<String> getNames( String path );
+	Set<String> getChildNames( String path );
 
 	boolean nodeExists( String path );
 

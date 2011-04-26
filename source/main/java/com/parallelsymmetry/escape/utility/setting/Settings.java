@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -149,25 +149,20 @@ public class Settings {
 		mounts.remove( providers.remove( index ) );
 	}
 
-	public String[] getNames() {
-		//List<String> names = new ArrayList<String>();
-
-		Set<String> nameSet = new HashSet<String>();
+	public Set<String> getChildNames( String path ) {
+		Set<String> names = new HashSet<String>();
 
 		for( SettingProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
-			if( full != null ) nameSet.addAll( provider.getNames( full ) );
+			if( full != null ) names.addAll( provider.getChildNames( full ) );
 		}
 
 		if( root.defaultProvider != null ) {
 			String full = getProviderPath( root.defaultProvider, path );
-			if( full != null ) nameSet.addAll( root.defaultProvider.getNames( full ) );
+			if( full != null ) names.addAll( root.defaultProvider.getChildNames( full ) );
 		}
 
-		List<String> nameList = new ArrayList<String>( nameSet );
-		Collections.sort( nameList );
-
-		return nameList.toArray( new String[nameList.size()] );
+		return names;
 	}
 
 	public boolean nodeExists( String path ) {
@@ -193,6 +188,10 @@ public class Settings {
 
 	public void reset() {
 		removeNode();
+	}
+
+	public void reset( String path ) {
+		removeNode( path );
 	}
 
 	public void removeNode() {
@@ -380,16 +379,72 @@ public class Settings {
 			removeNode( getItemPath( path, index ) );
 		}
 
-		int newCount = list == null ? 0 : list.size();
-		for( int index = 0; index < newCount; index++ ) {
-			list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
+		if( list == null ) {
+			reset( path );
+		} else {
+			int newCount = list.size();
+			for( int index = 0; index < newCount; index++ ) {
+				list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
+			}
+			putInt( path + ITEM_COUNT, newCount );
+		}
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public <T extends Persistent<?>> Map<String, T> getMap( String path ) {
+		Map<String, T> map = new HashMap<String, T>();
+
+		String typeName = get( path + "/type", null );
+		if( typeName == null ) return map;
+
+		Class<T> type = null;
+		try {
+			type = (Class<T>)Class.forName( typeName );
+		} catch( ClassNotFoundException exception ) {
+			Log.write( exception );
 		}
 
-		putInt( path + ITEM_COUNT, newCount );
+		Set<String> names = getChildNames( path );
+		for( String name : names ) {
+			try {
+				Constructor<T> constructor = type.getConstructor();
+				constructor.setAccessible( true );
+				T object = constructor.newInstance();
+				Settings node = getNode( path + "/" + name );
+				map.put( name, type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
+			} catch( InstantiationException exception ) {
+				Log.write( exception );
+			} catch( IllegalAccessException exception ) {
+				Log.write( exception );
+			} catch( SecurityException exception ) {
+				Log.write( exception );
+			} catch( NoSuchMethodException exception ) {
+				Log.write( exception );
+			} catch( IllegalArgumentException exception ) {
+				Log.write( exception );
+			} catch( InvocationTargetException exception ) {
+				Log.write( exception );
+			}
+		}
+
+		return map;
 	}
 
 	public <T extends Persistent<?>> void putMap( String path, Map<String, T> map ) {
+		Set<String> names = getChildNames( path );
+		for( String name : names ) {
+			removeNode( path + "/" + name );
+		}		
+		
+		if( map == null ) {
+			reset( path );
+		} else {
+			put( path + "/type", map.values().iterator().next().getClass().getName() );
 
+			for( String name : map.keySet() ) {
+				map.get( name ).saveSettings( getNode( path + "/" + name ) );
+			}
+		}
 	}
 
 	private String getProviderPath( SettingProvider provider, String path ) {

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -122,17 +123,23 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", settings.get( "/test/path/D", null ) );
 	}
 
-	public void testGetNames() {
+	public void testGetChildNames() {
 		provider1.set( "/test/path1/value", "1" );
 		// Intentionally skip provider 2.
 		provider3.set( "/test/path3/value", "3" );
 		providerD.set( "/test/pathD/value", "D" );
 
-		String[] names = settings.getNode( "/test" ).getNames();
-		assertEquals( 3, names.length );
-		assertEquals( "path1", names[0] );
-		assertEquals( "path3", names[1] );
-		assertEquals( "pathD", names[2] );
+		Set<String> names = settings.getChildNames( "/test" );
+		assertEquals( 3, names.size() );
+		assertTrue( names.contains( "path1" ) );
+		assertTrue( names.contains( "path3" ) );
+		assertTrue( names.contains( "pathD" ) );
+
+		names = settings.getNode( "/test" ).getChildNames( "" );
+		assertEquals( 3, names.size() );
+		assertTrue( names.contains( "path1" ) );
+		assertTrue( names.contains( "path3" ) );
+		assertTrue( names.contains( "pathD" ) );
 	}
 
 	public void testGetNode() {
@@ -236,7 +243,7 @@ public class SettingsTest extends TestCase {
 
 		assertEquals( count, targetList.size() );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( index, targetList.get( index ).getValue() );
+			assertEquals( index, targetList.get( index ).getIndex() );
 		}
 	}
 
@@ -250,17 +257,16 @@ public class SettingsTest extends TestCase {
 		}
 
 		settings.putList( path, sourceList );
-
 		List<MockPersistent> targetList = settings.getList( MockPersistent.class, path );
 
 		assertEquals( count, targetList.size() );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( index, targetList.get( index ).getValue() );
+			assertEquals( index, targetList.get( index ).getIndex() );
 		}
 
 		settings.putList( path, null );
 
-		assertTrue( settings.nodeExists( path ) );
+		assertFalse( settings.nodeExists( path ) );
 		assertEquals( 0, settings.getList( MockPersistent.class, path ).size() );
 	}
 
@@ -270,16 +276,35 @@ public class SettingsTest extends TestCase {
 		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
 
 		for( int index = 0; index < count; index++ ) {
-			sourceMap.put( String.valueOf( index ), new MockPersistent( String.valueOf( index ) ) );
+			String name = String.valueOf( (char)( 65 + index ) );
+			sourceMap.put( name, new MockPersistent( name ) );
 		}
 
 		settings.putMap( path, sourceMap );
+		Map<String, MockPersistent> targetMap = settings.getMap( path );
 
-		//Map<String, MockPersistent> targetMap = settings.getMap( path );
+		assertEquals( count, targetMap.size() );
+		for( int index = 0; index < count; index++ ) {
+			String name = String.valueOf( (char)( 65 + index ) );
+			assertEquals( name, targetMap.get( name ).getValue() );
+		}
 	}
 
 	public void testRemoveMap() {
+		int count = 5;
+		String path = "/test/maps/map1";
+		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
 
+		for( int index = 0; index < count; index++ ) {
+			String name = String.valueOf( (char)( 65 + index ) );
+			sourceMap.put( name, new MockPersistent( name ) );
+		}
+
+		settings.putMap( path, sourceMap );
+		settings.putMap( path, null );
+
+		assertFalse( settings.nodeExists( path ) );
+		assertEquals( 0, settings.getMap( path ).size() );
 	}
 
 	public void testReset() {
@@ -314,40 +339,42 @@ public class SettingsTest extends TestCase {
 
 	private static final class MockPersistent implements Persistent<MockPersistent> {
 
-		private int value;
+		private int index;
 
-		private String key;
+		private String value;
 
 		@SuppressWarnings( "unused" )
 		public MockPersistent() {
 			this( 0 );
 		}
 
-		public MockPersistent( int value ) {
+		public MockPersistent( int index ) {
+			this.index = index;
+		}
+
+		public MockPersistent( String value ) {
 			this.value = value;
 		}
 
-		public MockPersistent( String key ) {
-			this.key = key;
+		public int getIndex() {
+			return index;
 		}
 
-		public int getValue() {
+		public String getValue() {
 			return value;
-		}
-
-		public String getKey() {
-			return key;
 		}
 
 		@Override
 		public MockPersistent loadSettings( Settings settings ) {
-			value = settings.getInt( "value", 0 );
+			value = settings.get( "value", null );
+			index = settings.getInt( "index", 0 );
 			return this;
 		}
 
 		@Override
 		public MockPersistent saveSettings( Settings settings ) {
-			settings.putInt( "value", value );
+			if( value != null ) settings.put( "value", value );
+			settings.putInt( "index", index );
 			return this;
 		}
 
