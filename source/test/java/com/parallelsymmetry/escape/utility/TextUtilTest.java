@@ -202,6 +202,16 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "--------", TextUtil.pad( 8, '-' ) );
 	}
 
+	public void testGetLines() {
+		String test = "This\nis\na\ntest.";
+		List<String> lines = TextUtil.getLines( test );
+
+		assertEquals( "This", lines.get( 0 ) );
+		assertEquals( "is", lines.get( 1 ) );
+		assertEquals( "a", lines.get( 2 ) );
+		assertEquals( "test.", lines.get( 3 ) );
+	}
+
 	public void testGetLineCount() {
 		assertEquals( 0, TextUtil.getLineCount( null ) );
 		assertEquals( 1, TextUtil.getLineCount( "" ) );

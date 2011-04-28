@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -106,7 +107,7 @@ public final class TextUtil {
 	}
 
 	public static String toString( Object[] array, int offset, int length ) {
-		Object[] items = new Object[ length ];
+		Object[] items = new Object[length];
 		System.arraycopy( array, offset, items, 0, length );
 		return toString( Arrays.asList( items ) );
 	}
@@ -120,7 +121,7 @@ public final class TextUtil {
 	}
 
 	public static String toString( Object[] array, String delimiter, int offset, int length ) {
-		Object[] items = new Object[ length ];
+		Object[] items = new Object[length];
 		System.arraycopy( array, offset, items, 0, length );
 		return toString( Arrays.asList( items ), delimiter );
 	}
@@ -386,6 +387,18 @@ public final class TextUtil {
 		}
 		builder.append( text );
 		return builder.toString();
+	}
+
+	public static final List<String> getLines( String text ) {
+		if( text == null ) return null;
+
+		List<String> lines = new ArrayList<String>();
+		LineParser parser = new LineParser( text );
+		while( parser.next() != null ) {
+			lines.add( parser.getLine() );
+		}
+
+		return lines;
 	}
 
 	public static final int getLineCount( String text ) {
