@@ -4,7 +4,11 @@ import java.awt.event.ActionEvent;
 
 import junit.framework.TestCase;
 
-public class ActionDequeTest extends TestCase {
+import com.parallelsymmetry.escape.utility.ui.SwingUtil;
+import com.parallelsymmetry.escape.utility.ui.XAction;
+import com.parallelsymmetry.escape.utility.ui.XActionHandler;
+
+public class XActionTest extends TestCase {
 
 	public void testCreate() throws Exception {
 		assertNotNull( new XAction( "test", "Test" ) );
@@ -111,20 +115,22 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testGetShortcutDisplayText() {
-		assertEquals( "Ctl+A", XAction.getShortcutDisplayText( "c-a" ) );
-		assertEquals( "Alt+A", XAction.getShortcutDisplayText( "a-a" ) );
-		assertEquals( "Shift+A", XAction.getShortcutDisplayText( "s-a" ) );
+		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getShortcutDisplayText( "a-a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+A", XAction.getShortcutDisplayText( "c-a" ) );
+		assertEquals( XAction.DEFAULT_META_PREFIX + "+A", XAction.getShortcutDisplayText( "m-a" ) );
+		assertEquals( XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "s-a" ) );
 
-		assertEquals( "Ctl+Shift+A", XAction.getShortcutDisplayText( "cs-a" ) );
-		assertEquals( "Alt+Shift+A", XAction.getShortcutDisplayText( "as-a" ) );
-		assertEquals( "Ctl+Alt+A", XAction.getShortcutDisplayText( "ca-a" ) );
+		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "as-a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+" + XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getShortcutDisplayText( "ca-a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "cs-a" ) );
+		assertEquals( XAction.DEFAULT_META_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "ms-a" ) );
 
 		assertEquals( "F1", XAction.getShortcutDisplayText( "f1" ) );
-		assertEquals( "Ctl+F1", XAction.getShortcutDisplayText( "c-f1" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+F1", XAction.getShortcutDisplayText( "c-f1" ) );
 
 		assertEquals( "A A", XAction.getShortcutDisplayText( "a a" ) );
-		assertEquals( "Ctl+K L", XAction.getShortcutDisplayText( "c-k l" ) );
-		assertEquals( "Ctl+K Alt+L M", XAction.getShortcutDisplayText( "c-k a-l m" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K L", XAction.getShortcutDisplayText( "c-k l" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K " + XAction.DEFAULT_ALT_PREFIX + "+L M", XAction.getShortcutDisplayText( "c-k a-l m" ) );
 	}
 
 	private static class TestActionHandler extends XActionHandler {
