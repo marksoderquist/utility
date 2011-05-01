@@ -28,40 +28,48 @@ import com.parallelsymmetry.escape.utility.log.Log;
  * the component that was focused to loose focus and therefore disable the
  * actions it can handle by the time the user selects the menu item.
  */
-public class ActionDeque extends AbstractAction {
+public class XAction extends AbstractAction {
 
 	private static final long serialVersionUID = -9144908291833751044L;
 
 	public static final int NONE = -1;
 
+	public static final String DEFAULT_ALT_PREFIX = "Alt";
+	
+	public static final String DEFAULT_CTRL_PREFIX = "Ctl";
+
+	public static final String DEFAULT_META_PREFIX = "Meta";
+	
+	public static final String DEFAULT_SHIFT_PREFIX = "Shift";
+	
 	public static final String SHORTCUT_KEY_DISPLAY = "shortcut.key.display";
 
 	public static final String SHORTCUT_KEY_SEQUENCE = "shortcut.key.sequence";
 
-	private Deque<ActionHandler> handlers;
+	private Deque<XActionHandler> handlers;
 
-	public ActionDeque( String command, String name ) {
+	public XAction( String command, String name ) {
 		this( command, name, null );
 	}
 
-	public ActionDeque( String command, String name, Icon icon ) {
+	public XAction( String command, String name, Icon icon ) {
 		this( command, name, icon, NONE );
 	}
 
-	public ActionDeque( String command, String name, Icon icon, int mnemonic ) {
+	public XAction( String command, String name, Icon icon, int mnemonic ) {
 		this( command, name, icon, mnemonic, null );
 	}
 
-	public ActionDeque( String command, String name, Icon icon, int mnemonic, String shortcut ) {
+	public XAction( String command, String name, Icon icon, int mnemonic, String shortcut ) {
 		this( command, name, icon, mnemonic, shortcut, null );
 	}
 
-	public ActionDeque( String command, String name, Icon icon, int mnemonic, String shortcut, String display ) {
+	public XAction( String command, String name, Icon icon, int mnemonic, String shortcut, String display ) {
 		super( name, icon );
 		enabled = false;
 		putValue( Action.SHORT_DESCRIPTION, name );
 		putValue( Action.ACTION_COMMAND_KEY, command );
-		handlers = new LinkedBlockingDeque<ActionHandler>();
+		handlers = new LinkedBlockingDeque<XActionHandler>();
 
 		int mnemonicKey = -1;
 		if( mnemonic > -1 && mnemonic < name.length() ) {
@@ -97,7 +105,7 @@ public class ActionDeque extends AbstractAction {
 	 * @return Whether the event was dispatched to any listeners.
 	 */
 	public boolean performAction( ActionEvent event ) {
-		ActionHandler handler = peekHandler();
+		XActionHandler handler = peekHandler();
 
 		if( handler != null && handler.isEnabled() ) {
 			handler.actionPerformed( new ActionEvent( event.getSource(), event.getID(), (String)getValue( Action.ACTION_COMMAND_KEY ) ) );
@@ -119,7 +127,7 @@ public class ActionDeque extends AbstractAction {
 	 * 
 	 * @param handler The XActionHandler that will handle this action.
 	 */
-	public void pushHandler( ActionHandler handler ) {
+	public void pushHandler( XActionHandler handler ) {
 		if( handler == null ) throw new IllegalArgumentException( "Null ActionListener not allowed." );
 		pushHandler( handler, handler.isEnabled() );
 	}
@@ -129,7 +137,7 @@ public class ActionDeque extends AbstractAction {
 	 * 
 	 * @param handler The XActionHandler that will handle this action.
 	 */
-	public void pushHandler( ActionHandler handler, boolean enabled ) {
+	public void pushHandler( XActionHandler handler, boolean enabled ) {
 		if( handler == null ) throw new IllegalArgumentException( "Null ActionListener not allowed." );
 		handlers.remove( handler );
 		handlers.push( handler );
@@ -143,7 +151,7 @@ public class ActionDeque extends AbstractAction {
 	 * 
 	 * @return The <code>XActionHandler</code> that is handling this action.
 	 */
-	public ActionHandler peekHandler() {
+	public XActionHandler peekHandler() {
 		return handlers.peek();
 	}
 
@@ -152,11 +160,11 @@ public class ActionDeque extends AbstractAction {
 	 * 
 	 * @param handler The XActionHandler to remove.
 	 */
-	public ActionListener pullHandler( ActionHandler handler ) {
+	public ActionListener pullHandler( XActionHandler handler ) {
 		handler.removeActionCallback( this );
 		handlers.remove( handler );
 
-		ActionHandler next = peekHandler();
+		XActionHandler next = peekHandler();
 		if( next == null ) {
 			new SetEnabled( false );
 		} else {
@@ -219,20 +227,20 @@ public class ActionDeque extends AbstractAction {
 					char modifier = modifiers.charAt( index );
 
 					switch( modifier ) {
-						case 'c': {
-							buffer.append( "Ctl" );
-							break;
-						}
 						case 'a': {
-							buffer.append( "Alt" );
+							buffer.append( DEFAULT_ALT_PREFIX );
 							break;
 						}
-						case 's': {
-							buffer.append( "Shift" );
+						case 'c': {
+							buffer.append( DEFAULT_CTRL_PREFIX );
 							break;
 						}
 						case 'm': {
-							buffer.append( "Meta" );
+							buffer.append( DEFAULT_META_PREFIX );
+							break;
+						}
+						case 's': {
+							buffer.append( DEFAULT_SHIFT_PREFIX );
 							break;
 						}
 					}
@@ -250,7 +258,7 @@ public class ActionDeque extends AbstractAction {
 		return buffer.toString();
 	}
 
-	void handlerEnabledChanged( ActionHandler handler, boolean enabled ) {
+	void handlerEnabledChanged( XActionHandler handler, boolean enabled ) {
 		new SetEnabled( peekHandler().isEnabled() );
 	}
 
@@ -281,7 +289,7 @@ public class ActionDeque extends AbstractAction {
 		 * Called by the thread.
 		 */
 		public void run() {
-			ActionDeque.super.setEnabled( enabled );
+			XAction.super.setEnabled( enabled );
 		}
 
 	}

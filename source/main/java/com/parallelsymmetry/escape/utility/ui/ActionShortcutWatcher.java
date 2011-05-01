@@ -52,7 +52,7 @@ public class ActionShortcutWatcher implements KeyEventPostProcessor {
 			}
 
 			// Get the keystroke string representation.
-			String keystroke = ActionDeque.encodeKeyEvent( event );
+			String keystroke = XAction.encodeKeyEvent( event );
 
 			// If starting a new sequence get a new shortcut list.
 			if( sequence == null ) {
@@ -169,7 +169,7 @@ public class ActionShortcutWatcher implements KeyEventPostProcessor {
 	private boolean processShortcut( String shortcut ) {
 		Log.write( Log.DEBUG, "Shortcut typed: " + shortcut );
 		ActionEvent event = new ActionEvent( this, ActionEvent.ACTION_PERFORMED, shortcut );
-		ActionDeque action = library.getActionByShortcut( shortcut );
+		XAction action = library.getActionByShortcut( shortcut );
 		reset();
 
 		if( action == null ) {

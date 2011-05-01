@@ -16,14 +16,14 @@ public class ActionLibrary {
 
 	private IconLibrary icons;
 
-	private Map<String, ActionDeque> actions;
+	private Map<String, XAction> actions;
 
-	private Map<String, ActionDeque> actionsByShortcut;
+	private Map<String, XAction> actionsByShortcut;
 
 	public ActionLibrary( IconLibrary icons ) {
 		this.icons = icons;
-		actions = new ConcurrentHashMap<String, ActionDeque>();
-		actionsByShortcut = new ConcurrentHashMap<String, ActionDeque>();
+		actions = new ConcurrentHashMap<String, XAction>();
+		actionsByShortcut = new ConcurrentHashMap<String, XAction>();
 
 		// Create default actions.
 		addAction( "new" );
@@ -73,10 +73,10 @@ public class ActionLibrary {
 		manager.addKeyEventPostProcessor( actionShortcutWatcher );
 	}
 
-	public ActionDeque getAction( String key ) {
+	public XAction getAction( String key ) {
 		if( key == null ) return null;
 
-		ActionDeque action = actions.get( key );
+		XAction action = actions.get( key );
 		if( action != null ) return action;
 
 		action = addAction( key );
@@ -84,7 +84,7 @@ public class ActionLibrary {
 		return action;
 	}
 
-	public ActionDeque getActionByShortcut( String shortcut ) {
+	public XAction getActionByShortcut( String shortcut ) {
 		return actionsByShortcut.get( shortcut );
 	}
 
@@ -99,8 +99,8 @@ public class ActionLibrary {
 	 * @param key
 	 * @return
 	 */
-	public ActionDeque addAction( String key ) {
-		ActionDeque action = actions.get( key );
+	public XAction addAction( String key ) {
+		XAction action = actions.get( key );
 		if( action != null ) return action;
 
 		String name = Bundles.getString( ACTIONS, key );
@@ -125,19 +125,19 @@ public class ActionLibrary {
 	 * @param shortcut
 	 * @return
 	 */
-	public ActionDeque addAction( String key, String name, Icon icon, int mnemonic, String shortcut, String display ) {
-		ActionDeque action = actions.get( key );
+	public XAction addAction( String key, String name, Icon icon, int mnemonic, String shortcut, String display ) {
+		XAction action = actions.get( key );
 		if( action != null ) return action;
 
-		action = new ActionDeque( key, name, icon, mnemonic, shortcut, display );
+		action = new XAction( key, name, icon, mnemonic, shortcut, display );
 		if( shortcut != null ) actionsByShortcut.put( shortcut, action );
 		actions.put( key, action );
 
 		return action;
 	}
 
-	public ActionDeque removeAction( String key ) {
-		ActionDeque action = actions.get( key );
+	public XAction removeAction( String key ) {
+		XAction action = actions.get( key );
 		actions.remove( key );
 		return action;
 	}

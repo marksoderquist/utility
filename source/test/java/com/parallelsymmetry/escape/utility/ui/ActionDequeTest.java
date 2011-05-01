@@ -7,11 +7,11 @@ import junit.framework.TestCase;
 public class ActionDequeTest extends TestCase {
 
 	public void testCreate() throws Exception {
-		assertNotNull( new ActionDeque( "test", "Test" ) );
+		assertNotNull( new XAction( "test", "Test" ) );
 	}
 
 	public void testAddHandlerWithNull() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		try {
 			action.pushHandler( null );
 		} catch( IllegalArgumentException exception ) {
@@ -22,7 +22,7 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testAddHandler() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
 		action.pushHandler( handler );
 		handler.setEnabled( true );
@@ -37,7 +37,7 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testAddTwoHandlers() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler1 = new TestActionHandler();
 		TestActionHandler handler2 = new TestActionHandler();
 		action.pushHandler( handler2 );
@@ -57,7 +57,7 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testActionEnable() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
 		action.pushHandler( handler );
 		handler.setEnabled( true );
@@ -66,7 +66,7 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testActionForceDisabled() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
 		action.pushHandler( handler );
 		handler.setEnabled( false );
@@ -75,7 +75,7 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testSetEnabled() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
 		action.pushHandler( handler );
 
@@ -88,7 +88,7 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testSetEnabledWithTwoHandlers() throws Exception {
-		ActionDeque action = new ActionDeque( "test", "Test" );
+		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler1 = new TestActionHandler();
 		TestActionHandler handler2 = new TestActionHandler();
 		action.pushHandler( handler2 );
@@ -111,23 +111,23 @@ public class ActionDequeTest extends TestCase {
 	}
 
 	public void testGetShortcutDisplayText() {
-		assertEquals( "Ctl+A", ActionDeque.getShortcutDisplayText( "c-a" ) );
-		assertEquals( "Alt+A", ActionDeque.getShortcutDisplayText( "a-a" ) );
-		assertEquals( "Shift+A", ActionDeque.getShortcutDisplayText( "s-a" ) );
+		assertEquals( "Ctl+A", XAction.getShortcutDisplayText( "c-a" ) );
+		assertEquals( "Alt+A", XAction.getShortcutDisplayText( "a-a" ) );
+		assertEquals( "Shift+A", XAction.getShortcutDisplayText( "s-a" ) );
 
-		assertEquals( "Ctl+Shift+A", ActionDeque.getShortcutDisplayText( "cs-a" ) );
-		assertEquals( "Alt+Shift+A", ActionDeque.getShortcutDisplayText( "as-a" ) );
-		assertEquals( "Ctl+Alt+A", ActionDeque.getShortcutDisplayText( "ca-a" ) );
+		assertEquals( "Ctl+Shift+A", XAction.getShortcutDisplayText( "cs-a" ) );
+		assertEquals( "Alt+Shift+A", XAction.getShortcutDisplayText( "as-a" ) );
+		assertEquals( "Ctl+Alt+A", XAction.getShortcutDisplayText( "ca-a" ) );
 
-		assertEquals( "F1", ActionDeque.getShortcutDisplayText( "f1" ) );
-		assertEquals( "Ctl+F1", ActionDeque.getShortcutDisplayText( "c-f1" ) );
+		assertEquals( "F1", XAction.getShortcutDisplayText( "f1" ) );
+		assertEquals( "Ctl+F1", XAction.getShortcutDisplayText( "c-f1" ) );
 
-		assertEquals( "A A", ActionDeque.getShortcutDisplayText( "a a" ) );
-		assertEquals( "Ctl+K L", ActionDeque.getShortcutDisplayText( "c-k l" ) );
-		assertEquals( "Ctl+K Alt+L M", ActionDeque.getShortcutDisplayText( "c-k a-l m" ) );
+		assertEquals( "A A", XAction.getShortcutDisplayText( "a a" ) );
+		assertEquals( "Ctl+K L", XAction.getShortcutDisplayText( "c-k l" ) );
+		assertEquals( "Ctl+K Alt+L M", XAction.getShortcutDisplayText( "c-k a-l m" ) );
 	}
 
-	private static class TestActionHandler extends ActionHandler {
+	private static class TestActionHandler extends XActionHandler {
 
 		private ActionEvent event;
 

@@ -4,14 +4,14 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public abstract class ActionHandler implements ActionListener {
+public abstract class XActionHandler implements ActionListener {
 
 	private boolean enabled;
 
-	private Collection<ActionDeque> actions;
+	private Collection<XAction> actions;
 
-	public ActionHandler() {
-		actions = new CopyOnWriteArraySet<ActionDeque>();
+	public XActionHandler() {
+		actions = new CopyOnWriteArraySet<XAction>();
 	}
 
 	public boolean isEnabled() {
@@ -26,16 +26,16 @@ public abstract class ActionHandler implements ActionListener {
 		fireEnabledChanged( enabled );
 	}
 
-	public void addActionCallback( ActionDeque action ) {
+	public void addActionCallback( XAction action ) {
 		actions.add( action );
 	}
 
-	public void removeActionCallback( ActionDeque action ) {
+	public void removeActionCallback( XAction action ) {
 		actions.remove( action );
 	}
 
 	private final void fireEnabledChanged( boolean enabled ) {
-		for( ActionDeque action : actions ) {
+		for( XAction action : actions ) {
 			action.handlerEnabledChanged( this, enabled );
 		}
 	}

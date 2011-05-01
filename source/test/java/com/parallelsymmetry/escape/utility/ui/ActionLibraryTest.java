@@ -20,7 +20,7 @@ public class ActionLibraryTest extends TestCase {
 		assertNull( library.getAction( null ) );
 		assertNotNull( library.getAction( "null" ) );
 
-		Map<String, ActionDeque> actions = Accessor.getField( library, "actions" );
+		Map<String, XAction> actions = Accessor.getField( library, "actions" );
 		for( String key : actions.keySet() ) {
 			checkAction( key );
 		}
