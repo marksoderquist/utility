@@ -372,17 +372,17 @@ public class Settings {
 					Settings node = getNode( getItemPath( path, index ) );
 					list.add( type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
 				} catch( InstantiationException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( IllegalAccessException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( SecurityException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( NoSuchMethodException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( IllegalArgumentException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( InvocationTargetException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				}
 			}
 		}
@@ -442,17 +442,17 @@ public class Settings {
 					Settings node = getNode( path + "/" + name );
 					map.put( name, type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
 				} catch( InstantiationException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( IllegalAccessException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( SecurityException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( NoSuchMethodException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( IllegalArgumentException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				} catch( InvocationTargetException exception ) {
-					Log.write( exception );
+					Log.write( getAbsolutePath( path ), exception );
 				}
 			}
 		}
