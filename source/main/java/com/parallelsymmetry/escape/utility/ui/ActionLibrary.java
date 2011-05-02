@@ -20,9 +20,11 @@ public class ActionLibrary {
 
 	private Map<String, XAction> actionsByShortcut;
 
-	private String bundlePath = DEFAULT_ACTION_BUNDLE_PATH;
+	private String bundlePath;
 
-	public ActionLibrary( IconLibrary icons ) {}
+	public ActionLibrary( IconLibrary icons ) {
+		this( icons, DEFAULT_ACTION_BUNDLE_PATH );
+	}
 
 	public ActionLibrary( IconLibrary icons, String bundlePath ) {
 		this.icons = icons;
