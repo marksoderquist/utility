@@ -36,7 +36,7 @@ public final class IconLibrary {
 
 	public static final String BROKEN = "broken";
 
-	private static final String INITIAL_ICON_PATH = "/";
+	private static final String DEFAULT_ICON_PATH = "/";
 
 	private Map<String, IconProxy> proxies;
 
@@ -60,13 +60,17 @@ public final class IconLibrary {
 	 * image.
 	 */
 	public IconLibrary() {
+		this( DEFAULT_ICON_PATH );
+	}
+
+	public IconLibrary( String path ) {
 		this.paths = new CopyOnWriteArrayList<String>();
 		this.loaders = new ConcurrentHashMap<String, ClassLoader>();
 		proxies = new ConcurrentHashMap<String, IconProxy>();
 		icons = new ConcurrentHashMap<IconProxy, Icon>();
 
 		ClassLoader loader = getClass().getClassLoader();
-		addPath( INITIAL_ICON_PATH, loader );
+		addPath( path, loader );
 
 		// No other icons need to be installed. See JavaDoc.
 		installIcon( BROKEN, new BrokenIcon() );
