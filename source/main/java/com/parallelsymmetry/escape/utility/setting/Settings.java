@@ -340,33 +340,50 @@ public class Settings {
 		put( path, Colors.encode( color ) );
 	}
 
-	public <T extends Persistent<T>> List<T> getList( Class<T> type, String path ) {
-		return getList( type, path, 0 );
-	}
+	@SuppressWarnings( "unchecked" )
+	public <T extends Persistent<T>> List<T> getList( String path, List<T> defaultList ) {
+		int count = getInt( path + ITEM_COUNT, -1 );
+		String typeName = get( path + "/type", null );
 
-	public <T extends Persistent<T>> List<T> getList( Class<T> type, String path, int size ) {
-		int count = getInt( path + ITEM_COUNT, size );
+		Class<T> type = null;
+		try {
+			type = typeName == null ? null : (Class<T>)Class.forName( typeName );
+		} catch( ClassNotFoundException exception ) {
+			Log.write( exception );
+		}
 
-		List<T> list = new ArrayList<T>( count );
-		for( int index = 0; index < count; index++ ) {
-			try {
-				Constructor<T> constructor = type.getConstructor();
-				constructor.setAccessible( true );
-				T object = constructor.newInstance();
-				Settings node = getNode( getItemPath( path, index ) );
-				list.add( type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
-			} catch( InstantiationException exception ) {
-				Log.write( exception );
-			} catch( IllegalAccessException exception ) {
-				Log.write( exception );
-			} catch( SecurityException exception ) {
-				Log.write( exception );
-			} catch( NoSuchMethodException exception ) {
-				Log.write( exception );
-			} catch( IllegalArgumentException exception ) {
-				Log.write( exception );
-			} catch( InvocationTargetException exception ) {
-				Log.write( exception );
+		List<T> list = null;
+		if( type == null || count < 0 ) {
+			list = defaultList;
+			if( list != null ) {
+				count = list.size();
+				for( int index = 0; index < count; index++ ) {
+					Settings node = getNode( getItemPath( path, index ) );
+					list.get( index ).loadSettings( node );
+				}
+			}
+		} else {
+			list = new ArrayList<T>( count );
+			for( int index = 0; index < count; index++ ) {
+				try {
+					Constructor<T> constructor = type.getConstructor();
+					constructor.setAccessible( true );
+					T object = constructor.newInstance();
+					Settings node = getNode( getItemPath( path, index ) );
+					list.add( type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
+				} catch( InstantiationException exception ) {
+					Log.write( exception );
+				} catch( IllegalAccessException exception ) {
+					Log.write( exception );
+				} catch( SecurityException exception ) {
+					Log.write( exception );
+				} catch( NoSuchMethodException exception ) {
+					Log.write( exception );
+				} catch( IllegalArgumentException exception ) {
+					Log.write( exception );
+				} catch( InvocationTargetException exception ) {
+					Log.write( exception );
+				}
 			}
 		}
 
@@ -383,47 +400,60 @@ public class Settings {
 			reset( path );
 		} else {
 			int newCount = list.size();
-			for( int index = 0; index < newCount; index++ ) {
-				list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
+			if( newCount > 0 ) {
+				for( int index = 0; index < newCount; index++ ) {
+					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
+				}
+
+				put( path + "/type", list.iterator().next().getClass().getName() );
+				putInt( path + ITEM_COUNT, newCount );
 			}
-			putInt( path + ITEM_COUNT, newCount );
 		}
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public <T extends Persistent<?>> Map<String, T> getMap( String path ) {
-		Map<String, T> map = new HashMap<String, T>();
-
+	public <T extends Persistent<?>> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
 		String typeName = get( path + "/type", null );
-		if( typeName == null ) return map;
 
 		Class<T> type = null;
 		try {
-			type = (Class<T>)Class.forName( typeName );
+			type = typeName == null ? null : (Class<T>)Class.forName( typeName );
 		} catch( ClassNotFoundException exception ) {
 			Log.write( exception );
 		}
 
-		Set<String> names = getChildNames( path );
-		for( String name : names ) {
-			try {
-				Constructor<T> constructor = type.getConstructor();
-				constructor.setAccessible( true );
-				T object = constructor.newInstance();
-				Settings node = getNode( path + "/" + name );
-				map.put( name, type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
-			} catch( InstantiationException exception ) {
-				Log.write( exception );
-			} catch( IllegalAccessException exception ) {
-				Log.write( exception );
-			} catch( SecurityException exception ) {
-				Log.write( exception );
-			} catch( NoSuchMethodException exception ) {
-				Log.write( exception );
-			} catch( IllegalArgumentException exception ) {
-				Log.write( exception );
-			} catch( InvocationTargetException exception ) {
-				Log.write( exception );
+		Map<String, T> map = new HashMap<String, T>();
+		if( type == null ) {
+			map = defaultMap;
+			if( map != null ) {
+				for( String name : map.keySet() ) {
+					Settings node = getNode( path + "/" + name );
+					map.get( name ).loadSettings( node );
+				}
+			}
+		} else {
+			map = new HashMap<String, T>();
+			Set<String> names = getChildNames( path );
+			for( String name : names ) {
+				try {
+					Constructor<T> constructor = type.getConstructor();
+					constructor.setAccessible( true );
+					T object = constructor.newInstance();
+					Settings node = getNode( path + "/" + name );
+					map.put( name, type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
+				} catch( InstantiationException exception ) {
+					Log.write( exception );
+				} catch( IllegalAccessException exception ) {
+					Log.write( exception );
+				} catch( SecurityException exception ) {
+					Log.write( exception );
+				} catch( NoSuchMethodException exception ) {
+					Log.write( exception );
+				} catch( IllegalArgumentException exception ) {
+					Log.write( exception );
+				} catch( InvocationTargetException exception ) {
+					Log.write( exception );
+				}
 			}
 		}
 
@@ -434,15 +464,17 @@ public class Settings {
 		Set<String> names = getChildNames( path );
 		for( String name : names ) {
 			removeNode( path + "/" + name );
-		}		
-		
+		}
+
 		if( map == null ) {
 			reset( path );
 		} else {
-			put( path + "/type", map.values().iterator().next().getClass().getName() );
+			if( map.size() > 0 ) {
+				for( String name : map.keySet() ) {
+					map.get( name ).saveSettings( getNode( path + "/" + name ) );
+				}
 
-			for( String name : map.keySet() ) {
-				map.get( name ).saveSettings( getNode( path + "/" + name ) );
+				put( path + "/type", map.values().iterator().next().getClass().getName() );
 			}
 		}
 	}
