@@ -12,7 +12,7 @@ import com.parallelsymmetry.escape.utility.Bundles;
 
 public class ActionLibrary {
 
-	public static final String ACTIONS = "actions";
+	public static final String DEFAULT_ACTION_BUNDLE_PATH = "actions";
 
 	private IconLibrary icons;
 
@@ -20,8 +20,13 @@ public class ActionLibrary {
 
 	private Map<String, XAction> actionsByShortcut;
 
-	public ActionLibrary( IconLibrary icons ) {
+	private String bundlePath = DEFAULT_ACTION_BUNDLE_PATH;
+
+	public ActionLibrary( IconLibrary icons ) {}
+
+	public ActionLibrary( IconLibrary icons, String bundlePath ) {
 		this.icons = icons;
+		this.bundlePath = bundlePath;
 		actions = new ConcurrentHashMap<String, XAction>();
 		actionsByShortcut = new ConcurrentHashMap<String, XAction>();
 
@@ -103,11 +108,11 @@ public class ActionLibrary {
 		XAction action = actions.get( key );
 		if( action != null ) return action;
 
-		String name = Bundles.getString( ACTIONS, key );
-		String mnemonic = Bundles.getString( ACTIONS, key + ".mnemonic", "-1", false );
-		String shortcut = Bundles.getString( ACTIONS, key + ".shortcut", false );
-		String display = Bundles.getString( ACTIONS, key + ".display", false );
-		String icon = Bundles.getString( ACTIONS, key + ".icon", false );
+		String name = Bundles.getString( bundlePath, key );
+		String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", "-1", false );
+		String shortcut = Bundles.getString( bundlePath, key + ".shortcut", false );
+		String display = Bundles.getString( bundlePath, key + ".display", false );
+		String icon = Bundles.getString( bundlePath, key + ".icon", false );
 		if( name == null ) name = key;
 
 		return addAction( key, name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), shortcut, display );
