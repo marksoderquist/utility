@@ -11,6 +11,11 @@ public abstract class XActionHandler implements ActionListener {
 	private Collection<XAction> actions;
 
 	public XActionHandler() {
+		this( false );
+	}
+	
+	public XActionHandler( boolean enabled ) {
+		this.enabled = enabled;
 		actions = new CopyOnWriteArraySet<XAction>();
 	}
 
@@ -36,7 +41,7 @@ public abstract class XActionHandler implements ActionListener {
 
 	private final void fireEnabledChanged( boolean enabled ) {
 		for( XAction action : actions ) {
-			action.handlerEnabledChanged( this, enabled );
+			action.handleEnabledChanged( this, enabled );
 		}
 	}
 

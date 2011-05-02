@@ -129,21 +129,10 @@ public class XAction extends AbstractAction {
 	 */
 	public void pushHandler( XActionHandler handler ) {
 		if( handler == null ) throw new IllegalArgumentException( "Null ActionListener not allowed." );
-		pushHandler( handler, handler.isEnabled() );
-	}
-
-	/**
-	 * Add an <code>XActionHandler</code>.
-	 * 
-	 * @param handler The XActionHandler that will handle this action.
-	 */
-	public void pushHandler( XActionHandler handler, boolean enabled ) {
-		if( handler == null ) throw new IllegalArgumentException( "Null ActionListener not allowed." );
 		handlers.remove( handler );
 		handlers.push( handler );
 		handler.addActionCallback( this );
-		handler.setEnabled( enabled );
-		new SetEnabled( enabled );
+		new SetEnabled( handler.isEnabled() );
 	}
 
 	/**
@@ -258,7 +247,7 @@ public class XAction extends AbstractAction {
 		return buffer.toString();
 	}
 
-	void handlerEnabledChanged( XActionHandler handler, boolean enabled ) {
+	void handleEnabledChanged( XActionHandler handler, boolean enabled ) {
 		new SetEnabled( peekHandler().isEnabled() );
 	}
 
