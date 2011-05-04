@@ -7,23 +7,23 @@ import junit.framework.TestCase;
 
 import com.parallelsymmetry.escape.utility.Accessor;
 
-public class ActionShortcutWatcherTest extends TestCase {
+public class ActionAcceleratorWatcherTest extends TestCase {
 
 	public void testMatch() throws Exception {
-		List<String> shortcuts = new ArrayList<String>();
-		ActionShortcutWatcher watcher = new ActionShortcutWatcher( new ActionLibrary( new IconLibrary() ) );
+		List<String> accelerators = new ArrayList<String>();
+		ActionAcceleratorWatcher watcher = new ActionAcceleratorWatcher( new ActionLibrary( new IconLibrary() ) );
 
-		assertEquals( ActionShortcutWatcher.Match.NONE, (ActionShortcutWatcher.Match)Accessor.callMethod( watcher, "match", List.class, shortcuts, String.class, null ) );
-		assertEquals( ActionShortcutWatcher.Match.NONE, (ActionShortcutWatcher.Match)Accessor.callMethod( watcher, "match", List.class, shortcuts, String.class, "c-o" ) );
+		assertEquals( ActionAcceleratorWatcher.Match.NONE, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, null ) );
+		assertEquals( ActionAcceleratorWatcher.Match.NONE, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-o" ) );
 
-		shortcuts.add( "c-n a" );
-		shortcuts.add( "c-n b" );
-		assertEquals( ActionShortcutWatcher.Match.PARTIAL, (ActionShortcutWatcher.Match)Accessor.callMethod( watcher, "match", List.class, shortcuts, String.class, "c-n" ) );
-		assertEquals( ActionShortcutWatcher.Match.EXACT, (ActionShortcutWatcher.Match)Accessor.callMethod( watcher, "match", List.class, shortcuts, String.class, "c-n a" ) );
+		accelerators.add( "c-n a" );
+		accelerators.add( "c-n b" );
+		assertEquals( ActionAcceleratorWatcher.Match.PARTIAL, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-n" ) );
+		assertEquals( ActionAcceleratorWatcher.Match.EXACT, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-n a" ) );
 	}
 
 	public void testStartsWith() throws Exception {
-		ActionShortcutWatcher watcher = new ActionShortcutWatcher( new ActionLibrary( new IconLibrary() ) );
+		ActionAcceleratorWatcher watcher = new ActionAcceleratorWatcher( new ActionLibrary( new IconLibrary() ) );
 
 		assertTrue( (Boolean)Accessor.callMethod( watcher, "sequenceStartsWith", String.class, null, String.class, null ) );
 		assertFalse( (Boolean)Accessor.callMethod( watcher, "sequenceStartsWith", String.class, "c-m", String.class, null ) );

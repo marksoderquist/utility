@@ -10,7 +10,7 @@ import java.util.StringTokenizer;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
-public class ActionShortcutWatcher implements KeyEventPostProcessor {
+public class ActionAcceleratorWatcher implements KeyEventPostProcessor {
 
 	enum Match {
 		NONE, EXACT, PARTIAL
@@ -22,9 +22,9 @@ public class ActionShortcutWatcher implements KeyEventPostProcessor {
 
 	private boolean block;
 
-	private List<String> shortcuts;
+	private List<String> accelerators;
 
-	public ActionShortcutWatcher( ActionLibrary library ) {
+	public ActionAcceleratorWatcher( ActionLibrary library ) {
 		this.library = library;
 	}
 
@@ -54,18 +54,18 @@ public class ActionShortcutWatcher implements KeyEventPostProcessor {
 			// Get the keystroke string representation.
 			String keystroke = XAction.encodeKeyEvent( event );
 
-			// If starting a new sequence get a new shortcut list.
+			// If starting a new sequence get a new accelerator list.
 			if( sequence == null ) {
 				sequence = keystroke;
-				shortcuts = getShortcuts();
+				accelerators = getAccelerators();
 			} else {
 				sequence = new StringBuilder( sequence ).append( " " ).append( keystroke ).toString();
 			}
 
-			// Match the key sequence with a shortcut.
-			switch( match( shortcuts, sequence ) ) {
+			// Match the key sequence with a accelerator.
+			switch( match( accelerators, sequence ) ) {
 				case EXACT: {
-					block = processShortcut( sequence );
+					block = processAccelerator( sequence );
 					return block;
 				}
 				case PARTIAL: {
@@ -84,49 +84,49 @@ public class ActionShortcutWatcher implements KeyEventPostProcessor {
 		return false;
 	}
 
-	private List<String> getShortcuts() {
-		List<String> shortcuts = new ArrayList<String>();
+	private List<String> getAccelerators() {
+		List<String> accelerators = new ArrayList<String>();
 
-		shortcuts.addAll( library.getShortcuts() );
-		Collections.sort( shortcuts );
+		accelerators.addAll( library.getAccelerators() );
+		Collections.sort( accelerators );
 
-		return shortcuts;
+		return accelerators;
 	}
 
 	/**
-	 * Match the sequence to one of the shortcuts.
+	 * Match the sequence to one of the accelerators.
 	 * 
-	 * @param shortcuts The shortcuts to try and match.
+	 * @param accelerators The accelerators to try and match.
 	 * @param sequence The key sequence to look for.
-	 * @return Match.NONE if the sequence does not match any shortcuts.<br/>
-	 *         Match.PARTIAL if the shortcut matches the start of a shortcut.<br>
-	 *         Match.EXACT if the sequence exactly matches a shortcut.
+	 * @return Match.NONE if the sequence does not match any accelerators.<br/>
+	 *         Match.PARTIAL if the accelerator matches the start of a accelerator.<br>
+	 *         Match.EXACT if the sequence exactly matches a accelerator.
 	 */
-	private Match match( List<String> shortcuts, String sequence ) {
+	private Match match( List<String> accelerators, String sequence ) {
 		if( sequence == null ) return Match.NONE;
 
 		Log.write( Log.DEBUG, "Match key sequence: " + sequence );
 
-		int index = Collections.binarySearch( shortcuts, sequence );
+		int index = Collections.binarySearch( accelerators, sequence );
 		if( index >= 0 ) return Match.EXACT;
 
 		// Check for start with matches.
 		index = -index - 1;
 		List<String> matches = new ArrayList<String>();
-		String shortcut = null;
-		int count = shortcuts.size();
+		String accelerator = null;
+		int count = accelerators.size();
 		while( index < count ) {
-			shortcut = (String)shortcuts.get( index++ );
-			if( sequenceStartsWith( shortcut, sequence ) ) {
-				matches.add( shortcut );
+			accelerator = (String)accelerators.get( index++ );
+			if( sequenceStartsWith( accelerator, sequence ) ) {
+				matches.add( accelerator );
 			} else {
-				index = shortcuts.size();
+				index = accelerators.size();
 			}
 		}
 
 		// Trim the list down to just those that matched.
 		if( matches.size() > 0 ) {
-			shortcuts = matches;
+			accelerators = matches;
 			return Match.PARTIAL;
 		}
 
@@ -164,25 +164,25 @@ public class ActionShortcutWatcher implements KeyEventPostProcessor {
 	}
 
 	/**
-	 * Lookup the action for the shortcut and cause an event to be sent.
+	 * Lookup the action for the accelerator and cause an event to be sent.
 	 */
-	private boolean processShortcut( String shortcut ) {
-		Log.write( Log.DEBUG, "Shortcut typed: " + shortcut );
-		ActionEvent event = new ActionEvent( this, ActionEvent.ACTION_PERFORMED, shortcut );
-		XAction action = library.getActionByShortcut( shortcut );
+	private boolean processAccelerator( String accelerator ) {
+		Log.write( Log.DEBUG, "Accelerator typed: " + accelerator );
+		ActionEvent event = new ActionEvent( this, ActionEvent.ACTION_PERFORMED, accelerator );
+		XAction action = library.getActionByAccelerator( accelerator );
 		reset();
 
 		if( action == null ) {
-			Log.write( Log.WARN, "Shortcut action not found: " + shortcut );
+			Log.write( Log.WARN, "Accelerator action not found: " + accelerator );
 			return false;
 		}
 
 		boolean result = action.performAction( event );
 
 		if( result == false ) {
-			Log.write( Log.WARN, "Shortcut not used: " + shortcut );
+			Log.write( Log.WARN, "Accelerator not used: " + accelerator );
 		} else {
-			Log.write( Log.DEBUG, "Shortcut used:  " + shortcut );
+			Log.write( Log.DEBUG, "Accelerator used:  " + accelerator );
 		}
 
 		return result;

@@ -42,9 +42,9 @@ public class XAction extends AbstractAction {
 	
 	public static final String DEFAULT_SHIFT_PREFIX = "Shift";
 	
-	public static final String SHORTCUT_KEY_DISPLAY = "shortcut.key.display";
+	public static final String ACCELERATOR_KEY_DISPLAY = "accelerator.key.display";
 
-	public static final String SHORTCUT_KEY_SEQUENCE = "shortcut.key.sequence";
+	public static final String ACCELERATOR_KEY_SEQUENCE = "accelerator.key.sequence";
 
 	private Deque<XActionHandler> handlers;
 
@@ -60,11 +60,11 @@ public class XAction extends AbstractAction {
 		this( command, name, icon, mnemonic, null );
 	}
 
-	public XAction( String command, String name, Icon icon, int mnemonic, String shortcut ) {
-		this( command, name, icon, mnemonic, shortcut, null );
+	public XAction( String command, String name, Icon icon, int mnemonic, String accelerator ) {
+		this( command, name, icon, mnemonic, accelerator, null );
 	}
 
-	public XAction( String command, String name, Icon icon, int mnemonic, String shortcut, String display ) {
+	public XAction( String command, String name, Icon icon, int mnemonic, String accelerator, String display ) {
 		super( name, icon );
 		enabled = false;
 		putValue( Action.SHORT_DESCRIPTION, name );
@@ -83,15 +83,15 @@ public class XAction extends AbstractAction {
 			putValue( DISPLAYED_MNEMONIC_INDEX_KEY, mnemonic );
 		}
 
-		// Set the shortcut sequence value.
-		if( shortcut != null ) {
-			putValue( SHORTCUT_KEY_SEQUENCE, shortcut );
-			putValue( SHORTCUT_KEY_DISPLAY, getShortcutDisplayText( shortcut ) );
+		// Set the accelerator sequence value.
+		if( accelerator != null ) {
+			putValue( ACCELERATOR_KEY_SEQUENCE, accelerator );
+			putValue( ACCELERATOR_KEY_DISPLAY, getAcceleratorDisplayText( accelerator ) );
 		}
 
-		// Set the shortcut display value.
+		// Set the accelerator display value.
 		if( display != null ) {
-			putValue( SHORTCUT_KEY_DISPLAY, display );
+			putValue( ACCELERATOR_KEY_DISPLAY, display );
 		}
 	}
 
@@ -100,7 +100,7 @@ public class XAction extends AbstractAction {
 	}
 
 	/**
-	 * Called by the <code>ActionShortcutWatcher</code>.
+	 * Called by the <code>ActionAcceleratorWatcher</code>.
 	 * 
 	 * @return Whether the event was dispatched to any listeners.
 	 */
@@ -197,13 +197,13 @@ public class XAction extends AbstractAction {
 	}
 
 	/**
-	 * Get the displayable text for a shortcut.
+	 * Get the displayable text for a accelerator.
 	 */
-	public static final String getShortcutDisplayText( String shortcut ) {
-		if( shortcut == null || shortcut == "" ) return "";
+	public static final String getAcceleratorDisplayText( String accelerator ) {
+		if( accelerator == null || accelerator == "" ) return "";
 
 		StringBuffer buffer = new StringBuffer();
-		StringTokenizer tokenizer = new StringTokenizer( shortcut );
+		StringTokenizer tokenizer = new StringTokenizer( accelerator );
 
 		while( tokenizer.hasMoreTokens() ) {
 			String keystroke = tokenizer.nextToken();

@@ -114,23 +114,23 @@ public class XActionTest extends TestCase {
 		assertFalse( action.isEnabled() );
 	}
 
-	public void testGetShortcutDisplayText() {
-		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getShortcutDisplayText( "a-a" ) );
-		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+A", XAction.getShortcutDisplayText( "c-a" ) );
-		assertEquals( XAction.DEFAULT_META_PREFIX + "+A", XAction.getShortcutDisplayText( "m-a" ) );
-		assertEquals( XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "s-a" ) );
+	public void testGetAcceleratorDisplayText() {
+		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "a-a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+A", XAction.getAcceleratorDisplayText( "c-a" ) );
+		assertEquals( XAction.DEFAULT_META_PREFIX + "+A", XAction.getAcceleratorDisplayText( "m-a" ) );
+		assertEquals( XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "s-a" ) );
 
-		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "as-a" ) );
-		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+" + XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getShortcutDisplayText( "ca-a" ) );
-		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "cs-a" ) );
-		assertEquals( XAction.DEFAULT_META_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getShortcutDisplayText( "ms-a" ) );
+		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "as-a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+" + XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "ca-a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "cs-a" ) );
+		assertEquals( XAction.DEFAULT_META_PREFIX + "+" + XAction.DEFAULT_SHIFT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "ms-a" ) );
 
-		assertEquals( "F1", XAction.getShortcutDisplayText( "f1" ) );
-		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+F1", XAction.getShortcutDisplayText( "c-f1" ) );
+		assertEquals( "F1", XAction.getAcceleratorDisplayText( "f1" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+F1", XAction.getAcceleratorDisplayText( "c-f1" ) );
 
-		assertEquals( "A A", XAction.getShortcutDisplayText( "a a" ) );
-		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K L", XAction.getShortcutDisplayText( "c-k l" ) );
-		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K " + XAction.DEFAULT_ALT_PREFIX + "+L M", XAction.getShortcutDisplayText( "c-k a-l m" ) );
+		assertEquals( "A A", XAction.getAcceleratorDisplayText( "a a" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K L", XAction.getAcceleratorDisplayText( "c-k l" ) );
+		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K " + XAction.DEFAULT_ALT_PREFIX + "+L M", XAction.getAcceleratorDisplayText( "c-k a-l m" ) );
 	}
 
 	private static class TestActionHandler extends XActionHandler {
