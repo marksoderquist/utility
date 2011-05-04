@@ -149,4 +149,17 @@ public class ActionLibrary {
 		return action;
 	}
 
+	public void refresh() {
+		// Go through the actions and change the names, accelerators, etc.
+		for( String key : actions.keySet() ) {
+			String name = Bundles.getString( bundlePath, key );
+			String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", "-1", false );
+			String accelerator = Bundles.getString( bundlePath, key + ".accelerator", false );
+			String display = Bundles.getString( bundlePath, key + ".display", false );
+			String icon = Bundles.getString( bundlePath, key + ".icon", false );
+
+			actions.get( key ).setValues( name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), accelerator, display );
+		}
+	}
+
 }

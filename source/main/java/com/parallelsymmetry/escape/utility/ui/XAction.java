@@ -67,10 +67,17 @@ public class XAction extends AbstractAction {
 	public XAction( String command, String name, Icon icon, int mnemonic, String accelerator, String display ) {
 		super( name, icon );
 		enabled = false;
-		putValue( Action.SHORT_DESCRIPTION, name );
 		putValue( Action.ACTION_COMMAND_KEY, command );
 		handlers = new LinkedBlockingDeque<XActionHandler>();
 
+		setValues( name, icon, mnemonic, accelerator, display );
+	}
+	
+	void setValues(String name, Icon icon, int mnemonic, String accelerator, String display ){
+		putValue(Action.NAME, name);
+		putValue(Action.SMALL_ICON, icon);
+		putValue( Action.SHORT_DESCRIPTION, name );
+		
 		int mnemonicKey = -1;
 		if( mnemonic > -1 && mnemonic < name.length() ) {
 			char mnemonicChar = name.charAt( mnemonic );
