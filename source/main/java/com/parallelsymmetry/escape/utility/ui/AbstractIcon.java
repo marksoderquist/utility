@@ -3,18 +3,15 @@ package com.parallelsymmetry.escape.utility.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -23,8 +20,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
 import java.io.File;
 import java.io.IOException;
@@ -35,24 +30,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 
 import com.parallelsymmetry.escape.utility.TextUtil;
 
 public abstract class AbstractIcon implements Icon {
 
-	public static final int DEFAULT_PEN_WIDTH = 8;
+	public static final int DEFAULT_ICON_SIZE = 256;
+
+	public static final int DEFAULT_PEN_WIDTH = DEFAULT_ICON_SIZE / 32;
 
 	public static final int DARK_GRADIENT_PAINT = 1;
 
 	public static final int MEDIUM_GRADIENT_PAINT = 2;
 
 	public static final int LIGHT_GRADIENT_PAINT = 3;
-
-	public static final double DEGREES_PER_RADIAN = 180 / Math.PI;
-
-	public static final double RADIANS_PER_DEGREE = Math.PI / 180;
 
 	protected static final String OUTLINE_DARK = "outline.dark";
 
@@ -78,9 +69,9 @@ public abstract class AbstractIcon implements Icon {
 
 	protected static final Stroke DOUBLE_STROKE = new BasicStroke( DEFAULT_PEN_WIDTH * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 
-	protected static final Map<String, Color> colors;
+	protected static final Map<String, Color> DEFAULT_COLORS;
 
-	protected final int grid = 256;
+	private static final double RADIANS_PER_DEGREE = Math.PI / 180;
 
 	protected int width;
 
@@ -97,32 +88,36 @@ public abstract class AbstractIcon implements Icon {
 	static {
 		Color basic = Color.BLACK;
 
-		colors = new ConcurrentHashMap<String, Color>();
-		colors.put( OUTLINE_DARK, basic.darker() );
-		colors.put( OUTLINE, basic );
-		colors.put( OUTLINE_LIGHT, basic.brighter() );
+		DEFAULT_COLORS = new ConcurrentHashMap<String, Color>();
+		DEFAULT_COLORS.put( OUTLINE_DARK, basic.darker() );
+		DEFAULT_COLORS.put( OUTLINE, basic );
+		DEFAULT_COLORS.put( OUTLINE_LIGHT, basic.brighter() );
 
-		colors.put( GRADIENT_LIGHT_BEGIN, Colors.mix( basic, Color.WHITE, 1 ) );
-		colors.put( GRADIENT_LIGHT_END, Colors.mix( basic, Color.WHITE, 0.5 ) );
+		DEFAULT_COLORS.put( GRADIENT_LIGHT_BEGIN, Colors.mix( basic, Color.WHITE, 1 ) );
+		DEFAULT_COLORS.put( GRADIENT_LIGHT_END, Colors.mix( basic, Color.WHITE, 0.5 ) );
 
-		colors.put( GRADIENT_MEDIUM_BEGIN, Colors.mix( basic, Color.WHITE, 0.875 ) );
-		colors.put( GRADIENT_MEDIUM_END, Colors.mix( basic, Color.WHITE, 0.375 ) );
+		DEFAULT_COLORS.put( GRADIENT_MEDIUM_BEGIN, Colors.mix( basic, Color.WHITE, 0.875 ) );
+		DEFAULT_COLORS.put( GRADIENT_MEDIUM_END, Colors.mix( basic, Color.WHITE, 0.375 ) );
 
-		colors.put( GRADIENT_DARK_BEGIN, Colors.mix( basic, Color.WHITE, 0.75 ) );
-		colors.put( GRADIENT_DARK_END, Colors.mix( basic, Color.WHITE, 0.25 ) );
+		DEFAULT_COLORS.put( GRADIENT_DARK_BEGIN, Colors.mix( basic, Color.WHITE, 0.75 ) );
+		DEFAULT_COLORS.put( GRADIENT_DARK_END, Colors.mix( basic, Color.WHITE, 0.25 ) );
 	}
 
 	public AbstractIcon() {
-		instructions = new CopyOnWriteArrayList<Instruction>();
-		width = grid;
-		height = grid;
+		this( DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE );
 	}
 
-	public int getIconHeight() {
-		return width;
+	public AbstractIcon( int width, int height ) {
+		this.width = width;
+		this.height = height;
+		instructions = new CopyOnWriteArrayList<Instruction>();
 	}
 
 	public int getIconWidth() {
+		return width;
+	}
+
+	public int getIconHeight() {
 		return height;
 	}
 
@@ -176,25 +171,6 @@ public abstract class AbstractIcon implements Icon {
 		} catch( IOException exception ) {
 			exception.printStackTrace();
 		}
-	}
-
-	public static void showSample( Icon icon ) {
-		showSample( icon, null );
-	}
-
-	public static void showSample( Icon icon, ImageFilter filter ) {
-		JFrame frame = new JFrame( icon.getClass().getName() );
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		frame.add( new SamplePanel( icon, filter ) );
-		frame.pack();
-
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (int)( ( screen.width - frame.getWidth() ) * 0.5 );
-		int y = (int)( ( screen.height - frame.getHeight() ) * 0.25 );
-
-		frame.setLocation( x, y );
-		frame.setResizable( false );
-		frame.setVisible( true );
 	}
 
 	protected void add( Graphics2D graphics, AbstractIcon icon ) {
@@ -336,19 +312,19 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected Paint darkPaint( Point2D anchor ) {
-		return new GradientPaint( anchor, colors.get( GRADIENT_DARK_BEGIN ), new Point2D.Double( anchor.getX() + grid, anchor.getY() + grid ), colors.get( GRADIENT_DARK_END ) );
+		return new GradientPaint( anchor, DEFAULT_COLORS.get( GRADIENT_DARK_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), DEFAULT_COLORS.get( GRADIENT_DARK_END ) );
 	}
 
 	protected Paint mediumPaint( Point2D anchor ) {
-		return new GradientPaint( anchor, colors.get( GRADIENT_MEDIUM_BEGIN ), new Point2D.Double( anchor.getX() + grid, anchor.getY() + grid ), colors.get( GRADIENT_MEDIUM_END ) );
+		return new GradientPaint( anchor, DEFAULT_COLORS.get( GRADIENT_MEDIUM_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), DEFAULT_COLORS.get( GRADIENT_MEDIUM_END ) );
 	}
 
 	protected Paint lightPaint( Point2D anchor ) {
-		return new GradientPaint( anchor, colors.get( GRADIENT_LIGHT_BEGIN ), new Point2D.Double( anchor.getX() + grid, anchor.getY() + grid ), colors.get( GRADIENT_LIGHT_END ) );
+		return new GradientPaint( anchor, DEFAULT_COLORS.get( GRADIENT_LIGHT_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), DEFAULT_COLORS.get( GRADIENT_LIGHT_END ) );
 	}
 
 	protected Paint coloredPaint( Shape shape, Color color ) {
-		return coloredPaint( shape, colors.get( GRADIENT_LIGHT_BEGIN ), color );
+		return coloredPaint( shape, DEFAULT_COLORS.get( GRADIENT_LIGHT_BEGIN ), color );
 	}
 
 	protected Paint coloredPaint( Shape shape, Color color1, Color color2 ) {
@@ -359,11 +335,11 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected Paint coloredPaint( Point2D anchor, Color color ) {
-		return coloredPaint( anchor, colors.get( GRADIENT_LIGHT_BEGIN ), color );
+		return coloredPaint( anchor, DEFAULT_COLORS.get( GRADIENT_LIGHT_BEGIN ), color );
 	}
 
 	protected Paint coloredPaint( Point2D anchor, Color color1, Color color2 ) {
-		return new GradientPaint( anchor, color1, new Point2D.Double( anchor.getX() + grid, anchor.getY() + grid ), color2 );
+		return new GradientPaint( anchor, color1, new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), color2 );
 	}
 
 	protected Path getDot( double x, double y ) {
@@ -745,7 +721,7 @@ public abstract class AbstractIcon implements Icon {
 		}
 
 		public void paint( Graphics2D graphics, int x, int y ) {
-			graphics.setPaint( paint == null ? colors.get( OUTLINE ) : paint );
+			graphics.setPaint( paint == null ? DEFAULT_COLORS.get( OUTLINE ) : paint );
 			graphics.setStroke( stroke == null ? AbstractIcon.DEFAULT_STROKE : stroke );
 			graphics.translate( x, y );
 			graphics.draw( shape );
@@ -804,95 +780,12 @@ public abstract class AbstractIcon implements Icon {
 
 		public void paint( Graphics2D graphics, int x, int y ) {
 			if( TextUtil.isEmpty( text.getText() ) ) return;
-			graphics.setColor( color == null ? colors.get( OUTLINE ) : color );
+			graphics.setColor( color == null ? DEFAULT_COLORS.get( OUTLINE ) : color );
 			graphics.setStroke( stroke == null ? AbstractIcon.DEFAULT_STROKE : stroke );
 			graphics.setFont( text.getFont() == null ? graphics.getFont() : text.getFont() );
 			graphics.translate( x, y );
 			graphics.drawString( text.getText(), (float)text.getX(), (float)text.getY() );
 			graphics.translate( -x, -y );
-		}
-
-	}
-
-	private static class SamplePanel extends JComponent {
-
-		private static final long serialVersionUID = 7020998970315590613L;
-
-		private Image iconImage;
-
-		private Image gridImage;
-
-		private Color border = new Color( 255, 0, 0, 64 );
-
-		public SamplePanel( Icon icon, ImageFilter filter ) {
-			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-			icon.paintIcon( null, iconImage.getGraphics(), 0, 0 );
-			if( filter != null ) iconImage = Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( iconImage.getSource(), filter ) );
-			gridImage = createBackgroundImage();
-			setBackground( new Color( 220, 220, 220 ) );
-			setBackground( Color.WHITE );
-		}
-
-		private Image createBackgroundImage() {
-			Image image = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_RGB );
-
-			Graphics graphics = image.getGraphics();
-			for( int x = 0; x < 16; x++ ) {
-				for( int y = 0; y < 16; y++ ) {
-					graphics.setColor( ( x + y ) % 2 == 0 ? Color.WHITE : Color.LIGHT_GRAY );
-					graphics.fillRect( x, y, 1, 1 );
-				}
-			}
-
-			return image;
-		}
-
-		@Override
-		public void paint( Graphics graphics ) {
-			graphics.setColor( getBackground() );
-			graphics.fillRect( 0, 0, getWidth(), getHeight() );
-
-			paintIcon( graphics, 0, 0, 256, true );
-			paintZoomedIcon( graphics, 256, 0, 16, false );
-
-			paintIcon( graphics, 0, 256, 256, false );
-			paintIcon( graphics, 256, 256, 128, false );
-			paintIcon( graphics, 384, 384, 64, false );
-			paintIcon( graphics, 448, 448, 32, false );
-			paintIcon( graphics, 480, 480, 16, false );
-
-			// Center 448
-			paintIcon( graphics, 436, 308, 24, false );
-			paintIcon( graphics, 296, 420, 48, false );
-		}
-
-		private void paintIcon( Graphics graphics, int x, int y, int size, boolean paintGrid ) {
-			if( paintGrid ) graphics.drawImage( gridImage, x, y, size, size, null );
-			graphics.setColor( border );
-			graphics.drawRect( x, y, size - 1, size - 1 );
-			graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
-		}
-
-		private void paintZoomedIcon( Graphics graphics, int x, int y, int size, boolean paintGrid ) {
-			if( paintGrid ) graphics.drawImage( gridImage, x, y, 256, 256, null );
-			graphics.setColor( border );
-			graphics.drawRect( x, y, 255, 255 );
-			graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, 256, 256, null );
-		}
-
-		@Override
-		public Dimension getMinimumSize() {
-			return new Dimension( 512, 512 );
-		}
-
-		@Override
-		public Dimension getPreferredSize() {
-			return getMinimumSize();
-		}
-
-		@Override
-		public Dimension getMaximumSize() {
-			return getMinimumSize();
 		}
 
 	}

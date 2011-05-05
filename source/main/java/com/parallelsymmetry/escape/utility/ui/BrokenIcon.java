@@ -9,7 +9,7 @@ public class BrokenIcon extends AbstractIcon {
 	public void render( Graphics2D graphics ) {
 		int penWidth = DEFAULT_PEN_WIDTH * 4;
 		int near = penWidth / 2 + 24;
-		int far = grid - penWidth / 2 - 24;
+		int far = DEFAULT_ICON_SIZE - penWidth / 2 - 24;
 
 		Path path = new Path();
 		path.moveTo( near, near );
@@ -20,7 +20,7 @@ public class BrokenIcon extends AbstractIcon {
 	}
 
 	public static void main( String[] parameters ) {
-		showSample( new BrokenIcon() );
+		Icons.proof( new BrokenIcon() );
 	}
 
 }
