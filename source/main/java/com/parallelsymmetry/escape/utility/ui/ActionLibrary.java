@@ -50,13 +50,13 @@ public class ActionLibrary {
 		addAction( "indent" );
 		addAction( "unindent" );
 		addAction( "properties" );
+		addAction( "settings" );
 
 		addAction( "workarea.new" );
 		addAction( "workarea.open" );
+
 		addAction( "view.new" );
-
 		addAction( "view.pane.select.default" );
-
 		addAction( "view.pane.split.horizontal" );
 		addAction( "view.pane.split.vertical" );
 
@@ -65,13 +65,12 @@ public class ActionLibrary {
 		addAction( "view.pane.merge.east" );
 		addAction( "view.pane.merge.west" );
 
-		addAction( "preferences" );
 		addAction( "system.properties" );
 		addAction( "module.organizer" );
 		addAction( "updates" );
 		addAction( "about" );
 
-		addAction( "preferences.reset" );
+		addAction( "settings.reset" );
 		addAction( "worker.manager" );
 		addAction( "restart" );
 
