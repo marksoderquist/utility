@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +26,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public class XmlUtil {
 
@@ -99,6 +102,16 @@ public class XmlUtil {
 		} catch( TransformerException exception ) {
 			throw new IOException( exception );
 		}
+	}
+
+	public static final String toString( Document document ) {
+		StringWriter output = new StringWriter();
+		try {
+			XmlUtil.save( document, output );
+		} catch( IOException exception ) {
+			Log.write( exception );
+		}
+		return output.toString();
 	}
 
 }

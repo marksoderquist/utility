@@ -31,9 +31,11 @@ public class IconPanel extends JComponent {
 		int x = ( bounds.width - icon.getIconWidth() ) / 2;
 		int y = ( bounds.height - icon.getIconHeight() ) / 2;
 
+
 		graphics.setColor( getBackground() );
 		graphics.fillRect( bounds.x, bounds.y, bounds.width, bounds.height );
 
+		graphics.setClip( bounds );
 		icon.paintIcon( this, graphics, x, y );
 	}
 

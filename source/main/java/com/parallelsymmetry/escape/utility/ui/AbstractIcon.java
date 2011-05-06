@@ -1,8 +1,10 @@
 package com.parallelsymmetry.escape.utility.ui;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
@@ -106,7 +108,11 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	public AbstractIcon() {
-		this( DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE );
+		this( DEFAULT_ICON_SIZE );
+	}
+
+	public AbstractIcon( int size ) {
+		this( size, size );
 	}
 
 	public AbstractIcon( int width, int height ) {
@@ -257,10 +263,13 @@ public abstract class AbstractIcon implements Icon {
 	protected void clip( Shape clip ) {
 		instructions.add( new ClipInstruction( clip ) );
 	}
+	
+	protected void opacity( double opacity ) {
+		instructions.add( new CompositeInstruction( AlphaComposite.getInstance( AlphaComposite.SRC_OVER, (float)opacity ) ) );
+	}
 
-	protected void draw( AbstractIcon icon ) {
-		icon.render();
-		instructions.addAll( icon.instructions );
+	protected void draw( Image image ) {
+		instructions.add( new ImageInstruction( image ) );
 	}
 
 	protected void draw( Shape shape ) {
@@ -612,6 +621,34 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
+	public static class Image {
+
+		private java.awt.Image image;
+
+		private double x;
+
+		private double y;
+
+		public Image( java.awt.Image text, double x, double y ) {
+			this.image = text;
+			this.x = x;
+			this.y = y;
+		}
+
+		public java.awt.Image getImage() {
+			return image;
+		}
+
+		public double getX() {
+			return x;
+		}
+
+		public double getY() {
+			return y;
+		}
+
+	}
+
 	public static class Point {
 
 		public final double x;
@@ -715,6 +752,21 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
+	private static class CompositeInstruction implements Instruction {
+
+		private Composite composite;
+
+		public CompositeInstruction( Composite composite ) {
+			this.composite = composite;
+		}
+
+		@Override
+		public void paint( Graphics2D graphics, int x, int y ) {
+			graphics.setComposite( composite );
+		}
+		
+	}
+
 	private static class DrawInstruction implements Instruction {
 
 		private Shape shape;
@@ -794,6 +846,22 @@ public abstract class AbstractIcon implements Icon {
 			graphics.setFont( text.getFont() == null ? graphics.getFont() : text.getFont() );
 			graphics.translate( x, y );
 			graphics.drawString( text.getText(), (float)text.getX(), (float)text.getY() );
+			graphics.translate( -x, -y );
+		}
+
+	}
+
+	private static class ImageInstruction implements Instruction {
+
+		private Image text;
+
+		public ImageInstruction( Image text ) {
+			this.text = text;
+		}
+
+		public void paint( Graphics2D graphics, int x, int y ) {
+			graphics.translate( x, y );
+			graphics.drawImage( text.getImage(), (int)text.getX(), (int)text.getY(), null );
 			graphics.translate( -x, -y );
 		}
 

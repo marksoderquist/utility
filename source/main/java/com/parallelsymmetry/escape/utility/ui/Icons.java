@@ -58,12 +58,17 @@ public class Icons {
 		show( icon, Color.WHITE );
 	}
 
+	public static void show( Icon icon, int size ) {
+		show( icon, Color.WHITE, size );
+	}
+
 	public static void show( Icon icon, Color color ) {
 		show( icon, color, 5 );
 	}
 
 	public static void show( Icon icon, Color color, int size ) {
 		JPanel border = new JPanel();
+		border.setBackground( color );
 		border.setBorder( new LineBorder( color, size ) );
 		border.setLayout( new BorderLayout() );
 
