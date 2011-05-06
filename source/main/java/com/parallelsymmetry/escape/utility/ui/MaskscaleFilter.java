@@ -34,7 +34,7 @@ public class MaskscaleFilter extends RGBImageFilter {
 
 		return a + r + g + b;
 	}
-	
+
 	private int calc( int value, float scale ) {
 		int delta = value;
 		if( scale > 0 ) delta = 255 - value;

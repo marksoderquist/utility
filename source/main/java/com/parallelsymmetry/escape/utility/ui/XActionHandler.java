@@ -13,7 +13,7 @@ public abstract class XActionHandler implements ActionListener {
 	public XActionHandler() {
 		this( false );
 	}
-	
+
 	public XActionHandler( boolean enabled ) {
 		this.enabled = enabled;
 		actions = new CopyOnWriteArraySet<XAction>();

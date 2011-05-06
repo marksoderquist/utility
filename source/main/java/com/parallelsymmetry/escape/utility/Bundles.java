@@ -173,8 +173,8 @@ public class Bundles {
 		InputStream input = null;
 
 		String[] parts = getLocaleParts( locale );
-		
-		for( int count = parts.length; count > -1; count--) {
+
+		for( int count = parts.length; count > -1; count-- ) {
 			if( input == null ) {
 				StringBuilder builder = new StringBuilder( path );
 				builder.append( "." );
@@ -183,7 +183,7 @@ public class Bundles {
 				input = loader.getResourceAsStream( builder.toString() );
 			}
 		}
-		
+
 		if( input == null ) {
 			StringBuilder builder = new StringBuilder( path );
 			builder.append( ".en.properties" );

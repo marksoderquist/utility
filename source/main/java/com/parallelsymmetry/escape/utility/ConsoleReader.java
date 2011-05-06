@@ -36,5 +36,5 @@ public final class ConsoleReader extends Thread {
 			exception.printStackTrace();
 		}
 	}
-	
+
 }

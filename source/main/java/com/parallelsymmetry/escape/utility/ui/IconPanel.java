@@ -36,5 +36,5 @@ public class IconPanel extends JComponent {
 
 		icon.paintIcon( this, graphics, x, y );
 	}
-	
+
 }

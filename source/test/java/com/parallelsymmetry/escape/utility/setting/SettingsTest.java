@@ -221,7 +221,7 @@ public class SettingsTest extends TestCase {
 		assertFalse( settings.nodeExists( "/test/path" ) );
 		assertFalse( settings.nodeExists( "/test" ) );
 	}
-	
+
 	public void testGetList() {
 		int count = 5;
 		String path = "/test/lists/list1";
@@ -316,7 +316,7 @@ public class SettingsTest extends TestCase {
 		Map<String, MockPersistent> map = new HashMap<String, MockPersistent>();
 		settings.putMap( path, map );
 	}
-	
+
 	public void testRemoveMap() {
 		int count = 5;
 		String path = "/test/maps/map1";

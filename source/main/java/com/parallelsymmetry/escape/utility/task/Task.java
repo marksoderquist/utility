@@ -77,7 +77,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	V invoke() throws InterruptedException, ExecutionException {
 		running = true;
 		fireTaskEvent();
-	
+
 		try {
 			future.run();
 			return future.get();
@@ -90,7 +90,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	V invoke( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
 		running = true;
 		fireTaskEvent();
-	
+
 		try {
 			future.run();
 			return future.get( timeout, unit );

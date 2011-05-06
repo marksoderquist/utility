@@ -35,15 +35,15 @@ public class JavaUtil {
 	public static final String getPackageName( Class<?> type ) {
 		return ( getPackageName( type.getName() ) );
 	}
-	
+
 	public static final String getPackagePath( String name ) {
-		return "/" + getPackageName( name).replace( '.', '/' );
+		return "/" + getPackageName( name ).replace( '.', '/' );
 	}
 
 	public static final String getPackagePath( Class<?> type ) {
 		return ( getPackagePath( type.getName() ) );
 	}
-	
+
 	public static List<URI> getClasspath() {
 		try {
 			return parseClasspath( System.getProperty( "class.path" ) );

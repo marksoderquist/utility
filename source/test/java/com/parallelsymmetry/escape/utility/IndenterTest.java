@@ -45,9 +45,9 @@ public class IndenterTest extends TestCase {
 	}
 
 	public void testWriteIndentWithString() throws Exception {
-		assertWriteIndentWithString( "<>", "<>");
-		assertWriteIndentWithString( "<><>", "<><>");
-		assertWriteIndentWithString( "<><><>", "<><><>");
+		assertWriteIndentWithString( "<>", "<>" );
+		assertWriteIndentWithString( "<><>", "<><>" );
+		assertWriteIndentWithString( "<><><>", "<><><>" );
 	}
 
 	public void testWriteIndentWithSizeAndString() throws Exception {

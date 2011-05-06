@@ -35,13 +35,13 @@ public class XAction extends AbstractAction {
 	public static final int NONE = -1;
 
 	public static final String DEFAULT_ALT_PREFIX = "Alt";
-	
+
 	public static final String DEFAULT_CTRL_PREFIX = "Ctl";
 
 	public static final String DEFAULT_META_PREFIX = "Meta";
-	
+
 	public static final String DEFAULT_SHIFT_PREFIX = "Shift";
-	
+
 	public static final String ACCELERATOR_KEY_DISPLAY = "accelerator.key.display";
 
 	public static final String ACCELERATOR_KEY_SEQUENCE = "accelerator.key.sequence";
@@ -72,12 +72,12 @@ public class XAction extends AbstractAction {
 
 		setValues( name, icon, mnemonic, accelerator, display );
 	}
-	
-	void setValues(String name, Icon icon, int mnemonic, String accelerator, String display ){
-		putValue(Action.NAME, name);
-		putValue(Action.SMALL_ICON, icon);
+
+	void setValues( String name, Icon icon, int mnemonic, String accelerator, String display ) {
+		putValue( Action.NAME, name );
+		putValue( Action.SMALL_ICON, icon );
 		putValue( Action.SHORT_DESCRIPTION, name );
-		
+
 		int mnemonicKey = -1;
 		if( mnemonic > -1 && mnemonic < name.length() ) {
 			char mnemonicChar = name.charAt( mnemonic );

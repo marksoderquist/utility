@@ -14,10 +14,10 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "2.6.32_45", OperatingSystem.getVersion() );
 		assertEquals( "x86_64", OperatingSystem.getSystemArchitecture() );
 		assertEquals( OperatingSystem.Family.LINUX, OperatingSystem.getFamily() );
-//		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
-//		assertEquals( new File( "/usr/local/share/data" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
-//		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
-//		assertEquals( new File( "/usr/local/share/data", "test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
+		//		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
+		//		assertEquals( new File( "/usr/local/share/data" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
+		//		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
+		//		assertEquals( new File( "/usr/local/share/data", "test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
 	public void testMac() throws Exception {
@@ -28,10 +28,10 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "10", OperatingSystem.getVersion() );
 		assertEquals( "ppc", OperatingSystem.getSystemArchitecture() );
 		assertEquals( OperatingSystem.Family.MAC, OperatingSystem.getFamily() );
-//		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
-//		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
-//		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
-//		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
+		//		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
+		//		assertEquals( new File( System.getProperty( "user.home" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
+		//		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
+		//		assertEquals( new File( System.getProperty( "user.home" ), ".test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
 	public void testWindows() throws Exception {
@@ -42,10 +42,10 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "6.1", OperatingSystem.getVersion() );
 		assertEquals( "x86", OperatingSystem.getSystemArchitecture() );
 		assertEquals( OperatingSystem.Family.WINDOWS, OperatingSystem.getFamily() );
-//		assertEquals( new File( System.getenv( "appdata" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
-//		assertEquals( new File( System.getenv( "allusersprofile" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
-//		assertEquals( new File( System.getenv( "appdata" ), "Test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
-//		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
+		//		assertEquals( new File( System.getenv( "appdata" ) ).getCanonicalFile(), OperatingSystem.getProgramDataFolder() );
+		//		assertEquals( new File( System.getenv( "allusersprofile" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
+		//		assertEquals( new File( System.getenv( "appdata" ), "Test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
+		//		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
 	private void init( String name, String arch, String version ) throws Exception {

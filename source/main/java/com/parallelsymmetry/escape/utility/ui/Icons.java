@@ -61,7 +61,7 @@ public class Icons {
 	public static void show( Icon icon, Color color ) {
 		show( icon, color, 5 );
 	}
-	
+
 	public static void show( Icon icon, Color color, int size ) {
 		JPanel border = new JPanel();
 		border.setBorder( new LineBorder( color, size ) );

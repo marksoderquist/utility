@@ -19,6 +19,7 @@ public class DateUtil {
 
 	/**
 	 * Convenience method to get the current year based on time zone.
+	 * 
 	 * @param timezone
 	 * @return
 	 */

@@ -99,7 +99,8 @@ public class ActionAcceleratorWatcher implements KeyEventPostProcessor {
 	 * @param accelerators The accelerators to try and match.
 	 * @param sequence The key sequence to look for.
 	 * @return Match.NONE if the sequence does not match any accelerators.<br/>
-	 *         Match.PARTIAL if the accelerator matches the start of a accelerator.<br>
+	 *         Match.PARTIAL if the accelerator matches the start of a
+	 *         accelerator.<br>
 	 *         Match.EXACT if the sequence exactly matches a accelerator.
 	 */
 	private Match match( List<String> accelerators, String sequence ) {

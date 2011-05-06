@@ -13,11 +13,11 @@ public class JavaUtilTest extends TestCase {
 	public void testGetClassNameWithString() {
 		assertEquals( "Object", JavaUtil.getClassName( "java.lang.Object" ) );
 	}
-	
+
 	public void testGetClassNameWithClass() {
 		assertEquals( "Object", JavaUtil.getClassName( Object.class ) );
 	}
-	
+
 	public void testGetPackageNameWithString() {
 		assertEquals( "java.lang", JavaUtil.getPackageName( "java.lang.Object" ) );
 	}

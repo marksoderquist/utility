@@ -1,7 +1,5 @@
 package com.parallelsymmetry.escape.utility.ui;
 
-import java.awt.Graphics2D;
-
 import junit.framework.TestCase;
 
 import com.parallelsymmetry.escape.utility.Accessor;
@@ -47,7 +45,7 @@ public class AbstractIconTest extends TestCase {
 	private static class MockIcon extends AbstractIcon {
 
 		@Override
-		public void render( Graphics2D graphics ) {}
+		public void render() {}
 
 	}
 

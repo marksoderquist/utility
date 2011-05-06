@@ -83,6 +83,8 @@ public abstract class AbstractIcon implements Icon {
 
 	private double angle;
 
+	protected Graphics2D graphics;
+
 	private List<Instruction> instructions;
 
 	static {
@@ -122,19 +124,21 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	public void paintIcon( Component c, Graphics g, int x, int y ) {
-		Graphics2D graphics = (Graphics2D)g;
+		graphics = (Graphics2D)g;
 		graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
 		graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 		graphics.setRenderingHint( RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON );
-		render( graphics );
-		reset();
+
+		render();
 		for( Instruction instruction : instructions ) {
 			instruction.paint( graphics, x, y );
 		}
+		graphics = null;
+		reset();
 	}
 
-	public abstract void render( Graphics2D graphics );
+	public abstract void render();
 
 	public void save( File target, String name ) {
 		save( target, name, getIconWidth(), getIconHeight() );
@@ -174,7 +178,7 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected void add( Graphics2D graphics, AbstractIcon icon ) {
-		icon.render( graphics );
+		icon.render();
 		instructions.addAll( icon.instructions );
 	}
 
@@ -252,6 +256,11 @@ public abstract class AbstractIcon implements Icon {
 
 	protected void clip( Shape clip ) {
 		instructions.add( new ClipInstruction( clip ) );
+	}
+
+	protected void draw( AbstractIcon icon ) {
+		icon.render();
+		instructions.addAll( icon.instructions );
 	}
 
 	protected void draw( Shape shape ) {
