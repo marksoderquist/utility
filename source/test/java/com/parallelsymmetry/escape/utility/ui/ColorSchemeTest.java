@@ -1,52 +1,129 @@
 package com.parallelsymmetry.escape.utility.ui;
 
-import java.io.InputStream;
+import java.awt.Color;
 
 import junit.framework.TestCase;
 
-import com.parallelsymmetry.escape.utility.Descriptor;
-
 public class ColorSchemeTest extends TestCase {
 
-	private ColorScheme colorScheme;
+	public void testGetPrimary() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
-	@Override
-	public void setUp() throws Exception {
-		InputStream input = getClass().getResourceAsStream( "test.color.scheme.xml" );
-		Descriptor descriptor = new Descriptor( input );
-		colorScheme = new ColorScheme( descriptor );
+		assertEquals( Color.decode( "#000000" ), scheme.getPrimary( -1 ) );
+		assertEquals( Color.decode( "#7f0000" ), scheme.getPrimary( -0.5 ) );
+		assertEquals( Color.decode( "#ff0000" ), scheme.getPrimary( 0 ) );
+		assertEquals( Color.decode( "#ff7f7f" ), scheme.getPrimary( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
 
-	public void testPrimaryColors() {
-		assertEquals( "153553", colorScheme.getPrimaryCode( -2 ) );
-		assertEquals( "3C4E60", colorScheme.getPrimaryCode( -1 ) );
-		assertEquals( "406180", colorScheme.getPrimaryCode( 0 ) );
-		assertEquals( "789CC0", colorScheme.getPrimaryCode( 1 ) );
-		assertEquals( "8BA6C0", colorScheme.getPrimaryCode( 2 ) );
-	}
+	public void testGetPrimaryWithBlack() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
-	public void testSecondaryAColors() {
-		assertEquals( "172158", colorScheme.getSecondaryACode( -2 ) );
-		assertEquals( "414765", colorScheme.getSecondaryACode( -1 ) );
-		assertEquals( "475187", colorScheme.getSecondaryACode( 0 ) );
-		assertEquals( "7E89C3", colorScheme.getSecondaryACode( 1 ) );
-		assertEquals( "9098C3", colorScheme.getSecondaryACode( 2 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getPrimary( -1 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getPrimary( -0.5 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getPrimary( 0 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getPrimary( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
+	
+	public void testGetPrimaryWithWhite() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
-	public void testSecondaryBColors() {
-		assertEquals( "124F4A", colorScheme.getSecondaryBCode( -2 ) );
-		assertEquals( "365B58", colorScheme.getSecondaryBCode( -1 ) );
-		assertEquals( "387974", colorScheme.getSecondaryBCode( 0 ) );
-		assertEquals( "70BCB7", colorScheme.getSecondaryBCode( 1 ) );
-		assertEquals( "84BCB8", colorScheme.getSecondaryBCode( 2 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getPrimary( -1 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getPrimary( -0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 0 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
+	
+	public void testGetSecondaryA() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
-	public void testComplementColors() {
-		assertEquals( "80581D", colorScheme.getComplementCode( -2 ) );
-		assertEquals( "947B58", colorScheme.getComplementCode( -1 ) );
-		assertEquals( "C59A5B", colorScheme.getComplementCode( 0 ) );
-		assertEquals( "E2BD87", colorScheme.getComplementCode( 1 ) );
-		assertEquals( "E2C79F", colorScheme.getComplementCode( 2 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryA( -1 ) );
+		assertEquals( Color.decode( "#7f0040" ), scheme.getSecondaryA( -0.5 ) );
+		assertEquals( Color.decode( "#ff0080" ), scheme.getSecondaryA( 0 ) );
+		assertEquals( Color.decode( "#ff7fbf" ), scheme.getSecondaryA( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
+	
+	public void testGetSecondaryAWithBlack() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryA( -1 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryA( -0.5 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryA( 0 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getSecondaryA( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
+	}
+	
+	public void testGetSecondaryAWithWhite() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryA( -1 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getSecondaryA( -0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 0 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
+	}
+	
+	public void testGetSecondaryB() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryB( -1 ) );
+		assertEquals( Color.decode( "#7f4000" ), scheme.getSecondaryB( -0.5 ) );
+		assertEquals( Color.decode( "#ff8000" ), scheme.getSecondaryB( 0 ) );
+		assertEquals( Color.decode( "#ffbf7f" ), scheme.getSecondaryB( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
+	}
+	
+	public void testGetSecondaryBWithBlack() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryB( -1 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryB( -0.5 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryB( 0 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getSecondaryB( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
+	}
+	
+	public void testGetSecondaryBWithWhite() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getSecondaryB( -1 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getSecondaryB( -0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 0 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
+	}
+	
+	public void testGetComplement() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getComplement( -1 ) );
+		assertEquals( Color.decode( "#007f7f" ), scheme.getComplement( -0.5 ) );
+		assertEquals( Color.decode( "#00ffff" ), scheme.getComplement( 0 ) );
+		assertEquals( Color.decode( "#7fffff" ), scheme.getComplement( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
+	}
+	
+	public void testGetComplementWithBlack() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getComplement( -1 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getComplement( -0.5 ) );
+		assertEquals( Color.decode( "#000000" ), scheme.getComplement( 0 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getComplement( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
+	}
+	
+	public void testGetComplementWithWhite() {
+		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
+
+		assertEquals( Color.decode( "#000000" ), scheme.getComplement( -1 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), scheme.getComplement( -0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 0 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
+	}
+	
 }
