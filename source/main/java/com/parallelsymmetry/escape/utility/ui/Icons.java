@@ -12,7 +12,6 @@ import java.awt.image.ImageFilter;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
@@ -45,7 +44,6 @@ public class Icons {
 		icon.paintIcon( null, image.getGraphics(), 0, 0 );
 
 		// Scale the image to the icon size of the cache.
-		//image = image.getScaledInstance( width, height, Image.SCALE_SMOOTH );
 		image = Images.scale( image, width, height );
 
 		// Apply the filter.
@@ -82,20 +80,7 @@ public class Icons {
 	}
 
 	public static void proof( Icon icon, ImageFilter filter ) {
-		JFrame frame = new JFrame( icon.getClass().getName() );
-		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-		frame.add( new SamplePanel( icon, filter ) );
-		frame.pack();
-
-		frame.setIconImage( getImage( icon, 64 ) );
-
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (int)( ( screen.width - frame.getWidth() ) * 0.5 );
-		int y = (int)( ( screen.height - frame.getHeight() ) * 0.25 );
-
-		frame.setLocation( x, y );
-		frame.setResizable( false );
-		frame.setVisible( true );
+		JOptionPane.showMessageDialog( null, new SamplePanel( icon, filter ), null, JOptionPane.PLAIN_MESSAGE );
 	}
 
 	private static class SamplePanel extends JComponent {

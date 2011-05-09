@@ -13,7 +13,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import com.parallelsymmetry.escape.utility.Descriptor;
-import com.parallelsymmetry.escape.utility.log.Log;
 
 public class ColorScheme {
 

@@ -6,7 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Font;
-import java.awt.FontMetrics;
+import java.awt.FontFormatException;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RGBImageFilter;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,7 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 
 import com.parallelsymmetry.escape.utility.TextUtil;
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class AbstractIcon implements Icon {
 
@@ -71,13 +73,13 @@ public abstract class AbstractIcon implements Icon {
 
 	protected static final Stroke DOUBLE_STROKE = new BasicStroke( DEFAULT_PEN_WIDTH * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 
-	protected static final Map<String, Color> DEFAULT_COLORS;
-
 	private static final double RADIANS_PER_DEGREE = Math.PI / 180;
 
 	protected int width;
 
 	protected int height;
+
+	protected Map<String, Color> colors;
 
 	private double movex;
 
@@ -88,24 +90,6 @@ public abstract class AbstractIcon implements Icon {
 	protected Graphics2D graphics;
 
 	private List<Instruction> instructions;
-
-	static {
-		Color basic = Color.BLACK;
-
-		DEFAULT_COLORS = new ConcurrentHashMap<String, Color>();
-		DEFAULT_COLORS.put( OUTLINE_DARK, basic.darker() );
-		DEFAULT_COLORS.put( OUTLINE, basic );
-		DEFAULT_COLORS.put( OUTLINE_LIGHT, basic.brighter() );
-
-		DEFAULT_COLORS.put( GRADIENT_LIGHT_BEGIN, Colors.mix( basic, Color.WHITE, 1 ) );
-		DEFAULT_COLORS.put( GRADIENT_LIGHT_END, Colors.mix( basic, Color.WHITE, 0.5 ) );
-
-		DEFAULT_COLORS.put( GRADIENT_MEDIUM_BEGIN, Colors.mix( basic, Color.WHITE, 0.875 ) );
-		DEFAULT_COLORS.put( GRADIENT_MEDIUM_END, Colors.mix( basic, Color.WHITE, 0.375 ) );
-
-		DEFAULT_COLORS.put( GRADIENT_DARK_BEGIN, Colors.mix( basic, Color.WHITE, 0.75 ) );
-		DEFAULT_COLORS.put( GRADIENT_DARK_END, Colors.mix( basic, Color.WHITE, 0.25 ) );
-	}
 
 	public AbstractIcon() {
 		this( DEFAULT_ICON_SIZE );
@@ -118,6 +102,7 @@ public abstract class AbstractIcon implements Icon {
 	public AbstractIcon( int width, int height ) {
 		this.width = width;
 		this.height = height;
+		setBaseColor( Color.BLACK );
 		instructions = new CopyOnWriteArrayList<Instruction>();
 	}
 
@@ -181,6 +166,22 @@ public abstract class AbstractIcon implements Icon {
 		} catch( IOException exception ) {
 			exception.printStackTrace();
 		}
+	}
+
+	protected void setBaseColor( Color color ) {
+		colors = new ConcurrentHashMap<String, Color>();
+		colors.put( OUTLINE_DARK, Colors.mix( color, Color.WHITE, 0.25 ) );
+		colors.put( OUTLINE, color );
+		colors.put( OUTLINE_LIGHT, Colors.mix( color, Color.WHITE, 0.75 ) );
+
+		colors.put( GRADIENT_LIGHT_BEGIN, Colors.mix( color, Color.WHITE, 1 ) );
+		colors.put( GRADIENT_LIGHT_END, Colors.mix( color, Color.WHITE, 0.5 ) );
+
+		colors.put( GRADIENT_MEDIUM_BEGIN, Colors.mix( color, Color.WHITE, 0.875 ) );
+		colors.put( GRADIENT_MEDIUM_END, Colors.mix( color, Color.WHITE, 0.375 ) );
+
+		colors.put( GRADIENT_DARK_BEGIN, Colors.mix( color, Color.WHITE, 0.75 ) );
+		colors.put( GRADIENT_DARK_END, Colors.mix( color, Color.WHITE, 0.25 ) );
 	}
 
 	protected void add( Graphics2D graphics, AbstractIcon icon ) {
@@ -263,7 +264,7 @@ public abstract class AbstractIcon implements Icon {
 	protected void clip( Shape clip ) {
 		instructions.add( new ClipInstruction( clip ) );
 	}
-	
+
 	protected void opacity( double opacity ) {
 		instructions.add( new CompositeInstruction( AlphaComposite.getInstance( AlphaComposite.SRC_OVER, (float)opacity ) ) );
 	}
@@ -285,23 +286,23 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected void draw( Shape shape, Paint paint, Stroke stroke ) {
-		instructions.add( new DrawInstruction( shape, paint, stroke ) );
+		instructions.add( new DrawInstruction( shape, paint == null ? colors.get( OUTLINE ) : paint, stroke == null ? DEFAULT_STROKE : stroke ) );
 	}
 
 	protected void draw( Text text ) {
-		instructions.add( new TextInstruction( text ) );
+		draw( text, null, null );
 	}
 
-	protected void draw( Text text, Color color ) {
-		instructions.add( new TextInstruction( text, color ) );
+	protected void draw( Text text, Paint paint ) {
+		draw( text, paint, null );
 	}
 
 	protected void draw( Text text, Stroke stroke ) {
-		instructions.add( new TextInstruction( text, stroke ) );
+		draw( text, null, stroke );
 	}
 
-	protected void draw( Text text, Color color, Stroke stroke ) {
-		instructions.add( new TextInstruction( text, color, stroke ) );
+	protected void draw( Text text, Paint paint, Stroke stroke ) {
+		instructions.add( new TextInstruction( text, paint == null ? colors.get( OUTLINE ) : paint, stroke == null ? DEFAULT_STROKE : stroke ) );
 	}
 
 	protected void fill( Shape shape ) {
@@ -329,20 +330,50 @@ public abstract class AbstractIcon implements Icon {
 		instructions.add( new FillInstruction( shape, paint ) );
 	}
 
+	protected Font loadFont( String path, Font defaultFont ) {
+		InputStream input = getClass().getResourceAsStream( path );
+
+		if( input == null ) {
+			Log.write( Log.WARN, "Font not found: " + path );
+		} else {
+			try {
+				return Font.createFont( Font.TRUETYPE_FONT, input );
+			} catch( FontFormatException exception ) {
+				Log.write( exception );
+			} catch( IOException exception ) {
+				Log.write( exception );
+			}
+		}
+
+		return defaultFont;
+	}
+
+	protected Paint darkPaint() {
+		return darkPaint( new Point2D.Double( 0, 0 ) );
+	}
+
 	protected Paint darkPaint( Point2D anchor ) {
-		return new GradientPaint( anchor, DEFAULT_COLORS.get( GRADIENT_DARK_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), DEFAULT_COLORS.get( GRADIENT_DARK_END ) );
+		return new GradientPaint( anchor, colors.get( GRADIENT_DARK_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), colors.get( GRADIENT_DARK_END ) );
+	}
+
+	protected Paint mediumPaint() {
+		return mediumPaint( new Point2D.Double( 0, 0 ) );
 	}
 
 	protected Paint mediumPaint( Point2D anchor ) {
-		return new GradientPaint( anchor, DEFAULT_COLORS.get( GRADIENT_MEDIUM_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), DEFAULT_COLORS.get( GRADIENT_MEDIUM_END ) );
+		return new GradientPaint( anchor, colors.get( GRADIENT_MEDIUM_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), colors.get( GRADIENT_MEDIUM_END ) );
+	}
+
+	protected Paint lightPaint() {
+		return lightPaint( new Point2D.Double( 0, 0 ) );
 	}
 
 	protected Paint lightPaint( Point2D anchor ) {
-		return new GradientPaint( anchor, DEFAULT_COLORS.get( GRADIENT_LIGHT_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), DEFAULT_COLORS.get( GRADIENT_LIGHT_END ) );
+		return new GradientPaint( anchor, colors.get( GRADIENT_LIGHT_BEGIN ), new Point2D.Double( anchor.getX() + DEFAULT_ICON_SIZE, anchor.getY() + DEFAULT_ICON_SIZE ), colors.get( GRADIENT_LIGHT_END ) );
 	}
 
 	protected Paint coloredPaint( Shape shape, Color color ) {
-		return coloredPaint( shape, DEFAULT_COLORS.get( GRADIENT_LIGHT_BEGIN ), color );
+		return coloredPaint( shape, colors.get( GRADIENT_LIGHT_BEGIN ), color );
 	}
 
 	protected Paint coloredPaint( Shape shape, Color color1, Color color2 ) {
@@ -353,7 +384,7 @@ public abstract class AbstractIcon implements Icon {
 	}
 
 	protected Paint coloredPaint( Point2D anchor, Color color ) {
-		return coloredPaint( anchor, DEFAULT_COLORS.get( GRADIENT_LIGHT_BEGIN ), color );
+		return coloredPaint( anchor, colors.get( GRADIENT_LIGHT_BEGIN ), color );
 	}
 
 	protected Paint coloredPaint( Point2D anchor, Color color1, Color color2 ) {
@@ -440,13 +471,11 @@ public abstract class AbstractIcon implements Icon {
 		Graphics2D graphics = (Graphics2D)g;
 
 		Font currentFont = font.deriveFont( 1.0f );
-		FontMetrics fontMetrics = graphics.getFontMetrics( currentFont );
-		Rectangle2D textBounds = fontMetrics.getStringBounds( text, graphics );
+		Rectangle2D textBounds = currentFont.createGlyphVector( graphics.getFontRenderContext(), text ).getVisualBounds();
 
 		while( textBounds.getWidth() < width ) {
 			currentFont = currentFont.deriveFont( currentFont.getSize2D() + 1 );
-			fontMetrics = graphics.getFontMetrics( currentFont );
-			textBounds = fontMetrics.getStringBounds( text, graphics );
+			textBounds = currentFont.createGlyphVector( graphics.getFontRenderContext(), text ).getVisualBounds();
 		}
 
 		return currentFont;
@@ -455,17 +484,15 @@ public abstract class AbstractIcon implements Icon {
 	/**
 	 * Find the font that fits the specified height.
 	 */
-	protected Font findFontForHeight( Graphics g, Font font, float height ) {
+	protected Font findFontForHeight( Graphics g, Font font, String text, float height ) {
 		Graphics2D graphics = (Graphics2D)g;
 
 		Font currentFont = font.deriveFont( 1.0f );
-		FontMetrics fontMetrics = graphics.getFontMetrics( currentFont );
-		int fontHeight = fontMetrics.getAscent() - fontMetrics.getLeading() - fontMetrics.getDescent();
+		Rectangle2D textBounds = currentFont.createGlyphVector( graphics.getFontRenderContext(), text ).getVisualBounds();
 
-		while( fontHeight < height ) {
+		while( textBounds.getHeight() < height ) {
 			currentFont = currentFont.deriveFont( currentFont.getSize2D() + 1 );
-			fontMetrics = graphics.getFontMetrics( currentFont );
-			fontHeight = fontMetrics.getAscent() - fontMetrics.getLeading() - fontMetrics.getDescent();
+			textBounds = currentFont.createGlyphVector( graphics.getFontRenderContext(), text ).getVisualBounds();
 		}
 
 		return currentFont;
@@ -695,11 +722,11 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
-	private static interface Instruction {
+	private interface Instruction {
 		void paint( Graphics2D graphics, int x, int y );
 	}
 
-	private static class MoveInstruction implements Instruction {
+	private class MoveInstruction implements Instruction {
 
 		private double x;
 
@@ -716,7 +743,7 @@ public abstract class AbstractIcon implements Icon {
 		}
 	}
 
-	private static class SpinInstruction implements Instruction {
+	private class SpinInstruction implements Instruction {
 
 		private double x;
 
@@ -737,7 +764,7 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
-	private static class ClipInstruction implements Instruction {
+	private class ClipInstruction implements Instruction {
 
 		private Shape clip;
 
@@ -752,7 +779,7 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
-	private static class CompositeInstruction implements Instruction {
+	private class CompositeInstruction implements Instruction {
 
 		private Composite composite;
 
@@ -764,10 +791,10 @@ public abstract class AbstractIcon implements Icon {
 		public void paint( Graphics2D graphics, int x, int y ) {
 			graphics.setComposite( composite );
 		}
-		
+
 	}
 
-	private static class DrawInstruction implements Instruction {
+	private class DrawInstruction implements Instruction {
 
 		private Shape shape;
 
@@ -782,8 +809,8 @@ public abstract class AbstractIcon implements Icon {
 		}
 
 		public void paint( Graphics2D graphics, int x, int y ) {
-			graphics.setPaint( paint == null ? DEFAULT_COLORS.get( OUTLINE ) : paint );
-			graphics.setStroke( stroke == null ? AbstractIcon.DEFAULT_STROKE : stroke );
+			graphics.setPaint( paint );
+			graphics.setStroke( stroke );
 			graphics.translate( x, y );
 			graphics.draw( shape );
 			graphics.translate( -x, -y );
@@ -791,7 +818,7 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
-	private static class FillInstruction implements Instruction {
+	private class FillInstruction implements Instruction {
 
 		private Shape shape;
 
@@ -803,7 +830,7 @@ public abstract class AbstractIcon implements Icon {
 		}
 
 		public void paint( Graphics2D graphics, int x, int y ) {
-			if( paint != null ) graphics.setPaint( paint );
+			graphics.setPaint( paint );
 			graphics.translate( x, y );
 			graphics.fill( shape );
 			graphics.translate( -x, -y );
@@ -811,39 +838,25 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
-	private static class TextInstruction implements Instruction {
+	private class TextInstruction implements Instruction {
 
 		private Text text;
 
-		private Color color;
+		private Paint paint;
 
 		private Stroke stroke;
 
-		public TextInstruction( Text text ) {
+		public TextInstruction( Text text, Paint paint, Stroke stroke ) {
 			this.text = text;
-		}
-
-		public TextInstruction( Text text, Color color ) {
-			this.text = text;
-			this.color = color;
-		}
-
-		public TextInstruction( Text text, Stroke stroke ) {
-			this.text = text;
-			this.stroke = stroke;
-		}
-
-		public TextInstruction( Text text, Color color, Stroke stroke ) {
-			this.text = text;
-			this.color = color;
+			this.paint = paint;
 			this.stroke = stroke;
 		}
 
 		public void paint( Graphics2D graphics, int x, int y ) {
 			if( TextUtil.isEmpty( text.getText() ) ) return;
-			graphics.setColor( color == null ? DEFAULT_COLORS.get( OUTLINE ) : color );
-			graphics.setStroke( stroke == null ? AbstractIcon.DEFAULT_STROKE : stroke );
-			graphics.setFont( text.getFont() == null ? graphics.getFont() : text.getFont() );
+			graphics.setPaint( paint );
+			graphics.setStroke( stroke );
+			graphics.setFont( text.getFont() );
 			graphics.translate( x, y );
 			graphics.drawString( text.getText(), (float)text.getX(), (float)text.getY() );
 			graphics.translate( -x, -y );
@@ -851,7 +864,7 @@ public abstract class AbstractIcon implements Icon {
 
 	}
 
-	private static class ImageInstruction implements Instruction {
+	private class ImageInstruction implements Instruction {
 
 		private Image text;
 

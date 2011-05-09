@@ -28,38 +28,38 @@ public final class Colors {
 		return new Color( color, true );
 	}
 
-	public static Color makeOpaque( Color color ) {
-		return new Color( color.getRGB() | 0xff000000 );
-	}
-
-	public static Color makeTransparent( Color color, float transparency ) {
-		float[] components = color.getColorComponents( new float[4] );
-		return new Color( components[0], components[1], components[2], transparency );
-	}
-
 	public static Color mix( Color color, Color mixer, double factor ) {
 		if( color == null || mixer == null ) return null;
-
+	
 		int colorR = color.getRed();
 		int colorG = color.getGreen();
 		int colorB = color.getBlue();
 		int colorA = color.getAlpha();
-
+	
 		int mixerR = mixer.getRed();
 		int mixerG = mixer.getGreen();
 		int mixerB = mixer.getBlue();
 		int mixerA = mixer.getAlpha();
-
+	
 		int diffR = mixerR - colorR;
 		int diffG = mixerG - colorG;
 		int diffB = mixerB - colorB;
 		int diffA = mixerA - colorA;
-
+	
 		int r = (int)( colorR + ( diffR * factor ) );
 		int g = (int)( colorG + ( diffG * factor ) );
 		int b = (int)( colorB + ( diffB * factor ) );
 		int a = (int)( colorA + ( diffA * factor ) );
-
+	
 		return new Color( r, g, b, a );
+	}
+
+	public static Color makeOpaque( Color color ) {
+		return new Color( color.getRGB() | 0xff000000 );
+	}
+
+	public static Color makeTransparent( Color color, double transparency ) {
+		float[] components = color.getColorComponents( new float[4] );
+		return new Color( components[0], components[1], components[2], (float)transparency );
 	}
 }
