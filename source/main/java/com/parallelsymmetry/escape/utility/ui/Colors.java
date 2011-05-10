@@ -63,23 +63,31 @@ public final class Colors {
 		return new Color( components[0], components[1], components[2], (float)transparency );
 	}
 
+	public static Color getHue( Color color ) {
+		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
+		return new Color(  Color.HSBtoRGB(  components[0], 1, 1 ) );
+	}
+
+	/**
+	 * @param color The reference color.
+	 * @param angle The color wheel angle in degrees.
+	 * @return
+	 */
+	public static Color getSecondary( Color color, double angle ) {
+		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
+
+		double factor = ( angle / 360 );
+		double h = ( components[0] + factor ) % 1.0;
+
+		return Color.getHSBColor( (float)h, components[1], components[2] );
+	}
+
 	public static Color getComplement( Color color ) {
 		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
 
 		float h = components[0];
 
 		return Color.getHSBColor( h > 0.5 ? h - 0.5f : h + 0.5f, components[1], components[2] );
-	}
-
-	public static Color getSecondary( Color color, double angle ) {
-		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
-
-		float factor = (float)(angle / 360);
-		float h = components[0] + factor;
-		if( h >= 1 ) h -= 1;
-		if( h < 0 ) h += 1;
-
-		return Color.getHSBColor( h, components[1], components[2] );
 	}
 
 }

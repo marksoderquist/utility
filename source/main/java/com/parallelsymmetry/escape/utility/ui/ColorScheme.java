@@ -45,5 +45,9 @@ public class ColorScheme {
 		if( factor > 1 ) factor = 1;
 		return factor < 0 ? Colors.mix( color, Color.BLACK, -factor ) : Colors.mix( color, Color.WHITE, factor );
 	}
+	
+	public String toString() {
+		return primary.toString();
+	}
 
 }

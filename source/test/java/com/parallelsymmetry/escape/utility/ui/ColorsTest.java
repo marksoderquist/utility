@@ -39,24 +39,20 @@ public class ColorsTest extends TestCase {
 		assertEquals( new Color( 63, 63, 63, 255 ), Colors.mix( Color.BLACK, Color.WHITE, 0.25 ) );
 	}
 
-	public void testGetComplement() {
-		// Black
-		assertEquals( Color.decode( "#000000" ), Colors.getComplement( Color.decode( "#000000" ) ) );
-		
-		// White
-		assertEquals( Color.decode( "#ffffff" ), Colors.getComplement( Color.decode( "#ffffff" ) ) );
-		
-		// Colors
-		assertEquals( Color.decode( "#00ffff" ), Colors.getComplement( Color.decode( "#ff0000" ) ) );
-		assertEquals( Color.decode( "#ff00ff" ), Colors.getComplement( Color.decode( "#00ff00" ) ) );
-		assertEquals( Color.decode( "#ffff00" ), Colors.getComplement( Color.decode( "#0000ff" ) ) );
+	public void testGetHue() {
+		assertEquals( Color.decode( "#ff0000" ), Colors.getHue( Color.decode( "#000000" ) ) );
+		assertEquals( Color.decode( "#ff0000" ), Colors.getHue( Color.decode( "#ffffff" ) ) );
+
+		assertEquals( Color.decode( "#ff0000" ), Colors.getHue( Color.decode( "#ff0000" ) ) );
+		assertEquals( Color.decode( "#00ff00" ), Colors.getHue( Color.decode( "#00ff00" ) ) );
+		assertEquals( Color.decode( "#0000ff" ), Colors.getHue( Color.decode( "#0000ff" ) ) );
 	}
 
 	public void testGetSecondary() {
 		// Black
 		assertEquals( Color.decode( "#000000" ), Colors.getSecondary( Color.decode( "#000000" ), -30 ) );
 		assertEquals( Color.decode( "#000000" ), Colors.getSecondary( Color.decode( "#000000" ), 30 ) );
-		
+
 		// White
 		assertEquals( Color.decode( "#ffffff" ), Colors.getSecondary( Color.decode( "#ffffff" ), -30 ) );
 		assertEquals( Color.decode( "#ffffff" ), Colors.getSecondary( Color.decode( "#ffffff" ), 30 ) );
@@ -68,5 +64,18 @@ public class ColorsTest extends TestCase {
 		assertEquals( Color.decode( "#00ff80" ), Colors.getSecondary( Color.decode( "#00ff00" ), 30 ) );
 		assertEquals( Color.decode( "#007fff" ), Colors.getSecondary( Color.decode( "#0000ff" ), -30 ) );
 		assertEquals( Color.decode( "#8000ff" ), Colors.getSecondary( Color.decode( "#0000ff" ), 30 ) );
+	}
+
+	public void testGetComplement() {
+		// Black
+		assertEquals( Color.decode( "#000000" ), Colors.getComplement( Color.decode( "#000000" ) ) );
+
+		// White
+		assertEquals( Color.decode( "#ffffff" ), Colors.getComplement( Color.decode( "#ffffff" ) ) );
+
+		// Colors
+		assertEquals( Color.decode( "#00ffff" ), Colors.getComplement( Color.decode( "#ff0000" ) ) );
+		assertEquals( Color.decode( "#ff00ff" ), Colors.getComplement( Color.decode( "#00ff00" ) ) );
+		assertEquals( Color.decode( "#ffff00" ), Colors.getComplement( Color.decode( "#0000ff" ) ) );
 	}
 }

@@ -12,6 +12,7 @@ import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -31,20 +32,22 @@ public abstract class BaseImage {
 
 	protected enum ColorType {
 
-		PRIMARY( 0 ), SECONDARYA( 0 ), SECONDARYB( 0 ), COMPLEMENT( 0 );
+		OUTLINE( -0.75 );
+
+		private double factor;
 
 		ColorType( double factor ) {
-
+			this.factor = factor;
 		}
 
-		double getFactor() {
-			return 0;
+		protected double getFactor() {
+			return factor;
 		}
 
 	}
 
 	protected enum GradientType {
-		DARK( -0.75, -0.25 ), MEDIUM( -0.5, 0.5 ), LIGHT( 0.25, 0.75 );
+		DARK( 0.5, -0.5 ), MEDIUM( 0.75, -0.25 ), LIGHT( 1, 0 );
 
 		private double begin;
 
@@ -65,7 +68,13 @@ public abstract class BaseImage {
 
 	}
 
-	protected static final float DEFAULT_PEN_WIDTH = 1f / 32f;
+	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
+
+	protected static final double RADIANS_PER_DEGREE = Math.PI / 180;
+	
+	protected static final double DEGREES_PER_RADIAN = 180 / Math.PI;
+
+	private static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( Color.GRAY );
 
 	protected int size;
 
@@ -73,24 +82,46 @@ public abstract class BaseImage {
 
 	protected int height;
 
-	protected ColorScheme scheme;
+	protected ColorScheme scheme = DEFAULT_COLOR_SCHEME;
 
-	protected Graphics2D graphics;
+	private double outlineSize = DEFAULT_OUTLINE_SIZE;
 
 	private List<Instruction> instructions;
+
+	private AffineTransform baseTransform;
 
 	public BaseImage( int width, int height ) {
 		this.size = Math.min( width, height );
 		this.width = width;
 		this.height = height;
-		this.scheme = new ColorScheme( Color.BLACK );
 		instructions = new CopyOnWriteArrayList<Instruction>();
 	}
 
 	public abstract void render();
 
+	public Color getColor( ColorType type ) {
+		switch( type ) {
+			case OUTLINE: {
+				return scheme.getPrimary( type.getFactor() );
+			}
+		}
+		return scheme.getPrimary( 0 );
+	}
+
 	public ColorScheme getColorScheme() {
 		return scheme;
+	}
+
+	public void setColorScheme( ColorScheme scheme ) {
+		this.scheme = scheme;
+	}
+
+	public double getOutlineSize() {
+		return outlineSize;
+	}
+
+	public void setOutlineSize( double size ) {
+		this.outlineSize = size;
 	}
 
 	public Paint getGradientPaint( GradientType type ) {
@@ -98,36 +129,47 @@ public abstract class BaseImage {
 	}
 
 	public Paint getGradientPaint( GradientType type, Point anchor ) {
-		return new GradientPaint( anchor, scheme.getPrimary( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + size, anchor.getY() + size ), scheme.getPrimary( type.getEndFactor() ) );
+		return new GradientPaint( anchor, scheme.getPrimary( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), scheme.getPrimary( type.getEndFactor() ) );
 	}
 
 	protected final void render( Graphics2D graphics, int x, int y ) {
+		AffineTransform transform = graphics.getTransform();
+		
+		graphics.scale( size, size );
+		baseTransform = graphics.getTransform();
+
 		graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
 		graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
 		graphics.setRenderingHint( RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON );
 
+		// Set default before call to render.
+		setColorScheme( DEFAULT_COLOR_SCHEME );
+		setOutlineSize( DEFAULT_OUTLINE_SIZE );
+
 		render();
+
 		for( Instruction instruction : instructions ) {
 			instruction.paint( graphics, x, y );
 		}
+
+		graphics.setTransform( transform );
 	}
 
-	@Deprecated
-	private void setBaseColor( Color color ) {
-		//		colors = new ConcurrentHashMap<String, Color>();
-		//		colors.put( OUTLINE_DARK, Colors.mix( color, Color.WHITE, 0.25 ) );
-		//		colors.put( OUTLINE, color );
-		//		colors.put( OUTLINE_LIGHT, Colors.mix( color, Color.WHITE, 0.75 ) );
-		//
-		//		colors.put( GRADIENT_LIGHT_BEGIN, Colors.mix( color, Color.WHITE, 1 ) );
-		//		colors.put( GRADIENT_LIGHT_END, Colors.mix( color, Color.WHITE, 0.5 ) );
-		//
-		//		colors.put( GRADIENT_MEDIUM_BEGIN, Colors.mix( color, Color.WHITE, 0.875 ) );
-		//		colors.put( GRADIENT_MEDIUM_END, Colors.mix( color, Color.WHITE, 0.375 ) );
-		//
-		//		colors.put( GRADIENT_DARK_BEGIN, Colors.mix( color, Color.WHITE, 0.75 ) );
-		//		colors.put( GRADIENT_DARK_END, Colors.mix( color, Color.WHITE, 0.25 ) );
+	protected void move( double x, double y ) {
+		instructions.add( new MoveInstruction( x, y ) );
+	}
+
+	protected void spin( double angle ) {
+		spin( 0, 0, angle );
+	}
+
+	protected void spin( double x, double y, double angle ) {
+		instructions.add( new SpinInstruction( x, y, -angle * ( RADIANS_PER_DEGREE ) ) );
+	}
+
+	protected void reset() {
+		instructions.add( new ResetInstruction() );
 	}
 
 	protected void clip() {
@@ -147,7 +189,11 @@ public abstract class BaseImage {
 	}
 
 	protected void draw( Shape shape ) {
-		draw( shape, null, null );
+		draw( shape, (Paint)null, null );
+	}
+
+	protected void draw( Shape shape, ColorType type ) {
+		draw( shape, getColor( type ), null );
 	}
 
 	protected void draw( Shape shape, Paint paint ) {
@@ -155,17 +201,25 @@ public abstract class BaseImage {
 	}
 
 	protected void draw( Shape shape, Stroke stroke ) {
-		draw( shape, null, stroke );
+		draw( shape, (Paint)null, stroke );
+	}
+
+	protected void draw( Shape shape, ColorType type, Stroke stroke ) {
+		draw( shape, getColor( type ), stroke );
 	}
 
 	protected void draw( Shape shape, Paint paint, Stroke stroke ) {
-		if( paint == null ) paint = scheme.getPrimary( 0 );
-		if( stroke == null ) stroke = new BasicStroke( DEFAULT_PEN_WIDTH * size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
+		if( paint == null ) paint = scheme.getPrimary( ColorType.OUTLINE.getFactor() );
+		if( stroke == null ) stroke = new BasicStroke( (float)outlineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 		instructions.add( new DrawInstruction( shape, paint, stroke ) );
 	}
 
 	protected void draw( Text text ) {
-		draw( text, null, null );
+		draw( text, (Paint)null, null );
+	}
+
+	protected void draw( Text text, ColorType type ) {
+		draw( text, getColor( type ) );
 	}
 
 	protected void draw( Text text, Paint paint ) {
@@ -173,12 +227,16 @@ public abstract class BaseImage {
 	}
 
 	protected void draw( Text text, Stroke stroke ) {
-		draw( text, null, stroke );
+		draw( text, (Paint)null, stroke );
+	}
+
+	protected void draw( Text text, ColorType type, Stroke stroke ) {
+		draw( text, getColor( type ), stroke );
 	}
 
 	protected void draw( Text text, Paint paint, Stroke stroke ) {
-		if( paint == null ) paint = scheme.getPrimary( 0 );
-		if( stroke == null ) stroke = new BasicStroke( DEFAULT_PEN_WIDTH * size, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
+		if( paint == null ) paint = scheme.getPrimary( ColorType.OUTLINE.getFactor() );
+		if( stroke == null ) stroke = new BasicStroke( (float)outlineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 		instructions.add( new TextInstruction( text, paint, stroke ) );
 	}
 
@@ -191,7 +249,81 @@ public abstract class BaseImage {
 	}
 
 	protected void fill( Shape shape, Paint paint ) {
+		if( paint == null ) paint = getGradientPaint( GradientType.LIGHT );
 		instructions.add( new FillInstruction( shape, paint ) );
+	}
+
+	protected Path getDot( double x, double y ) {
+		float offset = DEFAULT_OUTLINE_SIZE;
+		Path path = new Path();
+		path.append( new Ellipse( x - offset, y - offset, offset * 2, offset * 2 ), false );
+		return path;
+	}
+
+	protected Ellipse getCenteredCircle( double cx, double cy, double r ) {
+		return getCenteredEllipse( cx, cy, r, r );
+	}
+
+	protected Ellipse getCenteredEllipse( double cx, double cy, double r ) {
+		return getCenteredEllipse( cx, cy, r, r );
+	}
+
+	protected Ellipse getCenteredEllipse( double cx, double cy, double rx, double ry ) {
+		double x = cx - rx;
+		double y = cy - ry;
+		double w = rx * 2;
+		double h = ry * 2;
+
+		return new Ellipse( x, y, w, h );
+	}
+
+	protected Arc getCenteredArc( double cx, double cy, double radius, double start, double end, int type ) {
+		return getCenteredArc( cx, cy, radius, radius, start, end, type );
+	}
+
+	protected Arc getCenteredArc( double cx, double cy, double rx, double ry, double start, double end, int type ) {
+		double x = cx - rx;
+		double y = cy - ry;
+		double w = rx * 2;
+		double h = ry * 2;
+
+		double extents = end - start;
+		if( extents < 0 ) extents += 360;
+
+		return new Arc( x, y, w, h, start, extents, type );
+	}
+
+	protected Arc getDirectedArc( double cx, double cy, double radius, double start, double extents, int type ) {
+		return getDirectedArc( cx, cy, radius, radius, start, extents, type );
+	}
+
+	protected Arc getDirectedArc( double cx, double cy, double rx, double ry, double start, double extents, int type ) {
+		double x = cx - rx;
+		double y = cy - ry;
+		double w = rx * 2;
+		double h = ry * 2;
+
+		return new Arc( x, y, w, h, start, extents, type );
+	}
+
+	protected Point getArcCenter( Point a, Point b, Point c ) {
+		double alpha = 0;
+		double beta = 0;
+		double gamma = 0;
+
+		alpha = getSquare( b.minus( c ).getMagnitude() ) * a.minus( b ).dot( a.minus( c ) ) / ( 2 * getSquare( a.minus( b ).cross( b.minus( c ) ).getMagnitude() ) );
+		beta = getSquare( a.minus( c ).getMagnitude() ) * b.minus( a ).dot( b.minus( c ) ) / ( 2 * getSquare( a.minus( b ).cross( b.minus( c ) ).getMagnitude() ) );
+		gamma = getSquare( a.minus( b ).getMagnitude() ) * c.minus( a ).dot( c.minus( b ) ) / ( 2 * getSquare( a.minus( b ).cross( b.minus( c ) ).getMagnitude() ) );
+
+		return a.times( alpha ).plus( b.times( beta ) ).plus( c.times( gamma ) );
+	}
+
+	protected double getDistance( Point a, Point b ) {
+		double dx = b.x - a.x;
+		double dy = b.y - a.y;
+		double dz = b.z - a.z;
+
+		return Math.sqrt( dx * dx + dy * dy + dz * dz );
 	}
 
 	protected Font getFont( String path, Font defaultFont ) {
@@ -210,6 +342,10 @@ public abstract class BaseImage {
 		}
 
 		return defaultFont;
+	}
+
+	private final double getSquare( double x ) {
+		return x * x;
 	}
 
 	protected static class Path extends Path2D.Double {
@@ -429,6 +565,15 @@ public abstract class BaseImage {
 		void paint( Graphics2D graphics, int x, int y );
 	}
 
+	private class ResetInstruction implements Instruction {
+
+		@Override
+		public void paint( Graphics2D graphics, int x, int y ) {
+			graphics.setTransform( baseTransform );
+		}
+
+	}
+
 	private class MoveInstruction implements Instruction {
 
 		private double x;
@@ -497,6 +642,26 @@ public abstract class BaseImage {
 
 	}
 
+	private class FillInstruction implements Instruction {
+
+		private Shape shape;
+
+		private Paint paint;
+
+		public FillInstruction( Shape shape, Paint paint ) {
+			this.shape = shape;
+			this.paint = paint;
+		}
+
+		public void paint( Graphics2D graphics, int x, int y ) {
+			graphics.setPaint( paint );
+			graphics.translate( x, y );
+			graphics.fill( shape );
+			graphics.translate( -x, -y );
+		}
+
+	}
+
 	private class DrawInstruction implements Instruction {
 
 		private Shape shape;
@@ -516,26 +681,6 @@ public abstract class BaseImage {
 			graphics.setStroke( stroke );
 			graphics.translate( x, y );
 			graphics.draw( shape );
-			graphics.translate( -x, -y );
-		}
-
-	}
-
-	private class FillInstruction implements Instruction {
-
-		private Shape shape;
-
-		private Paint paint;
-
-		public FillInstruction( Shape shape, Paint paint ) {
-			this.shape = shape;
-			this.paint = paint;
-		}
-
-		public void paint( Graphics2D graphics, int x, int y ) {
-			graphics.setPaint( paint );
-			graphics.translate( x, y );
-			graphics.fill( shape );
 			graphics.translate( -x, -y );
 		}
 

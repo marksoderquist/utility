@@ -37,6 +37,7 @@ import javax.swing.Icon;
 import com.parallelsymmetry.escape.utility.TextUtil;
 import com.parallelsymmetry.escape.utility.log.Log;
 
+@Deprecated
 public abstract class AbstractIcon implements Icon {
 
 	public static final int DEFAULT_ICON_SIZE = 256;
