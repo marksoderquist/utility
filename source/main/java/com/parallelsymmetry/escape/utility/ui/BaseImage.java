@@ -88,7 +88,7 @@ public abstract class BaseImage {
 
 	protected static final Font DEFAULT_FONT = new Font( Font.SANS_SERIF, Font.PLAIN, 24 );
 
-	protected static final FontRenderContext FONT_RENDER_CONTEXT = new FontRenderContext( new AffineTransform(), true, true );
+	protected static final FontRenderContext FONT_RENDER_CONTEXT = new FontRenderContext( new AffineTransform(), true, false );
 
 	protected int size;
 
@@ -201,7 +201,7 @@ public abstract class BaseImage {
 		graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
 		graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
-		graphics.setRenderingHint( RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON );
+		//graphics.setRenderingHint( RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON );
 
 		// Set default before call to render.
 		setColorScheme( DEFAULT_COLOR_SCHEME );
@@ -230,6 +230,7 @@ public abstract class BaseImage {
 
 	protected void reset() {
 		instructions.add( new ResetInstruction() );
+		clip();
 	}
 
 	protected void clip() {
@@ -402,6 +403,36 @@ public abstract class BaseImage {
 		}
 
 		return defaultFont;
+	}
+
+	/**
+	 * Find the font that fits the specified width.
+	 */
+	protected Font findFontForWidth( Font font, String text, double width ) {
+		Font currentFont = font.deriveFont( 1.0f );
+		Rectangle2D textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
+
+		while( textBounds.getWidth() < width ) {
+			currentFont = currentFont.deriveFont( currentFont.getSize2D() + 1 );
+			textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
+		}
+
+		return currentFont;
+	}
+
+	/**
+	 * Find the font that fits the specified height.
+	 */
+	protected Font findFontForHeight( Font font, String text, double height ) {
+		Font currentFont = font.deriveFont( 1.0f );
+		Rectangle2D textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
+
+		while( textBounds.getHeight() < height ) {
+			currentFont = currentFont.deriveFont( currentFont.getSize2D() + 1 );
+			textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
+		}
+
+		return currentFont;
 	}
 
 	private final double getSquare( double x ) {
