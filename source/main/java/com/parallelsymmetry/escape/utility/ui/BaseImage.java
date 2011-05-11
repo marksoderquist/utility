@@ -12,6 +12,7 @@ import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
@@ -20,10 +21,15 @@ import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.RGBImageFilter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.imageio.ImageIO;
 
 import com.parallelsymmetry.escape.utility.TextUtil;
 import com.parallelsymmetry.escape.utility.log.Log;
@@ -71,10 +77,14 @@ public abstract class BaseImage {
 	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
 
 	protected static final double RADIANS_PER_DEGREE = Math.PI / 180;
-	
+
 	protected static final double DEGREES_PER_RADIAN = 180 / Math.PI;
 
 	private static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( Color.GRAY );
+
+	protected static final Font DEFAULT_FONT = new Font( Font.SANS_SERIF, Font.PLAIN, 24 );
+
+	protected static final FontRenderContext FONT_RENDER_CONTEXT = new FontRenderContext( new AffineTransform(), true, true );
 
 	protected int size;
 
@@ -132,9 +142,53 @@ public abstract class BaseImage {
 		return new GradientPaint( anchor, scheme.getPrimary( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), scheme.getPrimary( type.getEndFactor() ) );
 	}
 
+	public BufferedImage getImage() {
+		BufferedImage image = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
+
+		render( image.createGraphics(), 0, 0 );
+
+		return image;
+	}
+
+	public void save( File target, String name ) {
+		save( target, name, width, height );
+	}
+
+	public void save( File target, String name, int size ) {
+		save( target, name, size, size, null );
+	}
+
+	public void save( File target, String name, int width, int height ) {
+		save( target, name, width, height, null );
+	}
+
+	public void save( File target, String name, int width, int height, RGBImageFilter filter ) {
+		if( !target.isDirectory() ) target = target.getParentFile();
+		if( !target.exists() && target.mkdirs() ) {
+			System.err.println( "Could not create target: " + target );
+			return;
+		}
+
+		BufferedImage image = getImage();
+
+		// Scale the icon.
+		if( this.width != width || this.height != height ) image = Images.scale( image, width, height );
+
+		// Filter the icon.
+		image = Images.filter( image, filter );
+
+		try {
+			File file = new File( target, name + ".png" );
+			ImageIO.write( image, "png", file );
+			System.out.println( "Image created: " + file.toString() );
+		} catch( IOException exception ) {
+			exception.printStackTrace();
+		}
+	}
+
 	protected final void render( Graphics2D graphics, int x, int y ) {
 		AffineTransform transform = graphics.getTransform();
-		
+
 		graphics.scale( size, size );
 		baseTransform = graphics.getTransform();
 
@@ -704,7 +758,7 @@ public abstract class BaseImage {
 			if( TextUtil.isEmpty( text.getText() ) ) return;
 			graphics.setPaint( paint );
 			graphics.setStroke( stroke );
-			graphics.setFont( text.getFont() );
+			graphics.setFont( text.getFont().deriveFont( text.getFont().getSize2D() / size ) );
 			graphics.translate( x, y );
 			graphics.drawString( text.getText(), (float)text.getX(), (float)text.getY() );
 			graphics.translate( -x, -y );
