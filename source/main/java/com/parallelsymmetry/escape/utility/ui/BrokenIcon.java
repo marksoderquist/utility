@@ -3,19 +3,19 @@ package com.parallelsymmetry.escape.utility.ui;
 import java.awt.BasicStroke;
 import java.awt.Color;
 
-public class BrokenIcon extends AbstractIcon {
+public class BrokenIcon extends BaseIcon {
 
 	public void render() {
-		int penWidth = DEFAULT_PEN_WIDTH * 4;
-		int near = penWidth / 2 + 24;
-		int far = DEFAULT_ICON_SIZE - penWidth / 2 - 24;
+		double penWidth = K;
+		double near = penWidth / 2 + ZB;
+		double far = 1 - penWidth / 2 - ZB;
 
 		Path path = new Path();
 		path.moveTo( near, near );
 		path.lineTo( far, far );
 		path.moveTo( near, far );
 		path.lineTo( far, near );
-		draw( path, Color.RED.darker(), new BasicStroke( penWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND ) );
+		draw( path, new Color( 196, 0, 0 ), new BasicStroke( (float)penWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND ) );
 	}
 
 	public static void main( String[] parameters ) {

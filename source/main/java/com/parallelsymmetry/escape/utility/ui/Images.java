@@ -38,7 +38,8 @@ public class Images {
 	}
 
 	public static final BufferedImage filter( BufferedImage image, RGBImageFilter filter ) {
-		if( filter == null ) return null;
+		if( image == null ) return null;
+		if( filter == null ) return image;
 
 		int w = image.getWidth();
 		int h = image.getHeight();

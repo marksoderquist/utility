@@ -51,6 +51,10 @@ public abstract class BaseImage {
 		}
 
 	}
+	
+	protected enum ColorMode {
+		PRIMARY, SECONDARYA, SECONDARYB, COMPLEMENT
+	}
 
 	protected enum GradientType {
 		DARK( 0.5, -0.5 ), MEDIUM( 0.75, -0.25 ), LIGHT( 1, 0 );
@@ -97,6 +101,8 @@ public abstract class BaseImage {
 	private double outlineSize = DEFAULT_OUTLINE_SIZE;
 
 	private List<Instruction> instructions;
+
+	private AffineTransform originalTransform;
 
 	private AffineTransform baseTransform;
 
@@ -187,7 +193,7 @@ public abstract class BaseImage {
 	}
 
 	protected final void render( Graphics2D graphics, int x, int y ) {
-		AffineTransform transform = graphics.getTransform();
+		originalTransform = graphics.getTransform();
 
 		graphics.scale( size, size );
 		baseTransform = graphics.getTransform();
@@ -207,7 +213,7 @@ public abstract class BaseImage {
 			instruction.paint( graphics, x, y );
 		}
 
-		graphics.setTransform( transform );
+		graphics.setTransform( originalTransform );
 	}
 
 	protected void move( double x, double y ) {
@@ -775,8 +781,12 @@ public abstract class BaseImage {
 		}
 
 		public void paint( Graphics2D graphics, int x, int y ) {
+			AffineTransform transform = graphics.getTransform();
 			graphics.translate( x, y );
-			graphics.drawImage( text.getImage(), (int)text.getX(), (int)text.getY(), null );
+			graphics.setTransform( originalTransform );
+			graphics.drawImage( text.getImage(), (int)(text.getX() * transform.getScaleX()), (int)(text.getY() * transform.getScaleY()), null );
+			graphics.setTransform( transform );
+
 			graphics.translate( -x, -y );
 		}
 

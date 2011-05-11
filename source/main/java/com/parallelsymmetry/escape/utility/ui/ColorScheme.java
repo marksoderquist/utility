@@ -4,12 +4,14 @@ import java.awt.Color;
 
 public class ColorScheme {
 
+	public static final double DEFAULT_SECONDARY_ANGLE = 30;
+
 	private Color primary;
-	
+
 	private Color secondaryA;
-	
+
 	private Color secondaryB;
-	
+
 	private Color complement;
 
 	public ColorScheme() {
@@ -17,9 +19,22 @@ public class ColorScheme {
 	}
 
 	public ColorScheme( Color color ) {
+		this( color, DEFAULT_SECONDARY_ANGLE, false );
+	}
+
+	public ColorScheme( Color color, boolean switchSecondary ) {
+		this( color, DEFAULT_SECONDARY_ANGLE, switchSecondary );
+	}
+
+	public ColorScheme( Color color, double secondaryAngle ) {
+		this( color, secondaryAngle, false );
+	}
+
+	public ColorScheme( Color color, double secondaryAngle, boolean switchSecondary ) {
+		secondaryAngle = secondaryAngle % 360;
 		this.primary = color;
-		this.secondaryA = Colors.getSecondary( color, -30 );
-		this.secondaryB = Colors.getSecondary( color, 30);
+		this.secondaryA = Colors.getSecondary( color, switchSecondary ? secondaryAngle : -secondaryAngle );
+		this.secondaryB = Colors.getSecondary( color, switchSecondary ? -secondaryAngle : secondaryAngle );
 		this.complement = Colors.getComplement( color );
 	}
 
@@ -45,7 +60,7 @@ public class ColorScheme {
 		if( factor > 1 ) factor = 1;
 		return factor < 0 ? Colors.mix( color, Color.BLACK, -factor ) : Colors.mix( color, Color.WHITE, factor );
 	}
-	
+
 	public String toString() {
 		return primary.toString();
 	}
