@@ -54,6 +54,21 @@ public final class Colors {
 		return new Color( r, g, b, a );
 	}
 
+	/**
+	 * Return a shade of the base color. Factor ranges from -1 to 1 with negative
+	 * values trending toward black and positive values trending toward white.
+	 * 
+	 * @param color The base color.
+	 * @param factor The shading factor.
+	 * @return
+	 */
+	public static Color getShade( Color color, double factor ) {
+		if( factor == 0 ) return color;
+		if( factor < -1 ) factor = -1;
+		if( factor > 1 ) factor = 1;
+		return factor < 0 ? Colors.mix( color, Color.BLACK, -factor ) : Colors.mix( color, Color.WHITE, factor );
+	}
+
 	public static Color makeOpaque( Color color ) {
 		return new Color( color.getRGB() | 0xff000000 );
 	}
@@ -65,7 +80,7 @@ public final class Colors {
 
 	public static Color getHue( Color color ) {
 		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
-		return new Color(  Color.HSBtoRGB(  components[0], 1, 1 ) );
+		return new Color( Color.HSBtoRGB( components[0], 1, 1 ) );
 	}
 
 	/**

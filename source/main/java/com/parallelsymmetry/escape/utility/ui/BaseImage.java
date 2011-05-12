@@ -51,7 +51,7 @@ public abstract class BaseImage {
 		}
 
 	}
-	
+
 	protected enum ColorMode {
 		PRIMARY, SECONDARYA, SECONDARYB, COMPLEMENT
 	}
@@ -138,6 +138,14 @@ public abstract class BaseImage {
 
 	public void setOutlineSize( double size ) {
 		this.outlineSize = size;
+	}
+
+	public Paint getGradientPaint( Color color ) {
+		return getGradientPaint( color, new Point( 0, 0 ) );
+	}
+
+	public Paint getGradientPaint( Color color, Point anchor ) {
+		return new GradientPaint( anchor, Colors.getShade( color, 0.75 ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), Colors.getShade( color, -0.25 ) );
 	}
 
 	public Paint getGradientPaint( GradientType type ) {
@@ -815,7 +823,7 @@ public abstract class BaseImage {
 			AffineTransform transform = graphics.getTransform();
 			graphics.translate( x, y );
 			graphics.setTransform( originalTransform );
-			graphics.drawImage( text.getImage(), (int)(text.getX() * transform.getScaleX()), (int)(text.getY() * transform.getScaleY()), null );
+			graphics.drawImage( text.getImage(), (int)( text.getX() * transform.getScaleX() ), (int)( text.getY() * transform.getScaleY() ), null );
 			graphics.setTransform( transform );
 
 			graphics.translate( -x, -y );

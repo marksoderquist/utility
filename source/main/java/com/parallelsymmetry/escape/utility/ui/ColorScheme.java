@@ -39,26 +39,19 @@ public class ColorScheme {
 	}
 
 	public Color getPrimary( double factor ) {
-		return getColor( primary, factor );
+		return Colors.getShade( primary, factor );
 	}
 
 	public Color getSecondaryA( double factor ) {
-		return getColor( secondaryA, factor );
+		return Colors.getShade( secondaryA, factor );
 	}
 
 	public Color getSecondaryB( double factor ) {
-		return getColor( secondaryB, factor );
+		return Colors.getShade( secondaryB, factor );
 	}
 
 	public Color getComplement( double factor ) {
-		return getColor( complement, factor );
-	}
-
-	private Color getColor( Color color, double factor ) {
-		if( factor == 0 ) return color;
-		if( factor < -1 ) factor = -1;
-		if( factor > 1 ) factor = 1;
-		return factor < 0 ? Colors.mix( color, Color.BLACK, -factor ) : Colors.mix( color, Color.WHITE, factor );
+		return Colors.getShade( complement, factor );
 	}
 
 	public String toString() {

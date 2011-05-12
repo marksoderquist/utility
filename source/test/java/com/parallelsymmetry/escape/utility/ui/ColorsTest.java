@@ -39,6 +39,36 @@ public class ColorsTest extends TestCase {
 		assertEquals( new Color( 63, 63, 63, 255 ), Colors.mix( Color.BLACK, Color.WHITE, 0.25 ) );
 	}
 
+	public void testGetShade() {
+		Color color = Color.decode( "#ff0000" );
+
+		assertEquals( Color.decode( "#000000" ), Colors.getShade( color, -1 ) );
+		assertEquals( Color.decode( "#7f0000" ), Colors.getShade( color, -0.5 ) );
+		assertEquals( Color.decode( "#ff0000" ), Colors.getShade( color, 0 ) );
+		assertEquals( Color.decode( "#ff7f7f" ), Colors.getShade( color, 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), Colors.getShade( color, 1 ) );
+	}
+
+	public void testGetShadeWithBlack() {
+		Color color = Color.BLACK;
+
+		assertEquals( Color.decode( "#000000" ), Colors.getShade( color, -1 ) );
+		assertEquals( Color.decode( "#000000" ), Colors.getShade( color, -0.5 ) );
+		assertEquals( Color.decode( "#000000" ), Colors.getShade( color, 0 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), Colors.getShade( color, 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), Colors.getShade( color, 1 ) );
+	}
+
+	public void testGetShadeWithWhite() {
+		Color color = Color.WHITE;
+
+		assertEquals( Color.decode( "#000000" ), Colors.getShade( color, -1 ) );
+		assertEquals( Color.decode( "#7f7f7f" ), Colors.getShade( color, -0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), Colors.getShade( color, 0 ) );
+		assertEquals( Color.decode( "#ffffff" ), Colors.getShade( color, 0.5 ) );
+		assertEquals( Color.decode( "#ffffff" ), Colors.getShade( color, 1 ) );
+	}
+
 	public void testGetHue() {
 		assertEquals( Color.decode( "#ff0000" ), Colors.getHue( Color.decode( "#000000" ) ) );
 		assertEquals( Color.decode( "#ff0000" ), Colors.getHue( Color.decode( "#ffffff" ) ) );
