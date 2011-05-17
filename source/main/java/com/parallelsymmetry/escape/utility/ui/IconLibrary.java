@@ -8,7 +8,6 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
-import java.awt.image.RGBImageFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -21,16 +20,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public final class IconLibrary {
-
-	public static final RGBImageFilter STANDARD_FILTER = new GrayscaleFilter( 0, 0 );
-
-	public static final RGBImageFilter DISABLED_FILTER = new GrayscaleFilter( 0.5 );
-
-	public static final RGBImageFilter PRESSED_FILTER = new GrayscaleFilter( -0.125 );
-
-	public static final RGBImageFilter ROLLOVER_FILTER = new MaskscaleFilter( 0x80808080 );
-
-	public static final RGBImageFilter NO_ALPHA_FILTER = new NoAlphaFilter();
 
 	public static final int DEFAULT_ICON_SIZE = 16;
 

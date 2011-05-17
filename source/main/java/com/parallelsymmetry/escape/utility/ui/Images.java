@@ -5,7 +5,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
 
 import javax.swing.JOptionPane;
@@ -13,6 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 public class Images {
+
+	public static final RGBImageFilter NO_ALPHA_FILTER = new NoAlphaFilter();
+
+	public static final RGBImageFilter STANDARD_FILTER = new GrayscaleFilter( 0, 0 );
+
+	public static final RGBImageFilter DISABLED_FILTER = new GrayscaleFilter( 0.5 );
+
+	public static final RGBImageFilter PRESSED_FILTER = new GrayscaleFilter( -0.125 );
+
+	public static final RGBImageFilter ROLLOVER_FILTER = new MaskscaleFilter( 0x80808080 );
 
 	public static void show( Image image ) {
 		show( image, Color.WHITE );
@@ -37,18 +50,21 @@ public class Images {
 		JOptionPane.showMessageDialog( null, border, null, JOptionPane.PLAIN_MESSAGE );
 	}
 
-	public static final BufferedImage filter( BufferedImage image, RGBImageFilter filter ) {
+	public static final Image filter( Image image, ImageFilter filter ) {
+		if( filter == null ) return image;
+		return Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( image.getSource(), filter ) );
+	}
+
+	public static final BufferedImage filter( BufferedImage image, ImageFilter filter ) {
 		if( image == null ) return null;
 		if( filter == null ) return image;
 
 		int w = image.getWidth();
 		int h = image.getHeight();
-		BufferedImage result = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
-		for( int x = 0; x < w; x++ ) {
-			for( int y = 0; y < h; y++ ) {
-				result.setRGB( x, y, filter.filterRGB( x, y, image.getRGB( x, y ) ) );
-			}
-		}
+		BufferedImage result = new BufferedImage( w, h, image.getType() );
+		Graphics2D graphics = result.createGraphics();
+		graphics.drawImage( filter( (Image)image, filter ), 0, 0, null );
+		graphics.dispose();
 
 		return result;
 	}

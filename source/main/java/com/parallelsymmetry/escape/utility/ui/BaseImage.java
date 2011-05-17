@@ -36,22 +36,6 @@ import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class BaseImage {
 
-	protected enum ColorType {
-
-		OUTLINE( -0.75 );
-
-		private double factor;
-
-		ColorType( double factor ) {
-			this.factor = factor;
-		}
-
-		protected double getFactor() {
-			return factor;
-		}
-
-	}
-
 	protected enum ColorMode {
 		PRIMARY, SECONDARYA, SECONDARYB, COMPLEMENT
 	}
@@ -100,6 +84,8 @@ public abstract class BaseImage {
 
 	private double outlineSize = DEFAULT_OUTLINE_SIZE;
 
+	private ColorMode colorMode = ColorMode.PRIMARY;
+
 	private List<Instruction> instructions;
 
 	private AffineTransform originalTransform;
@@ -114,15 +100,6 @@ public abstract class BaseImage {
 	}
 
 	public abstract void render();
-
-	public Color getColor( ColorType type ) {
-		switch( type ) {
-			case OUTLINE: {
-				return scheme.getPrimary( type.getFactor() );
-			}
-		}
-		return scheme.getPrimary( 0 );
-	}
 
 	public ColorScheme getColorScheme() {
 		return scheme;
@@ -153,13 +130,15 @@ public abstract class BaseImage {
 	}
 
 	public Paint getGradientPaint( GradientType type, Point anchor ) {
-		return new GradientPaint( anchor, scheme.getPrimary( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), scheme.getPrimary( type.getEndFactor() ) );
+		return new GradientPaint( anchor, getColor( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), getColor( type.getEndFactor() ) );
 	}
 
 	public BufferedImage getImage() {
 		BufferedImage image = new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
 
-		render( image.createGraphics(), 0, 0 );
+		Graphics2D graphics = image.createGraphics();
+		render( graphics, 0, 0 );
+		graphics.dispose();
 
 		return image;
 	}
@@ -209,11 +188,6 @@ public abstract class BaseImage {
 		graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
 		graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
-		//graphics.setRenderingHint( RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON );
-
-		// Set default before call to render.
-		setColorScheme( DEFAULT_COLOR_SCHEME );
-		setOutlineSize( DEFAULT_OUTLINE_SIZE );
 
 		render();
 
@@ -261,10 +235,6 @@ public abstract class BaseImage {
 		draw( shape, (Paint)null, null );
 	}
 
-	protected void draw( Shape shape, ColorType type ) {
-		draw( shape, getColor( type ), null );
-	}
-
 	protected void draw( Shape shape, Paint paint ) {
 		draw( shape, paint, null );
 	}
@@ -273,22 +243,14 @@ public abstract class BaseImage {
 		draw( shape, (Paint)null, stroke );
 	}
 
-	protected void draw( Shape shape, ColorType type, Stroke stroke ) {
-		draw( shape, getColor( type ), stroke );
-	}
-
 	protected void draw( Shape shape, Paint paint, Stroke stroke ) {
-		if( paint == null ) paint = scheme.getPrimary( ColorType.OUTLINE.getFactor() );
+		if( paint == null ) paint = getColor( -0.75 );
 		if( stroke == null ) stroke = new BasicStroke( (float)outlineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 		instructions.add( new DrawInstruction( shape, paint, stroke ) );
 	}
 
 	protected void draw( Text text ) {
 		draw( text, (Paint)null, null );
-	}
-
-	protected void draw( Text text, ColorType type ) {
-		draw( text, getColor( type ) );
 	}
 
 	protected void draw( Text text, Paint paint ) {
@@ -299,12 +261,8 @@ public abstract class BaseImage {
 		draw( text, (Paint)null, stroke );
 	}
 
-	protected void draw( Text text, ColorType type, Stroke stroke ) {
-		draw( text, getColor( type ), stroke );
-	}
-
 	protected void draw( Text text, Paint paint, Stroke stroke ) {
-		if( paint == null ) paint = scheme.getPrimary( ColorType.OUTLINE.getFactor() );
+		if( paint == null ) paint = getColor( -0.75 );
 		if( stroke == null ) stroke = new BasicStroke( (float)outlineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 		instructions.add( new TextInstruction( text, paint, stroke ) );
 	}
@@ -322,8 +280,16 @@ public abstract class BaseImage {
 		instructions.add( new FillInstruction( shape, paint ) );
 	}
 
+	protected ColorMode getColorMode() {
+		return colorMode;
+	}
+
+	protected void setColorMode( ColorMode mode ) {
+		this.colorMode = mode;
+	}
+
 	protected Path getDot( double x, double y ) {
-		float offset = DEFAULT_OUTLINE_SIZE;
+		double offset = 0.5 * DEFAULT_OUTLINE_SIZE;
 		Path path = new Path();
 		path.append( new Ellipse( x - offset, y - offset, offset * 2, offset * 2 ), false );
 		return path;
@@ -441,6 +407,23 @@ public abstract class BaseImage {
 		}
 
 		return currentFont;
+	}
+
+	private final Color getColor( double factor ) {
+		switch( colorMode ) {
+			case SECONDARYA: {
+				return scheme.getSecondaryA( factor );
+			}
+			case SECONDARYB: {
+				return scheme.getSecondaryB( factor );
+			}
+			case COMPLEMENT: {
+				return scheme.getComplement( factor );
+			}
+			default: {
+				return scheme.getPrimary( factor );
+			}
+		}
 	}
 
 	private final double getSquare( double x ) {

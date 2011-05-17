@@ -95,8 +95,13 @@ public class Icons {
 
 		public SamplePanel( Icon icon, ImageFilter filter ) {
 			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-			icon.paintIcon( null, iconImage.getGraphics(), 0, 0 );
-			if( filter != null ) iconImage = Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( iconImage.getSource(), filter ) );
+
+			Graphics graphics = iconImage.getGraphics();
+			icon.paintIcon( null, graphics, 0, 0 );
+			graphics.dispose();
+
+			iconImage = Images.filter( iconImage, filter );
+
 			gridImage = createBackgroundImage();
 			setBackground( new Color( 220, 220, 220 ) );
 			setBackground( Color.WHITE );
