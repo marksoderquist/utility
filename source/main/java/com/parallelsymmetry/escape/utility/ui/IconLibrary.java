@@ -113,8 +113,8 @@ public final class IconLibrary {
 		return new IconProxy( name, getIcon( name ), filter );
 	}
 
-	public Icon getIcon( Icon icon, ImageFilter filter ) {
-		return createRenderedIcon( icon, filter );
+	public Icon getIcon( String name, int size, ImageFilter filter ) {
+		return new IconProxy( name, getIcon( name, size ), filter );
 	}
 
 	public Image getImage( String name ) {
@@ -127,6 +127,10 @@ public final class IconLibrary {
 
 	public Image getImage( String name, ImageFilter filter ) {
 		return getImage( getIcon( name, filter ) );
+	}
+
+	public Image getImage( String name, int size, ImageFilter filter ) {
+		return getImage( getIcon( name, size ), filter );
 	}
 
 	/**
@@ -144,7 +148,7 @@ public final class IconLibrary {
 	}
 
 	public Image getImage( Icon icon, ImageFilter filter ) {
-		return getImage( getIcon( icon, filter ) );
+		return getImage( createRenderedIcon( icon, filter ) );
 	}
 
 	/**

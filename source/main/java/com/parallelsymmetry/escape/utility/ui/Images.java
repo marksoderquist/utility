@@ -17,15 +17,27 @@ import javax.swing.border.LineBorder;
 
 public class Images {
 
-	public static final RGBImageFilter NO_ALPHA_FILTER = new NoAlphaFilter();
+	/**
+	 * Forces pixels to opaque or transparent.
+	 */
+	public static final RGBImageFilter BITMASK_FILTER = new BitmaskFilter();
 
+	/**
+	 * Standard grayscale filter.
+	 */
 	public static final RGBImageFilter STANDARD_FILTER = new GrayscaleFilter( 0, 0 );
 
+	/**
+	 * Brighter grayscale filter.
+	 */
 	public static final RGBImageFilter DISABLED_FILTER = new GrayscaleFilter( 0.5 );
 
+	/**
+	 * Slightly darker grayscale filter.
+	 */
 	public static final RGBImageFilter PRESSED_FILTER = new GrayscaleFilter( -0.125 );
 
-	public static final RGBImageFilter ROLLOVER_FILTER = new MaskscaleFilter( 0x80808080 );
+	public static final RGBImageFilter ROLLOVER_FILTER = new RescaleFilter( 0x80808080 );
 
 	public static void show( Image image ) {
 		show( image, Color.WHITE );

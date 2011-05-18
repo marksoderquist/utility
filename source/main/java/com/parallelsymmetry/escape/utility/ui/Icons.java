@@ -11,12 +11,17 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 public class Icons {
+
+	public static Icon filter( Icon icon, ImageFilter filter ) {
+		return new ImageIcon( getImage( icon, filter ) );
+	}
 
 	public static Image getImage( Icon icon ) {
 		return getImage( icon, icon.getIconWidth(), icon.getIconHeight() );

@@ -8,25 +8,41 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 
-public class AbstractIconGenerator {
+public abstract class AbstractIconGenerator {
 
-	protected static final void save( File target, String name, Icon icon ) {
+	private ColorScheme scheme;
+	
+	public abstract void generate();
+
+	protected void forceColorScheme( ColorScheme scheme ) {
+		this.scheme = scheme;
+	}
+
+	protected void save( File target, String name, Icon icon ) {
 		save( target, name, icon, icon.getIconWidth(), icon.getIconHeight() );
 	}
 
-	protected static final void save( File target, String name, Icon icon, int size ) {
+	protected void save( File target, String name, Icon icon, int size ) {
 		save( target, name, icon, size, size, null );
 	}
 
-	protected static final void save( File target, String name, Icon icon, int width, int height ) {
+	protected void save( File target, String name, Icon icon, int width, int height ) {
 		save( target, name, icon, width, height, null );
 	}
 
-	protected static final void save( File target, String name, Icon icon, int width, int height, ImageFilter filter ) {
+	protected void save( File target, String name, Icon icon, ImageFilter filter ) {
+		save( target, name, icon, icon.getIconWidth(), icon.getIconHeight(), filter );
+	}
+
+	protected void save( File target, String name, Icon icon, int width, int height, ImageFilter filter ) {
 		if( !target.isDirectory() ) target = target.getParentFile();
 		if( !target.exists() && target.mkdirs() ) {
 			System.err.println( "Could not create target: " + target );
 			return;
+		}
+
+		if( scheme != null && icon instanceof BaseIcon ) {
+			( (BaseIcon)icon ).setColorScheme( scheme );
 		}
 
 		BufferedImage image = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );

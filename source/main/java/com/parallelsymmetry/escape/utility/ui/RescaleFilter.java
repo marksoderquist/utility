@@ -2,7 +2,7 @@ package com.parallelsymmetry.escape.utility.ui;
 
 import java.awt.image.RGBImageFilter;
 
-public class MaskscaleFilter extends RGBImageFilter {
+public class RescaleFilter extends RGBImageFilter {
 
 	float ascale = 0;
 
@@ -12,7 +12,7 @@ public class MaskscaleFilter extends RGBImageFilter {
 
 	float bscale = 0;
 
-	public MaskscaleFilter( int mask ) {
+	public RescaleFilter( int mask ) {
 		canFilterIndexColorModel = true;
 
 		ascale = ( ( ( mask & 0xff000000 ) >>> 24 ) - 128 ) / 128f;

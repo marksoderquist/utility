@@ -2,7 +2,7 @@ package com.parallelsymmetry.escape.utility.ui;
 
 import java.awt.image.RGBImageFilter;
 
-public class NoAlphaFilter extends RGBImageFilter {
+public class BitmaskFilter extends RGBImageFilter {
 
 	@Override
 	public int filterRGB( int x, int y, int rgb ) {
