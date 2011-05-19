@@ -37,21 +37,44 @@ public class ColorScheme {
 		this.secondaryB = Colors.getSecondary( color, switchSecondary ? -secondaryAngle : secondaryAngle );
 		this.complement = Colors.getComplement( color );
 	}
+	
+	public ColorScheme( Color primary, Color secondaryA, Color secondaryB, Color complement ) {
+		this.primary = primary;
+		this.secondaryA = secondaryA;
+		this.secondaryB = secondaryB;
+		this.complement = complement;
+	}
 
 	public Color getPrimary( double factor ) {
 		return Colors.getShade( primary, factor );
 	}
+	
+	public void setPrimary( Color color ) {
+		this.primary = color;
+	}
 
 	public Color getSecondaryA( double factor ) {
 		return Colors.getShade( secondaryA, factor );
+	}
+	
+	public void setSecondaryA( Color color ) {
+		this.secondaryA = color;
 	}
 
 	public Color getSecondaryB( double factor ) {
 		return Colors.getShade( secondaryB, factor );
 	}
 
+	public void setSecondaryB( Color color ) {
+		this.secondaryB = color;
+	}
+
 	public Color getComplement( double factor ) {
 		return Colors.getShade( complement, factor );
+	}
+	
+	public void setComplement( Color color ) {
+		this.complement = color;
 	}
 
 	public String toString() {
