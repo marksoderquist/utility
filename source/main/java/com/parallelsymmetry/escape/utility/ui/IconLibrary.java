@@ -45,8 +45,8 @@ public final class IconLibrary {
 	 * using the specified name and the .png extension. This way icon images only
 	 * need to be located in one if the paths and then called by name. For
 	 * example, if an image exit.png is located in one of the paths then calling
-	 * IconCache.get().getIcon( "exit" ) will return the icon using the exit.png
-	 * image.
+	 * <code>library.getIcon( "exit" )</code> will return the icon using the
+	 * exit.png image. Note that file names and extensions are case sensitive.
 	 */
 	public IconLibrary() {
 		this( DEFAULT_ICON_PATH );
