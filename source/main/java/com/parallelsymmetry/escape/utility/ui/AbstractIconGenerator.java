@@ -11,7 +11,7 @@ import javax.swing.Icon;
 public abstract class AbstractIconGenerator {
 
 	private ColorScheme scheme;
-	
+
 	public abstract void generate();
 
 	protected void forceColorScheme( ColorScheme scheme ) {
@@ -35,7 +35,6 @@ public abstract class AbstractIconGenerator {
 	}
 
 	protected void save( File target, String name, Icon icon, int width, int height, ImageFilter filter ) {
-		if( !target.isDirectory() ) target = target.getParentFile();
 		if( !target.exists() && target.mkdirs() ) {
 			System.err.println( "Could not create target: " + target );
 			return;
