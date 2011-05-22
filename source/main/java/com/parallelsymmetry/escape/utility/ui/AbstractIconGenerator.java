@@ -35,6 +35,10 @@ public abstract class AbstractIconGenerator {
 	}
 
 	protected void save( File target, String name, Icon icon, int width, int height, ImageFilter filter ) {
+		if( target.exists() && target.isFile() ) {
+			System.err.println( "Target not a folder: " + target );
+			return;
+		}
 		if( !target.exists() && target.mkdirs() ) {
 			System.err.println( "Could not create target: " + target );
 			return;
