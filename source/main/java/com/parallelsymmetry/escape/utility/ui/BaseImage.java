@@ -114,7 +114,7 @@ public abstract class BaseImage {
 	}
 
 	public void setColorScheme( ColorScheme scheme ) {
-		this.scheme = scheme;
+		this.scheme = scheme != null ? scheme : DEFAULT_COLOR_SCHEME;
 	}
 
 	public double getOutlineSize() {
