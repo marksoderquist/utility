@@ -23,8 +23,6 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	private boolean running;
 
-	private boolean success;
-
 	private FutureTask<V> future;
 
 	public Task() {
@@ -56,7 +54,14 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	}
 
 	public final boolean isSuccess() {
-		return success;
+		if( !isRunning() && !isDone() ) return false;
+
+		try {
+			future.get();
+			return true;
+		} catch( Throwable throwable ) {
+			return false;
+		}
 	}
 
 	@Override
@@ -118,8 +123,10 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 		@Override
 		protected void set( W value ) {
-			success = true;
 			super.set( value );
+			try {
+				super.get();
+			} catch( Exception exception ) {}
 			fireTaskEvent();
 		}
 
