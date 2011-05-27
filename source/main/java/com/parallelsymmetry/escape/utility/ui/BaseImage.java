@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.RGBImageFilter;
+import java.awt.image.ImageFilter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -154,6 +154,10 @@ public abstract class BaseImage {
 	public void save( File target, String name ) {
 		save( target, name, width, height );
 	}
+	
+	public void save( File target, String name, ImageFilter filter ) {
+		save( target, name, width, height, filter );
+	}
 
 	public void save( File target, String name, int size ) {
 		save( target, name, size, size, null );
@@ -163,13 +167,17 @@ public abstract class BaseImage {
 		save( target, name, width, height, null );
 	}
 
-	public void save( File target, String name, int width, int height, RGBImageFilter filter ) {
-		if( !target.isDirectory() ) target = target.getParentFile();
-		if( !target.exists() && target.mkdirs() ) {
+	public void save( File target, String name, int width, int height, ImageFilter filter ) {
+		if( target.exists() && target.isFile() ) {
+			System.err.println( "Target not a folder: " + target );
+			return;
+		}
+		if( !target.exists() && !target.mkdirs() ) {
 			System.err.println( "Could not create target: " + target );
 			return;
 		}
 
+		// Generate the image.
 		BufferedImage image = getImage();
 
 		// Scale the icon.

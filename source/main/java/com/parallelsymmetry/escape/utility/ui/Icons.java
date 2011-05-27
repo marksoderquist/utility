@@ -9,7 +9,10 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -55,6 +58,54 @@ public class Icons {
 		if( filter != null ) image = Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( image.getSource(), filter ) );
 
 		return image;
+	}
+
+	public static void save( Icon icon, File target, String name ) {
+		save( icon, target, name, icon.getIconWidth(), icon.getIconHeight() );
+	}
+	
+	public static void save( Icon icon, File target, String name, int size ) {
+		save( icon, target, name, size, size, null );
+	}
+
+	public static void save( Icon icon, File target, String name, int width, int height ) {
+		save( icon, target, name, width, height, null );
+	}
+
+	public static void save( Icon icon, File target, String name, ImageFilter filter ) {
+		save( icon, target, name, icon.getIconWidth(), icon.getIconHeight(), filter );
+	}
+
+	public static void save( Icon icon, File target, String name, int size, ImageFilter filter ) {
+		save( icon, target, name, size, size, filter );
+	}
+
+	public static void save( Icon icon, File target, String name, int width, int height, ImageFilter filter ) {
+		if( target.exists() && target.isFile() ) {
+			System.err.println( "Target not a folder: " + target );
+			return;
+		}
+		if( !target.exists() && !target.mkdirs() ) {
+			System.err.println( "Could not create target: " + target );
+			return;
+		}
+
+		BufferedImage image = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+		icon.paintIcon( null, image.getGraphics(), 0, 0 );
+
+		// Scale the icon.
+		if( icon.getIconWidth() != width || icon.getIconHeight() != height ) image = Images.scale( image, width, height );
+
+		// Filter the icon.
+		image = Images.filter( image, filter );
+
+		try {
+			File file = new File( target, name + ".png" );
+			ImageIO.write( image, "png", file );
+			System.out.println( "Image created: " + file.toString() );
+		} catch( IOException exception ) {
+			exception.printStackTrace();
+		}
 	}
 
 	public static void show( Icon icon ) {
