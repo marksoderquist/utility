@@ -32,51 +32,6 @@ public class ActionLibrary {
 		actions = new ConcurrentHashMap<String, XAction>();
 		actionsByAccelerator = new ConcurrentHashMap<String, XAction>();
 
-		// Create default actions.
-		addAction( "new" );
-		addAction( "open" );
-		addAction( "save" );
-		addAction( "save.as" );
-		addAction( "save.copy.as" );
-		addAction( "close" );
-		addAction( "exit" );
-
-		addAction( "undo" );
-		addAction( "redo" );
-		addAction( "cut" );
-		addAction( "copy" );
-		addAction( "paste" );
-		addAction( "delete" );
-		addAction( "indent" );
-		addAction( "unindent" );
-		addAction( "properties" );
-		addAction( "settings" );
-
-		addAction( "window.new" );
-
-		addAction( "workarea.new" );
-		addAction( "workarea.open" );
-
-		addAction( "worktool.new" );
-		
-		addAction( "workpane.default" );
-		addAction( "workpane.split.horizontal" );
-		addAction( "workpane.split.vertical" );
-
-		addAction( "workpane.merge.north" );
-		addAction( "workpane.merge.south" );
-		addAction( "workpane.merge.east" );
-		addAction( "workpane.merge.west" );
-
-		addAction( "system.properties" );
-		addAction( "module.organizer" );
-		addAction( "updates" );
-		addAction( "about" );
-
-		addAction( "settings.reset" );
-		addAction( "worker.manager" );
-		addAction( "restart" );
-
 		ActionAcceleratorWatcher actionAcceleratorWatcher = new ActionAcceleratorWatcher( this );
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		manager.addKeyEventPostProcessor( actionAcceleratorWatcher );
