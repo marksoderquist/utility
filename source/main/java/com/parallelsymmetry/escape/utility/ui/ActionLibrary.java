@@ -52,18 +52,21 @@ public class ActionLibrary {
 		addAction( "properties" );
 		addAction( "settings" );
 
+		addAction( "window.new" );
+
 		addAction( "workarea.new" );
 		addAction( "workarea.open" );
 
-		addAction( "view.new" );
-		addAction( "view.pane.select.default" );
-		addAction( "view.pane.split.horizontal" );
-		addAction( "view.pane.split.vertical" );
+		addAction( "worktool.new" );
+		
+		addAction( "workpane.default" );
+		addAction( "workpane.split.horizontal" );
+		addAction( "workpane.split.vertical" );
 
-		addAction( "view.pane.merge.north" );
-		addAction( "view.pane.merge.south" );
-		addAction( "view.pane.merge.east" );
-		addAction( "view.pane.merge.west" );
+		addAction( "workpane.merge.north" );
+		addAction( "workpane.merge.south" );
+		addAction( "workpane.merge.east" );
+		addAction( "workpane.merge.west" );
 
 		addAction( "system.properties" );
 		addAction( "module.organizer" );
