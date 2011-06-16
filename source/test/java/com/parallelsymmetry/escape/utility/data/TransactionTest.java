@@ -109,7 +109,7 @@ public class TransactionTest extends DataTestCase {
 		DataEventHandler watcher = parent.getDataEventHandler();
 
 		parent.add( child );
-		parent.clearModified();
+		parent.unmodify();
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
 		watcher.reset();
@@ -146,7 +146,7 @@ public class TransactionTest extends DataTestCase {
 
 		parent.add( child );
 		child.add( grandchild );
-		parent.clearModified();
+		parent.unmodify();
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
 		assertFalse( grandchild.isModified() );

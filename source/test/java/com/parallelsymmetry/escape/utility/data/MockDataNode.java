@@ -13,7 +13,7 @@ class MockDataNode extends DataNode {
 	public MockDataNode( String name ) {
 		this.name = name;
 		setAttribute( "name", name );
-		clearModified();
+		unmodify();
 
 		handler = new DataEventHandler();
 		addDataListener( handler );

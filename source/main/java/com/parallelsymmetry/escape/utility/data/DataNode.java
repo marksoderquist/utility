@@ -23,6 +23,8 @@ public abstract class DataNode {
 	protected Transaction transaction;
 
 	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
+	
+	private boolean selfModified;
 
 	private Map<String, Object> attributes;
 
@@ -35,23 +37,35 @@ public abstract class DataNode {
 	/**
 	 * Is the node modified. The node is modified if any attribute has been
 	 * modified or any child node has been modified since the last time
-	 * {@link #clearModified()} was called.
+	 * {@link #unmodify()} was called.
 	 * 
 	 * @return true if this node or any child nodes are modified, false otherwise.
 	 */
 	public boolean isModified() {
 		return modified;
 	}
+	
+	/**
+	 * Set the modified flag for this node.
+	 */
+	public void modify() {
+		if( modified ) return;
+		
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+		getTransaction().add( new ModifyAction( this ) );
+		if( atomic ) getTransaction().commit();
+	}
 
 	/**
-	 * Clear the modified state for this node and all child nodes.
+	 * Clear the modified flag for this node and all child nodes.
 	 */
-	public void clearModified() {
+	public void unmodify() {
 		if( !modified ) return;
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
-		getTransaction().add( new ClearModifiedAction( this ) );
+		getTransaction().add( new UnmodifyAction( this ) );
 
 		// Clear the modified flag of any attribute nodes.
 		if( attributes != null ) {
@@ -60,7 +74,7 @@ public abstract class DataNode {
 					DataNode childNode = (DataNode)child;
 					if( childNode.isModified() ) {
 						childNode.setTransaction( getTransaction() );
-						childNode.clearModified();
+						childNode.unmodify();
 					}
 				}
 			}
@@ -330,15 +344,21 @@ public abstract class DataNode {
 			fireMetaAttributeChanged( (MetaAttributeEvent)event );
 		}
 	}
+	
+	protected void doModify() {
+		selfModified = true;
+		updateModifiedFlag();
+	}
 
-	protected void doClearModified() {
+	protected void doUnmodify() {
+		selfModified = false;
 		modifiedAttributes = null;
 		modifiedAttributeCount = 0;
 		updateModifiedFlag();
 	}
 
 	protected void updateModifiedFlag() {
-		modified = modifiedAttributeCount != 0;
+		modified = selfModified || modifiedAttributeCount != 0;
 	}
 
 	void setParent( DataNode parent ) {
@@ -430,10 +450,27 @@ public abstract class DataNode {
 		}
 		// Do not propagate the meta attribute events to parents.
 	}
+	
+	public static class ModifyAction extends Action {
+		
+		public ModifyAction( DataNode data ) {
+			super( data);
+		}
+		
+		@Override
+		protected ActionResult process() {
+			ActionResult result = new ActionResult( this );
 
-	private static class ClearModifiedAction extends Action {
+			getData().doModify();
 
-		public ClearModifiedAction( DataNode data ) {
+			return result;
+		}
+		
+	}
+
+	private static class UnmodifyAction extends Action {
+
+		public UnmodifyAction( DataNode data ) {
 			super( data );
 		}
 
@@ -441,7 +478,7 @@ public abstract class DataNode {
 		protected ActionResult process() {
 			ActionResult result = new ActionResult( this );
 
-			getData().doClearModified();
+			getData().doUnmodify();
 
 			return result;
 		}

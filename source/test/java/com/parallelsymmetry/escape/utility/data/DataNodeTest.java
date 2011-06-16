@@ -19,9 +19,28 @@ public class DataNodeTest extends DataTestCase {
 		MockDataNode node = new MockDataNode();
 		assertFalse( "New node should not be modified.", node.isModified() );
 	}
+	
+	@Test
+	public void testModifyUnmodify() {
+		MockDataNode data = new MockDataNode();
+		DataEventHandler handler = data.getDataEventHandler();
+		assertEquals( 0, data.getModifiedAttributeCount() );
+		assertFalse( data.isModified() );
+		assertEventCounts( handler, 0, 0, 0 );
+		
+		data.modify();
+		assertEquals( 0, data.getModifiedAttributeCount() );
+		assertTrue( data.isModified() );
+		assertEventCounts( handler, 1, 0, 1 );
+
+		data.unmodify();
+		assertEquals( 0, data.getModifiedAttributeCount() );
+		assertFalse( data.isModified() );
+		assertEventCounts( handler, 2, 0, 2 );
+	}
 
 	@Test
-	public void testIsModified() {
+	public void testSetAttributeUnmodify() {
 		MockDataNode data = new MockDataNode();
 		DataEventHandler handler = data.getDataEventHandler();
 		assertEquals( 0, data.getModifiedAttributeCount() );
@@ -33,7 +52,7 @@ public class DataNodeTest extends DataTestCase {
 		assertTrue( data.isModified() );
 		assertEventCounts( handler, 1, 1, 1 );
 
-		data.clearModified();
+		data.unmodify();
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
 		assertEventCounts( handler, 2, 1, 2 );
@@ -232,7 +251,7 @@ public class DataNodeTest extends DataTestCase {
 		data.setAttribute( "x", 0 );
 		data.setAttribute( "y", 0 );
 		data.setAttribute( "z", 0 );
-		data.clearModified();
+		data.unmodify();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 4, 3, 2 );
 
@@ -262,7 +281,7 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 3, 3, 1 );
 
-		data.clearModified();
+		data.unmodify();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 4, 3, 2 );
 	}
@@ -334,12 +353,12 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( handler, 1, 1, 1 );
 
 		// Commit the changes.
-		data.clearModified();
+		data.unmodify();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
 
 		// Commit again to test that nothing else happens.
-		data.clearModified();
+		data.unmodify();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 2, 1, 2 );
 
@@ -419,7 +438,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( nodeHandler, 1, 1, 1 );
 		assertEventCounts( attributeHandler, 0, 0, 0 );
 
-		node.clearModified();
+		node.unmodify();
 		assertNodeState( node, false, 0 );
 		assertEventCounts( nodeHandler, 2, 1, 2 );
 
@@ -453,7 +472,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( nodeHandler, 1, 1, 1 );
 		assertEventCounts( attributeHandler, 0, 0, 0 );
 
-		node.clearModified();
+		node.unmodify();
 		assertNodeState( node, false, 0 );
 		assertEventCounts( nodeHandler, 2, 1, 2 );
 
@@ -466,7 +485,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( attributeHandler, 1, 1, 1 );
 
 		// Test unsetting an attribute on the attribute node unmodified the parent.
-		attribute.clearModified();
+		attribute.unmodify();
 		assertNodeState( attribute, false, 0 );
 		assertNodeState( node, false, 0 );
 		assertEventCounts( nodeHandler, 4, 2, 4 );
@@ -487,7 +506,7 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( parent, true, 1 );
 		assertEventCounts( parentHandler, 1, 1, 1 );
 
-		parent.clearModified();
+		parent.unmodify();
 		assertNodeState( parent, false, 0 );
 		assertEventCounts( parentHandler, 2, 1, 2 );
 
@@ -497,7 +516,7 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( parent, true, 1 );
 		assertEventCounts( parentHandler, 3, 2, 3 );
 
-		parent.clearModified();
+		parent.unmodify();
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 2, 1, 2 );
 		assertNodeState( parent, false, 0 );
@@ -520,7 +539,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( parent1Handler, 0, 0, 0 );
 
 		// Clear the modified flag of parent 0.
-		parent0.clearModified();
+		parent0.unmodify();
 		assertNodeState( parent0, false, 0 );
 		assertEventCounts( childHandler, 0, 0, 0 );
 		assertEventCounts( parent0Handler, 2, 1, 2 );

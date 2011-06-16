@@ -29,14 +29,14 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		for( T child : children ) {
 			add( child );
 		}
-		clearModified();
+		unmodify();
 	}
 
 	public DataList( Collection<T> children ) {
 		for( T child : children ) {
 			add( child );
 		}
-		clearModified();
+		unmodify();
 	}
 
 	public boolean isSelfModified() {
@@ -48,13 +48,13 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 	}
 
 	@Override
-	public void clearModified() {
+	public void unmodify() {
 		if( !modified ) return;
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
 
-		super.clearModified();
+		super.unmodify();
 
 		// Clear the modified flag of any child nodes.
 		if( children != null ) {
@@ -63,7 +63,7 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 					DataNode childNode = (DataNode)child;
 					if( childNode.isModified() ) {
 						childNode.setTransaction( getTransaction() );
-						childNode.clearModified();
+						childNode.unmodify();
 					}
 				}
 			}
@@ -335,10 +335,10 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		if( parent != null ) parent.dispatchEvent( event );
 	}
 
-	protected void doClearModified() {
+	protected void doUnmodify() {
 		addRemoveChildren = null;
 		modifiedChildCount = 0;
-		super.doClearModified();
+		super.doUnmodify();
 	}
 
 	private void doAddChild( int index, T child ) {
