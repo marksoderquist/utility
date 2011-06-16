@@ -45,7 +45,7 @@ public class DefaultFormatter extends Formatter {
 		}
 
 		if( record.getMessage() != null ) {
-			buffer.append( TextUtil.prepend( TextUtil.append( record.getMessage().trim(), suffix.toString() ), prefix.toString() ) );
+			buffer.append( TextUtil.prepend( TextUtil.append( record.getMessage(), suffix.toString() ), prefix.toString() ) );
 			buffer.append( "\n" );
 		}
 

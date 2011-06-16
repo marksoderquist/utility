@@ -31,12 +31,20 @@ public class DefaultFormatterTest extends TestCase {
 		assertEquals( "[D] Test message.\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
 	}
 	
+	public void testFormatWithWhitespacedRecord() {
+		assertEquals( "[E]   Test message.\n", formatter.format( new LogRecord( Log.ERROR, "  Test message." ) ) );
+		assertEquals( "[W]   Test message.\n", formatter.format( new LogRecord( Log.WARN, "  Test message." ) ) );
+		assertEquals( "[I]   Test message.\n", formatter.format( new LogRecord( Log.INFO, "  Test message." ) ) );
+		assertEquals( "[T]   Test message.\n", formatter.format( new LogRecord( Log.TRACE, "  Test message." ) ) );
+		assertEquals( "[D]   Test message.\n", formatter.format( new LogRecord( Log.DEBUG, "  Test message." ) ) );
+	}
+	
 	public void testFormatWithMultiLineRecord() {
-		assertEquals( "[E] Test message one.\n[E] Test message two.\n", formatter.format( new LogRecord( Log.ERROR, "Test message one.\nTest message two.\n" ) ) );
-		assertEquals( "[W] Test message one.\n[W] Test message two.\n", formatter.format( new LogRecord( Log.WARN, "Test message one.\nTest message two.\n" ) ) );
-		assertEquals( "[I] Test message one.\n[I] Test message two.\n", formatter.format( new LogRecord( Log.INFO, "Test message one.\nTest message two.\n" ) ) );
-		assertEquals( "[T] Test message one.\n[T] Test message two.\n", formatter.format( new LogRecord( Log.TRACE, "Test message one.\nTest message two.\n" ) ) );
-		assertEquals( "[D] Test message one.\n[D] Test message two.\n", formatter.format( new LogRecord( Log.DEBUG, "Test message one.\nTest message two.\n" ) ) );
+		assertEquals( "[E] Test message one.\n[E] Test message two.\n", formatter.format( new LogRecord( Log.ERROR, "Test message one.\nTest message two." ) ) );
+		assertEquals( "[W] Test message one.\n[W] Test message two.\n", formatter.format( new LogRecord( Log.WARN, "Test message one.\nTest message two." ) ) );
+		assertEquals( "[I] Test message one.\n[I] Test message two.\n", formatter.format( new LogRecord( Log.INFO, "Test message one.\nTest message two." ) ) );
+		assertEquals( "[T] Test message one.\n[T] Test message two.\n", formatter.format( new LogRecord( Log.TRACE, "Test message one.\nTest message two." ) ) );
+		assertEquals( "[D] Test message one.\n[D] Test message two.\n", formatter.format( new LogRecord( Log.DEBUG, "Test message one.\nTest message two." ) ) );
 	}
 
 	public void testColorFormatWithNonEmptyRecord() {
