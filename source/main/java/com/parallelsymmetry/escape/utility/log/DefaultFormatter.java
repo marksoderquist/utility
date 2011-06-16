@@ -9,6 +9,7 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import com.parallelsymmetry.escape.utility.Indenter;
 import com.parallelsymmetry.escape.utility.TextUtil;
 
 public class DefaultFormatter extends Formatter {
@@ -45,9 +46,7 @@ public class DefaultFormatter extends Formatter {
 		}
 
 		if( record.getMessage() != null ) {
-			buffer.append( prefix );
-			buffer.append( record.getMessage() );
-			buffer.append( suffix );
+			buffer.append( TextUtil.prepend( TextUtil.append( record.getMessage().trim(), suffix.toString() ), prefix.toString() ) );
 			buffer.append( "\n" );
 		}
 
