@@ -154,7 +154,7 @@ public abstract class BaseImage {
 	public void save( File target, String name ) {
 		save( target, name, width, height );
 	}
-	
+
 	public void save( File target, String name, ImageFilter filter ) {
 		save( target, name, width, height, filter );
 	}
@@ -393,46 +393,6 @@ public abstract class BaseImage {
 		}
 
 		return defaultFont;
-	}
-
-	/**
-	 * Find the font that fits the specified width.
-	 */
-	protected Font findFontForWidth( Font font, String text, double width ) {
-		Font currentFont = font.deriveFont( 1f );
-		Rectangle2D textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
-
-		double error = ( textBounds.getWidth() - width ) / width;
-		double precision = textBounds.getWidth() / width;
-
-		while( Math.abs( error ) > precision ) {
-			double rescale = Math.pow( 2, -error );
-			currentFont = currentFont.deriveFont( (float)( currentFont.getSize2D() * rescale ) );
-			textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
-			error = ( textBounds.getWidth() - width ) / width;
-		}
-
-		return currentFont;
-	}
-
-	/**
-	 * Find the font that fits the specified height.
-	 */
-	protected Font findFontForHeight( Font font, String text, double height ) {
-		Font currentFont = font.deriveFont( 1f );
-		Rectangle2D textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
-
-		double error = ( textBounds.getHeight() - height ) / height;
-		double precision = textBounds.getHeight() / height;
-
-		while( Math.abs( error ) > precision ) {
-			double rescale = Math.pow( 2, -error );
-			currentFont = currentFont.deriveFont( (float)( currentFont.getSize2D() * rescale ) );
-			textBounds = currentFont.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
-			error = ( textBounds.getHeight() - height ) / height;
-		}
-
-		return currentFont;
 	}
 
 	private final Color getColor( double factor ) {
