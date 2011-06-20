@@ -2,7 +2,7 @@ package com.parallelsymmetry.escape.utility.ui;
 
 import java.awt.Color;
 
-public class ColorScheme {
+public class ColorScheme implements Cloneable {
 
 	public static final double DEFAULT_SECONDARY_ANGLE = 30;
 
@@ -37,7 +37,7 @@ public class ColorScheme {
 		this.secondaryB = Colors.getSecondary( color, switchSecondary ? -secondaryAngle : secondaryAngle );
 		this.complement = Colors.getComplement( color );
 	}
-	
+
 	public ColorScheme( Color primary, Color secondaryA, Color secondaryB, Color complement ) {
 		this.primary = primary;
 		this.secondaryA = secondaryA;
@@ -48,7 +48,7 @@ public class ColorScheme {
 	public Color getPrimary( double factor ) {
 		return Colors.getShade( primary, factor );
 	}
-	
+
 	public void setPrimary( Color color ) {
 		this.primary = color;
 	}
@@ -56,7 +56,7 @@ public class ColorScheme {
 	public Color getSecondaryA( double factor ) {
 		return Colors.getShade( secondaryA, factor );
 	}
-	
+
 	public void setSecondaryA( Color color ) {
 		this.secondaryA = color;
 	}
@@ -72,9 +72,21 @@ public class ColorScheme {
 	public Color getComplement( double factor ) {
 		return Colors.getShade( complement, factor );
 	}
-	
+
 	public void setComplement( Color color ) {
 		this.complement = color;
+	}
+
+	@Override
+	public ColorScheme clone() {
+		ColorScheme scheme = new ColorScheme();
+
+		scheme.primary = this.primary;
+		scheme.secondaryA = this.secondaryA;
+		scheme.secondaryB = this.secondaryB;
+		scheme.complement = this.complement;
+
+		return scheme;
 	}
 
 	public String toString() {

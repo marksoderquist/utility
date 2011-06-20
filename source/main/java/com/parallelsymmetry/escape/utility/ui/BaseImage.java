@@ -12,7 +12,6 @@ import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
@@ -72,15 +71,13 @@ public abstract class BaseImage {
 
 	protected static final Font DEFAULT_FONT = new Font( Font.SANS_SERIF, Font.PLAIN, 24 );
 
-	protected static final FontRenderContext FONT_RENDER_CONTEXT = new FontRenderContext( new AffineTransform(), true, false );
-
 	protected int size;
 
 	protected int width;
 
 	protected int height;
 
-	protected ColorScheme scheme = DEFAULT_COLOR_SCHEME;
+	protected ColorScheme scheme = DEFAULT_COLOR_SCHEME.clone();
 
 	private double outlineSize = DEFAULT_OUTLINE_SIZE;
 
@@ -204,6 +201,8 @@ public abstract class BaseImage {
 		graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
 		graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
 		graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+
+		setColorMode( ColorMode.PRIMARY );
 
 		render();
 
