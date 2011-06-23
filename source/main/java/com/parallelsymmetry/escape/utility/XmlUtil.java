@@ -91,19 +91,18 @@ public class XmlUtil {
 		format( input, output, DEFAULT_INDENT );
 	}
 
-	public static final void format( InputStream input, OutputStream output, int indentAmount ) throws IOException {
-		Transformer transformer;
-		TransformerFactory factory = TransformerFactory.newInstance();
-		try {
-			transformer = factory.newTransformer();
-			transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-			transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", String.valueOf( indentAmount ) );
-			transformer.transform( new StreamSource( input ), new StreamResult( output ) );
-		} catch( TransformerException exception ) {
-			throw new IOException( exception );
-		}
+	public static final void format( InputStream input, OutputStream output, int indent ) throws IOException {
+		format( new StreamSource( input ), new StreamResult( output ), indent );
 	}
-
+	
+	public static final void format( Reader reader, Writer writer ) throws IOException {
+		format( reader, writer, DEFAULT_INDENT );
+	}
+	
+	public static final void format( Reader reader, Writer writer, int indent ) throws IOException {
+		format( new StreamSource( reader ), new StreamResult( writer ), indent );
+	}
+	
 	public static final String toString( Document document ) {
 		StringWriter output = new StringWriter();
 		try {
@@ -112,6 +111,18 @@ public class XmlUtil {
 			Log.write( exception );
 		}
 		return output.toString();
+	}
+
+	private static final void format( StreamSource source, StreamResult result, int indent ) throws IOException {
+		try {
+			TransformerFactory factory = TransformerFactory.newInstance();
+			Transformer transformer = factory.newTransformer();
+			transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
+			transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", String.valueOf( indent ) );
+			transformer.transform( source, result );
+		} catch( TransformerException exception ) {
+			throw new IOException( exception );
+		}
 	}
 
 }
