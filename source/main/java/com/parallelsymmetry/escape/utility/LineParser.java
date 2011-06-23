@@ -17,6 +17,10 @@ public class LineParser {
 		this.length = content == null ? -1 : content.length();
 	}
 
+	public boolean more() {
+		return next <= length;
+	}
+
 	public String next() {
 		parseNextLine();
 		return line;
@@ -33,9 +37,9 @@ public class LineParser {
 	public String getRemaining() {
 		return content.substring( next );
 	}
-
+	
 	private void parseNextLine() {
-		if( next > length ) {
+		if( !more() ) {
 			line = null;
 			term = null;
 			return;

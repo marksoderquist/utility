@@ -105,6 +105,10 @@ public class Parameters {
 		this.values = values;
 		this.files = files;
 	}
+	
+	public static final Parameters create() {
+		return parse( new String[0] );
+	}
 
 	public static final Parameters parse( String[] commands ) {
 		return parse( commands, (Set<String>)null );
