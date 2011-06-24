@@ -3,6 +3,8 @@ package com.parallelsymmetry.escape.utility.setting;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.w3c.dom.Node;
+
 import com.parallelsymmetry.escape.utility.Descriptor;
 
 public class DescriptorSettingProvider implements SettingProvider {
@@ -25,11 +27,10 @@ public class DescriptorSettingProvider implements SettingProvider {
 		// Incoming paths should always be absolute.
 		String value = descriptor.getValue( root + path );
 
+		// Check attributes.
 		if( value == null ) {
-			// Check attributes.
-			String parent = getParentPath( root + path );
-			String name = getFile( path );
-			if( parent != null ) value = Descriptor.getAttribute( descriptor.getNode( parent ), name );
+			Node node = descriptor.getNode( getParentPath( root + path ) );
+			if( node != null ) value = Descriptor.getAttribute( node, getFile( path ) );
 		}
 
 		return value;
