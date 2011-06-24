@@ -52,6 +52,15 @@ public class SettingsTest extends TestCase {
 		assertEquals( "1", settings.get( path, null ) );
 	}
 
+	public void testGetWithSelf() {
+		String path = "/test/get/value";
+		settings.put( path, "5" );
+		assertEquals( "5", settings.get( path, null ) );
+		
+		Settings self = settings.getNode( path );
+		assertEquals( "5", self.get( ".", null ) );
+	}
+
 	public void testPut() {
 		String path = "/test/put/value";
 		String value = "X";

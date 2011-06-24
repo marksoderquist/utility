@@ -51,19 +51,28 @@ public class Settings {
 	 * The node name prefix for list items.
 	 */
 	/*
-	 * Do not change the value of this field, it will break backward compatibility
-	 * with previously created setting lists.
+	 * DEVELOPERS: Do not change the value of this field, it will break backward
+	 * compatibility with previously created setting lists.
 	 */
-	public static final String ITEM_PREFIX = "/item-";
+	public static final String ITEM_PREFIX = SEPARATOR + "item-";
 
 	/**
 	 * The key name for list item counts.
 	 */
 	/*
-	 * Do not change the value of this field, it will break backward compatibility
-	 * with previously created setting lists.
+	 * DEVELOPERS: Do not change the value of this field, it will break backward
+	 * compatibility with previously created setting lists.
 	 */
 	public static final String ITEM_COUNT = ITEM_PREFIX + "count";
+
+	/**
+	 * The key name for list item classes.
+	 */
+	/*
+	 * DEVELOPERS: Do not change the value of this field, it will break backward
+	 * compatibility with previously created setting lists.
+	 */
+	public static final String ITEM_CLASS = ITEM_PREFIX + "class";
 
 	private SettingProvider defaultProvider;
 
@@ -343,7 +352,7 @@ public class Settings {
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent<T>> List<T> getList( String path, List<T> defaultList ) {
 		int count = getInt( path + ITEM_COUNT, -1 );
-		String typeName = get( path + "/type", null );
+		String typeName = get( path + ITEM_CLASS, null );
 
 		Class<T> type = null;
 		try {
@@ -405,7 +414,7 @@ public class Settings {
 					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 				}
 
-				put( path + "/type", list.iterator().next().getClass().getName() );
+				put( path + ITEM_CLASS, list.iterator().next().getClass().getName() );
 				putInt( path + ITEM_COUNT, newCount );
 			}
 		}
@@ -413,7 +422,7 @@ public class Settings {
 
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent<?>> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
-		String typeName = get( path + "/type", null );
+		String typeName = get( path + ITEM_CLASS, null );
 
 		Class<T> type = null;
 		try {
@@ -474,13 +483,14 @@ public class Settings {
 					map.get( name ).saveSettings( getNode( path + "/" + name ) );
 				}
 
-				put( path + "/type", map.values().iterator().next().getClass().getName() );
+				put( path + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
 			}
 		}
 	}
 
 	private String getProviderPath( SettingProvider provider, String path ) {
 		String full = getAbsolutePath( path );
+
 		String mount = root.mounts.get( provider );
 
 		if( mount != null && !full.startsWith( mount ) ) return null;
@@ -489,6 +499,8 @@ public class Settings {
 	}
 
 	private String getAbsolutePath( String path ) {
+		if( path.startsWith( "." ) ) return this.path + path.substring( 1 );
+
 		// If the path is already absolute, return the specified path.
 		if( path.startsWith( SEPARATOR ) ) return path;
 
