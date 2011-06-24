@@ -24,8 +24,9 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "test.path.value", provider.get( "/path/value" ) );
 		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
-	
+
 	public void testGetWithAttributes() {
+		assertNull( provider.get( "/invalid/path" ) );
 		assertEquals( "5", provider.get( "/bounds/x" ) );
 		assertEquals( "10", provider.get( "/bounds/y" ) );
 		assertEquals( "20", provider.get( "/bounds/w" ) );
