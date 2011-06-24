@@ -24,14 +24,22 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "test.path.value", provider.get( "/path/value" ) );
 		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
+	
+	public void testGetWithAttributes() {
+		assertEquals( "5", provider.get( "/bounds/x" ) );
+		assertEquals( "10", provider.get( "/bounds/y" ) );
+		assertEquals( "20", provider.get( "/bounds/w" ) );
+		assertEquals( "15", provider.get( "/bounds/h" ) );
+	}
 
 	public void testGetChildNames() {
 		Set<String> names = provider.getChildNames( "" );
 
-		assertEquals( 6, names.size() );
+		assertEquals( 7, names.size() );
 		assertTrue( names.contains( "name" ) );
 		assertTrue( names.contains( "alias" ) );
 		assertTrue( names.contains( "path" ) );
+		assertTrue( names.contains( "bounds" ) );
 		assertTrue( names.contains( "integer" ) );
 		assertTrue( names.contains( "list" ) );
 		assertTrue( names.contains( "nodes" ) );

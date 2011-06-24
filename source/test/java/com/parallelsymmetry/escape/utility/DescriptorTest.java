@@ -89,10 +89,11 @@ public class DescriptorTest extends TestCase {
 		Descriptor descriptor = new Descriptor( input );
 
 		List<String> names = descriptor.getNames( "/test" );
-		assertEquals( 6, names.size() );
+		assertEquals( 7, names.size() );
 		assertTrue( names.contains( "name" ) );
 		assertTrue( names.contains( "alias" ) );
 		assertTrue( names.contains( "path" ) );
+		assertTrue( names.contains( "bounds" ) );
 		assertTrue( names.contains( "integer" ) );
 		assertTrue( names.contains( "list" ) );
 		assertTrue( names.contains( "nodes" ) );

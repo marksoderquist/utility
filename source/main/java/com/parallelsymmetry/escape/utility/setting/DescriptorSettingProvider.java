@@ -23,7 +23,16 @@ public class DescriptorSettingProvider implements SettingProvider {
 	@Override
 	public String get( String path ) {
 		// Incoming paths should always be absolute.
-		return descriptor.getValue( root + path );
+		String value = descriptor.getValue( root + path );
+
+		if( value == null ) {
+			// Check attributes.
+			String parent = getParentPath( root + path );
+			String name = getFile( path );
+			if( parent != null ) value = Descriptor.getAttribute( descriptor.getNode( parent ), name );
+		}
+
+		return value;
 	}
 
 	@Override
@@ -36,6 +45,20 @@ public class DescriptorSettingProvider implements SettingProvider {
 	public boolean nodeExists( String path ) {
 		// Incoming paths should always be absolute.
 		return descriptor.getNode( root + path ) != null;
+	}
+
+	private String getParentPath( String path ) {
+		if( path == null ) return null;
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+		int index = path.lastIndexOf( "/" );
+		return index < 0 ? null : path.substring( 0, index );
+	}
+
+	private String getFile( String path ) {
+		if( path == null ) return null;
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+		int index = path.lastIndexOf( "/" );
+		return index < 0 ? null : path.substring( index + 1 );
 	}
 
 }
