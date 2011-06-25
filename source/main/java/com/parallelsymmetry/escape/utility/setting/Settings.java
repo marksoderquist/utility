@@ -336,6 +336,38 @@ public class Settings {
 		put( path, String.valueOf( value ) );
 	}
 
+	public float getFloat( String path, float defaultValue ) {
+		try {
+			return Float.parseFloat( get( path, null ) );
+		} catch( Throwable throwable ) {
+			return defaultValue;
+		}
+	}
+
+	public float getDefaultFloat( String path ) {
+		return Float.parseFloat( getDefault( path ) );
+	}
+
+	public void putFloat( String path, float value ) {
+		put( path, String.valueOf( value ) );
+	}
+
+	public double getDouble( String path, double defaultValue ) {
+		try {
+			return Double.parseDouble( get( path, null ) );
+		} catch( Throwable throwable ) {
+			return defaultValue;
+		}
+	}
+
+	public double getDefaultDouble( String path ) {
+		return Double.parseDouble( getDefault( path ) );
+	}
+
+	public void putDouble( String path, double value ) {
+		put( path, String.valueOf( value ) );
+	}
+
 	public Color getColor( String path, Color value ) {
 		String code = get( path, null );
 		return code != null ? Colors.decode( code ) : value;

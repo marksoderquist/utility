@@ -73,6 +73,30 @@ public class SettingsTest extends TestCase {
 		assertNull( providerD.get( path ) );
 	}
 
+	public void testPutGetInt() {
+		settings.putInt( "int", 73 );
+		assertEquals( "73", settings.get( "int", null ) );
+		assertEquals( 73, settings.getInt( "int", -1 ) );
+	}
+
+	public void testPutGetFloat() {
+		settings.putFloat( "float", 2.718283f );
+		assertEquals( "2.718283", settings.get( "float", null ) );
+		assertEquals( 2.718283f, settings.getFloat( "float", Float.NaN ) );
+
+		settings.putFloat( "float-nan", Float.NaN );
+		assertEquals( Float.NaN, settings.getFloat( "float-nan", 0 ) );
+	}
+
+	public void testPutGetDouble() {
+		settings.putDouble( "double", 3.141593 );
+		assertEquals( "3.141593", settings.get( "double", null ) );
+		assertEquals( 3.141593, settings.getDouble( "double", Double.NaN ) );
+
+		settings.putDouble( "double-nan", Double.NaN );
+		assertEquals( Double.NaN, settings.getDouble( "double-nan", 0 ) );
+	}
+
 	public void testPutGetColor() {
 		settings.putColor( "color", new Color( 73, 74, 99, 128 ) );
 		assertEquals( "#80494a63", settings.get( "color", null ) );
