@@ -16,7 +16,7 @@ import com.parallelsymmetry.escape.utility.log.Log;
 import com.parallelsymmetry.escape.utility.setting.Persistent;
 import com.parallelsymmetry.escape.utility.setting.Settings;
 
-public class TaskManager implements Persistent<TaskManager>, Controllable {
+public class TaskManager implements Persistent, Controllable {
 
 	private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
 
@@ -208,21 +208,17 @@ public class TaskManager implements Persistent<TaskManager>, Controllable {
 	}
 
 	@Override
-	public TaskManager loadSettings( Settings settings ) {
+	public void loadSettings( Settings settings ) {
 		this.settings = settings;
 
 		this.threadCount = settings.getInt( "thread-count", DEFAULT_THREAD_COUNT );
-
-		return this;
 	}
 
 	@Override
-	public TaskManager saveSettings( Settings settings ) {
-		if( settings == null ) return this;
+	public void saveSettings( Settings settings ) {
+		if( settings == null ) return;
 
 		settings.putInt( "thread-count", threadCount );
-
-		return this;
 	}
 
 	private <T> void synchronousExecute( Task<T> task ) {

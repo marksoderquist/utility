@@ -56,7 +56,7 @@ public class SettingsTest extends TestCase {
 		String path = "/test/get/value";
 		settings.put( path, "5" );
 		assertEquals( "5", settings.get( path, null ) );
-		
+
 		Settings self = settings.getNode( path );
 		assertEquals( "5", self.get( ".", null ) );
 	}
@@ -374,7 +374,7 @@ public class SettingsTest extends TestCase {
 		}
 	}
 
-	private static final class MockPersistent implements Persistent<MockPersistent> {
+	private static final class MockPersistent implements Persistent {
 
 		private int index;
 
@@ -407,18 +407,16 @@ public class SettingsTest extends TestCase {
 		}
 
 		@Override
-		public MockPersistent loadSettings( Settings settings ) {
+		public void loadSettings( Settings settings ) {
 			this.settings = settings;
 			value = settings.get( "value", null );
 			index = settings.getInt( "index", 0 );
-			return this;
 		}
 
 		@Override
-		public MockPersistent saveSettings( Settings settings ) {
+		public void saveSettings( Settings settings ) {
 			if( value != null ) settings.put( "value", value );
 			settings.putInt( "index", index );
-			return this;
 		}
 
 	}

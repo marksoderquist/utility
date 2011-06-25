@@ -1,9 +1,9 @@
 package com.parallelsymmetry.escape.utility.setting;
 
-public interface Persistent<T> {
+public interface Persistent {
 
-	T loadSettings( Settings settings );
+	void loadSettings( Settings settings );
 
-	T saveSettings( Settings settings );
+	void saveSettings( Settings settings );
 
 }

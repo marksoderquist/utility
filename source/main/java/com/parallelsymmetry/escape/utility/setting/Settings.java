@@ -350,7 +350,7 @@ public class Settings {
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public <T extends Persistent<T>> List<T> getList( String path, List<T> defaultList ) {
+	public <T extends Persistent> List<T> getList( String path, List<T> defaultList ) {
 		int count = getInt( path + ITEM_COUNT, -1 );
 		String typeName = get( path + ITEM_CLASS, null );
 
@@ -379,7 +379,8 @@ public class Settings {
 					constructor.setAccessible( true );
 					T object = constructor.newInstance();
 					Settings node = getNode( getItemPath( path, index ) );
-					list.add( type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
+					( (Persistent)object ).loadSettings( node );
+					list.add( type.cast( object ) );
 				} catch( InstantiationException exception ) {
 					Log.write( getAbsolutePath( path ), exception );
 				} catch( IllegalAccessException exception ) {
@@ -399,7 +400,7 @@ public class Settings {
 		return list;
 	}
 
-	public <T extends Persistent<?>> void putList( String path, List<T> list ) {
+	public <T extends Persistent> void putList( String path, List<T> list ) {
 		int oldCount = getInt( path + ITEM_COUNT, 0 );
 		for( int index = 0; index < oldCount; index++ ) {
 			removeNode( getItemPath( path, index ) );
@@ -421,7 +422,7 @@ public class Settings {
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public <T extends Persistent<?>> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
+	public <T extends Persistent> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
 		String typeName = get( path + ITEM_CLASS, null );
 
 		Class<T> type = null;
@@ -449,7 +450,8 @@ public class Settings {
 					constructor.setAccessible( true );
 					T object = constructor.newInstance();
 					Settings node = getNode( path + "/" + name );
-					map.put( name, type.cast( ( (Persistent<T>)object ).loadSettings( node ) ) );
+					( (Persistent)object ).loadSettings( node );
+					map.put( name, type.cast( object ) );
 				} catch( InstantiationException exception ) {
 					Log.write( getAbsolutePath( path ), exception );
 				} catch( IllegalAccessException exception ) {
@@ -469,7 +471,7 @@ public class Settings {
 		return map;
 	}
 
-	public <T extends Persistent<?>> void putMap( String path, Map<String, T> map ) {
+	public <T extends Persistent> void putMap( String path, Map<String, T> map ) {
 		Set<String> names = getChildNames( path );
 		for( String name : names ) {
 			removeNode( path + "/" + name );
