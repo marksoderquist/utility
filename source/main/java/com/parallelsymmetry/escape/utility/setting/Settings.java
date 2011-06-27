@@ -54,7 +54,7 @@ public class Settings {
 	 * DEVELOPERS: Do not change the value of this field, it will break backward
 	 * compatibility with previously created setting lists.
 	 */
-	public static final String ITEM_PREFIX = SEPARATOR + "item-";
+	public static final String ITEM_PREFIX = "item-";
 
 	/**
 	 * The key name for list item counts.
@@ -383,8 +383,8 @@ public class Settings {
 
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent> List<T> getList( String path, List<T> defaultList ) {
-		int count = getInt( path + ITEM_COUNT, -1 );
-		String typeName = get( path + ITEM_CLASS, null );
+		int count = getInt( path + SEPARATOR + ITEM_COUNT, -1 );
+		String typeName = get( path + SEPARATOR + ITEM_CLASS, null );
 
 		Class<T> type = null;
 		try {
@@ -433,7 +433,7 @@ public class Settings {
 	}
 
 	public <T extends Persistent> void putList( String path, List<T> list ) {
-		int oldCount = getInt( path + ITEM_COUNT, 0 );
+		int oldCount = getInt( path + SEPARATOR + ITEM_COUNT, 0 );
 		for( int index = 0; index < oldCount; index++ ) {
 			removeNode( getItemPath( path, index ) );
 		}
@@ -447,15 +447,15 @@ public class Settings {
 					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 				}
 
-				put( path + ITEM_CLASS, list.iterator().next().getClass().getName() );
-				putInt( path + ITEM_COUNT, newCount );
+				put( path + SEPARATOR + ITEM_CLASS, list.iterator().next().getClass().getName() );
+				putInt( path + SEPARATOR + ITEM_COUNT, newCount );
 			}
 		}
 	}
 
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
-		String typeName = get( path + ITEM_CLASS, null );
+		String typeName = get( path + SEPARATOR + ITEM_CLASS, null );
 
 		Class<T> type = null;
 		try {
@@ -517,7 +517,7 @@ public class Settings {
 					map.get( name ).saveSettings( getNode( path + "/" + name ) );
 				}
 
-				put( path + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
+				put( path + SEPARATOR + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
 			}
 		}
 	}
