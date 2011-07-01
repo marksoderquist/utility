@@ -42,30 +42,48 @@ public class Descriptor {
 		this.node = node;
 	}
 
-	public Descriptor( String uri ) throws SAXException, IOException, ParserConfigurationException {
+	public Descriptor( String uri ) throws IOException {
 		if( uri == null ) return;
 		source = uri;
-		node = XmlUtil.loadXmlDocument( uri );
+		try {
+			node = XmlUtil.loadXmlDocument( uri );
+		} catch( SAXException exception ) {
+			throw new IOException( exception );
+		} catch( ParserConfigurationException exception ) {
+			throw new IOException( exception );
+		}
 	}
 
-	public Descriptor( Reader reader ) throws SAXException, IOException, ParserConfigurationException {
+	public Descriptor( Reader reader ) throws IOException {
 		this( null, reader );
 	}
 
-	public Descriptor( String source, Reader reader ) throws SAXException, IOException, ParserConfigurationException {
+	public Descriptor( String source, Reader reader ) throws IOException {
 		if( reader == null ) return;
 		this.source = source;
-		node = XmlUtil.loadXmlDocument( reader );
+		try {
+			node = XmlUtil.loadXmlDocument( reader );
+		} catch( SAXException exception ) {
+			throw new IOException( exception );
+		} catch( ParserConfigurationException exception ) {
+			throw new IOException( exception );
+		}
 	}
 
-	public Descriptor( InputStream input ) throws SAXException, IOException, ParserConfigurationException {
+	public Descriptor( InputStream input ) throws IOException {
 		this( null, input );
 	}
 
-	public Descriptor( String source, InputStream input ) throws SAXException, IOException, ParserConfigurationException {
+	public Descriptor( String source, InputStream input ) throws IOException {
 		if( input == null ) return;
 		this.source = source;
-		node = XmlUtil.loadXmlDocument( input );
+		try {
+			node = XmlUtil.loadXmlDocument( input );
+		} catch( SAXException exception ) {
+			throw new IOException( exception );
+		} catch( ParserConfigurationException exception ) {
+			throw new IOException( exception );
+		}
 	}
 
 	public String getSource() {
