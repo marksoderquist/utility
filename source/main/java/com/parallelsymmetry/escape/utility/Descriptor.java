@@ -143,7 +143,7 @@ public class Descriptor {
 		try {
 			value = (Node)xpath.evaluate( path, node, XPathConstants.NODE );
 		} catch( XPathExpressionException exception ) {
-			Log.write( exception );
+			Log.write( new Exception( path, exception ) );
 		}
 
 		return value;
@@ -158,7 +158,7 @@ public class Descriptor {
 		try {
 			nodes = (NodeList)xpath.evaluate( path, node, XPathConstants.NODESET );
 		} catch( XPathExpressionException exception ) {
-			Log.write( exception );
+			Log.write( new Exception( path, exception ) );
 		}
 		if( nodes == null ) return null;
 
@@ -180,7 +180,7 @@ public class Descriptor {
 		try {
 			value = (String)xpath.evaluate( path, node, XPathConstants.STRING );
 		} catch( XPathExpressionException exception ) {
-			Log.write( exception );
+			Log.write( new Exception( path, exception ) );
 		}
 
 		if( TextUtil.isEmpty( value ) ) return null;
@@ -209,7 +209,7 @@ public class Descriptor {
 		try {
 			nodes = (NodeList)xpath.evaluate( path, node, XPathConstants.NODESET );
 		} catch( XPathExpressionException exception ) {
-			Log.write( exception );
+			Log.write( new Exception( path, exception ) );
 		}
 		if( nodes == null ) return null;
 
