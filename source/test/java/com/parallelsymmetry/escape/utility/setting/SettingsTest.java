@@ -31,6 +31,18 @@ public class SettingsTest extends TestCase {
 		settings.setDefaultProvider( providerD );
 	}
 
+	public void testGetName() {
+		assertEquals( "", settings.getName() );
+		assertEquals( "test", settings.getNode( "/test" ).getName() );
+		assertEquals( "name", settings.getNode( "/test/name" ).getName() );
+	}
+
+	public void testGetPath() {
+		assertEquals( "/", settings.getPath() );
+		assertEquals( "/test", settings.getNode( "/test").getPath() );
+		assertEquals( "/test/name", settings.getNode( "/test/name").getPath() );
+	}
+
 	public void testGet() {
 		String path = "/test/get/value";
 		assertNull( settings.get( path, null ) );

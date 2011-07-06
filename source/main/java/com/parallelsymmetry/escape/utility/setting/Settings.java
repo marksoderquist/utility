@@ -96,6 +96,10 @@ public class Settings {
 		this.path = path;
 	}
 
+	public String getName() {
+		return path.substring( path.lastIndexOf( "/" ) + 1 );
+	}
+
 	public String getPath() {
 		return path;
 	}
