@@ -433,11 +433,13 @@ public class Settings {
 	}
 
 	public <T extends Persistent> void putList( String path, List<T> list ) {
+		// Remove the old list.
 		int oldCount = getInt( path + SEPARATOR + ITEM_COUNT, 0 );
 		for( int index = 0; index < oldCount; index++ ) {
 			removeNode( getItemPath( path, index ) );
 		}
 
+		// Store the new list.
 		if( list == null ) {
 			reset( path );
 		} else {
@@ -504,11 +506,13 @@ public class Settings {
 	}
 
 	public <T extends Persistent> void putMap( String path, Map<String, T> map ) {
+		// Remove the old map.
 		Set<String> names = getChildNames( path );
 		for( String name : names ) {
 			removeNode( path + "/" + name );
 		}
 
+		// Store the new map.
 		if( map == null ) {
 			reset( path );
 		} else {
