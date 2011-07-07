@@ -203,7 +203,7 @@ public class Settings {
 			String full = getProviderPath( root.defaultProvider, path );
 			if( full != null ) names.addAll( root.defaultProvider.getChildNames( full ) );
 		}
-	
+		
 		return names;
 	}
 

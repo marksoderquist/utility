@@ -99,6 +99,7 @@ public class Descriptor {
 	}
 
 	public List<String> getNames( String path ) {
+		System.err.println( "Path: " + path );
 		if( names == null ) names = listNames( getNode( path ) );
 		return names;
 	}
@@ -235,6 +236,7 @@ public class Descriptor {
 		Node node = null;
 		NodeList list = parent.getChildNodes();
 		int count = list.getLength();
+		System.err.println( "listNames.count: " + count );
 		for( int index = 0; index < count; index++ ) {
 			node = list.item( index );
 			if( node instanceof Element ) names.add( node.getNodeName() );
