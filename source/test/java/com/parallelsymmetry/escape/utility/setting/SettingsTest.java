@@ -39,8 +39,9 @@ public class SettingsTest extends TestCase {
 
 	public void testGetPath() {
 		assertEquals( "/", settings.getPath() );
-		assertEquals( "/test", settings.getNode( "/test").getPath() );
-		assertEquals( "/test/name", settings.getNode( "/test/name").getPath() );
+		assertEquals( "/test", settings.getNode( "/test" ).getPath() );
+		assertEquals( "/test/name", settings.getNode( "/test/name" ).getPath() );
+		assertEquals( "/test/name", settings.getNode( "test" ).getNode( "name" ).getPath() );
 	}
 
 	public void testGet() {
@@ -180,11 +181,48 @@ public class SettingsTest extends TestCase {
 		assertTrue( names.contains( "path3" ) );
 		assertTrue( names.contains( "pathD" ) );
 
-		names = settings.getNode( "/test" ).getChildNames( "" );
+		names = settings.getChildNames( "test" );
 		assertEquals( 3, names.size() );
 		assertTrue( names.contains( "path1" ) );
 		assertTrue( names.contains( "path3" ) );
 		assertTrue( names.contains( "pathD" ) );
+
+		names = settings.getNode( "/test" ).getChildNames( "." );
+		assertEquals( 3, names.size() );
+		assertTrue( names.contains( "path1" ) );
+		assertTrue( names.contains( "path3" ) );
+		assertTrue( names.contains( "pathD" ) );
+
+		names = settings.getNode( "test" ).getChildNames( "." );
+		assertEquals( 3, names.size() );
+		assertTrue( names.contains( "path1" ) );
+		assertTrue( names.contains( "path3" ) );
+		assertTrue( names.contains( "pathD" ) );
+	}
+
+	public void testGetChildNodes() {
+		provider1.set( "/test/path1/value", "1" );
+		// Intentionally skip provider 2.
+		provider3.set( "/test/path3/value", "3" );
+		providerD.set( "/test/pathD/value", "D" );
+
+		Set<Settings> nodes = settings.getChildNodes( "/test" );
+		assertEquals( 3, nodes.size() );
+		assertTrue( nodes.contains( settings.getNode( "/test/path1" ) ) );
+		assertTrue( nodes.contains( settings.getNode( "/test/path3" ) ) );
+		assertTrue( nodes.contains( settings.getNode( "/test/pathD" ) ) );
+
+		nodes = settings.getNode( "/test" ).getChildNodes( "." );
+		assertEquals( 3, nodes.size() );
+		assertTrue( nodes.contains( settings.getNode( "/test/path1" ) ) );
+		assertTrue( nodes.contains( settings.getNode( "/test/path3" ) ) );
+		assertTrue( nodes.contains( settings.getNode( "/test/pathD" ) ) );
+
+		nodes = settings.getChildNodes( "test" );
+		assertEquals( 3, nodes.size() );
+		assertTrue( nodes.contains( settings.getNode( "/test/path1" ) ) );
+		assertTrue( nodes.contains( settings.getNode( "/test/path3" ) ) );
+		assertTrue( nodes.contains( settings.getNode( "/test/pathD" ) ) );
 	}
 
 	public void testGetNode() {
@@ -203,9 +241,7 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/test/path/D", "D" );
 
 		Settings node = settings.getNode( "test" );
-
 		assertEquals( "/test", node.getPath() );
-
 		assertEquals( "1", node.get( "path/1", null ) );
 		assertEquals( "2", node.get( "path/2", null ) );
 		assertEquals( "3", node.get( "path/3", null ) );
@@ -220,6 +256,13 @@ public class SettingsTest extends TestCase {
 		assertEquals( "B", node.get( "path/2", null ) );
 		assertEquals( "C", node.get( "path/3", null ) );
 		assertEquals( "D", node.get( "path/D", null ) );
+
+		node = settings.getNode( "test" ).getNode( "path" );
+		assertEquals( "/test/path", node.getPath() );
+		assertEquals( "1", node.get( "1", null ) );
+		assertEquals( "B", node.get( "2", null ) );
+		assertEquals( "C", node.get( "3", null ) );
+		assertEquals( "D", node.get( "D", null ) );
 	}
 
 	public void testRemoveNode() {
@@ -381,7 +424,6 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testReset() {
-		Log.setLevel( Log.DEBUG );
 		assertFalse( settings.nodeExists( "/test/path/remove" ) );
 		assertFalse( settings.nodeExists( "/test/path" ) );
 		assertFalse( settings.nodeExists( "/test" ) );

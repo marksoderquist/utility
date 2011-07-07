@@ -178,6 +178,16 @@ public class Settings {
 		return names;
 	}
 
+	public Set<Settings> getChildNodes( String path ) {
+		Settings node = getNode( path );
+		Set<String> names = getChildNames( path );
+		Set<Settings> nodes = new HashSet<Settings>();
+		for( String name : names ) {
+			nodes.add( node.getNode( name ) );
+		}
+		return nodes;
+	}
+
 	public boolean nodeExists( String path ) {
 		boolean result = false;
 		for( SettingProvider provider : root.providers ) {
@@ -530,6 +540,18 @@ public class Settings {
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return path.hashCode();
+	}
+
+	@Override
+	public boolean equals( Object object ) {
+		if( !( object instanceof Settings ) ) return false;
+		Settings that = (Settings)object;
+		return this.path.equals( that.path );
+	}
+
 	private String getProviderPath( SettingProvider provider, String path ) {
 		String full = getAbsolutePath( path );
 
@@ -550,13 +572,13 @@ public class Settings {
 		if( TextUtil.isEmpty( path ) ) return this.path;
 
 		// If this node's path is the root.
-		if( "/".equals( this.path ) ) return this.path + path;
+		if( SEPARATOR.equals( this.path ) ) return this.path + path;
 
 		return this.path + SEPARATOR + path;
 	}
 
 	private String getItemPath( String path, int index ) {
-		return path + "/item-" + index;
+		return path + SEPARATOR + "item-" + index;
 	}
 
 }
