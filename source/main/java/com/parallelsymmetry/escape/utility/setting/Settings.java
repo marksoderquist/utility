@@ -161,33 +161,7 @@ public class Settings {
 	public void removeProvider( int index ) {
 		mounts.remove( providers.remove( index ) );
 	}
-
-	public Set<String> getChildNames( String path ) {
-		Set<String> names = new HashSet<String>();
-
-		for( SettingProvider provider : root.providers ) {
-			String full = getProviderPath( provider, path );
-			if( full != null ) names.addAll( provider.getChildNames( full ) );
-		}
-
-		if( root.defaultProvider != null ) {
-			String full = getProviderPath( root.defaultProvider, path );
-			if( full != null ) names.addAll( root.defaultProvider.getChildNames( full ) );
-		}
-
-		return names;
-	}
-
-	public Set<Settings> getChildNodes( String path ) {
-		Settings node = getNode( path );
-		Set<String> names = getChildNames( path );
-		Set<Settings> nodes = new HashSet<Settings>();
-		for( String name : names ) {
-			nodes.add( node.getNode( name ) );
-		}
-		return nodes;
-	}
-
+	
 	public boolean nodeExists( String path ) {
 		boolean result = false;
 		for( SettingProvider provider : root.providers ) {
@@ -207,6 +181,49 @@ public class Settings {
 
 	public Settings getNode( String path ) {
 		return new Settings( root, getAbsolutePath( path ) );
+	}
+
+	public Settings getIndexedNode( String path, int index ) {
+		return getNode( getItemPath( path, index ) );
+	}
+
+	public int getChildCount( String path ) {
+		return getChildNames( path ).size();
+	}
+
+	public Set<String> getChildNames( String path ) {
+		Set<String> names = new HashSet<String>();
+	
+		for( SettingProvider provider : root.providers ) {
+			String full = getProviderPath( provider, path );
+			if( full != null ) names.addAll( provider.getChildNames( full ) );
+		}
+	
+		if( root.defaultProvider != null ) {
+			String full = getProviderPath( root.defaultProvider, path );
+			if( full != null ) names.addAll( root.defaultProvider.getChildNames( full ) );
+		}
+	
+		return names;
+	}
+
+	public Set<Settings> getChildNodes( String path ) {
+		Settings node = getNode( path );
+		Set<String> names = getChildNames( path );
+		Set<Settings> nodes = new HashSet<Settings>();
+		for( String name : names ) {
+			nodes.add( node.getNode( name ) );
+		}
+		return nodes;
+	}
+
+	public List<Settings> getIndexedNodes( String path ) {
+		int count = getChildCount( path );
+		List<Settings> settings = new ArrayList<Settings>();
+		for( int index = 0; index < count; index++ ) {
+			settings.add( getIndexedNode( path, index ) );
+		}
+		return settings;
 	}
 
 	public void reset() {
@@ -578,7 +595,7 @@ public class Settings {
 	}
 
 	private String getItemPath( String path, int index ) {
-		return path + SEPARATOR + "item-" + index;
+		return path + SEPARATOR + ITEM_PREFIX + index;
 	}
 
 }

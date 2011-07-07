@@ -224,6 +224,23 @@ public class SettingsTest extends TestCase {
 		assertTrue( nodes.contains( settings.getNode( "/test/path3" ) ) );
 		assertTrue( nodes.contains( settings.getNode( "/test/pathD" ) ) );
 	}
+	
+	public void testGetIndexedNodes() {
+		int count = 5;
+		String path = "/test/lists/list1";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceList.add( new MockPersistent( index ) );
+		}
+
+		settings.putList( path, sourceList );
+
+		int index = 0;
+		for( Settings itemSettings : settings.getIndexedNodes( "/test/lists/list1" ) ){
+			assertEquals( "item-" + index++, itemSettings.getName() );
+		}
+	}
 
 	public void testGetNode() {
 		provider1.set( "/test/path/1", "1" );
