@@ -97,6 +97,11 @@ public class DescriptorTest extends TestCase {
 		assertTrue( names.contains( "integer" ) );
 		assertTrue( names.contains( "list" ) );
 		assertTrue( names.contains( "nodes" ) );
+
+		names = descriptor.getNames( "/test/list" );
+		assertTrue( names.contains( "one" ) );
+		assertTrue( names.contains( "two" ) );
+		assertTrue( names.contains( "three" ) );
 	}
 
 	public void testGetPaths() throws Exception {

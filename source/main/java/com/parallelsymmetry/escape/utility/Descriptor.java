@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
@@ -27,7 +29,7 @@ public class Descriptor {
 
 	private Node node;
 
-	private List<String> names;
+	private Map<String, List<String>> names = new ConcurrentHashMap<String, List<String>>();
 
 	private List<String> paths;
 
@@ -99,8 +101,11 @@ public class Descriptor {
 	}
 
 	public List<String> getNames( String path ) {
-		System.err.println( "Path: " + path );
-		if( names == null ) names = listNames( getNode( path ) );
+		List<String> names = this.names.get( path );
+		if( names == null ) {
+			names = listNames( getNode( path ) );
+			this.names.put( path, names );
+		}
 		return names;
 	}
 
@@ -236,7 +241,6 @@ public class Descriptor {
 		Node node = null;
 		NodeList list = parent.getChildNodes();
 		int count = list.getLength();
-		System.err.println( "listNames.count: " + count );
 		for( int index = 0; index < count; index++ ) {
 			node = list.item( index );
 			if( node instanceof Element ) names.add( node.getNodeName() );
