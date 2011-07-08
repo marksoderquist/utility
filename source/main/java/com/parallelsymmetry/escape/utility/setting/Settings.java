@@ -45,6 +45,10 @@ public class Settings {
 	/**
 	 * The settings path separator character.
 	 */
+	/*
+	 * DEVELOPERS: Do not change the value of this field, it will break backward
+	 * compatibility with previously created settings.
+	 */
 	public static final String SEPARATOR = "/";
 
 	/**
@@ -52,7 +56,7 @@ public class Settings {
 	 */
 	/*
 	 * DEVELOPERS: Do not change the value of this field, it will break backward
-	 * compatibility with previously created setting lists.
+	 * compatibility with previously created settings.
 	 */
 	public static final String ITEM_PREFIX = "item-";
 
@@ -61,7 +65,7 @@ public class Settings {
 	 */
 	/*
 	 * DEVELOPERS: Do not change the value of this field, it will break backward
-	 * compatibility with previously created setting lists.
+	 * compatibility with previously created settings.
 	 */
 	public static final String ITEM_COUNT = ITEM_PREFIX + "count";
 
@@ -70,7 +74,7 @@ public class Settings {
 	 */
 	/*
 	 * DEVELOPERS: Do not change the value of this field, it will break backward
-	 * compatibility with previously created setting lists.
+	 * compatibility with previously created settings.
 	 */
 	public static final String ITEM_CLASS = ITEM_PREFIX + "class";
 
@@ -161,7 +165,7 @@ public class Settings {
 	public void removeProvider( int index ) {
 		mounts.remove( providers.remove( index ) );
 	}
-	
+
 	public boolean nodeExists( String path ) {
 		boolean result = false;
 		for( SettingProvider provider : root.providers ) {
@@ -193,17 +197,17 @@ public class Settings {
 
 	public Set<String> getChildNames( String path ) {
 		Set<String> names = new HashSet<String>();
-	
+
 		for( SettingProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
 			if( full != null ) names.addAll( provider.getChildNames( full ) );
 		}
-	
+
 		if( root.defaultProvider != null ) {
 			String full = getProviderPath( root.defaultProvider, path );
 			if( full != null ) names.addAll( root.defaultProvider.getChildNames( full ) );
 		}
-		
+
 		return names;
 	}
 
@@ -332,7 +336,10 @@ public class Settings {
 		for( SettingProvider provider : root.providers ) {
 			if( provider instanceof WritableSettingProvider ) {
 				String full = getProviderPath( provider, path );
-				if( full != null ) ( (WritableSettingProvider)provider ).put( full, value );
+				if( full != null ) {
+					( (WritableSettingProvider)provider ).put( full, value );
+					Log.write( Log.TRACE, "Write setting: ", full, " = ", value );
+				}
 			}
 		}
 	}
