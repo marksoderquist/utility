@@ -43,6 +43,11 @@ import com.parallelsymmetry.escape.utility.ui.Colors;
 public class Settings {
 
 	/**
+	 * Use this path to refer to the node itself.
+	 */
+	public static final String SELF = ".";
+
+	/**
 	 * The settings path separator character.
 	 */
 	/*
@@ -191,8 +196,16 @@ public class Settings {
 		return getNode( getItemPath( path, index ) );
 	}
 
+	public int getChildCount() {
+		return getChildCount( "." );
+	}
+
 	public int getChildCount( String path ) {
 		return getChildNames( path ).size();
+	}
+
+	public Set<String> getChildNames() {
+		return getChildNames( SELF );
 	}
 
 	public Set<String> getChildNames( String path ) {
@@ -209,6 +222,10 @@ public class Settings {
 		}
 
 		return names;
+	}
+
+	public Set<Settings> getChildNodes() {
+		return getChildNodes( SELF );
 	}
 
 	public Set<Settings> getChildNodes( String path ) {
