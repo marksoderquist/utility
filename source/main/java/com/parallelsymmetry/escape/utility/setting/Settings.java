@@ -355,7 +355,7 @@ public class Settings {
 				String full = getProviderPath( provider, path );
 				if( full != null ) {
 					( (WritableSettingProvider)provider ).put( full, value );
-					Log.write( Log.TRACE, "Write setting: ", full, " = ", value );
+					Log.write( Log.DEBUG, "Write setting: ", full, " = ", value );
 				}
 			}
 		}
