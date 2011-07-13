@@ -135,13 +135,11 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 		if( list.size() == 0 ) return false;
 
 		// Add the nodes.
-		int count = 0;
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
 		for( T node : list ) {
 			getTransaction().add( new AddChildAction<T>( this, index, node ) );
 			if( index < Integer.MAX_VALUE ) index++;
-			count++;
 		}
 		if( atomic ) getTransaction().commit();
 
