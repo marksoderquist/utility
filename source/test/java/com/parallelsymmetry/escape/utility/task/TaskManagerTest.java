@@ -8,8 +8,6 @@ import junit.framework.TestCase;
 
 public class TaskManagerTest extends TestCase {
 
-	private static final String EXCEPTION_MESSAGE = "Intentionally fail task.";
-
 	private TaskManager manager;
 
 	@Override
@@ -70,11 +68,14 @@ public class TaskManagerTest extends TestCase {
 		assertTrue( manager.isRunning() );
 
 		MockTask task = new MockTask( manager );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
+
 		Future<Object> future = manager.submit( task );
 		assertNull( future.get() );
 		assertTrue( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertTrue( task.isSuccess() );
+		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
 
@@ -86,11 +87,14 @@ public class TaskManagerTest extends TestCase {
 
 		Object result = new Object();
 		MockTask task = new MockTask( manager, result );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
+
 		Future<Object> future = manager.submit( task );
 		assertEquals( result, future.get() );
 		assertTrue( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertTrue( task.isSuccess() );
+		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
 
@@ -101,16 +105,19 @@ public class TaskManagerTest extends TestCase {
 		assertTrue( manager.isRunning() );
 
 		MockTask task = new MockTask( manager, null, true );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
+
 		manager.submit( task );
 		try {
 			assertNull( task.get() );
 			fail();
 		} catch( ExecutionException exception ) {
-			assertEquals( EXCEPTION_MESSAGE, exception.getCause().getMessage() );
+			assertEquals( MockTask.EXCEPTION_MESSAGE, exception.getCause().getMessage() );
 		}
 		assertTrue( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertFalse( task.isSuccess() );
+		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.Result.FAILED, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
 
@@ -118,6 +125,8 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( manager.isRunning() );
 
 		MockTask task = new MockTask( manager );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 
 		try {
 			manager.submit( task );
@@ -128,8 +137,8 @@ public class TaskManagerTest extends TestCase {
 
 		assertFalse( manager.isRunning() );
 		assertFalse( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertFalse( task.isSuccess() );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
 
@@ -141,11 +150,14 @@ public class TaskManagerTest extends TestCase {
 
 		Object result = new Object();
 		MockTask task = new MockTask( manager, result );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
+
 		manager.submit( task );
 		assertEquals( result, task.get() );
 		assertTrue( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertTrue( task.isSuccess() );
+		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
 
@@ -158,11 +170,14 @@ public class TaskManagerTest extends TestCase {
 		MockTask nestedTask = new MockTask( manager, nestedResult );
 		Object result = new Object();
 		MockTask task = new MockTask( manager, result, nestedTask );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
+
 		manager.submit( task );
 		assertEquals( result, task.get( 100, TimeUnit.MILLISECONDS ) );
 		assertTrue( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertTrue( task.isSuccess() );
+		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
 
@@ -173,16 +188,21 @@ public class TaskManagerTest extends TestCase {
 
 		Object nestedResult = new Object();
 		MockTask nestedTask = new MockTask( manager, nestedResult, true );
+		assertEquals( Task.State.WAITING, nestedTask.getState() );
+		assertEquals( Task.Result.UNKNOWN, nestedTask.getResult() );
+
 		Object result = new Object();
 		MockTask task = new MockTask( manager, result, nestedTask );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 
 		manager.submit( task );
 
 		// Check the parent task.
 		task.get();
 		assertTrue( task.isDone() );
-		assertFalse( task.isRunning() );
-		assertTrue( task.isSuccess() );
+		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 
 		// Check the nested task.
@@ -190,52 +210,12 @@ public class TaskManagerTest extends TestCase {
 			assertNull( nestedTask.get() );
 			fail();
 		} catch( ExecutionException exception ) {
-			assertEquals( EXCEPTION_MESSAGE, exception.getCause().getMessage() );
+			assertEquals( MockTask.EXCEPTION_MESSAGE, exception.getCause().getMessage() );
 		}
 		assertTrue( nestedTask.isDone() );
-		assertFalse( nestedTask.isRunning() );
-		assertFalse( nestedTask.isSuccess() );
+		assertEquals( Task.State.COMPLETE, nestedTask.getState() );
+		assertEquals( Task.Result.FAILED, nestedTask.getResult() );
 		assertFalse( nestedTask.isCancelled() );
-	}
-
-	private static final class MockTask extends Task<Object> {
-
-		private boolean fail;
-
-		private Task<?> nest;
-
-		private TaskManager manager;
-
-		private Object object;
-
-		public MockTask( TaskManager manager ) {
-			this( manager, null );
-		}
-
-		public MockTask( TaskManager manager, Object object ) {
-			this.manager = manager;
-			this.object = object;
-		}
-
-		public MockTask( TaskManager manager, Object object, boolean fail ) {
-			this.manager = manager;
-			this.object = object;
-			this.fail = fail;
-		}
-
-		public MockTask( TaskManager manager, Object object, Task<?> nest ) {
-			this.manager = manager;
-			this.object = object;
-			this.nest = nest;
-		}
-
-		@Override
-		public Object execute() throws Exception {
-			if( fail ) throw new Exception( EXCEPTION_MESSAGE );
-			if( nest != null ) manager.invoke( nest );
-			return object;
-		}
-
 	}
 
 }

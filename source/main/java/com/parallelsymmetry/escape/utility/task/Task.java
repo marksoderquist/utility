@@ -1,6 +1,9 @@
 package com.parallelsymmetry.escape.utility.task;
 
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -21,12 +24,25 @@ import java.util.concurrent.TimeoutException;
 
 public abstract class Task<V> implements Callable<V>, Future<V> {
 
-	private boolean running;
+	public enum State {
+		WAITING, RUNNING, COMPLETE;
+	}
+
+	public enum Result {
+		UNKNOWN, CANCELLED, SUCCESS, FAILED;
+	}
+
+	private State state = State.WAITING;
+
+	private Result result = Result.UNKNOWN;
 
 	private FutureTask<V> future;
 
+	private Set<TaskListener> listeners;
+
 	public Task() {
 		future = new TaskFuture<V>( new TaskExecute<V>( this ) );
+		listeners = new CopyOnWriteArraySet<TaskListener>();
 	}
 
 	/**
@@ -44,24 +60,17 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		return future.isDone();
 	}
 
-	public final boolean isRunning() {
-		return running && !future.isDone();
-	}
-
 	@Override
 	public final boolean isCancelled() {
 		return future.isCancelled();
 	}
 
-	public final boolean isSuccess() {
-		if( !isRunning() && !isDone() ) return false;
+	public final State getState() {
+		return state;
+	}
 
-		try {
-			future.get();
-			return true;
-		} catch( Throwable throwable ) {
-			return false;
-		}
+	public final Result getResult() {
+		return result;
 	}
 
 	@Override
@@ -79,37 +88,72 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		return future.get( timeout, unit );
 	}
 
+	public void addTaskListener( TaskListener listener ) {
+		listeners.add( listener );
+	}
+
+	public void removeTaskListener( TaskListener listener ) {
+		listeners.remove( listener );
+	}
+
+	protected void fireTaskEvent( TaskEvent.Type type ) {
+		TaskEvent event = new TaskEvent( this, this, type );
+		for( TaskListener listener : listeners ) {
+			listener.handleEvent( event );
+		}
+	}
+
 	V invoke() throws InterruptedException, ExecutionException {
-		running = true;
-		fireTaskEvent();
+		state = State.RUNNING;
+		fireTaskEvent( TaskEvent.Type.TASK_START );
 
 		try {
 			future.run();
-			return future.get();
 		} finally {
-			running = false;
-			fireTaskEvent();
+			state = State.COMPLETE;
+		}
+
+		try {
+			V value = future.get();
+			result = Result.SUCCESS;
+			return value;
+		} catch( CancellationException exception ) {
+			result = Result.CANCELLED;
+			throw exception;
+		} catch( ExecutionException exception ) {
+			result = Result.FAILED;
+			throw exception;
+		} finally {
+			fireTaskEvent( TaskEvent.Type.TASK_FINISH );
 		}
 	}
 
 	V invoke( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
-		running = true;
-		fireTaskEvent();
+		state = State.RUNNING;
+		fireTaskEvent( TaskEvent.Type.TASK_START );
 
 		try {
 			future.run();
-			return future.get( timeout, unit );
 		} finally {
-			running = false;
-			fireTaskEvent();
+			state = State.COMPLETE;
+		}
+
+		try {
+			V value = future.get( timeout, unit );
+			result = Result.SUCCESS;
+			return value;
+		} catch( CancellationException exception ) {
+			result = Result.CANCELLED;
+			throw exception;
+		} catch( ExecutionException exception ) {
+			result = Result.FAILED;
+			throw exception;
+		} finally {
+			fireTaskEvent( TaskEvent.Type.TASK_FINISH );
 		}
 	}
 
-	protected void fireTaskEvent() {
-		// TODO Implement task events.
-	}
-
-	private class TaskFuture<W> extends FutureTask<W> {
+	private static class TaskFuture<W> extends FutureTask<W> {
 
 		public TaskFuture( Callable<W> callable ) {
 			super( callable );
@@ -118,7 +162,6 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		@Override
 		protected void done() {
 			super.done();
-			fireTaskEvent();
 		}
 
 		@Override
@@ -127,13 +170,11 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 			try {
 				super.get();
 			} catch( Exception exception ) {}
-			fireTaskEvent();
 		}
 
 		@Override
 		protected void setException( Throwable throwable ) {
 			super.setException( throwable );
-			fireTaskEvent();
 		}
 
 	}
