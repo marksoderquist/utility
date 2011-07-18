@@ -74,7 +74,7 @@ public class TaskManagerTest extends TestCase {
 		Future<Object> future = manager.submit( task );
 		assertNull( future.get() );
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
@@ -93,7 +93,7 @@ public class TaskManagerTest extends TestCase {
 		Future<Object> future = manager.submit( task );
 		assertEquals( result, future.get() );
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
@@ -116,7 +116,7 @@ public class TaskManagerTest extends TestCase {
 			assertEquals( MockTask.EXCEPTION_MESSAGE, exception.getCause().getMessage() );
 		}
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.FAILED, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
@@ -156,7 +156,7 @@ public class TaskManagerTest extends TestCase {
 		manager.submit( task );
 		assertEquals( result, task.get() );
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
@@ -176,7 +176,7 @@ public class TaskManagerTest extends TestCase {
 		manager.submit( task );
 		assertEquals( result, task.get( 100, TimeUnit.MILLISECONDS ) );
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 	}
@@ -201,7 +201,7 @@ public class TaskManagerTest extends TestCase {
 		// Check the parent task.
 		task.get();
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 
@@ -213,7 +213,7 @@ public class TaskManagerTest extends TestCase {
 			assertEquals( MockTask.EXCEPTION_MESSAGE, exception.getCause().getMessage() );
 		}
 		assertTrue( nestedTask.isDone() );
-		assertEquals( Task.State.COMPLETE, nestedTask.getState() );
+		assertEquals( Task.State.DONE, nestedTask.getState() );
 		assertEquals( Task.Result.FAILED, nestedTask.getResult() );
 		assertFalse( nestedTask.isCancelled() );
 	}

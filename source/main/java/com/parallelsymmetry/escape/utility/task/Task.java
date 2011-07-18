@@ -2,13 +2,14 @@ package com.parallelsymmetry.escape.utility.task;
 
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import com.parallelsymmetry.escape.utility.ThreadUtil;
 
 /**
  * An executable task.
@@ -25,12 +26,14 @@ import java.util.concurrent.TimeoutException;
 public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	public enum State {
-		WAITING, RUNNING, COMPLETE;
+		WAITING, RUNNING, DONE;
 	}
 
 	public enum Result {
 		UNKNOWN, CANCELLED, SUCCESS, FAILED;
 	}
+
+	private Object stateLock = new Object();
 
 	private State state = State.WAITING;
 
@@ -41,16 +44,17 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	private Set<TaskListener> listeners;
 
 	public Task() {
-		future = new TaskFuture<V>( new TaskExecute<V>( this ) );
+		future = new TaskFuture<V>( this, new TaskExecute<V>( this ) );
 		listeners = new CopyOnWriteArraySet<TaskListener>();
 	}
 
-	/**
-	 * 
-	 */
 	@Override
 	public V call() throws Exception {
-		return invoke();
+		setState( State.RUNNING );
+		fireTaskEvent( TaskEvent.Type.TASK_START );
+
+		future.run();
+		return future.get();
 	}
 
 	public abstract V execute() throws Exception;
@@ -67,6 +71,21 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	public final State getState() {
 		return state;
+	}
+
+	public void waitForState( State state ) throws InterruptedException {
+		synchronized( stateLock ) {
+			while( this.state != state ) {
+				stateLock.wait();
+			}
+		}
+	}
+
+	private void setState( State state ) {
+		synchronized( stateLock ) {
+			this.state = state;
+			stateLock.notifyAll();
+		}
 	}
 
 	public final Result getResult() {
@@ -104,76 +123,47 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	}
 
 	V invoke() throws InterruptedException, ExecutionException {
-		state = State.RUNNING;
+		setState( State.RUNNING );
 		fireTaskEvent( TaskEvent.Type.TASK_START );
 
-		try {
-			future.run();
-		} finally {
-			state = State.COMPLETE;
-		}
-
-		try {
-			V value = future.get();
-			result = Result.SUCCESS;
-			return value;
-		} catch( CancellationException exception ) {
-			result = Result.CANCELLED;
-			throw exception;
-		} catch( ExecutionException exception ) {
-			result = Result.FAILED;
-			throw exception;
-		} finally {
-			fireTaskEvent( TaskEvent.Type.TASK_FINISH );
-		}
+		future.run();
+		return future.get();
 	}
 
 	V invoke( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
-		state = State.RUNNING;
+		setState( State.RUNNING );
 		fireTaskEvent( TaskEvent.Type.TASK_START );
 
-		try {
-			future.run();
-		} finally {
-			state = State.COMPLETE;
-		}
-
-		try {
-			V value = future.get( timeout, unit );
-			result = Result.SUCCESS;
-			return value;
-		} catch( CancellationException exception ) {
-			result = Result.CANCELLED;
-			throw exception;
-		} catch( ExecutionException exception ) {
-			result = Result.FAILED;
-			throw exception;
-		} finally {
-			fireTaskEvent( TaskEvent.Type.TASK_FINISH );
-		}
+		future.run();
+		return future.get( timeout, unit );
 	}
 
 	private static class TaskFuture<W> extends FutureTask<W> {
 
-		public TaskFuture( Callable<W> callable ) {
+		private Task<?> task;
+
+		public TaskFuture( Task<?> task, Callable<W> callable ) {
 			super( callable );
+			this.task = task;
 		}
 
 		@Override
 		protected void done() {
+			task.setState( State.DONE );
+			ThreadUtil.pause( 5 );
+			task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
 			super.done();
 		}
 
 		@Override
 		protected void set( W value ) {
+			task.result = Result.SUCCESS;
 			super.set( value );
-			try {
-				super.get();
-			} catch( Exception exception ) {}
 		}
 
 		@Override
 		protected void setException( Throwable throwable ) {
+			task.result = Result.FAILED;
 			super.setException( throwable );
 		}
 

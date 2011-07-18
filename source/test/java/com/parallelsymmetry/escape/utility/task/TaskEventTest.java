@@ -24,9 +24,16 @@ public class TaskEventTest extends TestCase {
 		task.get();
 
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 
+		/**
+		 * Because there are two threads involved in this test, the test thread
+		 * needs to wait for the events to arrive. Task is required to ensure the
+		 * done state is set correctly before events are sent but this allows the
+		 * test thread to continue before the events arrive.
+		 */
+		watcher.waitForEventCount( 2, 100 );
 		assertEvent( watcher.events.get( 0 ), task, TaskEvent.Type.TASK_START );
 		assertEvent( watcher.events.get( 1 ), task, TaskEvent.Type.TASK_FINISH );
 		assertEquals( 2, watcher.events.size() );
@@ -47,9 +54,16 @@ public class TaskEventTest extends TestCase {
 		}
 
 		assertTrue( task.isDone() );
-		assertEquals( Task.State.COMPLETE, task.getState() );
+		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.FAILED, task.getResult() );
 
+		/**
+		 * Because there are two threads involved in this test, the test thread
+		 * needs to wait for the events to arrive. Task is required to ensure the
+		 * done state is set correctly before events are sent but this allows the
+		 * test thread to continue before the events arrive.
+		 */
+		watcher.waitForEventCount( 2, 100 );
 		assertEvent( watcher.events.get( 0 ), task, TaskEvent.Type.TASK_START );
 		assertEvent( watcher.events.get( 1 ), task, TaskEvent.Type.TASK_FINISH );
 		assertEquals( 2, watcher.events.size() );
@@ -65,8 +79,15 @@ public class TaskEventTest extends TestCase {
 		List<TaskEvent> events = new ArrayList<TaskEvent>();
 
 		@Override
-		public void handleEvent( TaskEvent event ) {
+		public synchronized void handleEvent( TaskEvent event ) {
 			events.add( event );
+			notifyAll();
+		}
+
+		public synchronized void waitForEventCount( int count, int timout ) throws InterruptedException {
+			while( events.size() < count ) {
+				wait( timout );
+			}
 		}
 
 	}

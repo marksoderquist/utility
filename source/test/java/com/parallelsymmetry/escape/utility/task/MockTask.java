@@ -1,8 +1,12 @@
 package com.parallelsymmetry.escape.utility.task;
 
+import com.parallelsymmetry.escape.utility.ThreadUtil;
+
 final class MockTask extends Task<Object> {
 
 	static final String EXCEPTION_MESSAGE = "Intentionally fail task.";
+
+	private int delay;
 
 	private boolean fail;
 
@@ -16,14 +20,30 @@ final class MockTask extends Task<Object> {
 		this( manager, null );
 	}
 
+	public MockTask( TaskManager manager, int delay ) {
+		this( manager, null, delay );
+	}
+
+	public MockTask( TaskManager manager, int delay, boolean fail ) {
+		this( manager, null, delay, fail );
+	}
+
 	public MockTask( TaskManager manager, Object object ) {
-		this.manager = manager;
-		this.object = object;
+		this( manager, object, 0 );
+	}
+
+	public MockTask( TaskManager manager, Object object, int delay ) {
+		this( manager, object, delay, false );
 	}
 
 	public MockTask( TaskManager manager, Object object, boolean fail ) {
+		this( manager, object, 0, fail );
+	}
+
+	public MockTask( TaskManager manager, Object object, int delay, boolean fail ) {
 		this.manager = manager;
 		this.object = object;
+		this.delay = delay;
 		this.fail = fail;
 	}
 
@@ -35,6 +55,7 @@ final class MockTask extends Task<Object> {
 
 	@Override
 	public Object execute() throws Exception {
+		if( delay > 0 ) ThreadUtil.pause( delay );
 		if( fail ) throw new Exception( EXCEPTION_MESSAGE );
 		if( nest != null ) manager.invoke( nest );
 		return object;
