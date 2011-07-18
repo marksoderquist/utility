@@ -2,14 +2,13 @@ package com.parallelsymmetry.escape.utility.task;
 
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import com.parallelsymmetry.escape.utility.ThreadUtil;
 
 /**
  * An executable task.
@@ -50,11 +49,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	@Override
 	public V call() throws Exception {
-		setState( State.RUNNING );
-		fireTaskEvent( TaskEvent.Type.TASK_START );
-
-		future.run();
-		return future.get();
+		return invoke();
 	}
 
 	public abstract V execute() throws Exception;
@@ -81,10 +76,11 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		}
 	}
 
-	private void setState( State state ) {
+	public void waitForState( State state, long duration, TimeUnit unit ) throws InterruptedException {
 		synchronized( stateLock ) {
-			this.state = state;
-			stateLock.notifyAll();
+			while( this.state != state ) {
+				stateLock.wait( unit.toMillis( duration ), (int)( unit.toNanos( duration ) % 1000000 ) );
+			}
 		}
 	}
 
@@ -99,12 +95,14 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	@Override
 	public V get() throws InterruptedException, ExecutionException {
+		waitForState( State.DONE );
 		return future.get();
 	}
 
 	@Override
-	public V get( long timeout, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
-		return future.get( timeout, unit );
+	public V get( long duration, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
+		waitForState( State.DONE, duration, unit );
+		return future.get( duration, unit );
 	}
 
 	public void addTaskListener( TaskListener listener ) {
@@ -138,6 +136,13 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		return future.get( timeout, unit );
 	}
 
+	private void setState( State state ) {
+		synchronized( stateLock ) {
+			this.state = state;
+			stateLock.notifyAll();
+		}
+	}
+
 	private static class TaskFuture<W> extends FutureTask<W> {
 
 		private Task<?> task;
@@ -149,23 +154,43 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 		@Override
 		protected void done() {
-			task.setState( State.DONE );
-			ThreadUtil.pause( 5 );
-			task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
+			// This is a workaround in Java 6 to capture the result of the task.
+			try {
+				task.future.get();
+				task.result = Result.SUCCESS;
+			} catch( InterruptedException exception ) {
+				// Intentionally ignore exception.
+			} catch( CancellationException exception ) {
+				task.result = Result.CANCELLED;
+			} catch( ExecutionException exception ) {
+				task.result = Result.FAILED;
+			} finally {
+				task.setState( State.DONE );
+				task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
+			}
+
 			super.done();
 		}
 
-		@Override
-		protected void set( W value ) {
-			task.result = Result.SUCCESS;
-			super.set( value );
-		}
-
-		@Override
-		protected void setException( Throwable throwable ) {
-			task.result = Result.FAILED;
-			super.setException( throwable );
-		}
+		// The following methods work in Java 7 but not in Java 6.
+		//		@Override
+		//		protected void done() {
+		//			task.setState( State.DONE );
+		//			task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
+		//			super.done();
+		//		}
+		//
+		//		@Override
+		//		protected void set( W value ) {
+		//			task.result = Result.SUCCESS;
+		//			super.set( value );
+		//		}
+		//
+		//		@Override
+		//		protected void setException( Throwable throwable ) {
+		//			task.result = Result.FAILED;
+		//			super.setException( throwable );
+		//		}
 
 	}
 
