@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.escape.utility.TextUtil;
 import com.parallelsymmetry.escape.utility.log.Log;
@@ -89,15 +90,24 @@ public class Settings {
 
 	private Map<SettingProvider, String> mounts;
 
+	/**
+	 * The root settings node.
+	 */
 	private Settings root;
 
+	/**
+	 * The absolute path to this node.
+	 */
 	private String path;
+	
+	private Set<SettingListener> listeners;
 
 	public Settings() {
-		this.providers = new CopyOnWriteArrayList<SettingProvider>();
-		this.mounts = new ConcurrentHashMap<SettingProvider, String>();
-		this.root = this;
-		this.path = "/";
+		providers = new CopyOnWriteArrayList<SettingProvider>();
+		mounts = new ConcurrentHashMap<SettingProvider, String>();
+		listeners = new CopyOnWriteArraySet<SettingListener>();
+		root = this;
+		path = "/";
 	}
 
 	private Settings( Settings root, String path ) {
@@ -350,14 +360,23 @@ public class Settings {
 	 * @param value
 	 */
 	public void put( String path, String value ) {
+		boolean changed = false;
+		String oldValue = get( path, null );
+		String absolute = getAbsolutePath( path );
+		
 		for( SettingProvider provider : root.providers ) {
 			if( provider instanceof WritableSettingProvider ) {
 				String full = getProviderPath( provider, path );
 				if( full != null ) {
 					( (WritableSettingProvider)provider ).put( full, value );
-					Log.write( Log.DEBUG, "Write setting: ", full, " = ", value );
+					changed = true;
 				}
 			}
+		}
+		
+		if( changed ) {
+			fireSettingChangedEvent( new SettingEvent( absolute, oldValue, value ));
+			Log.write( Log.DEBUG, "Write setting: ", absolute, " = ", value );
 		}
 	}
 
@@ -580,6 +599,14 @@ public class Settings {
 			}
 		}
 	}
+	
+	public void addSettingListener( SettingListener listener ) {
+		listeners.add( listener );
+	}
+	
+	public void removeSettingListener( SettingListener listener ) {
+		listeners.remove( listener );
+	}
 
 	@Override
 	public int hashCode() {
@@ -591,6 +618,12 @@ public class Settings {
 		if( !( object instanceof Settings ) ) return false;
 		Settings that = (Settings)object;
 		return this.path.equals( that.path );
+	}
+	
+	private void fireSettingChangedEvent( SettingEvent event ) {
+		for( SettingListener listener : root.listeners ) {
+			listener.settingChanged( event );
+		}
 	}
 
 	private String getProviderPath( SettingProvider provider, String path ) {
