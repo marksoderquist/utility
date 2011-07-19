@@ -10,7 +10,12 @@ public class TaskTest extends TestCase {
 
 	private TaskManager manager = new TaskManager();
 
-	private int delay = 5;
+	/*
+	 * Don't make this number too small. The smaller the number, the more likely
+	 * the computer can't complete the task quickly enough to pass the test. A
+	 * good time is between 10-50 milliseconds.
+	 */
+	private int delay = 10;
 
 	@Override
 	public void setUp() throws Exception {
