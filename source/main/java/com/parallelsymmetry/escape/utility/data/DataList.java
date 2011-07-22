@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.parallelsymmetry.escape.utility.ObjectUtil;
 
-public abstract class DataList<T extends DataNode> extends DataNode implements List<T> {
+public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private List<T> children;
 
@@ -19,11 +19,11 @@ public abstract class DataList<T extends DataNode> extends DataNode implements L
 
 	private boolean treeModified;
 
-	public DataList() {}
-
 	private Map<DataNode, DataEvent.Type> addRemoveChildren;
 
 	private int modifiedChildCount;
+	
+	public DataList() {}
 
 	public DataList( T[] children ) {
 		for( T child : children ) {

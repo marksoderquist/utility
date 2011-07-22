@@ -1,6 +1,5 @@
 package com.parallelsymmetry.escape.utility.data;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +7,10 @@ import org.junit.Test;
 
 public class DataListTest extends DataTestCase {
 
-	@Test
-	public void testDataListIsAbstract() {
-		assertTrue( "DataList class is not abstract.", ( DataList.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
-	}
+//	@Test
+//	public void testDataListIsAbstract() {
+//		assertTrue( "DataList class is not abstract.", ( DataList.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
+//	}
 
 	@Test
 	public void testConstructor() {
