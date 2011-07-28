@@ -171,6 +171,49 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 	}
 
+	/**
+	 * This is a particular case where data nodes have redefined the hashCode and
+	 * equals methods to be dependent on an attribute. Transaction code cannot
+	 * depend on the hashCode() method returning a valid value, therefore it
+	 * cannot put the node into any collections that use the hashCode() method.
+	 */
+	@Test
+	public void testNodeWithAttributeDependentHashcode() {
+		AttributeDependentHashCodeType type = new AttributeDependentHashCodeType();
+		assertNull( type.getKey() );
+
+		type.setKey( "test" );
+		assertEquals( "test", type.getKey() );
+
+		type.setKey( null );
+		assertNull( type.getKey() );
+	}
+
+	private class AttributeDependentHashCodeType extends DataNode {
+
+		private static final String KEY = "key";
+
+		public String getKey() {
+			return (String)getAttribute( KEY );
+		}
+
+		public void setKey( String key ) {
+			setAttribute( KEY, key );
+		}
+
+		@Override
+		public int hashCode() {
+			return getKey().hashCode();
+		}
+
+		@Override
+		public boolean equals( Object object ) {
+			if( !( object instanceof AttributeDependentHashCodeType ) ) return false;
+			return getKey().equals( ( (AttributeDependentHashCodeType)object ).getKey() );
+		}
+
+	}
+
 	private class MockAction extends Action {
 
 		public MockAction( DataNode data ) {

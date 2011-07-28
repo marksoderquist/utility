@@ -1,9 +1,7 @@
 package com.parallelsymmetry.escape.utility.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -12,6 +10,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.parallelsymmetry.escape.utility.log.Log;
 
 public class Transaction {
+
+	private static final String PREVIOUS_MODIFIED_STATE = Transaction.class.getName() + ".previousModifiedState";
+
+	private static final String EVENT_LIST = Transaction.class.getName() + ".eventList";
 
 	private Queue<Action> actions;
 
@@ -46,9 +48,8 @@ public class Transaction {
 		Log.write( Log.DEBUG, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
 		try {
 			// Store the current modified state of each data object.
-			Map<DataNode, Boolean> modified = new HashMap<DataNode, Boolean>();
-			for( DataNode datum : nodes ) {
-				modified.put( datum, datum.isModified() );
+			for( DataNode node : nodes ) {
+				node.putResource( PREVIOUS_MODIFIED_STATE, node.isModified() );
 			}
 
 			// Process the actions.
@@ -61,33 +62,38 @@ public class Transaction {
 			}
 
 			// Collect events from the action results.
-			Map<DataNode, List<DataEvent>> events = new HashMap<DataNode, List<DataEvent>>();
 			for( ActionResult result : results ) {
-				DataNode datum = result.getAction().getData();
+				DataNode node = result.getAction().getData();
 
-				List<DataEvent> datumEvents = events.get( datum );
+				List<DataEvent> datumEvents = node.getResource( EVENT_LIST );
 				if( datumEvents == null ) {
 					datumEvents = new ArrayList<DataEvent>();
-					events.put( datum, datumEvents );
+					node.putResource( EVENT_LIST, datumEvents );
 				}
 
 				datumEvents.addAll( result.getEvents() );
 			}
 
 			// Send the events for each data object.
-			for( DataNode datum : nodes ) {
+			for( DataNode node : nodes ) {
 				boolean changed = false;
 
-				for( DataEvent event : events.get( datum ) ) {
-					datum.dispatchEvent( event );
-					changed = true;
+				List<DataEvent> events = node.getResource( EVENT_LIST );
+				if( events != null ) {
+					node.putResource( EVENT_LIST, null );
+					for( DataEvent event : events ) {
+						node.dispatchEvent( event );
+						changed = true;
+					}
 				}
 
-				boolean oldModified = modified.get( datum );
-				boolean newModified = datum.isModified();
+				boolean oldModified = node.getResource( PREVIOUS_MODIFIED_STATE );
+				boolean newModified = node.isModified();
+				node.putResource( PREVIOUS_MODIFIED_STATE, null );
+
 				if( newModified != oldModified ) {
 					// Notify the parent.
-					DataNode parent = datum.getParent();
+					DataNode parent = node.getParent();
 					while( parent != null ) {
 						boolean parentOldModified = parent.isModified();
 						if( parent instanceof DataList ) {
@@ -98,17 +104,17 @@ public class Transaction {
 						boolean parentNewModified = parent.isModified();
 
 						// Dispatch events for parent.
-						if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
+						if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
 
 						parent = parent.getParent();
 					}
 
 					// A meta attribute change event needs to be sent.
-					datum.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, datum, DataNode.MODIFIED, oldModified, newModified ) );
+					node.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
 					changed = true;
 				}
 
-				if( changed ) datum.dispatchEvent( new DataChangedEvent( DataEvent.Type.MODIFY, datum ) );
+				if( changed ) node.dispatchEvent( new DataChangedEvent( DataEvent.Type.MODIFY, node ) );
 			}
 		} finally {
 			cleanup();
