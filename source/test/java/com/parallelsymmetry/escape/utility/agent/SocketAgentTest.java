@@ -2,6 +2,7 @@ package com.parallelsymmetry.escape.utility.agent;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -23,7 +24,7 @@ public class SocketAgentTest extends TestCase {
 	@Override
 	public void setUp() throws Exception {
 		Log.setLevel( Log.NONE );
-		server.startAndWait();
+		server.startAndWait( 100, TimeUnit.MILLISECONDS );
 		assertTrue( server.isRunning() );
 		int localPort = server.getLocalPort();
 		assertTrue( "Server port should be greater than zero: " + localPort, localPort > 0 );

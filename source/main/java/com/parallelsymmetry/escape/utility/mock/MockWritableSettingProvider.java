@@ -1,8 +1,15 @@
-package com.parallelsymmetry.escape.utility.setting;
+package com.parallelsymmetry.escape.utility.mock;
 
 import java.util.Iterator;
 
+import com.parallelsymmetry.escape.utility.setting.SettingsStoreException;
+import com.parallelsymmetry.escape.utility.setting.WritableSettingProvider;
+
 public class MockWritableSettingProvider extends MockSettingProvider implements WritableSettingProvider {
+
+	public MockWritableSettingProvider() {
+		super();
+	}
 
 	public MockWritableSettingProvider( String name ) {
 		super( name );

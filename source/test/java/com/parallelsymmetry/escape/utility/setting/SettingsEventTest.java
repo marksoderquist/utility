@@ -3,6 +3,8 @@ package com.parallelsymmetry.escape.utility.setting;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.parallelsymmetry.escape.utility.mock.MockWritableSettingProvider;
+
 import junit.framework.TestCase;
 
 public class SettingsEventTest extends TestCase {

@@ -1,4 +1,4 @@
-package com.parallelsymmetry.escape.utility.setting;
+package com.parallelsymmetry.escape.utility.mock;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.parallelsymmetry.escape.utility.setting.SettingProvider;
+
 public class MockSettingProvider implements SettingProvider {
 
 	protected Map<String, String> values = new ConcurrentHashMap<String, String>();
 
 	private String name;
+	
+	public MockSettingProvider() {
+		this( null );
+	}
 
 	public MockSettingProvider( String name ) {
 		this.name = name;
@@ -63,7 +69,7 @@ public class MockSettingProvider implements SettingProvider {
 	}
 
 	public void show() {
-		System.out.println( name + " data: " );
+		System.out.println( (name == null ? "MockSettingProvider" : name ) + " data: " );
 		List<String> keys = new ArrayList<String>( values.keySet() );
 		Collections.sort( keys );
 		for( String key : keys ) {

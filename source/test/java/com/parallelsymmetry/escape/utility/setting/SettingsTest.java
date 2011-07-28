@@ -10,6 +10,8 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import com.parallelsymmetry.escape.utility.log.Log;
+import com.parallelsymmetry.escape.utility.mock.MockSettingProvider;
+import com.parallelsymmetry.escape.utility.mock.MockWritableSettingProvider;
 
 public class SettingsTest extends TestCase {
 
