@@ -188,7 +188,7 @@ public class FileUtilTest extends TestCase {
 		}
 
 		// Initialize for unzip tests.
-		FileUtil.delete( targetData );
+		assertTrue( FileUtil.delete( targetData ) );
 		assertFalse( targetData.exists() );
 		targetData.mkdirs();
 		assertTrue( targetData.exists() );
