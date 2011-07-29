@@ -11,10 +11,6 @@ public class BundlesTest extends TestCase {
 
 	private static final String TEST_BUNDLE = "test.bundle";
 
-	private static final String LOADER_1_BUNDLE = "loader.1.bundle";
-
-	private static final String LOADER_2_BUNDLE = "loader.2.bundle";
-
 	private static final String SPANISH = "es";
 
 	private static Locale locale;
@@ -46,13 +42,12 @@ public class BundlesTest extends TestCase {
 	}
 
 	public void testClassLoaderHandling() throws Exception {
-		ClassLoader loader1 = new URLClassLoader( new URL[] { new File( "source/test/resources/loader1" ).toURI().toURL() } );
-		ClassLoader loader2 = new URLClassLoader( new URL[] { new File( "source/test/resources/loader2" ).toURI().toURL() } );
-		
-		Bundles.register( loader1 );
-		Bundles.register( loader2 );
-		String text = Bundles.getString( "bundle", "string", null, false );
-		assertEquals( "Loader 1 String", text );
+		ClassLoader loader1 = new URLClassLoader( new URL[] { new File( "target/test/java/loader1" ).toURI().toURL() }, null );
+		ClassLoader loader2 = new URLClassLoader( new URL[] { new File( "target/test/java/loader2" ).toURI().toURL() }, null );
+
+		assertNull( Bundles.getString( "bundle", "string", null, false ) );
+		assertEquals( "Loader 1 String", Bundles.getString( loader1, "bundle", "string", null, false ) );
+		assertEquals( "Loader 2 String", Bundles.getString( loader2, "bundle", "string", null, false ) );
 	}
 
 	public void tearDown() {

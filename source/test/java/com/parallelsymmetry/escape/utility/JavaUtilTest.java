@@ -10,6 +10,15 @@ import junit.framework.TestCase;
 
 public class JavaUtilTest extends TestCase {
 
+	public void testGetCallingClassName() {
+		assertEquals( JavaUtilTest.class.getName(), JavaUtil.getCallingClassName() );
+	}
+
+	public void testGetCallingClassNameWithLevel() {
+		assertEquals( Thread.class.getName(), JavaUtil.getCallingClassName( 0 ) );
+		assertEquals( JavaUtil.class.getName(), JavaUtil.getCallingClassName( 1 ) );
+	}
+
 	public void testGetClassNameWithString() {
 		assertEquals( "Object", JavaUtil.getClassName( "java.lang.Object" ) );
 	}

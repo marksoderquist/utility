@@ -14,6 +14,14 @@ import java.util.StringTokenizer;
 
 public class JavaUtil {
 
+	public static final String getCallingClassName() {
+		return getCallingClassName( 3 );
+	}
+
+	public static final String getCallingClassName( int level ) {
+		return Thread.currentThread().getStackTrace()[level].getClassName();
+	}
+
 	/**
 	 * Get the simple class name from a full class name.
 	 * 
@@ -24,6 +32,12 @@ public class JavaUtil {
 		return name.substring( name.lastIndexOf( '.' ) + 1 );
 	}
 
+	/**
+	 * Get the simple class name from a full class name.
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public static final String getClassName( Class<?> type ) {
 		return ( getClassName( type.getName() ) );
 	}
