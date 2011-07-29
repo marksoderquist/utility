@@ -3,7 +3,9 @@ package com.parallelsymmetry.escape.utility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -201,23 +203,41 @@ public class Bundles {
 				builder.append( "." );
 				builder.append( TextUtil.toString( parts, "_", 0, count ) );
 				builder.append( ".properties" );
-				input = loader.getResourceAsStream( builder.toString() );
+				try {
+					Enumeration<URL> urls = loader.getResources( builder.toString() );
+					while( urls.hasMoreElements() ) {
+						streams.add( urls.nextElement().openStream() );
+					}
+				} catch( IOException exception ) {
+					// Intentionally ignore exception.
+				}
 			}
-			if( input != null ) streams.add( input );
 		}
 
 		if( input == null ) {
 			StringBuilder builder = new StringBuilder( path );
 			builder.append( ".en.properties" );
-			input = loader.getResourceAsStream( builder.toString() );
-			if( input != null ) streams.add( input );
+			try {
+				Enumeration<URL> urls = loader.getResources( builder.toString() );
+				while( urls.hasMoreElements() ) {
+					streams.add( urls.nextElement().openStream() );
+				}
+			} catch( IOException exception ) {
+				// Intentionally ignore exception.
+			}
 		}
 
 		if( input == null ) {
 			StringBuilder builder = new StringBuilder( path );
 			builder.append( ".properties" );
-			input = loader.getResourceAsStream( builder.toString() );
-			if( input != null ) streams.add( input );
+			try {
+				Enumeration<URL> urls = loader.getResources( builder.toString() );
+				while( urls.hasMoreElements() ) {
+					streams.add( urls.nextElement().openStream() );
+				}
+			} catch( IOException exception ) {
+				// Intentionally ignore exception.
+			}
 		}
 
 		return streams;

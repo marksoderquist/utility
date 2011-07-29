@@ -41,6 +41,11 @@ public class BundlesTest extends TestCase {
 		assertEquals( "Exit_es", Bundles.getString( TEST_BUNDLE, "exit", null, false ) );
 	}
 
+	public void testMultiStreamHandling() {
+		assertEquals( "main", Bundles.getString( "bundles/utility", "source" ) );
+		assertEquals( "test", Bundles.getString( "bundles/utility", "target" ) );
+	}
+
 	public void testClassLoaderHandling() throws Exception {
 		ClassLoader loader1 = new URLClassLoader( new URL[] { new File( "target/test/java/loader1" ).toURI().toURL() }, null );
 		ClassLoader loader2 = new URLClassLoader( new URL[] { new File( "target/test/java/loader2" ).toURI().toURL() }, null );
