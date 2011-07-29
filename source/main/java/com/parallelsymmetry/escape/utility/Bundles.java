@@ -3,7 +3,9 @@ package com.parallelsymmetry.escape.utility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -15,19 +17,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class Bundles {
 
-	//private static final List<ClassLoader> loaders = new CopyOnWriteArrayList<ClassLoader>();
-
 	private static final Map<ClassLoader, LoaderResources> cache = new HashMap<ClassLoader, LoaderResources>();
-
-	//	static {
-	//		register( Bundles.class.getClassLoader() );
-	//	}
-
-	//	public static final void register( ClassLoader loader ) {
-	//		if( loader == null || loaders.contains( loader ) ) return;
-	//		loaders.add( loader );
-	//		clearCache();
-	//	}
 
 	public static final void clearCache() {
 		cache.clear();
@@ -153,10 +143,9 @@ public class Bundles {
 			// Load the bundle if it does not exist.
 			if( bundle == null ) {
 
-				// FIXME There could be multiple copies of the resource.
-				InputStream input = getResourceAsStream( path, locale, loader );
+				List<InputStream> streams = getResourceStreams( path, locale, loader );
 
-				if( input != null ) {
+				for( InputStream input : streams ) {
 					if( bundle == null ) bundle = new MappedResourceBundle();
 					try {
 						bundle.add( new PropertyResourceBundle( new InputStreamReader( input, TextUtil.DEFAULT_ENCODING ) ) );
@@ -200,7 +189,8 @@ public class Bundles {
 		return parts;
 	}
 
-	private static InputStream getResourceAsStream( String path, Locale locale, ClassLoader loader ) {
+	private static List<InputStream> getResourceStreams( String path, Locale locale, ClassLoader loader ) {
+		List<InputStream> streams = new ArrayList<InputStream>();
 		InputStream input = null;
 
 		String[] parts = getLocaleParts( locale );
@@ -213,21 +203,24 @@ public class Bundles {
 				builder.append( ".properties" );
 				input = loader.getResourceAsStream( builder.toString() );
 			}
+			if( input != null ) streams.add( input );
 		}
 
 		if( input == null ) {
 			StringBuilder builder = new StringBuilder( path );
 			builder.append( ".en.properties" );
 			input = loader.getResourceAsStream( builder.toString() );
+			if( input != null ) streams.add( input );
 		}
 
 		if( input == null ) {
 			StringBuilder builder = new StringBuilder( path );
 			builder.append( ".properties" );
 			input = loader.getResourceAsStream( builder.toString() );
+			if( input != null ) streams.add( input );
 		}
 
-		return input;
+		return streams;
 	}
 
 	private static class LoaderResources {
