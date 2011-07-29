@@ -87,7 +87,7 @@ public class Transaction {
 					}
 				}
 
-				boolean oldModified = node.getResource( PREVIOUS_MODIFIED_STATE );
+				boolean oldModified = (Boolean)node.getResource( PREVIOUS_MODIFIED_STATE );
 				boolean newModified = node.isModified();
 				node.putResource( PREVIOUS_MODIFIED_STATE, null );
 
