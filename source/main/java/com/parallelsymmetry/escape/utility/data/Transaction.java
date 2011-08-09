@@ -118,7 +118,7 @@ public class Transaction {
 			}
 		} finally {
 			cleanup();
-			Log.write( Log.TRACE, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
+			Log.write( Log.DEBUG, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
 			commitInProgress = false;
 		}
 	}

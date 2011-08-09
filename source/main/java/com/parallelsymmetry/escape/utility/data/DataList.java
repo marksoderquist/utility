@@ -22,7 +22,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	private Map<DataNode, DataEvent.Type> addRemoveChildren;
 
 	private int modifiedChildCount;
-	
+
 	public DataList() {}
 
 	public DataList( T[] children ) {
@@ -426,9 +426,11 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		protected ActionResult process() {
 			ActionResult result = new ActionResult( this );
 
-			int index = list.children.indexOf( child );
-			list.doRemoveChild( child );
-			result.addEvent( new DataChildEvent( DataEvent.Type.REMOVE, list, index, child ) );
+			if( list != null && list.children != null ) {
+				int index = list.children.indexOf( child );
+				list.doRemoveChild( child );
+				result.addEvent( new DataChildEvent( DataEvent.Type.REMOVE, list, index, child ) );
+			}
 
 			return result;
 		}
