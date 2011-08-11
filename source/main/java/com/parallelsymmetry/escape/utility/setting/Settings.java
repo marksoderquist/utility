@@ -645,14 +645,14 @@ public class Settings {
 	}
 
 	private void fireSettingChangedEvent( SettingEvent event ) {
-//		synchronized( pathListeners ) {
-//			Set<SettingListener> listeners = pathListeners.get( event.getPath() );
-//			if( listeners != null ) {
-//				for( SettingListener listener : root.listeners ) {
-//					listener.settingChanged( event );
-//				}
-//			}
-//		}
+		synchronized( root.pathListeners ) {
+			Set<SettingListener> listeners = root.pathListeners.get( event.getPath() );
+			if( listeners != null ) {
+				for( SettingListener listener : listeners ) {
+					listener.settingChanged( event );
+				}
+			}
+		}
 		
 		for( SettingListener listener : root.listeners ) {
 			listener.settingChanged( event );
