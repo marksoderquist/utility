@@ -2,20 +2,20 @@ package com.parallelsymmetry.escape.utility.setting;
 
 public class SettingEvent {
 
-	private String key;
+	private String path;
 
 	private String oldValue;
 
 	private String newValue;
 
-	public SettingEvent( String key, String oldValue, String newValue ) {
-		this.key = key;
+	public SettingEvent( String path, String oldValue, String newValue ) {
+		this.path = path;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
 
-	public String getKey() {
-		return key;
+	public String getPath() {
+		return path;
 	}
 
 	public String getOldValue() {

@@ -99,13 +99,16 @@ public class Settings {
 	 * The absolute path to this node.
 	 */
 	private String path;
-	
+
 	private Set<SettingListener> listeners;
+
+	private Map<String, Set<SettingListener>> pathListeners;
 
 	public Settings() {
 		providers = new CopyOnWriteArrayList<SettingProvider>();
 		mounts = new ConcurrentHashMap<SettingProvider, String>();
 		listeners = new CopyOnWriteArraySet<SettingListener>();
+		pathListeners = new ConcurrentHashMap<String, Set<SettingListener>>();
 		root = this;
 		path = "/";
 	}
@@ -363,7 +366,7 @@ public class Settings {
 		boolean changed = false;
 		String oldValue = get( path, null );
 		String absolute = getAbsolutePath( path );
-		
+
 		for( SettingProvider provider : root.providers ) {
 			if( provider instanceof WritableSettingProvider ) {
 				String full = getProviderPath( provider, path );
@@ -373,9 +376,9 @@ public class Settings {
 				}
 			}
 		}
-		
+
 		if( changed ) {
-			fireSettingChangedEvent( new SettingEvent( absolute, oldValue, value ));
+			fireSettingChangedEvent( new SettingEvent( absolute, oldValue, value ) );
 			Log.write( Log.DEBUG, "Write setting: ", absolute, " = ", value );
 		}
 	}
@@ -599,13 +602,34 @@ public class Settings {
 			}
 		}
 	}
-	
+
 	public void addSettingListener( SettingListener listener ) {
 		listeners.add( listener );
 	}
-	
+
 	public void removeSettingListener( SettingListener listener ) {
 		listeners.remove( listener );
+	}
+
+	public void addSettingListener( String path, SettingListener listener ) {
+		String full = getAbsolutePath( path );
+		synchronized( pathListeners ) {
+			Set<SettingListener> listeners = pathListeners.get( full );
+			if( listeners == null ) {
+				listeners = new CopyOnWriteArraySet<SettingListener>();
+				pathListeners.put( full, listeners );
+			}
+			listeners.add( listener );
+		}
+	}
+
+	public void removeSettingListener( String path, SettingListener listener ) {
+		String full = getAbsolutePath( path );
+		synchronized( pathListeners ) {
+			Set<SettingListener> listeners = pathListeners.get( full );
+			listeners.remove( listener );
+			if( listeners.size() == 0 ) pathListeners.remove( full );
+		}
 	}
 
 	@Override
@@ -619,8 +643,17 @@ public class Settings {
 		Settings that = (Settings)object;
 		return this.path.equals( that.path );
 	}
-	
+
 	private void fireSettingChangedEvent( SettingEvent event ) {
+//		synchronized( pathListeners ) {
+//			Set<SettingListener> listeners = pathListeners.get( event.getPath() );
+//			if( listeners != null ) {
+//				for( SettingListener listener : root.listeners ) {
+//					listener.settingChanged( event );
+//				}
+//			}
+//		}
+		
 		for( SettingListener listener : root.listeners ) {
 			listener.settingChanged( event );
 		}

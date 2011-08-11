@@ -26,7 +26,7 @@ public class SettingsEventTest extends TestCase {
 	}
 	
 	private void assertEvent( SettingEvent event, String path, String oldValue, String newValue ) {
-		assertEquals( path, event.getKey() );
+		assertEquals( path, event.getPath() );
 		assertEquals( oldValue, event.getOldValue() );
 		assertEquals( newValue, event.getNewValue() );
 	}
