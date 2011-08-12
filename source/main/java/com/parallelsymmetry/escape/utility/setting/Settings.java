@@ -363,9 +363,11 @@ public class Settings {
 	 * @param value
 	 */
 	public void put( String path, String value ) {
-		boolean changed = false;
 		String oldValue = get( path, null );
+		if( TextUtil.areEqual( oldValue, value ) ) return;
+
 		String absolute = getAbsolutePath( path );
+		boolean changed = false;
 
 		for( SettingProvider provider : root.providers ) {
 			if( provider instanceof WritableSettingProvider ) {
@@ -604,20 +606,20 @@ public class Settings {
 	}
 
 	public void addSettingListener( SettingListener listener ) {
-		listeners.add( listener );
+		root.listeners.add( listener );
 	}
 
 	public void removeSettingListener( SettingListener listener ) {
-		listeners.remove( listener );
+		root.listeners.remove( listener );
 	}
 
 	public void addSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		synchronized( pathListeners ) {
-			Set<SettingListener> listeners = pathListeners.get( full );
+		synchronized( root.pathListeners ) {
+			Set<SettingListener> listeners = root.pathListeners.get( full );
 			if( listeners == null ) {
 				listeners = new CopyOnWriteArraySet<SettingListener>();
-				pathListeners.put( full, listeners );
+				root.pathListeners.put( full, listeners );
 			}
 			listeners.add( listener );
 		}
@@ -625,10 +627,10 @@ public class Settings {
 
 	public void removeSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		synchronized( pathListeners ) {
-			Set<SettingListener> listeners = pathListeners.get( full );
+		synchronized( root.pathListeners ) {
+			Set<SettingListener> listeners = root.pathListeners.get( full );
 			listeners.remove( listener );
-			if( listeners.size() == 0 ) pathListeners.remove( full );
+			if( listeners.size() == 0 ) root.pathListeners.remove( full );
 		}
 	}
 
@@ -653,7 +655,7 @@ public class Settings {
 				}
 			}
 		}
-		
+
 		for( SettingListener listener : root.listeners ) {
 			listener.settingChanged( event );
 		}
