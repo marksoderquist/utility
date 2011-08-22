@@ -628,7 +628,6 @@ public class Settings {
 	 */
 	public void addSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		//if( !full.endsWith( "/" ) ) full = full + "/";
 		synchronized( root.listeners ) {
 			Set<SettingListener> listeners = root.listeners.get( full );
 			if( listeners == null ) {
@@ -647,7 +646,6 @@ public class Settings {
 	 */
 	public void removeSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		//if( !full.endsWith( "/" ) ) full = full + "/";
 		synchronized( root.listeners ) {
 			Set<SettingListener> listeners = root.listeners.get( full );
 			listeners.remove( listener );
