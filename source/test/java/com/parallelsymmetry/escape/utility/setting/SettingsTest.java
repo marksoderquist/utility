@@ -485,8 +485,8 @@ public class SettingsTest extends TestCase {
 		assertEquals( null, Settings.getParentPath( "/" ) );
 		assertEquals( "/", Settings.getParentPath( "/path/" ) );
 		assertEquals( "/", Settings.getParentPath( "/element" ) );
-		assertEquals( "/path/to/", Settings.getParentPath( "/path/to/path/" ) );
-		assertEquals( "/path/to/", Settings.getParentPath( "/path/to/setting" ) );
+		assertEquals( "/path/to", Settings.getParentPath( "/path/to/path/" ) );
+		assertEquals( "/path/to", Settings.getParentPath( "/path/to/setting" ) );
 	}
 
 	public void testGetSettingKey() {

@@ -620,8 +620,7 @@ public class Settings {
 	}
 
 	/**
-	 * Add a SettingListener for changes to a specific path. To listen for changes
-	 * to all settings in a specific node the path must end with a slash.
+	 * Add a SettingListener for changes to a specific path.
 	 * 
 	 * @param path
 	 * @param listener
@@ -667,8 +666,7 @@ public class Settings {
 
 	/**
 	 * Get the parent path from a path. Path may, but is not required to, include
-	 * the trailing slash. The parent path is always returned with the trailing
-	 * slash. Examples:
+	 * the trailing slash. Examples:
 	 * <p>
 	 * <table>
 	 * <tr>
@@ -677,11 +675,11 @@ public class Settings {
 	 * </tr>
 	 * <tr>
 	 * <td>/path/to/setting</td>
-	 * <td>/path/to/</td>
+	 * <td>/path/to</td>
 	 * </tr>
 	 * <tr>
 	 * <td>/path/to/path/</td>
-	 * <td>/path/to/</td>
+	 * <td>/path/to</td>
 	 * </tr>
 	 * <tr>
 	 * <td>/element</td>
@@ -691,6 +689,10 @@ public class Settings {
 	 * <td>/path/</td>
 	 * <td>/</td>
 	 * </tr>
+	 * <tr>
+	 * <td>/</td>
+	 * <td>null</td>
+	 * </tr>
 	 * </table>
 	 * 
 	 * @param path
@@ -699,9 +701,10 @@ public class Settings {
 	static String getParentPath( String path ) {
 		if( path == null ) return null;
 		path = path.trim();
+		if( "/".equals( path ) ) return null;
 		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
-		if( "".equals( path ) ) return null;
-		return path.substring( 0, path.lastIndexOf( '/' ) + 1 );
+		path = path.substring( 0, path.lastIndexOf( '/' ) );
+		return "".equals( path ) ? "/" : path;
 	}
 
 	/**

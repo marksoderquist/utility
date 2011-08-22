@@ -18,7 +18,7 @@ public class SettingsEventTest extends TestCase {
 
 		settings.addProvider( provider );
 		settings.addSettingListener( "/", rootWatcher );
-		settings.addSettingListener( "/test/value/", nodeWatcher );
+		settings.addSettingListener( "/test/value", nodeWatcher );
 		settings.addSettingListener( "/test/value/b", valueWatcher );
 
 		settings.put( "/test/a", "1" );
