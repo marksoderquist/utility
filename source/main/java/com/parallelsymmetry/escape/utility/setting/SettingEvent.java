@@ -6,7 +6,7 @@ public class SettingEvent {
 	
 	private String nodePath;
 	
-	private String entryKey;
+	private String key;
 
 	private String oldValue;
 
@@ -18,19 +18,19 @@ public class SettingEvent {
 		this.newValue = newValue;
 		
 		this.nodePath = Settings.getParentPath( path );
-		this.entryKey = Settings.getSettingKey( path );
+		this.key = Settings.getSettingKey( path );
+	}
+	
+	public String getFullPath() {
+		return fullPath;
 	}
 	
 	public String getNodePath() {
 		return nodePath;
 	}
 
-	public String getFullPath() {
-		return fullPath;
-	}
-	
-	public String getEntryKey() {
-		return entryKey;
+	public String getKey() {
+		return key;
 	}
 
 	public String getOldValue() {
