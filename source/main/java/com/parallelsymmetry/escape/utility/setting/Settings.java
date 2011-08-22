@@ -100,15 +100,12 @@ public class Settings {
 	 */
 	private String path;
 
-	private Set<SettingListener> listeners;
-
-	private Map<String, Set<SettingListener>> pathListeners;
+	private Map<String, Set<SettingListener>> listeners;
 
 	public Settings() {
 		providers = new CopyOnWriteArrayList<SettingProvider>();
 		mounts = new ConcurrentHashMap<SettingProvider, String>();
-		listeners = new CopyOnWriteArraySet<SettingListener>();
-		pathListeners = new ConcurrentHashMap<String, Set<SettingListener>>();
+		listeners = new ConcurrentHashMap<String, Set<SettingListener>>();
 		root = this;
 		path = "/";
 	}
@@ -605,21 +602,26 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Adds a SettingListener for changes to this node. This is the same as
+	 * calling settings.addSettingListener( settings.getPath(), listener ).
+	 */
 	public void addSettingListener( SettingListener listener ) {
-		root.listeners.add( listener );
+		addSettingListener( path, listener );
 	}
 
 	public void removeSettingListener( SettingListener listener ) {
-		root.listeners.remove( listener );
+		removeSettingListener( path, listener );
 	}
 
 	public void addSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		synchronized( root.pathListeners ) {
-			Set<SettingListener> listeners = root.pathListeners.get( full );
+		if( !full.endsWith( "/" ) ) full = full + "/";
+		synchronized( root.listeners ) {
+			Set<SettingListener> listeners = root.listeners.get( full );
 			if( listeners == null ) {
 				listeners = new CopyOnWriteArraySet<SettingListener>();
-				root.pathListeners.put( full, listeners );
+				root.listeners.put( full, listeners );
 			}
 			listeners.add( listener );
 		}
@@ -627,10 +629,11 @@ public class Settings {
 
 	public void removeSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		synchronized( root.pathListeners ) {
-			Set<SettingListener> listeners = root.pathListeners.get( full );
+		if( !full.endsWith( "/" ) ) full = full + "/";
+		synchronized( root.listeners ) {
+			Set<SettingListener> listeners = root.listeners.get( full );
 			listeners.remove( listener );
-			if( listeners.size() == 0 ) root.pathListeners.remove( full );
+			if( listeners.size() == 0 ) root.listeners.remove( full );
 		}
 	}
 
@@ -646,18 +649,69 @@ public class Settings {
 		return this.path.equals( that.path );
 	}
 
+	/**
+	 * Get the parent path from a path. Path may, but is not required to, include
+	 * the trailing slash. The parent path is always returned with the trailing
+	 * slash. Examples:
+	 * <p>
+	 * <table>
+	 * <tr>
+	 * <th>Path</th>
+	 * <th>Parent Path</th>
+	 * </tr>
+	 * <tr>
+	 * <td>/path/to/setting</td>
+	 * <td>/path/to/</td>
+	 * </tr>
+	 * <tr>
+	 * <td>/path/to/path/</td>
+	 * <td>/path/to/</td>
+	 * </tr>
+	 * <tr>
+	 * <td>/element</td>
+	 * <td>/</td>
+	 * </tr>
+	 * <tr>
+	 * <td>/path/</td>
+	 * <td>/</td>
+	 * </tr>
+	 * </table>
+	 * 
+	 * @param path
+	 * @return
+	 */
+	static String getParentPath( String path ) {
+		if( path == null ) return null;
+		path = path.trim();
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+		if( "".equals( path ) ) return null;
+		return path.substring( 0, path.lastIndexOf( '/' ) + 1 );
+	}
+
+	/**
+	 * Get the setting key from a path. If the path ends with a slash, the key is
+	 * null.
+	 */
+	static String getSettingKey( String path ) {
+		if( path == null ) return null;
+		path = path.trim();
+		if( path.endsWith( "/" ) ) return null;
+		return path.substring( path.lastIndexOf( '/' ) + 1 );
+	}
+
 	private void fireSettingChangedEvent( SettingEvent event ) {
-		synchronized( root.pathListeners ) {
-			Set<SettingListener> listeners = root.pathListeners.get( event.getPath() );
+		// Dispatch the event to any listeners matching a parent node path.
+
+		String eventPath = event.getNodePath();
+
+		while( eventPath != null ) {
+			Set<SettingListener> listeners = root.listeners.get( eventPath );
 			if( listeners != null ) {
 				for( SettingListener listener : listeners ) {
 					listener.settingChanged( event );
 				}
 			}
-		}
-
-		for( SettingListener listener : root.listeners ) {
-			listener.settingChanged( event );
+			eventPath = getParentPath( eventPath );
 		}
 	}
 

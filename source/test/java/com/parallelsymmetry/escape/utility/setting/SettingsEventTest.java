@@ -12,21 +12,31 @@ public class SettingsEventTest extends TestCase {
 	public void testSettingChanged() {
 		Settings settings = new Settings();
 		MockWritableSettingProvider provider = new MockWritableSettingProvider( "changed.events" );
-		SettingWatcher watcher = new SettingWatcher();
+		SettingWatcher rootWatcher = new SettingWatcher();
+		SettingWatcher nodeWatcher = new SettingWatcher();
 
 		settings.addProvider( provider );
-		settings.addSettingListener( watcher );
+		settings.addSettingListener( "/", rootWatcher );
+		settings.addSettingListener( "/test/value", nodeWatcher );
 
-		settings.put( "/test/value/a", "1" );
-		settings.put( "/test/value/a", null );
+		settings.put( "/test/a", "1" );
+		settings.put( "/test/a", null );
+		settings.put( "/test/value/b", "2" );
+		settings.put( "/test/value/b", null );
+
+		assertEquals( 4, rootWatcher.events.size() );
+		assertEvent( rootWatcher.events.get( 0 ), "/test/a", null, "1" );
+		assertEvent( rootWatcher.events.get( 1 ), "/test/a", "1", null );
+		assertEvent( rootWatcher.events.get( 2 ), "/test/value/b", null, "2" );
+		assertEvent( rootWatcher.events.get( 3 ), "/test/value/b", "2", null );
 		
-		assertEvent( watcher.events.get(0), "/test/value/a", null, "1" );
-		assertEvent( watcher.events.get(1), "/test/value/a", "1", null );
-		assertEquals( 2, watcher.events.size() );
+		assertEquals( 2, nodeWatcher.events.size() );
+		assertEvent( nodeWatcher.events.get( 0 ), "/test/value/b", null, "2" );
+		assertEvent( nodeWatcher.events.get( 1 ), "/test/value/b", "2", null );
 	}
-	
+
 	private void assertEvent( SettingEvent event, String path, String oldValue, String newValue ) {
-		assertEquals( path, event.getPath() );
+		assertEquals( path, event.getFullPath() );
 		assertEquals( oldValue, event.getOldValue() );
 		assertEquals( newValue, event.getNewValue() );
 	}
