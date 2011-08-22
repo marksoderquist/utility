@@ -14,10 +14,12 @@ public class SettingsEventTest extends TestCase {
 		MockWritableSettingProvider provider = new MockWritableSettingProvider( "changed.events" );
 		SettingWatcher rootWatcher = new SettingWatcher();
 		SettingWatcher nodeWatcher = new SettingWatcher();
+		SettingWatcher valueWatcher = new SettingWatcher();
 
 		settings.addProvider( provider );
 		settings.addSettingListener( "/", rootWatcher );
-		settings.addSettingListener( "/test/value", nodeWatcher );
+		settings.addSettingListener( "/test/value/", nodeWatcher );
+		settings.addSettingListener( "/test/value/b", valueWatcher );
 
 		settings.put( "/test/a", "1" );
 		settings.put( "/test/a", null );
@@ -33,6 +35,10 @@ public class SettingsEventTest extends TestCase {
 		assertEquals( 2, nodeWatcher.events.size() );
 		assertEvent( nodeWatcher.events.get( 0 ), "/test/value/b", null, "2" );
 		assertEvent( nodeWatcher.events.get( 1 ), "/test/value/b", "2", null );
+		
+		assertEquals( 2, valueWatcher.events.size() );
+		assertEvent( valueWatcher.events.get( 0 ), "/test/value/b", null, "2" );
+		assertEvent( valueWatcher.events.get( 1 ), "/test/value/b", "2", null );
 	}
 
 	private void assertEvent( SettingEvent event, String path, String oldValue, String newValue ) {

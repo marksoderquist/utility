@@ -603,20 +603,32 @@ public class Settings {
 	}
 
 	/**
-	 * Adds a SettingListener for changes to this node. This is the same as
-	 * calling settings.addSettingListener( settings.getPath(), listener ).
+	 * Add a SettingListener for changes to this node. This is the same as calling
+	 * settings.addSettingListener( settings.getPath() + "/", listener ).
 	 */
 	public void addSettingListener( SettingListener listener ) {
-		addSettingListener( path, listener );
+		addSettingListener( path + "/", listener );
 	}
 
+	/**
+	 * Remove a SettingListener for changes to this node. This is the same as
+	 * calling settings.removeSettingListener( settings.getPath() + "/", listener
+	 * ).
+	 */
 	public void removeSettingListener( SettingListener listener ) {
-		removeSettingListener( path, listener );
+		removeSettingListener( path + "/", listener );
 	}
 
+	/**
+	 * Add a SettingListener for changes to a specific path. To listen for changes
+	 * to all settings in a specific node the path must end with a slash.
+	 * 
+	 * @param path
+	 * @param listener
+	 */
 	public void addSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		if( !full.endsWith( "/" ) ) full = full + "/";
+		//if( !full.endsWith( "/" ) ) full = full + "/";
 		synchronized( root.listeners ) {
 			Set<SettingListener> listeners = root.listeners.get( full );
 			if( listeners == null ) {
@@ -627,9 +639,15 @@ public class Settings {
 		}
 	}
 
+	/**
+	 * Remove a SettingListener for changes to a specific path.
+	 * 
+	 * @param path
+	 * @param listener
+	 */
 	public void removeSettingListener( String path, SettingListener listener ) {
 		String full = getAbsolutePath( path );
-		if( !full.endsWith( "/" ) ) full = full + "/";
+		//if( !full.endsWith( "/" ) ) full = full + "/";
 		synchronized( root.listeners ) {
 			Set<SettingListener> listeners = root.listeners.get( full );
 			listeners.remove( listener );
@@ -702,7 +720,7 @@ public class Settings {
 	private void fireSettingChangedEvent( SettingEvent event ) {
 		// Dispatch the event to any listeners matching a parent node path.
 
-		String eventPath = event.getNodePath();
+		String eventPath = event.getFullPath();
 
 		while( eventPath != null ) {
 			Set<SettingListener> listeners = root.listeners.get( eventPath );
