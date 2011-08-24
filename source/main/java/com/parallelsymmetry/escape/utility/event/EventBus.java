@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.parallelsymmetry.escape.utility.ThreadUtil;
 import com.parallelsymmetry.escape.utility.agent.Worker;
 import com.parallelsymmetry.escape.utility.log.Log;
 
@@ -71,7 +70,7 @@ public final class EventBus extends Worker {
 
 	public void submit( Event event, String queueName ) {
 		event.setEventBus( this );
-		event.setCaller( new Throwable() );
+		event.setCallStackThrowable( new Throwable() );
 
 		synchronized( eventlock ) {
 			Queue<Event> queue = queues.get( queueName );
@@ -187,7 +186,8 @@ public final class EventBus extends Worker {
 				try {
 					listener.eventOccurred( event );
 				} catch( Throwable throwable ) {
-					Log.write( ThreadUtil.appendStackTrace( throwable, event.getCaller() ) );
+					event.getCallStackThrowable().initCause( throwable );
+					Log.write( event.getCallStackThrowable() );
 				}
 			}
 

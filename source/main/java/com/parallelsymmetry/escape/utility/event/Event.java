@@ -22,7 +22,7 @@ public class Event implements Comparable<Event> {
 
 	private Object source;
 
-	private Throwable caller;
+	private Throwable callStackThrowable;
 
 	private int priority = DEFAULT_PRIORITY;
 
@@ -36,10 +36,6 @@ public class Event implements Comparable<Event> {
 
 	public Object getSource() {
 		return this.source;
-	}
-
-	public Throwable getCaller() {
-		return caller;
 	}
 
 	public int getPriority() {
@@ -96,8 +92,12 @@ public class Event implements Comparable<Event> {
 		return getClass().getName();
 	}
 
-	void setCaller( Throwable caller ) {
-		this.caller = caller;
+	Throwable getCallStackThrowable() {
+		return callStackThrowable;
+	}
+
+	void setCallStackThrowable( Throwable caller ) {
+		this.callStackThrowable = caller;
 	}
 
 	void setEventBus( EventBus bus ) {
