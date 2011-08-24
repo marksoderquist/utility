@@ -12,6 +12,8 @@ import com.parallelsymmetry.escape.utility.TripLock;
 import com.parallelsymmetry.escape.utility.log.Log;
 
 public class ServerAgent extends PipeAgent {
+	
+	private String name;
 
 	private String host;
 
@@ -49,6 +51,7 @@ public class ServerAgent extends PipeAgent {
 
 	public ServerAgent( String name, String host, int port ) {
 		super( name );
+		this.name = name;
 		this.host = host;
 		this.port = port;
 	}
@@ -74,7 +77,7 @@ public class ServerAgent extends PipeAgent {
 		server.setReuseAddress( true );
 		Log.write( Log.DEBUG, getName() + ": Binding " + address + "..." );
 		server.bind( address );
-		setName( getName() + ": " + server.getLocalPort() );
+		setName( name + "[" + server.getLocalPort() + "]" );
 		Log.write( Log.DEBUG, getName() + ": Starting on " + address + "..." );
 		runner = new ServerRunner();
 		startlock.reset();
