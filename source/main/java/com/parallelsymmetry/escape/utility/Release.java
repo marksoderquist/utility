@@ -50,20 +50,13 @@ public class Release implements Comparable<Release> {
 	public String toHumanString() {
 		return format( version.toHumanString() );
 	}
-
-	private String format( String version ) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-		dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-
-		StringBuffer buffer = new StringBuffer();
-
-		buffer.append( version );
-		if( date != null ) {
-			buffer.append( "  " );
-			buffer.append( dateFormat.format( date ) );
-		}
-
-		return buffer.toString();
+	
+	@Override
+	public boolean equals( Object object ) {
+		if( !(object instanceof Release ) ) return false;
+		
+		Release that = (Release)object;
+		return this.compareTo( that ) == 0;
 	}
 
 	@Override
@@ -75,6 +68,21 @@ public class Release implements Comparable<Release> {
 		if( this.date == null && that.date != null ) return -1;
 		if( this.date != null && that.date == null ) return 1;
 		return this.date.compareTo( that.date );
+	}
+
+	private String format( String version ) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+		dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+	
+		StringBuffer buffer = new StringBuffer();
+	
+		buffer.append( version );
+		if( date != null ) {
+			buffer.append( "  " );
+			buffer.append( dateFormat.format( date ) );
+		}
+	
+		return buffer.toString();
 	}
 
 }

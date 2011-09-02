@@ -28,6 +28,16 @@ public class ReleaseTest extends TestCase {
 		assertEquals( "1.2.3 Update 04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString() );
 	}
 
+	public void testEquals() {
+		assertTrue( new Release( versionString ).equals( new Release( versionString ) ) );
+		assertFalse( new Release( "1.2.3 Update 04" ).equals( new Release( versionString ) ) );
+
+		assertTrue( new Release( new Version( "1" ) ).equals( new Release( "1" ) ) );
+		assertFalse( new Release( new Version( "1" ) ).equals( new Release( "2" ) ) );
+		assertTrue( new Release( new Version( "1" ), new Date( 0 ) ).equals( new Release( "1", new Date( 0 ) ) ) );
+		assertFalse( new Release( new Version( "1" ), new Date( 0 ) ).equals( new Release( "1", new Date( 1 ) ) ) );
+	}
+
 	public void testCompareTo() {
 		assertTrue( new Release( "1" ).compareTo( new Release( "1" ) ) == 0 );
 		assertTrue( new Release( "1" ).compareTo( new Release( "2" ) ) < 0 );
