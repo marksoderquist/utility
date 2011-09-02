@@ -3,6 +3,7 @@ package com.parallelsymmetry.escape.utility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,10 @@ public class Descriptor {
 	public Descriptor( String source, Node node ) {
 		this.source = source;
 		this.node = node;
+	}
+
+	public Descriptor( URL url ) throws IOException {
+		this( url.openStream() );
 	}
 
 	public Descriptor( String uri ) throws IOException {
