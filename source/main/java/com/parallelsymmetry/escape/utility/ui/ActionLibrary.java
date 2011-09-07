@@ -32,9 +32,8 @@ public class ActionLibrary {
 		actions = new ConcurrentHashMap<String, XAction>();
 		actionsByAccelerator = new ConcurrentHashMap<String, XAction>();
 
-		ActionAcceleratorWatcher actionAcceleratorWatcher = new ActionAcceleratorWatcher( this );
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		manager.addKeyEventPostProcessor( actionAcceleratorWatcher );
+		manager.addKeyEventPostProcessor( new ActionAcceleratorWatcher( this ) );
 	}
 
 	public XAction getAction( String key ) {
