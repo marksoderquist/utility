@@ -50,6 +50,8 @@ public class ActionAcceleratorWatcher implements KeyEventPostProcessor {
 				reset();
 				return false;
 			}
+			
+			Log.write( Log.WARN, "Event: " + event );
 
 			// Get the keystroke string representation.
 			String keystroke = XAction.encodeKeyEvent( event );
