@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility.ui;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -18,6 +19,12 @@ public abstract class XActionHandler implements ActionListener {
 		this.enabled = enabled;
 		actions = new CopyOnWriteArraySet<XAction>();
 	}
+
+	/*
+	 * This is simply here to help the source completion feature of IDEs.
+	 */
+	@Override
+	public abstract void actionPerformed( ActionEvent event );
 
 	public boolean isEnabled() {
 		return this.enabled;
