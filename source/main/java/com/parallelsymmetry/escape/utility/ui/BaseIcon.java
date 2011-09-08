@@ -8,6 +8,60 @@ import java.io.File;
 
 import javax.swing.Icon;
 
+/**
+ * Base icon implementation intended to provided convenience for generating high
+ * quality icons.
+ * <p>
+ * The constants are based on a 16x16 grid so that it is easy to generate icons
+ * that can be accurately scaled down to 16x16 pixels. There are two commonly
+ * uses sets of constants, the grid constants and the cell constants. The grid
+ * constants fall on the grid lines while the cell constants fall in the center
+ * of a 16x16 cell.
+ * <p>
+ * The following graph shows the locations of each constant. While the grid
+ * constants are only shown on the Y-axis and the cell constants only on the
+ * X-axis they are valid for both axes.
+ * 
+ * <pre>
+ *     Z   Z   Z   Z   Z   Z   Z   Z   Z   Z   Z   Z   Z   Z   Z   Z
+ *     A   B   C   D   E   F   G   H   I   J   K   L   M   N   O   P
+ * A +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * I +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * E +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * J +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * D +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * K +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * F +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * L +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * C +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * M +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * G +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * N +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * D +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * O +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * H +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * P +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ *   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
+ * B +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+ * </pre>
+ * 
+ * @author SoderquistMV
+ */
 public abstract class BaseIcon extends BaseImage implements Icon {
 
 	public static final int DEFAULT_ICON_SIZE = 256;
