@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadUtil {
 
@@ -13,6 +14,20 @@ public class ThreadUtil {
 	public static final void pause( long duration ) {
 		try {
 			Thread.sleep( duration );
+		} catch( InterruptedException exception ) {
+			// Intentionally ignore exception.
+		}
+	}
+
+	/**
+	 * Pause a thread for a specific amount of time with the given unit. If an
+	 * InterruptedException occurs the method returns immediately.
+	 * 
+	 * @param duration
+	 */
+	public static final void pause( long duration, TimeUnit unit ) {
+		try {
+			unit.sleep( duration );
 		} catch( InterruptedException exception ) {
 			// Intentionally ignore exception.
 		}
