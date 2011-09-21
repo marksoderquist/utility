@@ -15,7 +15,7 @@ public class TaskTest extends TestCase {
 	 * the computer can't complete the task quickly enough to pass the test. A
 	 * good time is between 10-50 milliseconds.
 	 */
-	private int delay = 10;
+	private int delay = 20;
 
 	@Override
 	public void setUp() throws Exception {
