@@ -12,7 +12,7 @@ import com.parallelsymmetry.escape.utility.setting.SettingProvider;
 
 public class MockSettingProvider implements SettingProvider {
 
-	protected Map<String, String> values = new ConcurrentHashMap<String, String>();
+	public final Map<String, String> values = new ConcurrentHashMap<String, String>();
 
 	private String name;
 	
@@ -58,6 +58,10 @@ public class MockSettingProvider implements SettingProvider {
 		}
 
 		return names;
+	}
+	
+	public int getValueCount() {
+		return values.size();
 	}
 
 	public void set( String key, String value ) {
