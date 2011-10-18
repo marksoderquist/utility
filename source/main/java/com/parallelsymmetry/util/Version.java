@@ -81,11 +81,12 @@ public class Version implements Comparable<Version> {
 		}
 
 		if( !TextUtil.isEmpty( timestamp ) ) {
-			try {
-				version.date = PARSE_FORMAT.parse( timestamp );
-			} catch( Exception exception ) {
-				//throw new RuntimeException( "Exception parsing version timestamp: " + timestamp, exception );
-				Log.write( Log.WARN, exception );
+			if( !UNKNOWN.equals( timestamp ) ) {
+				try {
+					version.date = PARSE_FORMAT.parse( timestamp );
+				} catch( Exception exception ) {
+					Log.write( Log.WARN, exception.getMessage() );
+				}
 			}
 		}
 
