@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.parallelsymmetry.log.Log;
+
 public class Version implements Comparable<Version> {
 
 	public static final DateFormat PARSE_FORMAT = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
@@ -82,7 +84,8 @@ public class Version implements Comparable<Version> {
 			try {
 				version.date = PARSE_FORMAT.parse( timestamp );
 			} catch( Exception exception ) {
-				throw new RuntimeException( "Exception parsing version timestamp: " + timestamp, exception );
+				//throw new RuntimeException( "Exception parsing version timestamp: " + timestamp, exception );
+				Log.write( Log.WARN, exception );
 			}
 		}
 
@@ -180,6 +183,16 @@ public class Version implements Comparable<Version> {
 				}
 			}
 		}
+
+		return buffer.toString();
+	}
+
+	public final String getFullCodedVersion() {
+		StringBuffer buffer = new StringBuffer();
+
+		buffer.append( getCodedVersion() );
+		buffer.append( " " );
+		buffer.append( date == null ? UNKNOWN : PARSE_FORMAT.format( date ) );
 
 		return buffer.toString();
 	}

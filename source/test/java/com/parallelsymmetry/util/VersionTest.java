@@ -192,6 +192,16 @@ public class VersionTest extends TestCase {
 	}
 
 	@Test
+	public void testGetFullCodedVersion() throws Exception {
+		assertEquals( Version.UNKNOWN, Version.parse( null ).getCodedVersion() );
+
+		String code = "1-2-SNAPSHOT-3";
+		String time = "2000-01-01 00:00:00 -0700";
+		assertEquals( code + " " + time, Version.parse( code, time ).getFullCodedVersion() );
+		assertEquals( code + " Unknown", Version.parse( code, null ).getFullCodedVersion() );
+	}
+
+	@Test
 	public void testGetDateString() throws Exception {
 		DateFormat format = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
 		assertEquals( "Unknown", Version.parse( "1-2-U-3", null ).getDateString() );
