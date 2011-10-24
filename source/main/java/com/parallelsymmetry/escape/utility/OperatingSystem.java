@@ -116,6 +116,7 @@ public class OperatingSystem {
 	 * 
 	 * @return The total system memory in bytes or -1 if it cannot be determined.
 	 */
+	@SuppressWarnings( "restriction" )
 	public static final long getTotalSystemMemory() {
 		long memory = -1;
 		try {
