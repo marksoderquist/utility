@@ -1,7 +1,6 @@
 package com.parallelsymmetry.escape.utility.agent;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -33,8 +32,8 @@ public class SocketAgent extends PipeAgent {
 
 	@Override
 	protected void connect() throws IOException {
-		Log.write( Log.DEBUG, getName() + ": Connecting..." );
-		String server = host == null ? InetAddress.getLocalHost().getHostName() : host;
+		String server = host == null ? "localhost" : host;
+		Log.write( Log.DEBUG, getName() + ": Connecting to " + host + ":" + port + "..." );
 		socket = new Socket();
 		socket.connect( new InetSocketAddress( server, port ), TIMEOUT );
 		setRealInputStream( socket.getInputStream() );
