@@ -498,7 +498,7 @@ public class SettingsTest extends TestCase {
 		int pCount = settings.getProviderCount();
 		for( int pIndex = 0; pIndex < pCount; pIndex++ ) {
 			SettingProvider provider = settings.getProvider( pIndex );
-			( (MockSettingProvider)provider ).show();
+			( (MockSettingProvider)provider ).print();
 			System.out.println();
 		}
 	}

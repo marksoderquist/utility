@@ -72,7 +72,7 @@ public class MockSettingProvider implements SettingProvider {
 		}
 	}
 
-	public void show() {
+	public void print() {
 		System.out.println( (name == null ? "MockSettingProvider" : name ) + " data: " );
 		List<String> keys = new ArrayList<String>( values.keySet() );
 		Collections.sort( keys );
