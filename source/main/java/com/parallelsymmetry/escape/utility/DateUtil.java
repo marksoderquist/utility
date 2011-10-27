@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class DateUtil {
+	
+	public static final Date INCEPTION_DATE = parse("2010-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
 
 	/**
 	 * Convenience method to get the current year for the UTC time zone.
