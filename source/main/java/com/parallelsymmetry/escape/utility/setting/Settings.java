@@ -103,11 +103,20 @@ public class Settings {
 	private Map<String, Set<SettingListener>> listeners;
 
 	public Settings() {
+		this( null );
+	}
+
+	public Settings( SettingProvider defaultProvider ) {
+		this( defaultProvider, null );
+	}
+
+	public Settings( SettingProvider defaultProvider, String mount ) {
 		providers = new CopyOnWriteArrayList<SettingProvider>();
 		mounts = new ConcurrentHashMap<SettingProvider, String>();
 		listeners = new ConcurrentHashMap<String, Set<SettingListener>>();
 		root = this;
 		path = "/";
+		if( defaultProvider != null ) setDefaultProvider( defaultProvider, mount );
 	}
 
 	private Settings( Settings root, String path ) {
