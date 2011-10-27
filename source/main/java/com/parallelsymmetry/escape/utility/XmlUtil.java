@@ -24,6 +24,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -61,27 +62,27 @@ public class XmlUtil {
 		return document;
 	}
 
-	public static final void save( Document document, File file ) throws IOException {
+	public static final void save( Node node, File file ) throws IOException {
 		Writer writer = new OutputStreamWriter( new BufferedOutputStream( new FileOutputStream( file ) ), "UTF-8" );
 		try {
-			save( document, writer );
+			save( node, writer );
 		} finally {
 			if( writer != null ) writer.close();
 		}
 	}
 
-	public static final void save( Document document, Writer output ) throws IOException {
-		save( document, output, DEFAULT_INDENT );
+	public static final void save( Node node, Writer output ) throws IOException {
+		save( node, output, DEFAULT_INDENT );
 	}
 
-	public static final void save( Document document, Writer output, int indentAmount ) throws IOException {
+	public static final void save( Node node, Writer output, int indentAmount ) throws IOException {
 		Transformer transformer;
 		TransformerFactory factory = TransformerFactory.newInstance();
 		try {
 			transformer = factory.newTransformer();
 			transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
 			transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", String.valueOf( indentAmount ) );
-			transformer.transform( new DOMSource( document ), new StreamResult( output ) );
+			transformer.transform( new DOMSource( node ), new StreamResult( output ) );
 		} catch( TransformerException exception ) {
 			throw new IOException( exception );
 		}
@@ -94,19 +95,19 @@ public class XmlUtil {
 	public static final void format( InputStream input, OutputStream output, int indent ) throws IOException {
 		format( new StreamSource( input ), new StreamResult( output ), indent );
 	}
-	
+
 	public static final void format( Reader reader, Writer writer ) throws IOException {
 		format( reader, writer, DEFAULT_INDENT );
 	}
-	
+
 	public static final void format( Reader reader, Writer writer, int indent ) throws IOException {
 		format( new StreamSource( reader ), new StreamResult( writer ), indent );
 	}
-	
-	public static final String toString( Document document ) {
+
+	public static final String toString( Node node ) {
 		StringWriter output = new StringWriter();
 		try {
-			XmlUtil.save( document, output );
+			XmlUtil.save( node, output );
 		} catch( IOException exception ) {
 			Log.write( exception );
 		}
