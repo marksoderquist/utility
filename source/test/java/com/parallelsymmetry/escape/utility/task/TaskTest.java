@@ -15,7 +15,7 @@ public class TaskTest extends TestCase {
 	 * the computer can't complete the task quickly enough to pass the test. A
 	 * good time is between 10-50 milliseconds.
 	 */
-	private int delay = 20;
+	private int delay = 50;
 
 	@Override
 	public void setUp() throws Exception {
@@ -36,7 +36,7 @@ public class TaskTest extends TestCase {
 		assertEquals( Task.State.RUNNING, task.getState() );
 		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 		ThreadUtil.pause( 2 * delay );
-		assertEquals( Task.State.RUNNING, task.getState() );
+		assertEquals(  Task.State.RUNNING, task.getState() );
 		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 		ThreadUtil.pause( 2 * delay );
 		assertEquals( Task.State.DONE, task.getState() );
