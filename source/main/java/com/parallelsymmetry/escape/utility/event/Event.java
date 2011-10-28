@@ -22,6 +22,8 @@ public class Event implements Comparable<Event> {
 
 	private Object source;
 
+	private Object scope;
+
 	private Throwable callStackThrowable;
 
 	private int priority = DEFAULT_PRIORITY;
@@ -31,11 +33,33 @@ public class Event implements Comparable<Event> {
 	private transient boolean processed;
 
 	public Event( Object source ) {
+		this( source, null, DEFAULT_PRIORITY );
+	}
+
+	public Event( Object source, Object scope ) {
+		this( source, scope, DEFAULT_PRIORITY );
+	}
+
+	public Event( Object source, int priority ) {
+		this( source, null, priority );
+	}
+
+	public Event( Object source, Object scope, int priority ) {
 		this.source = source;
+		this.scope = scope;
+		this.priority = priority;
 	}
 
 	public Object getSource() {
-		return this.source;
+		return source;
+	}
+
+	public Object getScope() {
+		return scope;
+	}
+	
+	public void setScope( Object scope ) {
+		this.scope = scope;
 	}
 
 	public int getPriority() {
