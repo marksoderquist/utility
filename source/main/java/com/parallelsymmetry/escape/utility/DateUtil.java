@@ -8,7 +8,9 @@ import java.util.TimeZone;
 
 public class DateUtil {
 	
-	public static final Date INCEPTION_DATE = parse("2010-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	
+	public static final Date INCEPTION_DATE = parse("2010-01-01 00:00:00", DEFAULT_DATE_FORMAT);
 
 	/**
 	 * Convenience method to get the current year for the UTC time zone.

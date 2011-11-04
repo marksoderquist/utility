@@ -140,7 +140,7 @@ public class OperatingSystem {
 	 * @param product The product name to include in the path.
 	 * @return
 	 */
-	public static final File getProgramDataFolder() {
+	public static final File getUserProgramDataFolder() {
 		File folder = null;
 		switch( family ) {
 			case WINDOWS: {
@@ -162,15 +162,26 @@ public class OperatingSystem {
 		return null;
 	}
 
-	public static final File getProgramDataFolder( String identifier, String name ) {
+	/**
+	 * Get the program data folder for the operating system using the program
+	 * identifier and/or name. The program identifier is normally all lower case
+	 * with no spaces. The name can be mixed case with spaces. Windows systems use
+	 * the name instead of the identifier to generate the program data folder
+	 * path.
+	 * 
+	 * @param identifier
+	 * @param name
+	 * @return
+	 */
+	public static final File getUserProgramDataFolder( String identifier, String name ) {
 		File folder = null;
 		switch( family ) {
 			case WINDOWS: {
-				folder = new File( System.getenv( "appdata" ), name );
+				folder = new File( getUserProgramDataFolder(), name );
 				break;
 			}
 			default: {
-				folder = new File( System.getProperty( "user.home" ), "." + identifier );
+				folder = new File( getUserProgramDataFolder(), "." + identifier );
 				break;
 			}
 		}
@@ -224,19 +235,30 @@ public class OperatingSystem {
 		return null;
 	}
 
+	/**
+	 * Get the shared program data folder for the operating system using the
+	 * program identifier and/or name. The program identifier is normally all
+	 * lower case with no spaces. The name can be mixed case with spaces. Windows
+	 * systems use the name instead of the identifier to generate the program data
+	 * folder path.
+	 * 
+	 * @param identifier
+	 * @param name
+	 * @return
+	 */
 	public static final File getSharedProgramDataFolder( String identifier, String name ) {
 		File folder = null;
 		switch( family ) {
 			case WINDOWS: {
-				folder = new File( System.getenv( "allusersprofile" ), name );
+				folder = new File( getSharedProgramDataFolder(), name );
 				break;
 			}
 			case LINUX: {
-				folder = new File( "/usr/local/share/data", identifier );
+				folder = new File( getSharedProgramDataFolder(), identifier );
 				break;
 			}
 			default: {
-				folder = new File( System.getProperty( "user.home" ), "." + identifier );
+				folder = new File( getSharedProgramDataFolder(), "." + identifier );
 				break;
 			}
 		}
