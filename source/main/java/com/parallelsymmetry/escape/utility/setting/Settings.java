@@ -571,18 +571,8 @@ public class Settings {
 					Settings node = getNode( path + "/" + name );
 					( (Persistent)object ).loadSettings( node );
 					map.put( name, type.cast( object ) );
-				} catch( InstantiationException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
-				} catch( IllegalAccessException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
-				} catch( SecurityException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
-				} catch( NoSuchMethodException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
-				} catch( IllegalArgumentException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
-				} catch( InvocationTargetException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+				} catch( Throwable throwable) {
+					Log.write( Log.WARN, throwable, getAbsolutePath( path ) );
 				}
 			}
 		}
