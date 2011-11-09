@@ -8,6 +8,20 @@ public class ReleaseTest extends TestCase {
 
 	private String versionString = "1.2.3-u-04";
 
+	private String timestampString = "1970-01-01 00:00:00";
+
+	public void testConstructorWithStringString() throws Exception {
+		Release release = new Release( versionString, timestampString );
+		assertEquals( versionString, release.getVersion().toString() );
+		assertEquals( new Date( 0 ), release.getDate() );
+	}
+
+	public void testConstructorWithStringStringAndBadTimestamp() throws Exception {
+		Release release = new Release( versionString, "bad timestamp string" );
+		assertEquals( versionString, release.getVersion().toString() );
+		assertEquals( null, release.getDate() );
+	}
+
 	public void testGetVersion() {
 		Release release = new Release( versionString );
 		assertEquals( 0, new Version( "1.2.3-u-04" ).compareTo( release.getVersion() ) );

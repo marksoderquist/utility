@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -11,6 +13,10 @@ import java.util.TimeZone;
  */
 public class Release implements Comparable<Release> {
 
+	/**
+	 * All release dates are expected to be in UTC so no time zone is given in the
+	 * date format.
+	 */
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	private Version version;
@@ -35,6 +41,19 @@ public class Release implements Comparable<Release> {
 		this( new Version( version ), timestamp );
 	}
 
+	public Release( String version, String timestamp ) {
+		if( version == null ) throw new NullPointerException( "Version cannot be null." );
+		this.version = new Version( version );
+
+		DateFormat formatter = new SimpleDateFormat( DATE_FORMAT );
+		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		try {
+			this.date = formatter.parse( timestamp );
+		} catch( ParseException exception ) {
+
+		}
+	}
+
 	public Version getVersion() {
 		return version;
 	}
@@ -50,11 +69,11 @@ public class Release implements Comparable<Release> {
 	public String toHumanString() {
 		return format( version.toHumanString() );
 	}
-	
+
 	@Override
 	public boolean equals( Object object ) {
-		if( !(object instanceof Release ) ) return false;
-		
+		if( !( object instanceof Release ) ) return false;
+
 		Release that = (Release)object;
 		return this.compareTo( that ) == 0;
 	}
@@ -73,15 +92,15 @@ public class Release implements Comparable<Release> {
 	private String format( String version ) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
 		dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-	
+
 		StringBuffer buffer = new StringBuffer();
-	
+
 		buffer.append( version );
 		if( date != null ) {
 			buffer.append( "  " );
 			buffer.append( dateFormat.format( date ) );
 		}
-	
+
 		return buffer.toString();
 	}
 
