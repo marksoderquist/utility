@@ -270,7 +270,7 @@ public class Log {
 		if( message != null ) {
 			builder = new StringBuilder();
 			for( Object object : message ) {
-				if( object != null ) builder.append( object.toString() );
+				builder.append( object == null ? "null" : object.toString() );
 			}
 		}
 

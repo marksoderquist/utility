@@ -92,6 +92,16 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
 		assertEquals( "Incorrect log message.", "Test", record.getMessage() );
 	}
+	
+	public void testWriteWithObjectListAndNullValue() {
+		LogRecord record = null;
+
+		Log.write( "Test: ", null );
+		record = handler.getLogRecord();
+		assertNotNull( "Log record is null.", record );
+		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
+		assertEquals( "Incorrect log message.", "Test: null", record.getMessage() );
+	}
 
 	public void testWriteWithLevelAndString() {
 		LogRecord record = null;
