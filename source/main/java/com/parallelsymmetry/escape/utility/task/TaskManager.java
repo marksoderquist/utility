@@ -18,11 +18,15 @@ import com.parallelsymmetry.escape.utility.setting.Settings;
 
 public class TaskManager implements Persistent, Controllable {
 
-	private static final int DEFAULT_THREAD_COUNT = Runtime.getRuntime().availableProcessors();
+	private static final int PROCESSOR_COUNT = Runtime.getRuntime().availableProcessors();
+	
+	private static final int MIN_THREAD_COUNT = 4;
 
-	private TaskExecutor executor;
+	private ThreadPoolExecutor executor;
 
-	private int threadCount = DEFAULT_THREAD_COUNT;
+	private int maxThreadCount = Math.max( MIN_THREAD_COUNT, PROCESSOR_COUNT );
+
+	private int minThreadCount = maxThreadCount / 2;
 
 	private Settings settings;
 
@@ -33,12 +37,13 @@ public class TaskManager implements Persistent, Controllable {
 	}
 
 	public int getThreadCount() {
-		return threadCount;
+		return maxThreadCount;
 	}
 
 	public void setThreadCount( int count ) {
-		if( count < 1 ) count = 1;
-		this.threadCount = count;
+		if( count < MIN_THREAD_COUNT ) count = MIN_THREAD_COUNT;
+		this.maxThreadCount = count;
+		this.minThreadCount = count / 2;
 		saveSettings( settings );
 		if( isRunning() ) try {
 			restart();
@@ -50,7 +55,8 @@ public class TaskManager implements Persistent, Controllable {
 	@Override
 	public synchronized void start() {
 		if( isRunning() ) return;
-		executor = new TaskExecutor( 0, threadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
+		Log.write( Log.TRACE, "Task manager thread count: " + maxThreadCount );
+		executor = new ThreadPoolExecutor( minThreadCount, maxThreadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
 	}
 
 	@Override
@@ -84,7 +90,7 @@ public class TaskManager implements Persistent, Controllable {
 	@Override
 	public synchronized void stopAndWait() throws InterruptedException {
 		stop();
-		if( executor != null ) executor.awaitTermination();
+		if( executor != null ) executor.awaitTermination( Long.MAX_VALUE, TimeUnit.DAYS );
 	}
 
 	@Override
@@ -106,7 +112,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @return
 	 */
 	public <T> Future<T> submit( Task<T> task ) {
-		checkNullService();
+		checkStarted();
 		return executor.submit( task );
 	}
 
@@ -118,7 +124,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @return
 	 */
 	public <T> List<Future<T>> submitAll( Collection<? extends Task<T>> tasks ) {
-		checkNullService();
+		checkStarted();
 		List<Future<T>> futures = new ArrayList<Future<T>>();
 
 		for( Task<T> task : tasks ) {
@@ -178,7 +184,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks ) throws InterruptedException {
-		checkNullService();
+		checkStarted();
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks );
 		} else {
@@ -198,7 +204,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks, long timeout, TimeUnit unit ) throws InterruptedException {
-		checkNullService();
+		checkStarted();
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks, timeout, unit );
 		} else {
@@ -211,14 +217,14 @@ public class TaskManager implements Persistent, Controllable {
 	public void loadSettings( Settings settings ) {
 		this.settings = settings;
 
-		this.threadCount = settings.getInt( "thread-count", DEFAULT_THREAD_COUNT );
+		this.maxThreadCount = settings.getInt( "thread-count", PROCESSOR_COUNT );
 	}
 
 	@Override
 	public void saveSettings( Settings settings ) {
 		if( settings == null ) return;
 
-		settings.putInt( "thread-count", threadCount );
+		settings.putInt( "thread-count", maxThreadCount );
 	}
 
 	private <T> void synchronousExecute( Task<T> task ) {
@@ -249,7 +255,7 @@ public class TaskManager implements Persistent, Controllable {
 		}
 	}
 
-	private void checkNullService() {
+	private void checkStarted() {
 		if( executor == null ) throw new RuntimeException( "TaskManager has not been started." );
 	}
 
@@ -261,17 +267,13 @@ public class TaskManager implements Persistent, Controllable {
 
 	}
 
-	private static final class TaskExecutor extends ThreadPoolExecutor {
-
-		public TaskExecutor( int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory ) {
-			super( corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, new ThreadPoolExecutor.CallerRunsPolicy() );
-		}
-
-		public boolean awaitTermination() throws InterruptedException {
-			return awaitTermination( Long.MAX_VALUE, TimeUnit.DAYS );
-		}
-
-	}
+	//	private static final class TaskExecutor extends ThreadPoolExecutor {
+	//
+	//		public TaskExecutor( int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory ) {
+	//			super( corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, new ThreadPoolExecutor.CallerRunsPolicy() );
+	//		}
+	//
+	//	}
 
 	private static class TaskThreadFactory implements ThreadFactory {
 
