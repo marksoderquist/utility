@@ -3,6 +3,7 @@ package com.parallelsymmetry.escape.utility.setting;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -407,6 +408,67 @@ public class SettingsTest extends TestCase {
 		assertNull( targetList );
 	}
 
+	public void testGetSet() {
+		int count = 5;
+		String path = "/test/sets/set1";
+		Set<MockPersistent> sourceSet = new HashSet<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceSet.add( new MockPersistent( index ) );
+		}
+
+		settings.putSet( path, sourceSet );
+
+		Set<MockPersistent> targetSet = settings.getSet( path, null );
+
+		assertEquals( count, targetSet.size() );
+
+		for( MockPersistent item : sourceSet ) {
+			assertTrue( targetSet.contains( item ) );
+		}
+	}
+
+	public void testGetSetWithDefault() {
+		Set<MockPersistent> set = settings.getSet( "/test/sets/set0", null );
+		assertNull( set );
+
+		Set<MockPersistent> defaultSet = new HashSet<MockPersistent>();
+		defaultSet.add( new MockPersistent() );
+		set = settings.getSet( "/test/sets/set0", defaultSet );
+		assertEquals( defaultSet, set );
+		assertNotNull( defaultSet.iterator().next().getSettings() );
+	}
+
+	public void testPutEmptySet() {
+		String path = "/test/sets/set0";
+		Set<MockPersistent> set = new HashSet<MockPersistent>();
+		settings.putSet( path, set );
+	}
+
+	public void testRemoveSet() {
+		int count = 5;
+		String path = "/test/sets/set2";
+		Set<MockPersistent> sourceSet = new HashSet<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceSet.add( new MockPersistent( index ) );
+		}
+
+		settings.putSet( path, sourceSet );
+		Set<MockPersistent> targetSet = settings.getSet( path, null );
+
+		assertEquals( count, targetSet.size() );
+		for( MockPersistent item : sourceSet ) {
+			assertTrue( targetSet.contains( item ) );
+		}
+
+		settings.putSet( path, null );
+
+		targetSet = settings.getSet( path, null );
+		assertFalse( settings.nodeExists( path ) );
+		assertNull( targetSet );
+	}
+
 	public void testGetMap() {
 		int count = 5;
 		String path = "/test/maps/map1";
@@ -546,6 +608,18 @@ public class SettingsTest extends TestCase {
 		public void saveSettings( Settings settings ) {
 			if( value != null ) settings.put( "value", value );
 			settings.putInt( "index", index );
+		}
+
+		@Override
+		public int hashCode() {
+			return value == null ? index : value.hashCode();
+		}
+
+		@Override
+		public boolean equals( Object object ) {
+			if( !( object instanceof MockPersistent ) ) return false;
+			MockPersistent that = (MockPersistent)object;
+			return value == null ? this.index == that.index : this.value.equals( that.value );
 		}
 
 	}

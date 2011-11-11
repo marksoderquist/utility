@@ -540,6 +540,16 @@ public class Settings {
 		}
 	}
 
+	public <T extends Persistent> Set<T> getSet( String path, Set<T> defaultSet ) {
+		ArrayList<T> defaultList = defaultSet == null ? null : new ArrayList<T>( defaultSet );
+		List<T> list = getList( path, defaultList );
+		return list == defaultList ? defaultSet : new HashSet<T>( list );
+	}
+
+	public <T extends Persistent> void putSet( String path, Set<T> set ) {
+		putList( path, set == null ? null : new ArrayList<T>( set ) );
+	}
+
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
 		String typeName = get( path + SEPARATOR + ITEM_CLASS, null );
@@ -571,7 +581,7 @@ public class Settings {
 					Settings node = getNode( path + "/" + name );
 					( (Persistent)object ).loadSettings( node );
 					map.put( name, type.cast( object ) );
-				} catch( Throwable throwable) {
+				} catch( Throwable throwable ) {
 					Log.write( Log.WARN, throwable, getAbsolutePath( path ) );
 				}
 			}
