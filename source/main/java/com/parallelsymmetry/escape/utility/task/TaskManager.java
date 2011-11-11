@@ -56,7 +56,7 @@ public class TaskManager implements Persistent, Controllable {
 	public synchronized void start() {
 		if( isRunning() ) return;
 		Log.write( Log.TRACE, "Task manager thread count: " + maxThreadCount );
-		executor = new ThreadPoolExecutor( minThreadCount, maxThreadCount, 5, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
+		executor = new ThreadPoolExecutor( minThreadCount, maxThreadCount, 1, TimeUnit.SECONDS, queue, new TaskThreadFactory() );
 	}
 
 	@Override
