@@ -85,6 +85,7 @@ public class TaskManager implements Persistent, Controllable {
 	public synchronized void stop() {
 		if( executor == null || executor.isShutdown() ) return;
 		executor.shutdown();
+		executor = null;
 	}
 
 	@Override
@@ -112,7 +113,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @return
 	 */
 	public <T> Future<T> submit( Task<T> task ) {
-		checkStarted();
+		checkRunning();
 		return executor.submit( task );
 	}
 
@@ -124,7 +125,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @return
 	 */
 	public <T> List<Future<T>> submitAll( Collection<? extends Task<T>> tasks ) {
-		checkStarted();
+		checkRunning();
 		List<Future<T>> futures = new ArrayList<Future<T>>();
 
 		for( Task<T> task : tasks ) {
@@ -184,7 +185,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks ) throws InterruptedException {
-		checkStarted();
+		checkRunning();
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks );
 		} else {
@@ -204,7 +205,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks, long timeout, TimeUnit unit ) throws InterruptedException {
-		checkStarted();
+		checkRunning();
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks, timeout, unit );
 		} else {
@@ -217,7 +218,7 @@ public class TaskManager implements Persistent, Controllable {
 	public void loadSettings( Settings settings ) {
 		this.settings = settings;
 
-		this.maxThreadCount = settings.getInt( "thread-count", PROCESSOR_COUNT );
+		this.maxThreadCount = settings.getInt( "thread-count", maxThreadCount );
 	}
 
 	@Override
@@ -255,8 +256,8 @@ public class TaskManager implements Persistent, Controllable {
 		}
 	}
 
-	private void checkStarted() {
-		if( executor == null ) throw new RuntimeException( "TaskManager has not been started." );
+	private void checkRunning() {
+		if( executor == null ) throw new RuntimeException( "TaskManager is not running." );
 	}
 
 	private static final class TaskThread extends Thread {
