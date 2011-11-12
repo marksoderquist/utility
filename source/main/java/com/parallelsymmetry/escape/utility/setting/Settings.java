@@ -533,10 +533,9 @@ public class Settings {
 				for( int index = 0; index < newCount; index++ ) {
 					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 				}
-
 				put( path + SEPARATOR + ITEM_CLASS, list.iterator().next().getClass().getName() );
-				putInt( path + SEPARATOR + ITEM_COUNT, newCount );
 			}
+			putInt( path + SEPARATOR + ITEM_COUNT, newCount );
 		}
 	}
 
@@ -605,7 +604,6 @@ public class Settings {
 				for( String name : map.keySet() ) {
 					map.get( name ).saveSettings( getNode( path + "/" + name ) );
 				}
-
 				put( path + SEPARATOR + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
 			}
 		}

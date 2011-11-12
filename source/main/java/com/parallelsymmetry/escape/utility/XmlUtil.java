@@ -22,6 +22,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -60,6 +64,21 @@ public class XmlUtil {
 		Document document = factory.newDocumentBuilder().parse( new InputSource( stream ) );
 		document.getDocumentElement().normalize();
 		return document;
+	}
+
+	public static final Node getNode( Node node, String path ) {
+		if( node == null || TextUtil.isEmpty( path ) ) return null;
+
+		Node value = null;
+		XPath xpath = XPathFactory.newInstance().newXPath();
+
+		try {
+			value = (Node)xpath.evaluate( path, node, XPathConstants.NODE );
+		} catch( XPathExpressionException exception ) {
+			Log.write( new Exception( path, exception ) );
+		}
+
+		return value;
 	}
 
 	public static final void save( Node node, File file ) throws IOException {
