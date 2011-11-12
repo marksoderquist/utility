@@ -1,8 +1,8 @@
 package com.parallelsymmetry.escape.utility.data;
 
-import com.parallelsymmetry.escape.utility.log.Log;
-
 import junit.framework.TestCase;
+
+import com.parallelsymmetry.escape.utility.log.Log;
 
 public abstract class DataTestCase extends TestCase {
 

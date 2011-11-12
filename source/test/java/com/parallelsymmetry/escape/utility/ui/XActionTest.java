@@ -4,10 +4,6 @@ import java.awt.event.ActionEvent;
 
 import junit.framework.TestCase;
 
-import com.parallelsymmetry.escape.utility.ui.SwingUtil;
-import com.parallelsymmetry.escape.utility.ui.XAction;
-import com.parallelsymmetry.escape.utility.ui.XActionHandler;
-
 public class XActionTest extends TestCase {
 
 	public void testCreate() throws Exception {
