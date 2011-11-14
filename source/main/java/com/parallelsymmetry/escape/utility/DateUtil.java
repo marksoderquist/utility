@@ -7,10 +7,10 @@ import java.util.Date;
 import java.util.TimeZone;
 
 public class DateUtil {
-	
+
+	public static final String STANDARD_TIME_ZONE = "GMT";
+
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-	
-	public static final Date INCEPTION_DATE = parse("2010-01-01 00:00:00", DEFAULT_DATE_FORMAT);
 
 	/**
 	 * Convenience method to get the current year for the UTC time zone.
@@ -18,7 +18,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static final int getCurrentYear() {
-		return getCurrentYear( "UTC" );
+		return getCurrentYear( STANDARD_TIME_ZONE );
 	}
 
 	/**
@@ -32,14 +32,14 @@ public class DateUtil {
 	}
 
 	/**
-	 * Parse a date string with the given format using the UTC time zone.
+	 * Parse a date string with the given format using the standard time zone.
 	 * 
 	 * @param format
 	 * @param data
 	 * @return
 	 */
 	public static final Date parse( String data, String format ) {
-		return parse( data, format, "GMT" );
+		return parse( data, format, STANDARD_TIME_ZONE );
 	}
 
 	/**
@@ -61,6 +61,31 @@ public class DateUtil {
 		} catch( ParseException exception ) {
 			return null;
 		}
+	}
+
+	/**
+	 * Format a date with the given format using the standard time zone.
+	 * 
+	 * @param date
+	 * @param format
+	 * @return
+	 */
+	public static final String format( Date date, String format ) {
+		return format( date, format, STANDARD_TIME_ZONE );
+	}
+
+	/**
+	 * Format a date with the given format and time zone.
+	 * 
+	 * @param date
+	 * @param format
+	 * @param timeZone
+	 * @return
+	 */
+	public static final String format( Date date, String format, String timeZone ) {
+		SimpleDateFormat formatter = new SimpleDateFormat( format );
+		formatter.setTimeZone( TimeZone.getTimeZone( timeZone ) );
+		return formatter.format( date );
 	}
 
 }
