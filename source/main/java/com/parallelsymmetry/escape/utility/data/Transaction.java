@@ -31,7 +31,7 @@ public class Transaction {
 	public void add( Action action ) {
 		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
 
-		Log.write( Log.DEBUG, "Transaction: " + toString() + " adding action: " + action );
+		Log.write( Log.DETAIL, "Transaction: " + toString() + " adding action: " + action );
 
 		DataNode data = action.getData();
 
@@ -45,7 +45,7 @@ public class Transaction {
 		if( depth > 0 ) return;
 
 		commitInProgress = true;
-		Log.write( Log.DEBUG, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
+		Log.write( Log.DETAIL, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
 		try {
 			// Store the current modified state of each data object.
 			for( DataNode node : nodes ) {
@@ -57,7 +57,7 @@ public class Transaction {
 			List<ActionResult> results = new ArrayList<ActionResult>();
 			while( !actions.isEmpty() ) {
 				action = actions.poll();
-				Log.write( Log.DEBUG, "Transaction: " + toString() + " processing action: " + action );
+				Log.write( Log.DETAIL, "Transaction: " + toString() + " processing action: " + action );
 				results.add( action.process() );
 			}
 
@@ -118,7 +118,7 @@ public class Transaction {
 			}
 		} finally {
 			cleanup();
-			Log.write( Log.DEBUG, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
+			Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
 			commitInProgress = false;
 		}
 	}

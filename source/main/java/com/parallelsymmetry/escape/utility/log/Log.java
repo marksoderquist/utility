@@ -33,6 +33,8 @@ public class Log {
 	private static final int TRACE_VALUE = 700;
 
 	private static final int DEBUG_VALUE = 600;
+	
+	private static final int DETAIL_VALUE = 500;
 
 	public static final Level NONE = new CustomLevel( "NONE", Integer.MAX_VALUE );
 
@@ -45,6 +47,8 @@ public class Log {
 	public static final Level TRACE = new CustomLevel( "TRACE", TRACE_VALUE );
 
 	public static final Level DEBUG = new CustomLevel( "DEBUG", DEBUG_VALUE );
+	
+	public static final Level DETAIL = new CustomLevel( "DETAIL", DETAIL_VALUE );
 
 	public static final Level ALL = new CustomLevel( "ALL", Integer.MIN_VALUE );
 
@@ -312,6 +316,8 @@ public class Log {
 			return TRACE;
 		} else if( DEBUG.getName().equals( string ) ) {
 			return DEBUG;
+		} else if( DETAIL.getName().equals( string ) ) {
+			return DETAIL;
 		} else if( ALL.getName().equals( string ) ) {
 			return ALL;
 		}
