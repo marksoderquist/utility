@@ -38,13 +38,26 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	private Result result = Result.UNKNOWN;
 
+	private String name;
+
 	private FutureTask<V> future;
 
-	private Set<TaskListener> listeners;
+	private TaskManager manager;
 
+	private Set<TaskListener> listeners;
+	
 	public Task() {
+		this( null );
+	}
+
+	public Task( String name ) {
+		this.name = name;
 		future = new TaskFuture<V>( this, new TaskExecute<V>( this ) );
 		listeners = new CopyOnWriteArraySet<TaskListener>();
+	}
+
+	public String getName() {
+		return name == null ? getClass().getName() : name;
 	}
 
 	@Override
@@ -118,6 +131,12 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		for( TaskListener listener : listeners ) {
 			listener.handleEvent( event );
 		}
+		TaskManager manager = this.manager;
+		if( manager != null ) manager.fireTaskEvent( event );
+	}
+	
+	void setTaskManager( TaskManager manager ) {
+		this.manager = manager;
 	}
 
 	V invoke() throws InterruptedException, ExecutionException {
@@ -167,6 +186,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 			} finally {
 				task.setState( State.DONE );
 				task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
+				task.manager = null;
 			}
 
 			super.done();

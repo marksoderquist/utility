@@ -3,7 +3,9 @@ package com.parallelsymmetry.escape.utility.task;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -32,8 +34,11 @@ public class TaskManager implements Persistent, Controllable {
 
 	private BlockingQueue<Runnable> queue;
 
+	private Set<TaskListener> listeners;
+
 	public TaskManager() {
 		queue = new LinkedBlockingQueue<Runnable>();
+		listeners = new CopyOnWriteArraySet<TaskListener>();
 	}
 
 	public int getThreadCount() {
@@ -114,6 +119,7 @@ public class TaskManager implements Persistent, Controllable {
 	 */
 	public <T> Future<T> submit( Task<T> task ) {
 		checkRunning();
+		task.setTaskManager( this );
 		return executor.submit( task );
 	}
 
@@ -126,8 +132,12 @@ public class TaskManager implements Persistent, Controllable {
 	 */
 	public <T> List<Future<T>> submitAll( Collection<? extends Task<T>> tasks ) {
 		checkRunning();
+		
+		for( Task<T> task : tasks ) {
+			task.setTaskManager( this );
+		}
+		
 		List<Future<T>> futures = new ArrayList<Future<T>>();
-
 		for( Task<T> task : tasks ) {
 			futures.add( executor.submit( task ) );
 		}
@@ -189,6 +199,9 @@ public class TaskManager implements Persistent, Controllable {
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks );
 		} else {
+			for( Task<T> task : tasks ) {
+				task.setTaskManager( this );
+			}
 			executor.invokeAll( tasks );
 		}
 		return new ArrayList<Future<T>>( tasks );
@@ -214,6 +227,14 @@ public class TaskManager implements Persistent, Controllable {
 		return new ArrayList<Future<T>>( tasks );
 	}
 
+	public void addTaskListener( TaskListener listener ) {
+		listeners.add( listener );
+	}
+
+	public void removeTaskListener( TaskListener listener ) {
+		listeners.remove( listener );
+	}
+
 	@Override
 	public void loadSettings( Settings settings ) {
 		this.settings = settings;
@@ -226,6 +247,12 @@ public class TaskManager implements Persistent, Controllable {
 		if( settings == null ) return;
 
 		settings.putInt( "thread-count", maxThreadCount );
+	}
+
+	protected void fireTaskEvent( TaskEvent event) {
+		for( TaskListener listener : listeners ) {
+			listener.handleEvent( event );
+		}
 	}
 
 	private <T> void synchronousExecute( Task<T> task ) {

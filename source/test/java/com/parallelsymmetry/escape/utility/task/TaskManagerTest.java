@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility.task;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -216,6 +218,43 @@ public class TaskManagerTest extends TestCase {
 		assertEquals( Task.State.DONE, nestedTask.getState() );
 		assertEquals( Task.Result.FAILED, nestedTask.getResult() );
 		assertFalse( nestedTask.isCancelled() );
+	}
+
+	public void testTaskListener() throws Exception {
+		manager.setThreadCount( 1 );
+		manager.startAndWait();
+		assertTrue( manager.isRunning() );
+
+		MockTaskListener listener = new MockTaskListener();
+		manager.addTaskListener( listener );
+
+		Object result = new Object();
+		MockTask task = new MockTask( manager, result );
+		assertEquals( Task.State.WAITING, task.getState() );
+		assertEquals( Task.Result.UNKNOWN, task.getResult() );
+		assertEquals( 0, listener.events.size() );
+
+		Future<Object> future = manager.submit( task );
+		assertEquals( result, future.get() );
+		assertTrue( task.isDone() );
+		assertEquals( Task.State.DONE, task.getState() );
+		assertEquals( Task.Result.SUCCESS, task.getResult() );
+		assertFalse( task.isCancelled() );
+
+		assertEquals( 2, listener.events.size() );
+		assertEquals( TaskEvent.Type.TASK_START, listener.events.get( 0 ).getType() );
+		assertEquals( TaskEvent.Type.TASK_FINISH, listener.events.get( 1 ).getType() );
+	}
+
+	private class MockTaskListener implements TaskListener {
+
+		public List<TaskEvent> events = new CopyOnWriteArrayList<TaskEvent>();
+
+		@Override
+		public void handleEvent( TaskEvent event ) {
+			events.add( event );
+		}
+
 	}
 
 }
