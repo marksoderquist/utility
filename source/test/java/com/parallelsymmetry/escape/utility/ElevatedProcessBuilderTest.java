@@ -13,6 +13,20 @@ public class ElevatedProcessBuilderTest extends TestCase {
 		System.clearProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
 	}
 
+	/*
+	 * Keep this test commented for normal use, uncomment to test manually.
+	 */
+	//	@Test
+	//	public void testStart() throws Exception {
+	//		ElevatedProcessBuilder builder = new ElevatedProcessBuilder();
+	//
+	//		builder.command().add( "javaw.exe" );
+	//		builder.command().add( "-jar" );
+	//		builder.command().add( "C:\\Program Files\\Escape\\program.jar" );
+	//		
+	//		builder.start().waitFor();
+	//	}
+
 	@Test
 	public void testCommandMac() throws Exception {
 		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );

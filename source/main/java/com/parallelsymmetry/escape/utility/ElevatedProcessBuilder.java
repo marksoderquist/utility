@@ -114,7 +114,7 @@ public class ElevatedProcessBuilder {
 		List<String> commands = new ArrayList<String>();
 
 		if( OperatingSystem.isMac() ) {
-			commands.add( extractMacElevate().getCanonicalPath() );
+			commands.add( extractMacElevate().getPath() );
 		} else if( OperatingSystem.isUnix() ) {
 			// TODO Determine gksudo file location.
 			File gksudo = new File( "/bin/gksudo" );
@@ -133,15 +133,14 @@ public class ElevatedProcessBuilder {
 			}
 		} else if( OperatingSystem.isWindows() ) {
 			commands.add( "wscript" );
-			commands.add( extractWinElevate().getCanonicalPath() );
+			commands.add( extractWinElevate().getPath() );
 		}
 
 		return commands;
 	}
 
 	private File extractWinElevate() throws IOException {
-		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" );
-
+		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" ).getCanonicalFile();
 		InputStream source = getClass().getResourceAsStream( "/elevate/win-elevate.js" );
 		FileOutputStream target = new FileOutputStream( elevator );
 		try {
@@ -152,14 +151,12 @@ public class ElevatedProcessBuilder {
 		}
 
 		elevator.setExecutable( true );
-		elevator.deleteOnExit();
 		
 		return elevator;
 	}
 
 	private File extractMacElevate() throws IOException {
-		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate" );
-
+		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate" ).getCanonicalFile();
 		InputStream source = getClass().getResourceAsStream( "/elevate/mac-elevate" );
 		FileOutputStream target = new FileOutputStream( elevator );
 		try {
@@ -170,7 +167,6 @@ public class ElevatedProcessBuilder {
 		}
 
 		elevator.setExecutable( true );
-		elevator.deleteOnExit();
 
 		return elevator;
 	}
