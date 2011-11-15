@@ -48,7 +48,7 @@ public class OperatingSystemTest extends TestCase {
 		//		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
 
-	private void init( String name, String arch, String version ) throws Exception {
+	public static final void init( String name, String arch, String version ) throws Exception {
 		Method initMethod = OperatingSystem.class.getDeclaredMethod( "init", String.class, String.class, String.class );
 		initMethod.setAccessible( true );
 		initMethod.invoke( null, name, arch, version );
