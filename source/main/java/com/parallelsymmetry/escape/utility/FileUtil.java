@@ -388,5 +388,16 @@ public class FileUtil {
 			}
 		}
 	}
+	
+	public static final boolean isWritable( File file ) {
+		if( !file.isDirectory() ) return file.canWrite();
+		
+		try {
+			File privilegeCheckFile = new File( file, "privilege.check.txt" );
+			return privilegeCheckFile.createNewFile() && privilegeCheckFile.delete();
+		} catch( IOException exception ) {
+			return false;
+		}
+	}
 
 }

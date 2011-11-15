@@ -368,6 +368,11 @@ public class FileUtilTest extends TestCase {
 
 		FileUtil.deleteOnExit( parent0 );
 	}
+	
+	public void testIsWritable() throws Exception {
+		File folder = FileUtil.createTempFolder( "FileUtil", "test");
+		assertTrue( FileUtil.isWritable( folder ) );
+	}
 
 	private static final class TestFilenameFilter implements FilenameFilter {
 

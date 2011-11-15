@@ -20,7 +20,7 @@ public class ElevatedProcessBuilderTest extends TestCase {
 	//	public void testStart() throws Exception {
 	//		ElevatedProcessBuilder builder = new ElevatedProcessBuilder();
 	//
-	//		builder.command().add( "javaw.exe" );
+	//		builder.command().add( "javaw" );
 	//		builder.command().add( "-jar" );
 	//		builder.command().add( "C:\\Program Files\\Escape\\program.jar" );
 	//		

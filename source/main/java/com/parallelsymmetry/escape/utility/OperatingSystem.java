@@ -114,6 +114,10 @@ public class OperatingSystem {
 	public static final boolean isWindows() {
 		return family == Family.WINDOWS;
 	}
+	
+	public static final String getJavaExecutableName() {
+		return isWindows() ? "javaw" : "java";
+	}
 
 	/**
 	 * Returns the total system memory in bytes or -1 if it cannot be determined.
