@@ -25,11 +25,19 @@ public class ElevatedProcessBuilder {
 	private ProcessBuilder builder;
 
 	public ElevatedProcessBuilder() throws IOException {
-		this( new ProcessBuilder() );
+		this( new ProcessBuilder(), false );
+	}
+
+	public ElevatedProcessBuilder( boolean veto ) throws IOException {
+		this( new ProcessBuilder(), veto );
 	}
 
 	public ElevatedProcessBuilder( ProcessBuilder builder ) throws IOException {
-		if( isElevationRequired() ) {
+		this( builder, false );
+	}
+
+	public ElevatedProcessBuilder( ProcessBuilder builder, boolean veto ) throws IOException {
+		if( !veto && isElevationRequired() ) {
 			this.builder = new ProcessBuilder( getElevateCommands() );
 			builder.command().addAll( this.builder.command() );
 			builder.environment().putAll( this.builder.environment() );
@@ -55,7 +63,7 @@ public class ElevatedProcessBuilder {
 	 */
 	public boolean isElevationRequired() {
 		if( isElevatedFlagSet() ) return false;
-		
+
 		if( OperatingSystem.isWindows() ) {
 			return !canWriteToProgramFiles();
 		} else {
@@ -66,11 +74,11 @@ public class ElevatedProcessBuilder {
 	public List<String> command() {
 		return builder.command();
 	}
-	
+
 	public void command( String... command ) {
 		builder.command( command );
 	}
-	
+
 	public void command( List<String> command ) {
 		builder.command( command );
 	}
@@ -82,15 +90,15 @@ public class ElevatedProcessBuilder {
 	public void directory( File directory ) {
 		builder.directory( directory );
 	}
-	
-	public Map<String,String> environment() {
+
+	public Map<String, String> environment() {
 		return builder.environment();
 	}
-	
+
 	public boolean redirectErrorStream() {
 		return builder.redirectErrorStream();
 	}
-	
+
 	public void redirectErrorStream( boolean redirectErrorStream ) {
 		builder.redirectErrorStream( redirectErrorStream );
 	}
@@ -151,7 +159,7 @@ public class ElevatedProcessBuilder {
 		}
 
 		elevator.setExecutable( true );
-		
+
 		return elevator;
 	}
 
