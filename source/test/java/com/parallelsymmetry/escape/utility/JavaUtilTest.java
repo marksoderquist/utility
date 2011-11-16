@@ -86,4 +86,16 @@ public class JavaUtilTest extends TestCase {
 		assertEquals( new File( home.getCanonicalFile(), "test 3.jar" ).toURI().toURL(), entries.get( 2 ) );
 	}
 
+	public void testGetRootCause() {
+		assertNull( JavaUtil.getRootCause( null ) );
+
+		Throwable one = new Throwable();
+		Throwable two = new Throwable( one );
+		Throwable three = new Throwable( two );
+
+		assertEquals( one, JavaUtil.getRootCause( one ) );
+		assertEquals( one, JavaUtil.getRootCause( two ) );
+		assertEquals( one, JavaUtil.getRootCause( three ) );
+	}
+
 }

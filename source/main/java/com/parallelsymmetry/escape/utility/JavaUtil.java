@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class JavaUtil {
+public final class JavaUtil {
 
-	public static final String getCallingClassName() {
+	public static String getCallingClassName() {
 		return getCallingClassName( 3 );
 	}
 
-	public static final String getCallingClassName( int level ) {
+	public static String getCallingClassName( int level ) {
 		return Thread.currentThread().getStackTrace()[level].getClassName();
 	}
 
@@ -28,7 +28,7 @@ public class JavaUtil {
 	 * @param name
 	 * @return
 	 */
-	public static final String getClassName( String name ) {
+	public static String getClassName( String name ) {
 		return name.substring( name.lastIndexOf( '.' ) + 1 );
 	}
 
@@ -38,23 +38,23 @@ public class JavaUtil {
 	 * @param name
 	 * @return
 	 */
-	public static final String getClassName( Class<?> type ) {
+	public static String getClassName( Class<?> type ) {
 		return ( getClassName( type.getName() ) );
 	}
 
-	public static final String getPackageName( String name ) {
+	public static String getPackageName( String name ) {
 		return name.substring( 0, name.lastIndexOf( '.' ) );
 	}
 
-	public static final String getPackageName( Class<?> type ) {
+	public static String getPackageName( Class<?> type ) {
 		return ( getPackageName( type.getName() ) );
 	}
 
-	public static final String getPackagePath( String name ) {
+	public static String getPackagePath( String name ) {
 		return "/" + getPackageName( name ).replace( '.', '/' );
 	}
 
-	public static final String getPackagePath( Class<?> type ) {
+	public static String getPackagePath( Class<?> type ) {
 		return ( getPackagePath( type.getName() ) );
 	}
 
@@ -121,6 +121,22 @@ public class JavaUtil {
 		}
 
 		return urls;
+	}
+
+	/**
+	 * Get the root cause of a throwable.
+	 * 
+	 * @param throwable
+	 * @return
+	 */
+	public static Throwable getRootCause( Throwable throwable ) {
+		Throwable cause = throwable;
+
+		while( cause != null && cause.getCause() != null ) {
+			cause = cause.getCause();
+		}
+
+		return cause;
 	}
 
 }
