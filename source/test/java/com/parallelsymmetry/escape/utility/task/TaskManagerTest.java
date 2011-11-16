@@ -241,9 +241,12 @@ public class TaskManagerTest extends TestCase {
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 		assertFalse( task.isCancelled() );
 
-		assertEquals( 2, listener.events.size() );
-		assertEquals( TaskEvent.Type.TASK_START, listener.events.get( 0 ).getType() );
-		assertEquals( TaskEvent.Type.TASK_FINISH, listener.events.get( 1 ).getType() );
+		int index = 0;
+		assertEquals( 4, listener.events.size() );
+		assertEquals( TaskEvent.Type.TASK_SUBMITTED, listener.events.get( index++ ).getType() );
+		assertEquals( TaskEvent.Type.TASK_START, listener.events.get( index++ ).getType() );
+		assertEquals( TaskEvent.Type.TASK_FINISH, listener.events.get( index++ ).getType() );
+		assertEquals( TaskEvent.Type.TASK_COMPLETED, listener.events.get( index++ ).getType() );
 	}
 
 	private class MockTaskListener implements TaskListener {

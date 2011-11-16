@@ -10,6 +10,8 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.parallelsymmetry.escape.utility.task.TaskEvent.Type;
+
 /**
  * An executable task.
  * <p>
@@ -45,7 +47,13 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	private TaskManager manager;
 
 	private Set<TaskListener> listeners;
-	
+
+	private long minimum;
+
+	private long maximum;
+
+	private long progress;
+
 	public Task() {
 		this( null );
 	}
@@ -56,16 +64,12 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		listeners = new CopyOnWriteArraySet<TaskListener>();
 	}
 
-	public String getName() {
-		return name == null ? getClass().getName() : name;
-	}
+	public abstract V execute() throws Exception;
 
 	@Override
 	public V call() throws Exception {
 		return invoke();
 	}
-
-	public abstract V execute() throws Exception;
 
 	@Override
 	public boolean isDone() {
@@ -73,11 +77,32 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	}
 
 	@Override
-	public final boolean isCancelled() {
+	public boolean isCancelled() {
 		return future.isCancelled();
 	}
 
-	public final State getState() {
+	@Override
+	public boolean cancel( boolean mayInterruptIfRunning ) {
+		return future.cancel( mayInterruptIfRunning );
+	}
+
+	@Override
+	public V get() throws InterruptedException, ExecutionException {
+		waitForState( State.DONE );
+		return future.get();
+	}
+
+	@Override
+	public V get( long duration, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
+		waitForState( State.DONE, duration, unit );
+		return future.get( duration, unit );
+	}
+
+	public String getName() {
+		return name == null ? getClass().getName() : name;
+	}
+
+	public State getState() {
 		return state;
 	}
 
@@ -97,25 +122,33 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		}
 	}
 
-	public final Result getResult() {
+	public Result getResult() {
 		return result;
 	}
 
-	@Override
-	public final boolean cancel( boolean mayInterruptIfRunning ) {
-		return future.cancel( mayInterruptIfRunning );
+	public long getMinimum() {
+		return minimum;
 	}
 
-	@Override
-	public V get() throws InterruptedException, ExecutionException {
-		waitForState( State.DONE );
-		return future.get();
+	public void setMinimum( long min ) {
+		this.minimum = min;
 	}
 
-	@Override
-	public V get( long duration, TimeUnit unit ) throws InterruptedException, ExecutionException, TimeoutException {
-		waitForState( State.DONE, duration, unit );
-		return future.get( duration, unit );
+	public long getMaximum() {
+		return maximum;
+	}
+
+	public void setMaximum( long max ) {
+		this.maximum = max;
+	}
+
+	public long getProgress() {
+		return progress;
+	}
+
+	public void setProgress( long progress ) {
+		this.progress = progress;
+		fireTaskEvent( Type.TASK_PROGRESS );
 	}
 
 	public void addTaskListener( TaskListener listener ) {
@@ -134,7 +167,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		TaskManager manager = this.manager;
 		if( manager != null ) manager.fireTaskEvent( event );
 	}
-	
+
 	void setTaskManager( TaskManager manager ) {
 		this.manager = manager;
 	}
@@ -186,6 +219,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 			} finally {
 				task.setState( State.DONE );
 				task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
+				task.manager.completed( task );
 				task.manager = null;
 			}
 

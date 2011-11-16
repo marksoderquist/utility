@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -36,9 +37,16 @@ public class TaskManager implements Persistent, Controllable {
 
 	private Set<TaskListener> listeners;
 
+	private List<Task<?>> tasks;
+
 	public TaskManager() {
+		tasks = new CopyOnWriteArrayList<Task<?>>();
 		queue = new LinkedBlockingQueue<Runnable>();
 		listeners = new CopyOnWriteArraySet<TaskListener>();
+	}
+
+	public List<Task<?>> getTasks() {
+		return new ArrayList<Task<?>>( this.tasks );
 	}
 
 	public int getThreadCount() {
@@ -119,7 +127,7 @@ public class TaskManager implements Persistent, Controllable {
 	 */
 	public <T> Future<T> submit( Task<T> task ) {
 		checkRunning();
-		task.setTaskManager( this );
+		submitted( task );
 		return executor.submit( task );
 	}
 
@@ -132,11 +140,11 @@ public class TaskManager implements Persistent, Controllable {
 	 */
 	public <T> List<Future<T>> submitAll( Collection<? extends Task<T>> tasks ) {
 		checkRunning();
-		
+
 		for( Task<T> task : tasks ) {
-			task.setTaskManager( this );
+			submitted( task );
 		}
-		
+
 		List<Future<T>> futures = new ArrayList<Future<T>>();
 		for( Task<T> task : tasks ) {
 			futures.add( executor.submit( task ) );
@@ -200,7 +208,7 @@ public class TaskManager implements Persistent, Controllable {
 			synchronousExecute( tasks );
 		} else {
 			for( Task<T> task : tasks ) {
-				task.setTaskManager( this );
+				submitted( task );
 			}
 			executor.invokeAll( tasks );
 		}
@@ -222,6 +230,9 @@ public class TaskManager implements Persistent, Controllable {
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks, timeout, unit );
 		} else {
+			for( Task<T> task : tasks ) {
+				submitted( task );
+			}
 			executor.invokeAll( tasks, timeout, unit );
 		}
 		return new ArrayList<Future<T>>( tasks );
@@ -249,10 +260,26 @@ public class TaskManager implements Persistent, Controllable {
 		settings.putInt( "thread-count", maxThreadCount );
 	}
 
-	protected void fireTaskEvent( TaskEvent event) {
+	protected void fireTaskEvent( TaskEvent event ) {
 		for( TaskListener listener : listeners ) {
 			listener.handleEvent( event );
 		}
+	}
+
+	protected BlockingQueue<Runnable> getQueue() {
+		return executor.getQueue();
+	}
+
+	void submitted( Task<?> task ) {
+		tasks.add( task );
+		task.setTaskManager( this );
+		fireTaskEvent( new TaskEvent( this, task, TaskEvent.Type.TASK_SUBMITTED ) );
+	}
+
+	void completed( Task<?> task ) {
+		fireTaskEvent( new TaskEvent( this, task, TaskEvent.Type.TASK_COMPLETED ) );
+		task.setTaskManager( null );
+		tasks.remove( task );
 	}
 
 	private <T> void synchronousExecute( Task<T> task ) {
@@ -287,14 +314,6 @@ public class TaskManager implements Persistent, Controllable {
 		if( executor == null ) throw new RuntimeException( "TaskManager is not running." );
 	}
 
-	private static final class TaskThread extends Thread {
-
-		public TaskThread( ThreadGroup group, Runnable target, String name, long stackSize ) {
-			super( group, target, name, stackSize );
-		}
-
-	}
-
 	//	private static final class TaskExecutor extends ThreadPoolExecutor {
 	//
 	//		public TaskExecutor( int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory ) {
@@ -303,7 +322,7 @@ public class TaskManager implements Persistent, Controllable {
 	//
 	//	}
 
-	private static class TaskThreadFactory implements ThreadFactory {
+	private static final class TaskThreadFactory implements ThreadFactory {
 
 		private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
 
@@ -327,5 +346,21 @@ public class TaskManager implements Persistent, Controllable {
 		}
 
 	}
+
+	private static final class TaskThread extends Thread {
+
+		public TaskThread( ThreadGroup group, Runnable target, String name, long stackSize ) {
+			super( group, target, name, stackSize );
+		}
+
+	}
+
+	//	private static final class TaskExecutor extends ThreadPoolExecutor {
+	//
+	//		public TaskExecutor( int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory ) {
+	//			super( corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, new ThreadPoolExecutor.CallerRunsPolicy() );
+	//		}
+	//
+	//	}
 
 }

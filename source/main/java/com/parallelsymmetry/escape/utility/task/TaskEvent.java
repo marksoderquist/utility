@@ -5,7 +5,7 @@ import java.util.EventObject;
 public class TaskEvent extends EventObject {
 
 	public enum Type {
-		TASK_START, TASK_SUCCESS, TASK_FAILURE, TASK_FINISH;
+		TASK_SUBMITTED, TASK_START, TASK_PROGRESS, TASK_FINISH, TASK_COMPLETED;
 	}
 
 	private static final long serialVersionUID = 6199687149599225794L;
