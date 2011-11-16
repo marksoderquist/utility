@@ -33,10 +33,11 @@ public class TaskEventTest extends TestCase {
 		 * done state is set correctly before events are sent but this allows the
 		 * test thread to continue before the events arrive.
 		 */
-		watcher.waitForEventCount( 2, 100 );
+		watcher.waitForEventCount( 3, 100 );
+		assertEquals( 3, watcher.events.size() );
 		assertEvent( watcher.events.get( 0 ), task, TaskEvent.Type.TASK_START );
-		assertEvent( watcher.events.get( 1 ), task, TaskEvent.Type.TASK_FINISH );
-		assertEquals( 2, watcher.events.size() );
+		assertEvent( watcher.events.get( 1 ), task, TaskEvent.Type.TASK_PROGRESS );
+		assertEvent( watcher.events.get( 2 ), task, TaskEvent.Type.TASK_FINISH );
 	}
 
 	public void testFailure() throws Exception {
@@ -63,10 +64,11 @@ public class TaskEventTest extends TestCase {
 		 * done state is set correctly before events are sent but this allows the
 		 * test thread to continue before the events arrive.
 		 */
-		watcher.waitForEventCount( 2, 100 );
+		watcher.waitForEventCount( 3, 100 );
+		assertEquals( 3, watcher.events.size() );
 		assertEvent( watcher.events.get( 0 ), task, TaskEvent.Type.TASK_START );
-		assertEvent( watcher.events.get( 1 ), task, TaskEvent.Type.TASK_FINISH );
-		assertEquals( 2, watcher.events.size() );
+		assertEvent( watcher.events.get( 1 ), task, TaskEvent.Type.TASK_PROGRESS );
+		assertEvent( watcher.events.get( 2 ), task, TaskEvent.Type.TASK_FINISH );
 	}
 
 	private void assertEvent( TaskEvent event, Task<?> task, TaskEvent.Type type ) {

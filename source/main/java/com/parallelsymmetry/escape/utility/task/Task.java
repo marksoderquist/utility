@@ -48,9 +48,9 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	private Set<TaskListener> listeners;
 
-	private long minimum;
+	private long minimum = 0;
 
-	private long maximum;
+	private long maximum = 1;
 
 	private long progress;
 
@@ -218,6 +218,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 				task.result = Result.FAILED;
 			} finally {
 				task.setState( State.DONE );
+				task.setProgress( task.maximum );
 				task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
 				task.manager.completed( task );
 				task.manager = null;
