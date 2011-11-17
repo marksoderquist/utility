@@ -83,9 +83,7 @@ public class Release implements Comparable<Release> {
 		int result = this.getVersion().compareTo( that.getVersion() );
 		if( result != 0 ) return result;
 
-		if( this.date == null && that.date == null ) return 0;
-		if( this.date == null && that.date != null ) return -1;
-		if( this.date != null && that.date == null ) return 1;
+		if( this.date == null || that.date == null ) return 0;
 		return this.date.compareTo( that.date );
 	}
 
