@@ -124,14 +124,12 @@ public class ElevatedProcessBuilder {
 		if( OperatingSystem.isMac() ) {
 			commands.add( extractMacElevate().getPath() );
 		} else if( OperatingSystem.isUnix() ) {
-			// TODO Determine gksudo file location.
-			File gksudo = new File( "/bin/gksudo" );
-			// TODO Determine kdesudo file location.
-			File kdesudo = new File( "/bin/kdesudo" );
+			File gksudo = new File( "/usr/bin/gksudo" );
+			File kdesudo = new File( "/usr/bin/kdesudo" );
 			if( gksudo.exists() ) {
-				commands.add( "gksudo" );
+				commands.add( "/usr/bin/gksudo" );
 			} else if( kdesudo.exists() ) {
-				commands.add( "kdesudo" );
+				commands.add( "/usr/bin/kdesudo" );
 			} else {
 				commands.add( "xterm" );
 				commands.add( "-title" );
