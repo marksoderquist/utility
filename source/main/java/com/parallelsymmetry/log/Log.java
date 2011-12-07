@@ -77,6 +77,13 @@ public class Log {
 		DEFAULT_HANDLER.setLevel( DEFAULT_LOG_LEVEL );
 		defaultHandlers.put( defaultLogger, DEFAULT_HANDLER );
 	}
+	
+	/**
+	 * Determine if the log level is at a specific level or higher.
+	 */
+	public static final boolean isLevel( Level level ) {
+		return getLevel().intValue() >= level.intValue();
+	}
 
 	/**
 	 * Get the log level of the default handler.
