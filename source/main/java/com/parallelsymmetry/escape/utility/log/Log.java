@@ -112,6 +112,13 @@ public class Log {
 	}
 
 	/**
+	 * Determine if the specified log level is active.
+	 */
+	public static final boolean isActive( Level level ) {
+		return getLevel().intValue() >= level.intValue();
+	}
+
+	/**
 	 * Get the log level of the default handler.
 	 * 
 	 * @return The default handler log level.
