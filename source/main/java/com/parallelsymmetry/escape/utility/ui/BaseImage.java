@@ -122,6 +122,14 @@ public abstract class BaseImage {
 		this.outlineSize = size;
 	}
 
+	public Paint getGradientPaint( GradientType type ) {
+		return getGradientPaint( type, new Point( 0, 0 ) );
+	}
+
+	public Paint getGradientPaint( GradientType type, Point anchor ) {
+		return new GradientPaint( anchor, getColor( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), getColor( type.getEndFactor() ) );
+	}
+
 	public Paint getGradientPaint( Color color ) {
 		return getGradientPaint( color, new Point( 0, 0 ) );
 	}
@@ -130,12 +138,13 @@ public abstract class BaseImage {
 		return new GradientPaint( anchor, Colors.getShade( color, 0.75 ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), Colors.getShade( color, -0.25 ) );
 	}
 
-	public Paint getGradientPaint( GradientType type ) {
-		return getGradientPaint( type, new Point( 0, 0 ) );
+	public Paint getGradientPaint( Color colora, Color colorb, Point anchor ) {
+		return new GradientPaint( anchor, colora, new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), colorb );
 	}
-
-	public Paint getGradientPaint( GradientType type, Point anchor ) {
-		return new GradientPaint( anchor, getColor( type.getBeginFactor() ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), getColor( type.getEndFactor() ) );
+	
+	public Paint getGradientPaint( Color colora, Color colorb, Shape shape ) {
+		Point2D anchor = new Point2D.Double( shape.getBounds2D().getMinX(), shape.getBounds().getMinY() );
+		return new GradientPaint( anchor, colora, new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), colorb );
 	}
 
 	public BufferedImage getImage() {
