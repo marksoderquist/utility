@@ -79,9 +79,9 @@ public class Log {
 	}
 	
 	/**
-	 * Determine if the log level is at a specific level or higher.
+	 * Determine if the specified log level is active.
 	 */
-	public static final boolean isLevel( Level level ) {
+	public static final boolean isActive( Level level ) {
 		return getLevel().intValue() >= level.intValue();
 	}
 
