@@ -21,6 +21,8 @@ public final class TextUtil {
 
 	public static final String DEFAULT_ENCODING = "UTF-8";
 
+	public static final Charset DEFAULT_CHARSET = Charset.forName( TextUtil.DEFAULT_ENCODING );
+
 	private static final char DEFAULT_PAD_CHAR = ' ';
 
 	public static final boolean isEmpty( String string ) {
