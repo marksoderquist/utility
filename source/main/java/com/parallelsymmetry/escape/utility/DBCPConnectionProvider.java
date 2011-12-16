@@ -138,7 +138,7 @@ public class DBCPConnectionProvider implements ConnectionProvider {
 	}
 
 	protected void logStatistics() {
-		Log.write( Log.INFO, "active: " + datasource.getNumActive() + " (max: " + datasource.getMaxActive() + ")   " + "idle: " + datasource.getNumIdle() + "(max: " + datasource.getMaxIdle() + ")" );
+		Log.write( Log.TRACE, "DBCP active: " + datasource.getNumActive() + " (max: " + datasource.getMaxActive() + ")   " + "idle: " + datasource.getNumIdle() + "(max: " + datasource.getMaxIdle() + ")" );
 	}
 
 	public boolean supportsAggressiveRelease() {
