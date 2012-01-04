@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,8 @@ import com.parallelsymmetry.escape.utility.Parameters;
  */
 public class Log {
 
+	private static Set<CustomLevel> known = new HashSet<CustomLevel>();
+
 	private static final int ERROR_VALUE = 1000;
 
 	private static final int WARN_VALUE = 900;
@@ -33,7 +36,7 @@ public class Log {
 	private static final int TRACE_VALUE = 700;
 
 	private static final int DEBUG_VALUE = 600;
-	
+
 	private static final int DETAIL_VALUE = 500;
 
 	public static final Level NONE = new CustomLevel( "NONE", Integer.MAX_VALUE );
@@ -47,7 +50,7 @@ public class Log {
 	public static final Level TRACE = new CustomLevel( "TRACE", TRACE_VALUE );
 
 	public static final Level DEBUG = new CustomLevel( "DEBUG", DEBUG_VALUE );
-	
+
 	public static final Level DETAIL = new CustomLevel( "DETAIL", DETAIL_VALUE );
 
 	public static final Level ALL = new CustomLevel( "ALL", Integer.MIN_VALUE );
@@ -306,6 +309,20 @@ public class Log {
 	public static final void writeTo( String name, LogRecord record ) {
 		getLogger( name == null ? DEFAULT_LOGGER_NAME : name ).log( record );
 	}
+	
+	public static final Level getLevel( int value ) {
+		List<CustomLevel> levels = new ArrayList<CustomLevel>(known);
+		Collections.sort( levels );
+		
+		Level level = null;
+		
+		int count = levels.size();
+		for( int index = 0; index < count; index++ ) {
+			// FIXME Finish this method.
+		}
+		
+		return level;
+	}
 
 	public static final Level parseLevel( String string ) {
 		if( string == null ) return null;
@@ -387,14 +404,23 @@ public class Log {
 		return null;
 	}
 
-	private static class CustomLevel extends Level {
+	private static class CustomLevel extends Level implements Comparable<CustomLevel> {
 
 		private static final long serialVersionUID = -7853455775674488102L;
 
 		protected CustomLevel( String name, int value ) {
 			super( name, value );
+			synchronized( CustomLevel.class ) {
+				known.add( this );
+			}
 		}
 
+		@Override
+		public int compareTo( CustomLevel that ) {
+			int result = this.intValue() - that.intValue();
+			if( result == 0 ) return 0;
+			return result > 0 ? 1 : -1;
+		}
 	}
 
 }
