@@ -210,7 +210,7 @@ public class Version implements Comparable<Version> {
 		return result == null ? text : result;
 	}
 
-	public String generateHumanString() {
+	private String generateHumanString() {
 		StringBuilder builder = new StringBuilder();
 
 		Part prefix = null;
