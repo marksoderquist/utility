@@ -26,6 +26,32 @@ public class LogTest extends TestCase {
 		Log.removeHandler( handler );
 		Log.setLevel( null );
 	}
+	
+	public void testIsActive() {
+		Log.setLevel( Log.NONE );
+		assertTrue( Log.isActive( Log.NONE ) );
+		assertFalse( Log.isActive( Log.ERROR ) );
+		assertFalse( Log.isActive( Log.DETAIL ) );
+		assertFalse( Log.isActive( Log.ALL ) );
+		
+		Log.setLevel( Log.ERROR );
+		assertTrue( Log.isActive( Log.NONE ) );
+		assertTrue( Log.isActive( Log.ERROR ) );
+		assertFalse( Log.isActive( Log.DETAIL ) );
+		assertFalse( Log.isActive( Log.ALL ) );
+		
+		Log.setLevel( Log.DETAIL );
+		assertTrue( Log.isActive( Log.NONE ) );
+		assertTrue( Log.isActive( Log.ERROR ) );
+		assertTrue( Log.isActive( Log.DETAIL ) );
+		assertFalse( Log.isActive( Log.ALL ) );
+		
+		Log.setLevel( Log.ALL );
+		assertTrue( Log.isActive( Log.NONE ) );
+		assertTrue( Log.isActive( Log.ERROR ) );
+		assertTrue( Log.isActive( Log.DETAIL ) );
+		assertTrue( Log.isActive( Log.ALL ) );
+	}
 
 	public void testSetLevel() {
 		Level level = Log.getLevel();
