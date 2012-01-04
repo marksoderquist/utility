@@ -22,12 +22,6 @@
 			<version>3.6.8.Final</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.4</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 	
 </project>
