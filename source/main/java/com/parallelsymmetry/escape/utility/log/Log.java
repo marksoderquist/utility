@@ -211,6 +211,7 @@ public class Log {
 
 		defaultHandlers.put( logger, handler );
 		logger.addHandler( handler );
+		oldHandler.setLevel( Log.ALL );
 	}
 
 	public static final void write() {
