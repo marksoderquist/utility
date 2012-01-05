@@ -18,7 +18,7 @@ public class LogTest extends TestCase {
 	public void setUp() {
 		// Must set log level because it is in an unknown state from previous tests.
 		Log.setLevel( Log.INFO );
-		Log.removeHandler( Log.DEFAULT_HANDLER );
+		Log.removeHandler( Log.getDefaultHandler() );
 		handler = new MockLogHandler();
 		Log.addHandler( handler );
 	}
@@ -243,7 +243,25 @@ public class LogTest extends TestCase {
 			assertEquals( level, Log.parseLevel( level.getName().toLowerCase() ) );
 			assertEquals( level, Log.parseLevel( level.getName().toUpperCase() ) );
 		}
+	}
 
+	public void testSetDefaultHandlerCheckLogLevel() {
+		Handler handlerD = Log.getDefaultHandler();
+		Handler handler1 = new MockLogHandler();
+		Handler handler2 = new MockLogHandler();
+		assertEquals( Log.INFO, handlerD.getLevel() );
+		assertEquals( Log.ALL, handler1.getLevel() );
+		assertEquals( Log.ALL, handler2.getLevel() );
+
+		Log.setDefaultHandler( handler1 );
+		assertEquals( Log.ALL, handlerD.getLevel() );
+		assertEquals( Log.INFO, handler1.getLevel() );
+		assertEquals( Log.ALL, handler2.getLevel() );
+
+		Log.setDefaultHandler( handler2 );
+		assertEquals( Log.ALL, handlerD.getLevel() );
+		assertEquals( Log.ALL, handler1.getLevel() );
+		assertEquals( Log.INFO, handler2.getLevel() );
 	}
 
 }
