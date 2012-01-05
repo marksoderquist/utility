@@ -15,6 +15,8 @@ public class ServletContextHandler extends Handler {
 
 	@Override
 	public void publish( LogRecord record ) {
+		if( !isLoggable( record ) ) return;
+
 		if( this.context == null ) return;
 
 		if( record.getThrown() == null ) {
@@ -34,4 +36,9 @@ public class ServletContextHandler extends Handler {
 		// Intentionally do nothing.
 	}
 
+	public boolean isLoggable( LogRecord record ) {
+		if( context == null ) return false;
+		return super.isLoggable( record );
+	}
+	
 }
