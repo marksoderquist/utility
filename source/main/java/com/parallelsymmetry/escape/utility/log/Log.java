@@ -299,6 +299,20 @@ public class Log {
 		getLogger( name == null ? DEFAULT_LOGGER_NAME : name ).log( record );
 	}
 
+	public static final Level getLevel( int value ) {
+		List<CustomLevel> levels = new ArrayList<CustomLevel>( known );
+		Collections.sort( levels );
+
+		Level level = null;
+
+		int count = levels.size();
+		for( int index = 0; index < count; index++ ) {
+			// FIXME Finish this method.
+		}
+
+		return level;
+	}
+
 	public static final SortedSet<? extends Level> getLevels() {
 		return new ConcurrentSkipListSet<CustomLevel>( known );
 	}
