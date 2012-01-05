@@ -17,12 +17,10 @@ public class ServletContextHandler extends Handler {
 	public void publish( LogRecord record ) {
 		if( !isLoggable( record ) ) return;
 
-		if( this.context == null ) return;
-
 		if( record.getThrown() == null ) {
-			this.context.log( record.getMessage() );
+			context.log( record.getMessage() );
 		} else {
-			this.context.log( record.getMessage(), record.getThrown() );
+			context.log( record.getMessage(), record.getThrown() );
 		}
 	}
 
