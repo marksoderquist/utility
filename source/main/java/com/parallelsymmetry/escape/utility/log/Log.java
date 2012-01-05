@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -17,6 +19,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import com.parallelsymmetry.escape.utility.Parameters;
+import com.parallelsymmetry.escape.utility.agent.Worker;
 
 /**
  * Provides a facade to the standard Java logging architecture. This facade
@@ -65,6 +68,8 @@ public class Log {
 	private static boolean showColor;
 
 	private static boolean showPrefix;
+
+	private static LogDaemon daemon;
 
 	static {
 		Logger defaultLogger = Logger.getLogger( DEFAULT_LOGGER_NAME );
@@ -296,7 +301,11 @@ public class Log {
 	 * @param record
 	 */
 	public static final void writeTo( String name, LogRecord record ) {
-		getLogger( name == null ? DEFAULT_LOGGER_NAME : name ).log( record );
+		if( isDaemon() ) {
+			daemon.submit( name, record );
+		} else {
+			doWriteTo( name, record );
+		}
 	}
 
 	public static final Level getLevel( int value ) {
@@ -355,27 +364,23 @@ public class Log {
 		}
 	}
 
-	private static final Logger getLogger( String name ) {
-		Logger logger = Logger.getLogger( name );
-
-		synchronized( defaultHandlers ) {
-			// Ensure a default handler exists for the logger.
-			if( defaultHandlers.get( logger ) == null ) {
-				logger.setUseParentHandlers( false );
-				logger.setLevel( ALL );
-
-				Handler handler = new DefaultHandler( System.out );
-				logger.addHandler( handler );
-				handler.setLevel( INFO );
-
-				defaultHandlers.put( logger, handler );
-			}
-		}
-
-		return logger;
+	public synchronized static final boolean isDaemon() {
+		return daemon != null && daemon.isRunning();
 	}
 
-	private static StackTraceElement getCaller() {
+	public synchronized static final void startDaemon() {
+		if( isDaemon() ) return;
+		daemon = new LogDaemon();
+		daemon.start();
+	}
+
+	public synchronized static final void stopDaemon() {
+		if( !isDaemon() ) return;
+		daemon.stop();
+		daemon = null;
+	}
+
+	private static final StackTraceElement getCaller() {
 		StackTraceElement elements[] = Thread.currentThread().getStackTrace();
 
 		int index = 0;
@@ -398,6 +403,78 @@ public class Log {
 		}
 
 		return null;
+	}
+
+	private static final Logger getLogger( String name ) {
+		Logger logger = Logger.getLogger( name );
+
+		synchronized( defaultHandlers ) {
+			// Ensure a default handler exists for the logger.
+			if( defaultHandlers.get( logger ) == null ) {
+				logger.setUseParentHandlers( false );
+				logger.setLevel( ALL );
+
+				Handler handler = new DefaultHandler( System.out );
+				logger.addHandler( handler );
+				handler.setLevel( INFO );
+
+				defaultHandlers.put( logger, handler );
+			}
+		}
+
+		return logger;
+	}
+
+	private static final void doWriteTo( String name, LogRecord record ) {
+		getLogger( name == null ? DEFAULT_LOGGER_NAME : name ).log( record );
+	}
+
+	private static class LogDaemon extends Worker {
+
+		private BlockingQueue<LogRequest> queue = new LinkedBlockingQueue<LogRequest>();
+
+		public LogDaemon() {
+			super( "Log Daemon", true );
+			setInterruptOnStop( true );
+		}
+
+		@Override
+		public void run() {
+			while( shouldExecute() ) {
+				try {
+					LogRequest request = queue.take();
+					doWriteTo( request.getName(), request.getRecord() );
+				} catch( InterruptedException exception ) {
+					// Intentionally ignore exception.
+				}
+			}
+		}
+
+		public void submit( String name, LogRecord record ) {
+			queue.offer( new LogRequest( name, record ) );
+		}
+
+		private class LogRequest {
+
+			private String name;
+
+			private LogRecord record;
+
+			public LogRequest( String name, LogRecord record ) {
+				this.name = name;
+				this.record = record;
+			}
+
+			public String getName() {
+				return name;
+			}
+
+			public LogRecord getRecord() {
+				return record;
+			}
+
+		}
+
 	}
 
 	private static class CustomLevel extends Level implements Comparable<CustomLevel> {
