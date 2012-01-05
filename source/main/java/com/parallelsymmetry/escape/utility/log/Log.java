@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -24,31 +26,21 @@ import com.parallelsymmetry.escape.utility.Parameters;
  */
 public class Log {
 
-	private static final int ERROR_VALUE = 1000;
-
-	private static final int WARN_VALUE = 900;
-
-	private static final int INFO_VALUE = 800;
-
-	private static final int TRACE_VALUE = 700;
-
-	private static final int DEBUG_VALUE = 600;
-	
-	private static final int DETAIL_VALUE = 500;
+	private static SortedSet<CustomLevel> known = new ConcurrentSkipListSet<CustomLevel>();
 
 	public static final Level NONE = new CustomLevel( "NONE", Integer.MAX_VALUE );
 
-	public static final Level ERROR = new CustomLevel( "ERROR", ERROR_VALUE );
+	public static final Level ERROR = new CustomLevel( "ERROR", 1000 );
 
-	public static final Level WARN = new CustomLevel( "WARN", WARN_VALUE );
+	public static final Level WARN = new CustomLevel( "WARN", 900 );
 
-	public static final Level INFO = new CustomLevel( "INFO", INFO_VALUE );
+	public static final Level INFO = new CustomLevel( "INFO", 800 );
 
-	public static final Level TRACE = new CustomLevel( "TRACE", TRACE_VALUE );
+	public static final Level TRACE = new CustomLevel( "TRACE", 700 );
 
-	public static final Level DEBUG = new CustomLevel( "DEBUG", DEBUG_VALUE );
-	
-	public static final Level DETAIL = new CustomLevel( "DETAIL", DETAIL_VALUE );
+	public static final Level DEBUG = new CustomLevel( "DEBUG", 600 );
+
+	public static final Level DETAIL = new CustomLevel( "DETAIL", 500 );
 
 	public static final Level ALL = new CustomLevel( "ALL", Integer.MIN_VALUE );
 
@@ -307,26 +299,33 @@ public class Log {
 		getLogger( name == null ? DEFAULT_LOGGER_NAME : name ).log( record );
 	}
 
+	public static final SortedSet<? extends Level> getLevels() {
+		return new ConcurrentSkipListSet<CustomLevel>( known );
+	}
+
+	public static final Level parseLevel( int value ) {
+		List<CustomLevel> levels = new ArrayList<CustomLevel>( known );
+		Collections.sort( levels );
+
+		Level level = null;
+
+		int count = levels.size();
+		for( int index = 0; index < count; index++ ) {
+			Level check = levels.get( index );
+			if( check.intValue() > value ) break;
+			level = check;
+		}
+
+		return level;
+	}
+
 	public static final Level parseLevel( String string ) {
 		if( string == null ) return null;
 
 		string = string.toUpperCase();
-		if( NONE.getName().equals( string ) ) {
-			return NONE;
-		} else if( ERROR.getName().equals( string ) ) {
-			return ERROR;
-		} else if( WARN.getName().equals( string ) ) {
-			return WARN;
-		} else if( INFO.getName().equals( string ) ) {
-			return INFO;
-		} else if( TRACE.getName().equals( string ) ) {
-			return TRACE;
-		} else if( DEBUG.getName().equals( string ) ) {
-			return DEBUG;
-		} else if( DETAIL.getName().equals( string ) ) {
-			return DETAIL;
-		} else if( ALL.getName().equals( string ) ) {
-			return ALL;
+
+		for( Level level : known ) {
+			if( level.getName().equals( string ) ) return level;
 		}
 
 		return null;
@@ -387,12 +386,22 @@ public class Log {
 		return null;
 	}
 
-	private static class CustomLevel extends Level {
+	private static class CustomLevel extends Level implements Comparable<CustomLevel> {
 
 		private static final long serialVersionUID = -7853455775674488102L;
 
 		protected CustomLevel( String name, int value ) {
 			super( name, value );
+			synchronized( CustomLevel.class ) {
+				known.add( this );
+			}
+		}
+
+		@Override
+		public int compareTo( CustomLevel that ) {
+			int thisValue = this.intValue();
+			int thatValue = that.intValue();
+			return ( thisValue < thatValue ? -1 : ( thisValue == thatValue ? 0 : 1 ) );
 		}
 
 	}

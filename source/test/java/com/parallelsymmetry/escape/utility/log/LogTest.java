@@ -2,6 +2,8 @@ package com.parallelsymmetry.escape.utility.log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.SortedSet;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -26,26 +28,26 @@ public class LogTest extends TestCase {
 		Log.removeHandler( handler );
 		Log.setLevel( null );
 	}
-	
+
 	public void testIsActive() {
 		Log.setLevel( Log.NONE );
 		assertTrue( Log.isActive( Log.NONE ) );
 		assertFalse( Log.isActive( Log.ERROR ) );
 		assertFalse( Log.isActive( Log.DETAIL ) );
 		assertFalse( Log.isActive( Log.ALL ) );
-		
+
 		Log.setLevel( Log.ERROR );
 		assertTrue( Log.isActive( Log.NONE ) );
 		assertTrue( Log.isActive( Log.ERROR ) );
 		assertFalse( Log.isActive( Log.DETAIL ) );
 		assertFalse( Log.isActive( Log.ALL ) );
-		
+
 		Log.setLevel( Log.DETAIL );
 		assertTrue( Log.isActive( Log.NONE ) );
 		assertTrue( Log.isActive( Log.ERROR ) );
 		assertTrue( Log.isActive( Log.DETAIL ) );
 		assertFalse( Log.isActive( Log.ALL ) );
-		
+
 		Log.setLevel( Log.ALL );
 		assertTrue( Log.isActive( Log.NONE ) );
 		assertTrue( Log.isActive( Log.ERROR ) );
@@ -118,7 +120,7 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
 		assertEquals( "Incorrect log message.", "Test", record.getMessage() );
 	}
-	
+
 	public void testWriteWithObjectListAndNullValue() {
 		LogRecord record = null;
 
@@ -207,21 +209,41 @@ public class LogTest extends TestCase {
 		assertEquals( "Incorrect log level.", Log.TRACE, record.getLevel() );
 	}
 
-	public void testParseLevel() {
+	public void testGetLevels() {
+		SortedSet<? extends Level> levels = Log.getLevels();
+		assertEquals( 8, levels.size() );
+
+		Iterator<? extends Level> iterator = levels.iterator();
+		assertEquals( Log.ALL, iterator.next() );
+		assertEquals( Log.DETAIL, iterator.next() );
+		assertEquals( Log.DEBUG, iterator.next() );
+		assertEquals( Log.TRACE, iterator.next() );
+		assertEquals( Log.INFO, iterator.next() );
+		assertEquals( Log.WARN, iterator.next() );
+		assertEquals( Log.ERROR, iterator.next() );
+		assertEquals( Log.NONE, iterator.next() );
+	}
+
+	public void testParseLevelWithInt() {
+		assertEquals( Log.ALL, Log.parseLevel( 0 ) );
+
+		SortedSet<? extends Level> levels = Log.getLevels();
+		for( Level level : levels ) {
+			assertEquals( level, Log.parseLevel( level.intValue() ) );
+		}
+	}
+
+	public void testParseLevelWithString() {
 		assertEquals( "Incorrect log level.", null, Log.parseLevel( null ) );
 		assertEquals( "Incorrect log level.", null, Log.parseLevel( "" ) );
 		assertEquals( "Incorrect log level.", null, Log.parseLevel( "junk" ) );
 
-		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "none" ) );
-		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "NonE" ) );
-		assertEquals( "Incorrect log level.", Log.NONE, Log.parseLevel( "NONE" ) );
+		SortedSet<? extends Level> levels = Log.getLevels();
+		for( Level level : levels ) {
+			assertEquals( level, Log.parseLevel( level.getName().toLowerCase() ) );
+			assertEquals( level, Log.parseLevel( level.getName().toUpperCase() ) );
+		}
 
-		assertEquals( "Incorrect log level.", Log.ERROR, Log.parseLevel( "error" ) );
-		assertEquals( "Incorrect log level.", Log.WARN, Log.parseLevel( "warn" ) );
-		assertEquals( "Incorrect log level.", Log.INFO, Log.parseLevel( "info" ) );
-		assertEquals( "Incorrect log level.", Log.TRACE, Log.parseLevel( "trace" ) );
-		assertEquals( "Incorrect log level.", Log.DEBUG, Log.parseLevel( "debug" ) );
-		assertEquals( "Incorrect log level.", Log.ALL, Log.parseLevel( "all" ) );
 	}
 
 }
