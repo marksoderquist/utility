@@ -81,8 +81,13 @@ public class Images {
 		return result;
 	}
 
-	public static final Image scale( Image image, int width, int height ) {
+	public static final BufferedImage scale( Image image, int width, int height ) {
+		return scale( image, width, height, BufferedImage.TYPE_INT_ARGB );
+	}
+
+	public static final BufferedImage scale( Image image, int width, int height, int type ) {
 		Image result = image;
+		BufferedImage buffer = null;
 
 		int w = image.getWidth( null );
 		int h = image.getHeight( null );
@@ -104,7 +109,7 @@ public class Images {
 				if( h > height ) h = height;
 			}
 
-			BufferedImage buffer = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
+			buffer = new BufferedImage( w, h, type );
 			Graphics2D graphics = buffer.createGraphics();
 			graphics.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR );
 			graphics.drawImage( result, 0, 0, w, h, null );
@@ -113,11 +118,7 @@ public class Images {
 			result = buffer;
 		} while( w != width || h != height );
 
-		return result;
-	}
-
-	public static final BufferedImage scale( BufferedImage image, int width, int height ) {
-		return (BufferedImage)scale( (Image)image, width, height );
+		return buffer;
 	}
 
 }
