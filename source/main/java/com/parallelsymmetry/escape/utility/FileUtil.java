@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class FileUtil {
+public final class FileUtil {
 
 	public static final long KB = 1000;
 
@@ -46,19 +47,19 @@ public class FileUtil {
 
 	public static final FileFilter JAR_FILE_FILTER = new JarFileFilter();
 
-	public static final String getExtension( File file ) {
+	public static String getExtension( File file ) {
 		if( file == null ) return null;
 		return getExtension( file.getName() );
 	}
 
-	public static final String getExtension( String name ) {
+	public static String getExtension( String name ) {
 		if( name == null ) return null;
 		int index = name.lastIndexOf( '.' );
 		if( index < 0 ) return "";
 		return name.substring( index + 1 );
 	}
 
-	public static final String getHumanSize( long size ) {
+	public static String getHumanSize( long size ) {
 		int exponent = 0;
 		long coefficient = size;
 		while( coefficient >= KB ) {
@@ -106,7 +107,7 @@ public class FileUtil {
 		return String.valueOf( coefficient ) + unit;
 	}
 
-	public static final String getHumanBinSize( long size ) {
+	public static String getHumanBinSize( long size ) {
 		int exponent = 0;
 		long coefficient = size;
 		while( coefficient >= KiB ) {
@@ -154,12 +155,12 @@ public class FileUtil {
 		return String.valueOf( coefficient ) + unit;
 	}
 
-	public static final File removeExtension( File file ) {
+	public static File removeExtension( File file ) {
 		if( file == null ) return null;
 		return new File( removeExtension( file.toString() ) );
 	}
 
-	public static final String removeExtension( String name ) {
+	public static String removeExtension( String name ) {
 		if( name == null ) return null;
 		int index = name.lastIndexOf( '.' );
 		if( index < 0 ) return name;
@@ -175,7 +176,7 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static final File createTempFolder( String prefix, String suffix ) throws IOException {
+	public static File createTempFolder( String prefix, String suffix ) throws IOException {
 		File file = File.createTempFile( prefix, suffix );
 		if( !file.delete() ) return null;
 		if( !file.mkdir() ) return null;
@@ -192,34 +193,34 @@ public class FileUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	public static final File createTempFolder( String prefix, String suffix, File parent ) throws IOException {
+	public static File createTempFolder( String prefix, String suffix, File parent ) throws IOException {
 		File file = File.createTempFile( prefix, suffix, parent );
 		if( !file.delete() ) return null;
 		if( !file.mkdir() ) return null;
 		return file;
 	}
 
-	public static final void save( String data, File target ) throws IOException {
+	public static void save( String data, File target ) throws IOException {
 		save( data, target, "UTF-8" );
 	}
 
-	public static final void save( String data, File target, String encoding ) throws IOException {
+	public static void save( String data, File target, String encoding ) throws IOException {
 		IoUtil.save( data, new FileOutputStream( target ), encoding );
 	}
 
-	public static final String load( File source ) throws IOException {
+	public static String load( File source ) throws IOException {
 		return load( source, "UTF-8" );
 	}
 
-	public static final String load( File source, String encoding ) throws IOException {
+	public static String load( File source, String encoding ) throws IOException {
 		return IoUtil.load( new FileInputStream( source ), encoding );
 	}
 
-	public static final List<String> loadAsLines( File source ) throws IOException {
+	public static List<String> loadAsLines( File source ) throws IOException {
 		return loadAsLines( source, "UTF-8" );
 	}
 
-	public static final List<String> loadAsLines( File source, String encoding ) throws IOException {
+	public static List<String> loadAsLines( File source, String encoding ) throws IOException {
 		BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( source ), encoding ) );
 
 		String line = null;
@@ -235,7 +236,7 @@ public class FileUtil {
 		return list;
 	}
 
-	public static final void zip( File source, File target ) throws IOException {
+	public static void zip( File source, File target ) throws IOException {
 		URI base = source.toURI();
 		List<File> files = listFiles( source );
 
@@ -261,7 +262,7 @@ public class FileUtil {
 		}
 	}
 
-	public static final void unzip( File source, File target ) throws IOException {
+	public static void unzip( File source, File target ) throws IOException {
 		target.mkdirs();
 
 		ZipEntry entry = null;
@@ -289,7 +290,7 @@ public class FileUtil {
 		}
 	}
 
-	public static final List<File> listFiles( File file ) {
+	public static List<File> listFiles( File file ) {
 		List<File> files = new ArrayList<File>();
 
 		File[] fileArray = file.listFiles();
@@ -305,11 +306,11 @@ public class FileUtil {
 		return files;
 	}
 
-	public static final boolean copy( File source, File target ) throws IOException {
+	public static boolean copy( File source, File target ) throws IOException {
 		return copy( source, target, false );
 	}
 
-	public static final boolean copy( File source, File target, boolean keepSourceFolder ) throws IOException {
+	public static boolean copy( File source, File target, boolean keepSourceFolder ) throws IOException {
 		// Cannot copy a folder to a file.
 		if( source.isDirectory() && target.isFile() ) return false;
 
@@ -358,7 +359,16 @@ public class FileUtil {
 		return false;
 	}
 
-	public static final boolean move( File source, File target ) throws IOException {
+	public static long copy( File file, OutputStream target ) throws IOException {
+		final FileInputStream source = new FileInputStream( file );
+		try {
+			return IoUtil.copy( source, target );
+		} finally {
+			source.close();
+		}
+	}
+
+	public static boolean move( File source, File target ) throws IOException {
 		if( source.renameTo( target ) ) {
 			return true;
 		} else {
@@ -369,7 +379,7 @@ public class FileUtil {
 		return false;
 	}
 
-	public static final boolean delete( File file ) {
+	public static boolean delete( File file ) {
 		if( !file.exists() ) return true;
 		if( file.isDirectory() ) {
 			for( File child : file.listFiles() ) {
@@ -379,7 +389,7 @@ public class FileUtil {
 		return file.delete();
 	}
 
-	public static final void deleteOnExit( File file ) {
+	public static void deleteOnExit( File file ) {
 		if( !file.exists() ) return;
 		file.deleteOnExit();
 		if( file.isDirectory() ) {
@@ -388,10 +398,10 @@ public class FileUtil {
 			}
 		}
 	}
-	
-	public static final boolean isWritable( File file ) {
+
+	public static boolean isWritable( File file ) {
 		if( !file.isDirectory() ) return file.canWrite();
-		
+
 		try {
 			File privilegeCheckFile = new File( file, "privilege.check.txt" );
 			return privilegeCheckFile.createNewFile() && privilegeCheckFile.delete();

@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -335,6 +337,25 @@ public class FileUtilTest extends TestCase {
 		parent1.deleteOnExit();
 	}
 
+	public void testCopyFileToOutputStream() throws Exception {
+		long time = System.currentTimeMillis();
+		File source = File.createTempFile( PREFIX, "copyFileToFileSource" );
+		ByteArrayOutputStream target = new ByteArrayOutputStream();
+		FileOutputStream fileOutput = new FileOutputStream( source );
+		DataOutputStream output = new DataOutputStream( fileOutput );
+		output.writeLong( time );
+		output.close();
+
+		long count = FileUtil.copy( source, target );
+		assertEquals( 8, count );
+
+		DataInputStream input = new DataInputStream( new ByteArrayInputStream( target.toByteArray() ) );
+		assertEquals( time, input.readLong() );
+		input.close();
+
+		source.deleteOnExit();
+	}
+
 	public void testDeleteTree() throws Exception {
 		assertTrue( FileUtil.delete( new File( "" ) ) );
 		File file = File.createTempFile( PREFIX, "deleteTree" );
@@ -368,9 +389,9 @@ public class FileUtilTest extends TestCase {
 
 		FileUtil.deleteOnExit( parent0 );
 	}
-	
+
 	public void testIsWritable() throws Exception {
-		File folder = FileUtil.createTempFolder( "FileUtil", "test");
+		File folder = FileUtil.createTempFolder( "FileUtil", "test" );
 		assertTrue( FileUtil.isWritable( folder ) );
 	}
 

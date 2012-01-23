@@ -11,12 +11,17 @@ import java.io.Writer;
 
 public class IoUtil {
 
-	public static final void copy( InputStream source, OutputStream target ) throws IOException {
-		int length;
-		byte[] buffer = new byte[1024];
-		while( ( length = source.read( buffer ) ) > 0 ) {
-			target.write( buffer, 0, length );
+	private static final int DEFAULT_BUFFER_SIZE = 4 * 1024;
+
+	public static final long copy( InputStream source, OutputStream target ) throws IOException {
+		int read = 0;
+		long count = 0;
+		byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+		while( ( read = source.read( buffer ) ) > -1 ) {
+			target.write( buffer, 0, read );
+			count += read;
 		}
+		return count;
 	}
 
 	public static final void copy( Reader source, Writer target ) throws IOException {
