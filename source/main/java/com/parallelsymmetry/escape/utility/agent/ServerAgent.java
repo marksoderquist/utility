@@ -12,7 +12,7 @@ import com.parallelsymmetry.escape.utility.TripLock;
 import com.parallelsymmetry.escape.utility.log.Log;
 
 public class ServerAgent extends PipeAgent {
-	
+
 	private String name;
 
 	private String host;
@@ -28,6 +28,8 @@ public class ServerAgent extends PipeAgent {
 	private TripLock connectlock = new TripLock();
 
 	private ServerListener listener;
+
+	private PipeAgent slave;
 
 	public ServerAgent() {
 		this( null, 0 );
@@ -69,6 +71,14 @@ public class ServerAgent extends PipeAgent {
 		this.listener = listener;
 	}
 
+	public PipeAgent getSlave() {
+		return slave;
+	}
+
+	public void setSlave( PipeAgent slave ) {
+		this.slave = slave;
+	}
+
 	@Override
 	protected final void connect() throws Exception {
 		InetSocketAddress address = host == null ? new InetSocketAddress( port ) : new InetSocketAddress( host, port );
@@ -103,6 +113,13 @@ public class ServerAgent extends PipeAgent {
 		String address = socket.getInetAddress().getHostAddress() + ": " + socket.getPort();
 		Log.write( Log.TRACE, getName() + " Client connected: " + address );
 		try {
+			if( slave != null ) {
+				try {
+					slave.startAndWait();
+				} catch( InterruptedException exception ) {
+					return;
+				}
+			}
 			if( listener == null ) {
 				setRealInputStream( new BufferedInputStream( socket.getInputStream() ) );
 				setRealOutputStream( new BufferedOutputStream( socket.getOutputStream() ) );
@@ -116,6 +133,13 @@ public class ServerAgent extends PipeAgent {
 				listener.handleSocket( socket );
 			}
 		} finally {
+			if( slave != null ) {
+				try {
+					slave.stopAndWait();
+				} catch( InterruptedException exception ) {
+					return;
+				}
+			}
 			Log.write( Log.TRACE, getName() + " Client disconnected: " + address );
 		}
 	}
