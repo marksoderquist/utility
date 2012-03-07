@@ -166,10 +166,12 @@ public final class TextUtil {
 	 * @return A printable string representation of the character.
 	 */
 	public static String toPrintableString( char data ) {
+
 		if( data >= 32 && data <= 126 ) {
 			return String.valueOf( data );
 		} else {
-			return "[" + String.valueOf( (int)data ) + "]";
+			short value = (short)data;
+			return "[" + String.valueOf( (int)(value < 0 ? value + 65536 : value) ) + "]";
 		}
 	}
 
@@ -178,7 +180,8 @@ public final class TextUtil {
 		StringBuilder builder = new StringBuilder();
 		int count = data.length;
 		for( int index = 0; index < count; index++ ) {
-			builder.append( toPrintableString( (char)data[index] ) );
+			byte value = data[index];
+			builder.append( toPrintableString( (char)( value < 0 ? value + 256 : value ) ) );
 		}
 		return builder.toString();
 	}
