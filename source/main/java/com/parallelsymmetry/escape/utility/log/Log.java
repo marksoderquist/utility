@@ -89,6 +89,7 @@ public class Log {
 	 */
 	public static final void init( Parameters parameters ) {
 		if( parameters.isSet( LogFlag.LOG_TAG ) ) Log.setShowTag( parameters.isTrue( LogFlag.LOG_TAG ) );
+		if( parameters.isSet( LogFlag.LOG_DATE ) ) Log.setShowDate( parameters.isTrue( LogFlag.LOG_DATE ) );
 		if( parameters.isSet( LogFlag.LOG_COLOR ) ) Log.setShowColor( parameters.isTrue( LogFlag.LOG_COLOR ) );
 		if( parameters.isSet( LogFlag.LOG_PREFIX ) ) Log.setShowPrefix( parameters.isTrue( LogFlag.LOG_PREFIX ) );
 		if( parameters.isSet( LogFlag.LOG_LEVEL ) ) Log.setLevel( Log.parseLevel( parameters.get( LogFlag.LOG_LEVEL ) ) );

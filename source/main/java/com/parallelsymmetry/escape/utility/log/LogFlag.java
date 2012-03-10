@@ -15,5 +15,7 @@ public interface LogFlag {
 	public static final String LOG_PREFIX = "-log.prefix";
 
 	public static final String LOG_TAG = "-log.tag";
+	
+	public static final String LOG_DATE = "-log.date";
 
 }
