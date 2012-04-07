@@ -9,7 +9,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 public final class JavaUtil {
@@ -137,6 +139,19 @@ public final class JavaUtil {
 		}
 
 		return cause;
+	}
+
+	public static void dumpSystemProperties() {
+		Properties properties = System.getProperties();
+		List<String> keys = new ArrayList<String>( properties.size() );
+		for( Object key : System.getProperties().keySet() ) {
+			keys.add( key.toString() );
+		}
+		Collections.sort( keys );
+		
+		for( String key : keys ) {
+			System.out.println( key + " = " + properties.get( key ));
+		}
 	}
 
 }
