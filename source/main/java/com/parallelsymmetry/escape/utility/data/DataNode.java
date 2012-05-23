@@ -48,7 +48,18 @@ public abstract class DataNode {
 	/**
 	 * Set the modified flag for this node.
 	 */
-	public void modify() {
+	public void setModified( boolean modified ) {
+		if( modified ) {
+			modify();
+		} else {
+			unmodify();
+		}
+	}
+	
+	/**
+	 * Set the modified flag for this node.
+	 */
+	protected void modify() {
 		if( modified ) return;
 		
 		boolean atomic = !isTransactionActive();
@@ -60,7 +71,7 @@ public abstract class DataNode {
 	/**
 	 * Clear the modified flag for this node and all child nodes.
 	 */
-	public void unmodify() {
+	protected void unmodify() {
 		if( !modified ) return;
 
 		boolean atomic = !isTransactionActive();
