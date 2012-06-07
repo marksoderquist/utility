@@ -87,7 +87,7 @@ public class Log {
 	 * @param parameters
 	 * @return
 	 */
-	public static final void init( Parameters parameters ) {
+	public static final void config( Parameters parameters ) {
 		if( parameters.isSet( LogFlag.LOG_TAG ) ) Log.setShowTag( parameters.isTrue( LogFlag.LOG_TAG ) );
 		if( parameters.isSet( LogFlag.LOG_DATE ) ) Log.setShowDate( parameters.isTrue( LogFlag.LOG_DATE ) );
 		if( parameters.isSet( LogFlag.LOG_COLOR ) ) Log.setShowColor( parameters.isTrue( LogFlag.LOG_COLOR ) );
