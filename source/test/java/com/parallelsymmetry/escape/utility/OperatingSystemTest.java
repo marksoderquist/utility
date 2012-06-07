@@ -2,9 +2,16 @@ package com.parallelsymmetry.escape.utility;
 
 import java.lang.reflect.Method;
 
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 public class OperatingSystemTest extends TestCase {
+
+	@Override
+	public void setUp() throws Exception {
+		System.clearProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
+	}
 
 	public void testLinux() throws Exception {
 		init( "Linux", "x86_64", "2.6.32_45" );
@@ -49,6 +56,33 @@ public class OperatingSystemTest extends TestCase {
 		//		assertEquals( new File( System.getenv( "allusersprofile" ) ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder() );
 		//		assertEquals( new File( System.getenv( "appdata" ), "Test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
 		//		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
+	}
+
+	@Test
+	public void testIsProcessElevatedMac() throws Exception {
+		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
+		assertFalse( OperatingSystem.isProcessElevated() );
+
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		assertTrue( OperatingSystem.isProcessElevated() );
+	}
+
+	@Test
+	public void testIsProcessElevatedUnix() throws Exception {
+		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
+		assertFalse( OperatingSystem.isProcessElevated() );
+
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		assertTrue( OperatingSystem.isProcessElevated() );
+	}
+
+	@Test
+	public void testIsProcessElevatedWindows() throws Exception {
+		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
+		assertFalse( OperatingSystem.isProcessElevated() );
+
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {

@@ -8,11 +8,6 @@ import org.junit.Test;
 
 public class ElevatedProcessBuilderTest extends TestCase {
 
-	@Override
-	public void setUp() throws Exception {
-		System.clearProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
-	}
-
 	/*
 	 * Keep this test commented for normal use, uncomment to test manually.
 	 */
@@ -70,36 +65,6 @@ public class ElevatedProcessBuilderTest extends TestCase {
 		assertEquals( "wscript", builder.command().get( 0 ) );
 		assertEquals( elevate.getCanonicalPath(), builder.command().get( 1 ) );
 		assertEquals( "notepad.exe", builder.command().get( 2 ) );
-	}
-
-	@Test
-	public void testIsElevateRequiredMac() throws Exception {
-		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
-		ElevatedProcessBuilder builder = new ElevatedProcessBuilder();
-		assertTrue( builder.isElevationRequired() );
-
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
-		assertFalse( builder.isElevationRequired() );
-	}
-
-	@Test
-	public void testIsElevationRequiredUnix() throws Exception {
-		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
-		ElevatedProcessBuilder builder = new ElevatedProcessBuilder();
-		assertTrue( builder.isElevationRequired() );
-
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
-		assertFalse( builder.isElevationRequired() );
-	}
-
-	@Test
-	public void testIsElevationRequired() throws Exception {
-		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
-		ElevatedProcessBuilder builder = new ElevatedProcessBuilder();
-		assertTrue( builder.isElevationRequired() );
-
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
-		assertFalse( builder.isElevationRequired() );
 	}
 
 }

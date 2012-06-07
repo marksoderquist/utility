@@ -115,6 +115,16 @@ public class OperatingSystem {
 		return family == Family.WINDOWS;
 	}
 	
+	public static final boolean isProcessElevated() {
+		if( ElevatedProcessBuilder.isElevatedFlagSet() ) return true;
+	
+		if( OperatingSystem.isWindows() ) {
+			return canWriteToProgramFiles();
+		} else {
+			return System.getProperty( "user.name" ).equals( "root" );
+		}
+	}
+
 	public static final String getJavaExecutableName() {
 		return isWindows() ? "javaw" : "java";
 	}
@@ -278,6 +288,18 @@ public class OperatingSystem {
 		}
 
 		return null;
+	}
+
+	private static final boolean canWriteToProgramFiles() {
+		if( !OperatingSystem.isWindows() ) return false;
+		try {
+			String programFilesFolder = System.getenv( "ProgramFiles" );
+			if( programFilesFolder == null ) programFilesFolder = "C:\\Program Files";
+			File privilegeCheckFile = new File( programFilesFolder, "privilege.check.txt" );
+			return privilegeCheckFile.createNewFile() && privilegeCheckFile.delete();
+		} catch( IOException exception ) {
+			return false;
+		}
 	}
 
 }

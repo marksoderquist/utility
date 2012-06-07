@@ -37,7 +37,7 @@ public class ElevatedProcessBuilder {
 	}
 
 	public ElevatedProcessBuilder( ProcessBuilder builder, boolean veto ) throws IOException {
-		if( !veto && isElevationRequired() ) {
+		if( !veto && !OperatingSystem.isProcessElevated() ) {
 			this.builder = new ProcessBuilder( getElevateCommands() );
 			builder.command().addAll( this.builder.command() );
 			builder.environment().putAll( this.builder.environment() );
@@ -45,10 +45,6 @@ public class ElevatedProcessBuilder {
 		} else {
 			this.builder = builder;
 		}
-	}
-
-	public static final boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 	/**
@@ -61,29 +57,10 @@ public class ElevatedProcessBuilder {
 	}
 
 	/**
-	 * Check if the current user has required privilege elevation.
-	 * 
-	 * @return true if privilege elevation is required, false otherwise.
-	 */
-	public static final boolean isElevationRequired() {
-		return !isProcessElevated();
-	}
-	
-	/**
 	 * Check if the process has elevated privileges.
 	 * 
-	 * @return true if privilege elevation is required, false otherwise.
+	 * @return true if the process has elevated privileges.
 	 */
-	public static final boolean isProcessElevated() {
-		if( isElevatedFlagSet() ) return true;
-
-		if( OperatingSystem.isWindows() ) {
-			return canWriteToProgramFiles();
-		} else {
-			return System.getProperty( "user.name" ).equals( "root" );
-		}
-	}
-
 	public List<String> command() {
 		return builder.command();
 	}
@@ -120,15 +97,8 @@ public class ElevatedProcessBuilder {
 		return builder.start();
 	}
 
-	private static final boolean canWriteToProgramFiles() {
-		try {
-			String programFilesFolder = System.getenv( "ProgramFiles" );
-			if( programFilesFolder == null ) programFilesFolder = "C:\\Program Files";
-			File privilegeCheckFile = new File( programFilesFolder, "privilege.check.txt" );
-			return privilegeCheckFile.createNewFile() && privilegeCheckFile.delete();
-		} catch( IOException exception ) {
-			return false;
-		}
+	public static final boolean isElevatedFlagSet() {
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 	private List<String> getElevateCommands() throws IOException {
