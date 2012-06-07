@@ -115,6 +115,11 @@ public class OperatingSystem {
 		return family == Family.WINDOWS;
 	}
 	
+	/**
+	 * Check if the process has elevated privileges.
+	 * 
+	 * @return true if the process has elevated privileges.
+	 */
 	public static final boolean isProcessElevated() {
 		if( ElevatedProcessBuilder.isElevatedFlagSet() ) return true;
 	

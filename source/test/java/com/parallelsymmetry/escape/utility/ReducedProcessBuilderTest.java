@@ -1,14 +1,10 @@
 package com.parallelsymmetry.escape.utility;
 
-import java.io.File;
-
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
 public class ReducedProcessBuilderTest extends TestCase {
-
-	private static final String user = "tester";
 
 	@Test
 	public void testCommandMac() throws Exception {
@@ -16,7 +12,7 @@ public class ReducedProcessBuilderTest extends TestCase {
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
 		try {
-			ReducedProcessBuilder builder = new ReducedProcessBuilder( user );
+			ReducedProcessBuilder builder = new ReducedProcessBuilder(  );
 			fail();
 		} catch( UnsupportedOperationException exception ) {
 
@@ -33,12 +29,12 @@ public class ReducedProcessBuilderTest extends TestCase {
 		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
-		ReducedProcessBuilder builder = new ReducedProcessBuilder( user );
+		ReducedProcessBuilder builder = new ReducedProcessBuilder(  );
 		builder.command().add( "vi" );
 
 		assertEquals( 3, builder.command().size() );
 		assertEquals( "su", builder.command().get( 0 ) );
-		assertEquals( user, builder.command().get( 1 ) );
+		assertEquals( null, builder.command().get( 1 ) );
 		assertEquals( "vi", builder.command().get( 2 ) );
 	}
 
@@ -47,7 +43,7 @@ public class ReducedProcessBuilderTest extends TestCase {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
-		ReducedProcessBuilder builder = new ReducedProcessBuilder( user );
+		ReducedProcessBuilder builder = new ReducedProcessBuilder(  );
 		builder.command().add( "notepad.exe" );
 
 		assertEquals( 3, builder.command().size() );

@@ -56,11 +56,10 @@ public class ElevatedProcessBuilder {
 		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
 	}
 
-	/**
-	 * Check if the process has elevated privileges.
-	 * 
-	 * @return true if the process has elevated privileges.
-	 */
+	public ProcessBuilder getBuilder() {
+		return builder;
+	}
+
 	public List<String> command() {
 		return builder.command();
 	}

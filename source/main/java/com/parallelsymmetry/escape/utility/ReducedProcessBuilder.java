@@ -10,13 +10,13 @@ public class ReducedProcessBuilder {
 
 	private ProcessBuilder builder;
 
-	public ReducedProcessBuilder( String user ) throws IOException {
-		this( new ProcessBuilder(), user );
+	public ReducedProcessBuilder() throws IOException {
+		this( new ProcessBuilder() );
 	}
 
-	public ReducedProcessBuilder( ProcessBuilder builder, String user ) throws IOException {
+	public ReducedProcessBuilder( ProcessBuilder builder ) throws IOException {
 		if( OperatingSystem.isProcessElevated() ) {
-			this.builder = new ProcessBuilder( getReduceCommands( user ) );
+			this.builder = new ProcessBuilder( getReduceCommands() );
 			builder.command().addAll( this.builder.command() );
 			builder.environment().putAll( this.builder.environment() );
 			builder.environment().remove( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
@@ -25,11 +25,10 @@ public class ReducedProcessBuilder {
 		}
 	}
 
-	/**
-	 * Check if the process has elevated privileges.
-	 * 
-	 * @return true if the process has elevated privileges.
-	 */
+	public ProcessBuilder getBuilder() {
+		return builder;
+	}
+
 	public List<String> command() {
 		return builder.command();
 	}
@@ -66,14 +65,14 @@ public class ReducedProcessBuilder {
 		return builder.start();
 	}
 
-	private List<String> getReduceCommands( String user ) throws IOException {
+	private List<String> getReduceCommands() throws IOException {
 		List<String> commands = new ArrayList<String>();
 
 		if( OperatingSystem.isMac() ) {
 			throw new UnsupportedOperationException();
 		} else if( OperatingSystem.isUnix() ) {
 			commands.add( "su" );
-			commands.add( user );
+			commands.add( System.getenv( "SUDO_USER" ) );
 		} else if( OperatingSystem.isWindows() ) {
 			commands.add( "runas" );
 			commands.add( "/trustlevel:0x20000" );
