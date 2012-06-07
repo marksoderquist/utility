@@ -133,7 +133,7 @@ public class ElevatedProcessBuilder {
 			} else {
 				commands.add( "xterm" );
 				commands.add( "-title" );
-				commands.add( "Elevate" );
+				commands.add( "elevate" );
 				commands.add( "-e" );
 				commands.add( "sudo" );
 			}
