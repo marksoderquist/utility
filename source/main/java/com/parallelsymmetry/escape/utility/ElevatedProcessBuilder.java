@@ -177,7 +177,7 @@ public class ElevatedProcessBuilder {
 		return elevator;
 	}
 
-	private boolean isElevatedFlagSet() {
+	public static boolean isElevatedFlagSet() {
 		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
