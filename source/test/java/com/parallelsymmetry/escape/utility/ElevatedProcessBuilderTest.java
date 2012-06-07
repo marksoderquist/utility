@@ -51,7 +51,7 @@ public class ElevatedProcessBuilderTest extends TestCase {
 		assertEquals( 6, builder.command().size() );
 		assertEquals( "xterm", builder.command().get( 0 ) );
 		assertEquals( "-title", builder.command().get( 1 ) );
-		assertEquals( "Elevate", builder.command().get( 2 ) );
+		assertEquals( "elevate", builder.command().get( 2 ) );
 		assertEquals( "-e", builder.command().get( 3 ) );
 		assertEquals( "sudo", builder.command().get( 4 ) );
 		assertEquals( "vi", builder.command().get( 5 ) );

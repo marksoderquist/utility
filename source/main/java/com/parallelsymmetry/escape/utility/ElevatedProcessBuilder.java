@@ -47,12 +47,16 @@ public class ElevatedProcessBuilder {
 		}
 	}
 
+	public static final boolean isElevatedFlagSet() {
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+	}
+
 	/**
 	 * Check if the current operating system is supported.
 	 * 
 	 * @return true if the operating system is supported, false otherwise.
 	 */
-	public boolean isPlatformSupported() {
+	public static final boolean isPlatformSupported() {
 		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
 	}
 
@@ -61,13 +65,22 @@ public class ElevatedProcessBuilder {
 	 * 
 	 * @return true if privilege elevation is required, false otherwise.
 	 */
-	public boolean isElevationRequired() {
-		if( isElevatedFlagSet() ) return false;
+	public static final boolean isElevationRequired() {
+		return !isProcessElevated();
+	}
+	
+	/**
+	 * Check if the process has elevated privileges.
+	 * 
+	 * @return true if privilege elevation is required, false otherwise.
+	 */
+	public static final boolean isProcessElevated() {
+		if( isElevatedFlagSet() ) return true;
 
 		if( OperatingSystem.isWindows() ) {
-			return !canWriteToProgramFiles();
+			return canWriteToProgramFiles();
 		} else {
-			return !System.getProperty( "user.name" ).equals( "root" );
+			return System.getProperty( "user.name" ).equals( "root" );
 		}
 	}
 
@@ -107,7 +120,7 @@ public class ElevatedProcessBuilder {
 		return builder.start();
 	}
 
-	private boolean canWriteToProgramFiles() {
+	private static final boolean canWriteToProgramFiles() {
 		try {
 			String programFilesFolder = System.getenv( "ProgramFiles" );
 			if( programFilesFolder == null ) programFilesFolder = "C:\\Program Files";
@@ -175,10 +188,6 @@ public class ElevatedProcessBuilder {
 		elevator.setExecutable( true );
 
 		return elevator;
-	}
-
-	public static boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 }
