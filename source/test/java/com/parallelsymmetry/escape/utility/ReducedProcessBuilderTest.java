@@ -7,12 +7,24 @@ import org.junit.Test;
 public class ReducedProcessBuilderTest extends TestCase {
 
 	@Test
+	public void testConstructorWithProcessBuilder() throws Exception {
+		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+
+		ReducedProcessBuilder outer = new ReducedProcessBuilder( new ProcessBuilder( "java" ) );
+		assertEquals( 3, outer.command().size() );
+		assertEquals( "runas", outer.command().get( 0 ) );
+		assertEquals( "/trustlevel:0x20000", outer.command().get( 1 ) );
+		assertEquals( "java", outer.command().get( 2 ) );
+	}
+
+	@Test
 	public void testCommandMac() throws Exception {
 		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
 		try {
-			ReducedProcessBuilder builder = new ReducedProcessBuilder(  );
+			ReducedProcessBuilder builder = new ReducedProcessBuilder();
 			fail();
 		} catch( UnsupportedOperationException exception ) {
 
@@ -29,7 +41,7 @@ public class ReducedProcessBuilderTest extends TestCase {
 		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
-		ReducedProcessBuilder builder = new ReducedProcessBuilder(  );
+		ReducedProcessBuilder builder = new ReducedProcessBuilder();
 		builder.command().add( "vi" );
 
 		assertEquals( 3, builder.command().size() );
@@ -43,7 +55,7 @@ public class ReducedProcessBuilderTest extends TestCase {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
-		ReducedProcessBuilder builder = new ReducedProcessBuilder(  );
+		ReducedProcessBuilder builder = new ReducedProcessBuilder();
 		builder.command().add( "notepad.exe" );
 
 		assertEquals( 3, builder.command().size() );

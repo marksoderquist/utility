@@ -8,6 +8,19 @@ import org.junit.Test;
 
 public class ElevatedProcessBuilderTest extends TestCase {
 
+	@Test
+	public void testConstructorWithProcessBuilder() throws Exception {
+		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
+		ElevatedProcessBuilder builder = new ElevatedProcessBuilder( new ProcessBuilder( "notepad.exe"));
+
+		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" );
+
+		assertEquals( 3, builder.command().size() );
+		assertEquals( "wscript", builder.command().get( 0 ) );
+		assertEquals( elevate.getCanonicalPath(), builder.command().get( 1 ) );
+		assertEquals( "notepad.exe", builder.command().get( 2 ) );
+	}
+	
 	/*
 	 * Keep this test commented for normal use, uncomment to test manually.
 	 */

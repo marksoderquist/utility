@@ -39,9 +39,9 @@ public class ElevatedProcessBuilder {
 	public ElevatedProcessBuilder( ProcessBuilder builder, boolean veto ) throws IOException {
 		if( !veto && !OperatingSystem.isProcessElevated() ) {
 			this.builder = new ProcessBuilder( getElevateCommands() );
-			builder.command().addAll( this.builder.command() );
-			builder.environment().putAll( this.builder.environment() );
-			builder.environment().put( ELEVATED_PRIVILEGE_KEY, ELEVATED_PRIVILEGE_VALUE );
+			this.builder.command().addAll( builder.command() );
+			this.builder.environment().putAll( builder.environment() );
+			this.builder.environment().put( ELEVATED_PRIVILEGE_KEY, ELEVATED_PRIVILEGE_VALUE );
 		} else {
 			this.builder = builder;
 		}

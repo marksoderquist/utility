@@ -17,9 +17,9 @@ public class ReducedProcessBuilder {
 	public ReducedProcessBuilder( ProcessBuilder builder ) throws IOException {
 		if( OperatingSystem.isProcessElevated() ) {
 			this.builder = new ProcessBuilder( getReduceCommands() );
-			builder.command().addAll( this.builder.command() );
-			builder.environment().putAll( this.builder.environment() );
-			builder.environment().remove( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
+			this.builder.command().addAll( builder.command() );
+			this.builder.environment().putAll( builder.environment() );
+			this.builder.environment().remove( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
 		} else {
 			this.builder = builder;
 		}
