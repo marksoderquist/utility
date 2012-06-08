@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
@@ -83,6 +84,105 @@ public class OperatingSystemTest extends TestCase {
 
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 		assertTrue( OperatingSystem.isProcessElevated() );
+	}
+
+	@Test
+	public void testElevateProcessMac() throws Exception {
+		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
+		ProcessBuilder builder = new ProcessBuilder( "textmate" );
+		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate" );
+
+		OperatingSystem.elevateProcessBuilder( builder );
+		assertEquals( 2, builder.command().size() );
+		assertEquals( elevate.getCanonicalPath(), builder.command().get( 0 ) );
+		assertEquals( "textmate", builder.command().get( 1 ) );
+	}
+
+	@Test
+	public void testElevateProcessUnix() throws Exception {
+		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
+		ProcessBuilder builder = new ProcessBuilder( "vi" );
+
+		OperatingSystem.elevateProcessBuilder( builder );
+		assertEquals( 6, builder.command().size() );
+		assertEquals( "xterm", builder.command().get( 0 ) );
+		assertEquals( "-title", builder.command().get( 1 ) );
+		assertEquals( "elevate", builder.command().get( 2 ) );
+		assertEquals( "-e", builder.command().get( 3 ) );
+		assertEquals( "sudo", builder.command().get( 4 ) );
+		assertEquals( "vi", builder.command().get( 5 ) );
+	}
+
+	@Test
+	public void testElevateProcessWindows() throws Exception {
+		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
+		ProcessBuilder builder = new ProcessBuilder( "notepad.exe" );
+		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" );
+
+		OperatingSystem.elevateProcessBuilder( builder );
+		assertEquals( 3, builder.command().size() );
+		assertEquals( "wscript", builder.command().get( 0 ) );
+		assertEquals( elevate.getCanonicalPath(), builder.command().get( 1 ) );
+		assertEquals( "notepad.exe", builder.command().get( 2 ) );
+	}
+
+	@Test
+	public void testCommandMac() throws Exception {
+		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+
+		ProcessBuilder builder = new ProcessBuilder( "textmate" );
+
+		try {
+			OperatingSystem.reduceProcessBuilder( builder );
+			fail();
+		} catch( UnsupportedOperationException exception ) {
+
+		}
+		//		assertEquals( 2, builder.command().size() );
+		//		assertEquals( elevate.getCanonicalPath(), builder.command().get( 0 ) );
+		//		assertEquals( "textmate", builder.command().get( 1 ) );
+	}
+
+	@Test
+	public void testCommandUnix() throws Exception {
+		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		ProcessBuilder builder = new ProcessBuilder( "vi" );
+
+		OperatingSystem.reduceProcessBuilder( builder );
+
+		System.out.println( builder.command() );
+
+		int index = 0;
+		assertEquals( 4, builder.command().size() );
+		assertEquals( "su", builder.command().get( index++ ) );
+		assertEquals( "-", builder.command().get( index++ ) );
+		assertEquals( null, builder.command().get( index++ ) );
+		assertEquals( "vi", builder.command().get( index++ ) );
+	}
+
+	/**
+	 * The resulting command line should look similar to this:
+	 * <p>
+	 * <code>runas /trustlevel:0x20000 "javaw -jar \"C:\Program Files\Escape\program.jar\" -update false"</code>
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testReduceProcessWindows() throws Exception {
+		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
+		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		ProcessBuilder builder = new ProcessBuilder( "javaw", "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
+
+		OperatingSystem.reduceProcessBuilder( builder );
+
+		int index = 0;
+		assertEquals( 3, builder.command().size() );
+		assertEquals( "runas", builder.command().get( index++ ) );
+		assertEquals( "/trustlevel:0x20000", builder.command().get( index++ ) );
+		assertEquals( "\"javaw -jar \\\"C:\\Program Files\\Escape\\program.jar\\\" -update false\"", builder.command().get( index++ ) );
+
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {

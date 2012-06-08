@@ -72,6 +72,7 @@ public class ReducedProcessBuilder {
 			throw new UnsupportedOperationException();
 		} else if( OperatingSystem.isUnix() ) {
 			commands.add( "su" );
+			commands.add( "-" );
 			commands.add( System.getenv( "SUDO_USER" ) );
 		} else if( OperatingSystem.isWindows() ) {
 			commands.add( "runas" );

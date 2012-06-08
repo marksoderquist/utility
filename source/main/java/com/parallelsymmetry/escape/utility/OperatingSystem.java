@@ -1,8 +1,12 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.parallelsymmetry.escape.utility.log.Log;
 
@@ -114,7 +118,7 @@ public class OperatingSystem {
 	public static final boolean isWindows() {
 		return family == Family.WINDOWS;
 	}
-	
+
 	/**
 	 * Check if the process has elevated privileges.
 	 * 
@@ -122,12 +126,30 @@ public class OperatingSystem {
 	 */
 	public static final boolean isProcessElevated() {
 		if( ElevatedProcessBuilder.isElevatedFlagSet() ) return true;
-	
+
 		if( OperatingSystem.isWindows() ) {
 			return canWriteToProgramFiles();
 		} else {
 			return System.getProperty( "user.name" ).equals( "root" );
 		}
+	}
+
+	public static final boolean isElevateProcessSupported() {
+		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
+	}
+
+	public static final boolean isReduceProcessSupported() {
+		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
+	}
+
+	public static final Process startProcessElevated( ProcessBuilder builder ) throws IOException {
+		if( !OperatingSystem.isProcessElevated() ) elevateProcessBuilder( builder );
+		return builder.start();
+	}
+
+	public static final Process startProcessReduced( ProcessBuilder builder ) throws IOException {
+		if( OperatingSystem.isProcessElevated() ) reduceProcessBuilder( builder );
+		return builder.start();
 	}
 
 	public static final String getJavaExecutableName() {
@@ -295,6 +317,46 @@ public class OperatingSystem {
 		return null;
 	}
 
+	static final ProcessBuilder elevateProcessBuilder( ProcessBuilder builder ) throws IOException {
+		List<String> command = getElevateCommands();
+		command.addAll( builder.command() );
+		builder.command( command );
+		return builder;
+	}
+
+	static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
+		List<String> command = getReduceCommands();
+
+		if( isWindows() ) {
+			StringBuilder inner = new StringBuilder();
+
+			for( String c : builder.command() ) {
+				if( c.contains( " " ) ) {
+					inner.append( "\\\"" );
+					inner.append( c );
+					inner.append( "\\\"" );
+				} else {
+					inner.append( c );
+				}
+				inner.append( " " );
+			}
+
+			StringBuilder outer = new StringBuilder();
+			outer.append( "\"" );
+			outer.append( inner.toString().trim() );
+			outer.append( "\"" );
+
+			command.add( outer.toString() );
+		} else {
+			command.addAll( builder.command() );
+			builder.command( command );
+		}
+
+		builder.command( command );
+
+		return builder;
+	}
+
 	private static final boolean canWriteToProgramFiles() {
 		if( !OperatingSystem.isWindows() ) return false;
 		try {
@@ -305,6 +367,82 @@ public class OperatingSystem {
 		} catch( IOException exception ) {
 			return false;
 		}
+	}
+
+	private static final List<String> getElevateCommands() throws IOException {
+		List<String> commands = new ArrayList<String>();
+
+		if( isMac() ) {
+			commands.add( extractMacElevate().getPath() );
+		} else if( isUnix() ) {
+			File gksudo = new File( "/usr/bin/gksudo" );
+			File kdesudo = new File( "/usr/bin/kdesudo" );
+			if( gksudo.exists() ) {
+				commands.add( "/usr/bin/gksudo" );
+			} else if( kdesudo.exists() ) {
+				commands.add( "/usr/bin/kdesudo" );
+			} else {
+				commands.add( "xterm" );
+				commands.add( "-title" );
+				commands.add( "elevate" );
+				commands.add( "-e" );
+				commands.add( "sudo" );
+			}
+		} else if( isWindows() ) {
+			commands.add( "wscript" );
+			commands.add( extractWinElevate().getPath() );
+		}
+
+		return commands;
+	}
+
+	private static final List<String> getReduceCommands() throws IOException {
+		List<String> commands = new ArrayList<String>();
+
+		if( OperatingSystem.isMac() ) {
+			throw new UnsupportedOperationException();
+		} else if( OperatingSystem.isUnix() ) {
+			commands.add( "su" );
+			commands.add( "-" );
+			commands.add( System.getenv( "SUDO_USER" ) );
+		} else if( OperatingSystem.isWindows() ) {
+			commands.add( "runas" );
+			commands.add( "/trustlevel:0x20000" );
+		}
+
+		return commands;
+	}
+
+	private static final File extractWinElevate() throws IOException {
+		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" ).getCanonicalFile();
+		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/win-elevate.js" );
+		FileOutputStream target = new FileOutputStream( elevator );
+		try {
+			IoUtil.copy( source, target );
+		} finally {
+			source.close();
+			target.close();
+		}
+
+		elevator.setExecutable( true );
+
+		return elevator;
+	}
+
+	private static final File extractMacElevate() throws IOException {
+		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate" ).getCanonicalFile();
+		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/mac-elevate" );
+		FileOutputStream target = new FileOutputStream( elevator );
+		try {
+			IoUtil.copy( source, target );
+		} finally {
+			source.close();
+			target.close();
+		}
+
+		elevator.setExecutable( true );
+
+		return elevator;
 	}
 
 }

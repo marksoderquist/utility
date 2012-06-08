@@ -50,18 +50,30 @@ public class ReducedProcessBuilderTest extends TestCase {
 		assertEquals( "vi", builder.command().get( 2 ) );
 	}
 
+	/**
+	 * The resulting command line should look similar to this:
+	 * <p><code>runas /trustlevel:0x20000 "javaw -jar \"C:\Program Files\Escape\program.jar\" -update false"</code>
+
+	 * @throws Exception
+	 */
 	@Test
 	public void testCommandWindows() throws Exception {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
 
 		ReducedProcessBuilder builder = new ReducedProcessBuilder();
-		builder.command().add( "notepad.exe" );
+		builder.command().add( "javaw" );
+		builder.command().add( "-jar" );
+		builder.command().add( "C:\\Program Files\\Escape\\program.jar" );
+		builder.command().add( "-update" );
+		builder.command().add( "false" );
 
-		assertEquals( 3, builder.command().size() );
-		assertEquals( "runas", builder.command().get( 0 ) );
-		assertEquals( "/trustlevel:0x20000", builder.command().get( 1 ) );
-		assertEquals( "notepad.exe", builder.command().get( 2 ) );
+		int index = -1;
+		assertEquals( 7, builder.command().size() );
+		assertEquals( "runas", builder.command().get( index++ ) );
+		assertEquals( "/trustlevel:0x20000", builder.command().get(  index++ ) );
+		assertEquals( "\"javaw -jar \\\"C:\\Program Files\\Escape\\program.jar\\\" -update false\"", builder.command().get(  index++ ) );
+		
 	}
 
 }
