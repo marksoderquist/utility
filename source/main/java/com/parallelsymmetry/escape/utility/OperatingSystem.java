@@ -20,6 +20,10 @@ public class OperatingSystem {
 		UNKNOWN, X86, X64, PPC
 	}
 
+	static final String ELEVATED_PRIVILEGE_KEY = "escape.process.privilege";
+
+	static final String ELEVATED_PRIVILEGE_VALUE = "elevated";
+
 	private static Architecture architecture;
 
 	private static Family family;
@@ -119,19 +123,25 @@ public class OperatingSystem {
 		return family == Family.WINDOWS;
 	}
 
+	public static final boolean isElevatedFlagSet() {
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+	}
+
 	/**
 	 * Check if the process has elevated privileges.
 	 * 
 	 * @return true if the process has elevated privileges.
 	 */
 	public static final boolean isProcessElevated() {
-		if( ElevatedProcessBuilder.isElevatedFlagSet() ) return true;
+		if( isElevatedFlagSet() ) return true;
 
-		if( OperatingSystem.isWindows() ) {
+		if( isWindows() ) {
 			return canWriteToProgramFiles();
 		} else {
 			return System.getProperty( "user.name" ).equals( "root" );
 		}
+		
+		// FIXME This value can be cached for the duration of the JVM.
 	}
 
 	public static final boolean isElevateProcessSupported() {
@@ -150,6 +160,65 @@ public class OperatingSystem {
 	public static final Process startProcessReduced( ProcessBuilder builder ) throws IOException {
 		if( OperatingSystem.isProcessElevated() ) reduceProcessBuilder( builder );
 		return builder.start();
+	}
+
+	/**
+	 * Modify the process builder to attempt to elevate the process privileges
+	 * when the process is started. The returned ProcessBuilder should not be
+	 * modified after this call to avoid problems even though this cannot be
+	 * enforced.
+	 * 
+	 * @param builder
+	 * @return
+	 * @throws IOException
+	 */
+	public static final ProcessBuilder elevateProcessBuilder( ProcessBuilder builder ) throws IOException {
+		List<String> command = getElevateCommands();
+		command.addAll( builder.command() );
+		builder.command( command );
+		return builder;
+	}
+
+	/**
+	 * Modify the process builder to reduce the process privileges when the
+	 * process is started. The returned ProcessBuilder should not be modified
+	 * after this call to avoid problems even though this cannot be enforced.
+	 * 
+	 * @param builder
+	 * @return
+	 * @throws IOException
+	 */
+	public static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
+		List<String> command = getReduceCommands();
+	
+		if( isWindows() ) {
+			StringBuilder inner = new StringBuilder();
+	
+			for( String c : builder.command() ) {
+				if( c.contains( " " ) ) {
+					inner.append( "\\\"" );
+					inner.append( c );
+					inner.append( "\\\"" );
+				} else {
+					inner.append( c );
+				}
+				inner.append( " " );
+			}
+	
+			StringBuilder outer = new StringBuilder();
+			outer.append( "\"" );
+			outer.append( inner.toString().trim() );
+			outer.append( "\"" );
+	
+			command.add( outer.toString() );
+		} else {
+			command.addAll( builder.command() );
+			builder.command( command );
+		}
+	
+		builder.command( command );
+	
+		return builder;
 	}
 
 	public static final String getJavaExecutableName() {
@@ -317,46 +386,6 @@ public class OperatingSystem {
 		return null;
 	}
 
-	static final ProcessBuilder elevateProcessBuilder( ProcessBuilder builder ) throws IOException {
-		List<String> command = getElevateCommands();
-		command.addAll( builder.command() );
-		builder.command( command );
-		return builder;
-	}
-
-	static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
-		List<String> command = getReduceCommands();
-
-		if( isWindows() ) {
-			StringBuilder inner = new StringBuilder();
-
-			for( String c : builder.command() ) {
-				if( c.contains( " " ) ) {
-					inner.append( "\\\"" );
-					inner.append( c );
-					inner.append( "\\\"" );
-				} else {
-					inner.append( c );
-				}
-				inner.append( " " );
-			}
-
-			StringBuilder outer = new StringBuilder();
-			outer.append( "\"" );
-			outer.append( inner.toString().trim() );
-			outer.append( "\"" );
-
-			command.add( outer.toString() );
-		} else {
-			command.addAll( builder.command() );
-			builder.command( command );
-		}
-
-		builder.command( command );
-
-		return builder;
-	}
-
 	private static final boolean canWriteToProgramFiles() {
 		if( !OperatingSystem.isWindows() ) return false;
 		try {
@@ -399,15 +428,13 @@ public class OperatingSystem {
 	private static final List<String> getReduceCommands() throws IOException {
 		List<String> commands = new ArrayList<String>();
 
-		if( OperatingSystem.isMac() ) {
-			throw new UnsupportedOperationException();
-		} else if( OperatingSystem.isUnix() ) {
+		if( isWindows() ) {
+			commands.add( "runas" );
+			commands.add( "/trustlevel:0x20000" );
+		} else {
 			commands.add( "su" );
 			commands.add( "-" );
 			commands.add( System.getenv( "SUDO_USER" ) );
-		} else if( OperatingSystem.isWindows() ) {
-			commands.add( "runas" );
-			commands.add( "/trustlevel:0x20000" );
 		}
 
 		return commands;

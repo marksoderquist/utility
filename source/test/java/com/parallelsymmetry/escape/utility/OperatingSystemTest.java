@@ -11,7 +11,7 @@ public class OperatingSystemTest extends TestCase {
 
 	@Override
 	public void setUp() throws Exception {
-		System.clearProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY );
+		System.clearProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY );
 	}
 
 	public void testLinux() throws Exception {
@@ -64,7 +64,7 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
 		assertFalse( OperatingSystem.isProcessElevated() );
 
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
@@ -73,7 +73,7 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
 		assertFalse( OperatingSystem.isProcessElevated() );
 
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
@@ -82,7 +82,7 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		assertFalse( OperatingSystem.isProcessElevated() );
 
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
@@ -127,32 +127,28 @@ public class OperatingSystemTest extends TestCase {
 	}
 
 	@Test
-	public void testCommandMac() throws Exception {
+	public void testReduceProcessMac() throws Exception {
 		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
-
+		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		ProcessBuilder builder = new ProcessBuilder( "textmate" );
-
-		try {
-			OperatingSystem.reduceProcessBuilder( builder );
-			fail();
-		} catch( UnsupportedOperationException exception ) {
-
-		}
-		//		assertEquals( 2, builder.command().size() );
-		//		assertEquals( elevate.getCanonicalPath(), builder.command().get( 0 ) );
-		//		assertEquals( "textmate", builder.command().get( 1 ) );
-	}
-
-	@Test
-	public void testCommandUnix() throws Exception {
-		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
-		ProcessBuilder builder = new ProcessBuilder( "vi" );
 
 		OperatingSystem.reduceProcessBuilder( builder );
 
-		System.out.println( builder.command() );
+		int index = 0;
+		assertEquals( 4, builder.command().size() );
+		assertEquals( "su", builder.command().get( index++ ) );
+		assertEquals( "-", builder.command().get( index++ ) );
+		assertEquals( null, builder.command().get( index++ ) );
+		assertEquals( "textmate", builder.command().get( index++ ) );
+	}
+
+	@Test
+	public void testReduceProcessUnix() throws Exception {
+		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
+		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
+		ProcessBuilder builder = new ProcessBuilder( "vi" );
+
+		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
 		assertEquals( 4, builder.command().size() );
@@ -162,17 +158,10 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "vi", builder.command().get( index++ ) );
 	}
 
-	/**
-	 * The resulting command line should look similar to this:
-	 * <p>
-	 * <code>runas /trustlevel:0x20000 "javaw -jar \"C:\Program Files\Escape\program.jar\" -update false"</code>
-	 * 
-	 * @throws Exception
-	 */
 	@Test
 	public void testReduceProcessWindows() throws Exception {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
-		System.setProperty( ElevatedProcessBuilder.ELEVATED_PRIVILEGE_KEY, ElevatedProcessBuilder.ELEVATED_PRIVILEGE_VALUE );
+		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		ProcessBuilder builder = new ProcessBuilder( "javaw", "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
 
 		OperatingSystem.reduceProcessBuilder( builder );
