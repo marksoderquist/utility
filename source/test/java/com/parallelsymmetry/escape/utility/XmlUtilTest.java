@@ -40,7 +40,7 @@ public class XmlUtilTest extends TestCase {
 	@Test
 	public void testFormat() throws Exception {
 		String data = "<tag><indent/></tag>";
-		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tag>\n  <indent/>\n</tag>";
+		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n  <indent/>\n</tag>";
 		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -51,7 +51,7 @@ public class XmlUtilTest extends TestCase {
 	@Test
 	public void testFormatWithIndentSize() throws Exception {
 		String data = "<tag><indent/></tag>";
-		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tag>\n   <indent/>\n</tag>";
+		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
 		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 
