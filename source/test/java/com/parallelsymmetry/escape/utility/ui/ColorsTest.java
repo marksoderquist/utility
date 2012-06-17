@@ -39,6 +39,13 @@ public class ColorsTest extends TestCase {
 		assertEquals( new Color( 63, 63, 63, 255 ), Colors.mix( Color.BLACK, Color.WHITE, 0.25 ) );
 	}
 
+	public void testGetIntensity() {
+		assertEquals( -1f, Colors.getIntensity( Color.BLACK ) );
+		assertEquals( -0.0039215684f, Colors.getIntensity( new Color( 127, 127, 127 ) ) );
+		assertEquals( 0.003921628f, Colors.getIntensity( Color.GRAY ) );
+		assertEquals( 1f, Colors.getIntensity( Color.WHITE ) );
+	}
+
 	public void testGetShade() {
 		Color color = Color.decode( "#ff0000" );
 

@@ -54,6 +54,11 @@ public final class Colors {
 		return new Color( r, g, b, a );
 	}
 
+	public static float getIntensity( Color color ) {
+		float[] rgb = color.getRGBColorComponents( null );
+		return ( ( ( rgb[0] + rgb[1] + rgb[2] ) / 3f ) - 0.5f ) * 2;
+	}
+
 	/**
 	 * Return a shade of the base color. Factor ranges from -1 to 1 with negative
 	 * values trending toward black and positive values trending toward white.
