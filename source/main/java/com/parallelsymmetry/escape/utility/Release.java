@@ -61,6 +61,10 @@ public class Release implements Comparable<Release> {
 	public Date getDate() {
 		return date;
 	}
+	
+	public String getDateString() {
+		return date == null ? "" : DateUtil.format( date, Release.DATE_FORMAT );
+	}
 
 	public String toString() {
 		return format( version.toString() );

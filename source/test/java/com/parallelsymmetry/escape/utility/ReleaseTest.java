@@ -32,6 +32,11 @@ public class ReleaseTest extends TestCase {
 		assertEquals( new Date( 0 ), new Release( new Version( versionString ), new Date( 0 ) ).getDate() );
 	}
 
+	public void testGetDateString() {
+		assertEquals( "", new Release( versionString ).getDateString() );
+		assertEquals( "1970-01-01 00:00:00", new Release( versionString, new Date( 0 ) ).getDateString() );
+	}
+
 	public void testToString() {
 		assertEquals( "1.2.3-u-04", new Release( versionString ).toString() );
 		assertEquals( "1.2.3-u-04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toString() );
