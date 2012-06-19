@@ -453,6 +453,8 @@ public final class TextUtil {
 	}
 
 	public static final String reline( String text, int width ) {
+		if( text == null ) return null;
+		
 		StringBuilder line = new StringBuilder();
 		StringBuilder result = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer( text );
