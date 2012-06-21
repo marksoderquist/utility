@@ -204,9 +204,9 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 			this.task = task;
 		}
 
+		// This is a workaround in Java 6 to capture the result of the task.
 		@Override
 		protected void done() {
-			// This is a workaround in Java 6 to capture the result of the task.
 			try {
 				task.future.get();
 				task.result = Result.SUCCESS;
