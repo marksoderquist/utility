@@ -36,6 +36,13 @@ public class XmlUtilTest extends TestCase {
 		Document document = XmlUtil.loadXmlDocument( (InputStream)null );
 		assertNull( document );
 	}
+	
+	@Test
+	public void testGetDocumentType() throws Exception {
+		InputStream input = XmlUtilTest.class.getResourceAsStream( "/test.xml" );
+		Document document = XmlUtil.loadXmlDocument( input );
+		assertEquals( "test", document.getDocumentElement().getNodeName() );
+	}
 
 	@Test
 	public void testFormat() throws Exception {
