@@ -34,6 +34,7 @@ public class ServletContextHandler extends Handler {
 		// Intentionally do nothing.
 	}
 
+	@Override
 	public boolean isLoggable( LogRecord record ) {
 		if( context == null ) return false;
 		return super.isLoggable( record );

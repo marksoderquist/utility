@@ -155,22 +155,27 @@ public abstract class BaseIcon extends BaseImage implements Icon {
 		return height;
 	}
 
+	@Override
 	public void save( File target, String name ) {
 		save( target, name, width, height );
 	}
 
+	@Override
 	public void save( File target, String name, ImageFilter filter ) {
 		save( target, name, width, height, filter );
 	}
 
+	@Override
 	public void save( File target, String name, int size ) {
 		save( target, name, size, size, null );
 	}
 
+	@Override
 	public void save( File target, String name, int width, int height ) {
 		save( target, name, width, height, null );
 	}
 
+	@Override
 	public void save( File target, String name, int width, int height, ImageFilter filter ) {
 		Icons.save( this, target, name, width, height, filter );
 	}

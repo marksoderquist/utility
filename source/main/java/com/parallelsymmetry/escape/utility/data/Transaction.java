@@ -139,6 +139,7 @@ public class Transaction {
 		return depth.decrementAndGet();
 	}
 
+	@Override
 	public String toString() {
 		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
 	}

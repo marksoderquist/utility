@@ -79,6 +79,7 @@ public class HashUtil {
 			this.algorithm = algorithm;
 		}
 
+		@Override
 		public String hash( InputStream input ) {
 			if( input == null ) return null;
 

@@ -79,20 +79,24 @@ public class Version implements Comparable<Version> {
 		return this.human;
 	}
 
+	@Override
 	public int compareTo( Version version ) {
 		int result = items.compareTo( version.items );
 		if( result == 0 ) return 0;
 		return result < 0 ? -1 : 1;
 	}
 
+	@Override
 	public String toString() {
 		return version;
 	}
 
+	@Override
 	public boolean equals( Object object ) {
 		return ( object instanceof Version ) && canonical.equals( ( (Version)object ).canonical );
 	}
 
+	@Override
 	public int hashCode() {
 		return canonical.hashCode();
 	}
@@ -269,14 +273,17 @@ public class Version implements Comparable<Version> {
 			this.value = new BigInteger( string );
 		}
 
+		@Override
 		public int getType() {
 			return INTEGER_ITEM;
 		}
 
+		@Override
 		public boolean isNull() {
 			return BigInteger_ZERO.equals( value );
 		}
 
+		@Override
 		public int compareTo( Item item ) {
 			if( item == null ) {
 				return BigInteger_ZERO.equals( value ) ? 0 : 1;
@@ -301,6 +308,7 @@ public class Version implements Comparable<Version> {
 			}
 		}
 
+		@Override
 		public String toString() {
 			return value.toString();
 		}
@@ -363,10 +371,12 @@ public class Version implements Comparable<Version> {
 			if( this.value == null ) this.value = value;
 		}
 
+		@Override
 		public int getType() {
 			return STRING_ITEM;
 		}
 
+		@Override
 		public boolean isNull() {
 			return ( comparableQualifier( value ).compareTo( RELEASE_VERSION_INDEX ) == 0 );
 		}
@@ -388,6 +398,7 @@ public class Version implements Comparable<Version> {
 			return index == -1 ? QUALIFIERS.size() + "-" + qualifier : String.valueOf( index );
 		}
 
+		@Override
 		public int compareTo( Item item ) {
 			if( item == null ) {
 				return comparableQualifier( value ).compareTo( RELEASE_VERSION_INDEX );
@@ -411,6 +422,7 @@ public class Version implements Comparable<Version> {
 			}
 		}
 
+		@Override
 		public String toString() {
 			return value;
 		}
@@ -420,10 +432,12 @@ public class Version implements Comparable<Version> {
 
 		private static final long serialVersionUID = -4773402270598497998L;
 
+		@Override
 		public int getType() {
 			return LIST_ITEM;
 		}
 
+		@Override
 		public boolean isNull() {
 			return ( size() == 0 );
 		}
@@ -439,6 +453,7 @@ public class Version implements Comparable<Version> {
 			}
 		}
 
+		@Override
 		public int compareTo( Item item ) {
 			if( item == null ) {
 				if( size() == 0 ) {
@@ -478,6 +493,7 @@ public class Version implements Comparable<Version> {
 			}
 		}
 
+		@Override
 		public String toString() {
 			StringBuilder buffer = new StringBuilder( "(" );
 			for( Iterator<Item> iterator = iterator(); iterator.hasNext(); ) {
@@ -500,6 +516,7 @@ public class Version implements Comparable<Version> {
 			this.value = value;
 		}
 
+		@Override
 		public String toString() {
 			return value;
 		}

@@ -51,11 +51,13 @@ public class RoundGradientPaint implements Paint {
 		this.colors = Arrays.copyOf( colors, colors.length );
 	}
 
+	@Override
 	public PaintContext createContext( ColorModel colorModel, Rectangle deviceBounds, Rectangle2D userBounds, AffineTransform transform, RenderingHints hints ) {
 		Point2D center = transform.transform( this.center, null );
 		return new RoundGradientContext( center, angle, extent, stops, colors );
 	}
 
+	@Override
 	public int getTransparency() {
 		for( Color color : colors ) {
 			if( color.getAlpha() == 0xff ) continue;

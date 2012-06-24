@@ -43,6 +43,7 @@ public class SwingUtil {
 
 	private static class Token implements Runnable {
 
+		@Override
 		public void run() {}
 
 	}

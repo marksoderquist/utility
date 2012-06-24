@@ -292,6 +292,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		updateModifiedFlag();
 	}
 
+	@Override
 	protected void updateModifiedFlag() {
 		super.updateModifiedFlag();
 		selfModified = modified;
@@ -302,6 +303,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		modified = selfModified | treeModified;
 	}
 
+	@Override
 	protected void dispatchEvent( DataEvent event ) {
 		super.dispatchEvent( event );
 
@@ -333,6 +335,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( parent != null ) parent.dispatchEvent( event );
 	}
 
+	@Override
 	protected void doUnmodify() {
 		addRemoveChildren = null;
 		modifiedChildCount = 0;

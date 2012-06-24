@@ -89,6 +89,7 @@ public class ColorScheme implements Cloneable {
 		return scheme;
 	}
 
+	@Override
 	public String toString() {
 		return primary.toString();
 	}

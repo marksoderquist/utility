@@ -82,6 +82,7 @@ public class TaskManager implements Persistent, Controllable {
 		start();
 	}
 
+	@Override
 	public void restart() throws InterruptedException {
 		stopAndWait();
 		startAndWait();
@@ -338,6 +339,7 @@ public class TaskManager implements Persistent, Controllable {
 			prefix = "TaskPool-" + poolNumber.getAndIncrement() + "-Thread-";
 		}
 
+		@Override
 		public Thread newThread( Runnable r ) {
 			Thread thread = new TaskThread( group, r, prefix + threadNumber.getAndIncrement(), 0 );
 			if( thread.getPriority() != Thread.NORM_PRIORITY ) thread.setPriority( Thread.NORM_PRIORITY );

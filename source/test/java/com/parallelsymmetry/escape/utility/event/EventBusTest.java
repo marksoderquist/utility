@@ -240,6 +240,7 @@ public class EventBusTest extends TestCase {
 			super( source );
 		}
 
+		@Override
 		public boolean equals( Object object ) {
 			return this == object;
 		}

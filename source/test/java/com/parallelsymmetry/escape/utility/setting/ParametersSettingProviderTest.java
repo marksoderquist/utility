@@ -12,6 +12,7 @@ public class ParametersSettingProviderTest extends TestCase {
 
 	private ParametersSettingProvider provider;
 
+	@Override
 	public void setUp() {
 		parameters = Parameters.parse( new String[] { "-host", "localhost", "-log.level", "debug" } );
 		provider = new ParametersSettingProvider( parameters );

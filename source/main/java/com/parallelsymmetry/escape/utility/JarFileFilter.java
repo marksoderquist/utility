@@ -8,6 +8,7 @@ import java.io.FileFilter;
  */
 public class JarFileFilter implements FileFilter {
 
+	@Override
 	public boolean accept( File file ) {
 		return file.getName().endsWith( ".jar" );
 	}

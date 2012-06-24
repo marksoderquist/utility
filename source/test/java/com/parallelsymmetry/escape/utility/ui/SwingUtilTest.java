@@ -33,6 +33,7 @@ public class SwingUtilTest extends TestCase {
 
 		private boolean safe;
 
+		@Override
 		public synchronized void run() {
 			safe = EventQueue.isDispatchThread();
 			done = true;

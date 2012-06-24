@@ -26,6 +26,7 @@ public class SettingsTest extends TestCase {
 
 	private MockSettingProvider providerD = new MockSettingProvider( "Provider D" );
 
+	@Override
 	public void setUp() {
 		Log.setLevel( Log.NONE );
 		settings.addProvider( provider1 );

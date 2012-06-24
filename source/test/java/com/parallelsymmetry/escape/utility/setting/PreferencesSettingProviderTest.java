@@ -11,6 +11,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 
 	private PreferencesSettingProvider provider;
 
+	@Override
 	public void setUp() {
 		preferences = Preferences.userNodeForPackage( getClass() );
 		provider = new PreferencesSettingProvider( preferences );

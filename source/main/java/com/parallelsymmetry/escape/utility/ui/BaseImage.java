@@ -729,6 +729,7 @@ public abstract class BaseImage {
 			this.paint = paint;
 		}
 
+		@Override
 		public void paint( Graphics2D graphics, int x, int y ) {
 			graphics.setPaint( paint );
 			graphics.translate( x, y );
@@ -752,6 +753,7 @@ public abstract class BaseImage {
 			this.stroke = stroke;
 		}
 
+		@Override
 		public void paint( Graphics2D graphics, int x, int y ) {
 			graphics.setPaint( paint );
 			graphics.setStroke( stroke );
@@ -776,6 +778,7 @@ public abstract class BaseImage {
 			this.stroke = stroke;
 		}
 
+		@Override
 		public void paint( Graphics2D graphics, int x, int y ) {
 			if( TextUtil.isEmpty( text.getText() ) ) return;
 			graphics.setPaint( paint );
@@ -796,6 +799,7 @@ public abstract class BaseImage {
 			this.text = text;
 		}
 
+		@Override
 		public void paint( Graphics2D graphics, int x, int y ) {
 			AffineTransform transform = graphics.getTransform();
 			graphics.translate( x, y );

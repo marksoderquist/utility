@@ -14,6 +14,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 
 	private DescriptorSettingProvider rootedProvider;
 
+	@Override
 	public void setUp() throws Exception {
 		descriptor = new Descriptor( getClass().getResourceAsStream( "/test.descriptor.xml" ) );
 		provider = new DescriptorSettingProvider( descriptor );

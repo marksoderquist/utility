@@ -24,6 +24,7 @@ public final class ConsoleReader extends Thread {
 		setDaemon( true );
 	}
 
+	@Override
 	public void run() {
 		String line = null;
 		try {

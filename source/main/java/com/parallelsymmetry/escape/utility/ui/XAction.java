@@ -102,6 +102,7 @@ public class XAction extends AbstractAction {
 		}
 	}
 
+	@Override
 	public void actionPerformed( ActionEvent event ) {
 		performAction( event );
 	}
@@ -125,6 +126,7 @@ public class XAction extends AbstractAction {
 	/**
 	 * Set the enabled flag. This method is safe to call from any thread.
 	 */
+	@Override
 	public void setEnabled( boolean enabled ) {
 		Log.write( new Throwable( "Please use action handlers to enable/disable the action." ) );
 	}
@@ -284,6 +286,7 @@ public class XAction extends AbstractAction {
 		/**
 		 * Called by the thread.
 		 */
+		@Override
 		public void run() {
 			XAction.super.setEnabled( enabled );
 		}

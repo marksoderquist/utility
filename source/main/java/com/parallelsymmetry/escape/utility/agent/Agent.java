@@ -57,6 +57,7 @@ public abstract class Agent implements Controllable {
 	 * 
 	 * @return True if running, false otherwise.
 	 */
+	@Override
 	public boolean isRunning() {
 		return state == State.STARTED;
 	}
@@ -65,6 +66,7 @@ public abstract class Agent implements Controllable {
 	 * Start the agent. This method changes the agent state to STARTING and
 	 * returns immediately.
 	 */
+	@Override
 	public final void start() {
 		synchronized( operationLock ) {
 			if( state != State.STOPPED ) return;
@@ -86,6 +88,7 @@ public abstract class Agent implements Controllable {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
+	@Override
 	public final void startAndWait() throws InterruptedException {
 		startAndWait( 0, TimeUnit.SECONDS );
 	}
@@ -99,6 +102,7 @@ public abstract class Agent implements Controllable {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
+	@Override
 	public final void startAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			start();
@@ -110,6 +114,7 @@ public abstract class Agent implements Controllable {
 	 * Stop the agent. This method changes the agent state to STOPPING and returns
 	 * immediately.
 	 */
+	@Override
 	public final void stop() {
 		synchronized( operationLock ) {
 			if( state != State.STARTED ) return;
@@ -130,6 +135,7 @@ public abstract class Agent implements Controllable {
 	 * 
 	 * @throws InterruptedException
 	 */
+	@Override
 	public final void stopAndWait() throws InterruptedException {
 		stopAndWait( 0, TimeUnit.SECONDS );
 	}
@@ -143,6 +149,7 @@ public abstract class Agent implements Controllable {
 	 * @param timeout
 	 * @throws InterruptedException
 	 */
+	@Override
 	public final void stopAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			stop();
@@ -155,6 +162,7 @@ public abstract class Agent implements Controllable {
 	 * 
 	 * @throws InterruptedException
 	 */
+	@Override
 	public final void restart() throws InterruptedException {
 		restart( 0, TimeUnit.SECONDS );
 	}
@@ -165,6 +173,7 @@ public abstract class Agent implements Controllable {
 	 * @param timeout
 	 * @throws InterruptedException
 	 */
+	@Override
 	public final void restart( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			startingFlag = true;

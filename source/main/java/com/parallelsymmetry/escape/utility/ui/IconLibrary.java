@@ -341,6 +341,7 @@ public class IconLibrary {
 		/**
 		 * Get the width of the icon.
 		 */
+		@Override
 		public int getIconWidth() {
 			return getRenderedIcon().getIconWidth();
 		}
@@ -348,6 +349,7 @@ public class IconLibrary {
 		/**
 		 * Get the height of the icon.
 		 */
+		@Override
 		public int getIconHeight() {
 			return getRenderedIcon().getIconHeight();
 		}
@@ -357,6 +359,7 @@ public class IconLibrary {
 		 * 
 		 * @param graphics The <code>Graphics</code> object to use.
 		 */
+		@Override
 		public void paintIcon( Component component, Graphics graphics, int x, int y ) {
 			Icon icon = getRenderedIcon();
 			icon.paintIcon( component, graphics, x, y );

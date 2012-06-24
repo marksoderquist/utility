@@ -30,6 +30,7 @@ public class PersistentBlockingQueueTest extends PersistentQueueTest {
 		assertEquals( 0, queue.size() );
 	}
 
+	@Override
 	@Test
 	public void testOffer() throws Exception {
 		PersistentBlockingQueue<String> queue = createTemporaryQueue();
@@ -39,6 +40,7 @@ public class PersistentBlockingQueueTest extends PersistentQueueTest {
 		assertEquals( 2, queue.size() );
 	}
 
+	@Override
 	@Test
 	public void testPoll() throws Exception {
 		PersistentBlockingQueue<String> queue = createTemporaryQueue();

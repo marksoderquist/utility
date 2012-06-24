@@ -14,10 +14,12 @@ public class PipeAdapter implements Pipe {
 		this.output = output;
 	}
 
+	@Override
 	public InputStream getInputStream() {
 		return input;
 	}
 
+	@Override
 	public OutputStream getOutputStream() {
 		return output;
 	}

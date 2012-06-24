@@ -52,6 +52,7 @@ public class TripLockTest extends TestCase {
 			startLock.hold();
 		}
 
+		@Override
 		public synchronized void run() {
 			startLock.trip();
 			if( pause > 0 ) ThreadUtil.pause( pause );

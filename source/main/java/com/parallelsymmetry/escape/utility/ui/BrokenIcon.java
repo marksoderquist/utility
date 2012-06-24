@@ -5,6 +5,7 @@ import java.awt.Color;
 
 public class BrokenIcon extends BaseIcon {
 
+	@Override
 	public void render() {
 		double penWidth = K;
 		double near = penWidth / 2 + ZB;

@@ -133,6 +133,7 @@ public class XActionTest extends TestCase {
 
 		private ActionEvent event;
 
+		@Override
 		public void actionPerformed( ActionEvent event ) {
 			this.event = event;
 		}

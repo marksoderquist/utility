@@ -42,6 +42,7 @@ public class CompositeHandler extends Handler {
 		if( exception != null ) throw exception;
 	}
 
+	@Override
 	public boolean isLoggable( LogRecord record ) {
 		if( handlers == null || handlers.length == 0 ) return false;
 		return super.isLoggable( record );

@@ -32,10 +32,12 @@ public class RoundGradientContext implements PaintContext {
 	@Override
 	public void dispose() {}
 
+	@Override
 	public ColorModel getColorModel() {
 		return ColorModel.getRGBdefault();
 	}
 
+	@Override
 	public Raster getRaster( int x, int y, int w, int h ) {
 		WritableRaster raster = getColorModel().createCompatibleWritableRaster( w, h );
 

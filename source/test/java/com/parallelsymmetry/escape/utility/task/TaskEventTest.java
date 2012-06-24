@@ -9,6 +9,7 @@ public class TaskEventTest extends TestCase {
 
 	private TaskManager manager;
 
+	@Override
 	public void setUp() throws Exception {
 		manager = new TaskManager();
 		manager.startAndWait();

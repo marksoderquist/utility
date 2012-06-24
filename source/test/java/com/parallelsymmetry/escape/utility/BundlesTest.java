@@ -15,6 +15,7 @@ public class BundlesTest extends TestCase {
 
 	private static Locale locale;
 
+	@Override
 	public void setUp() {
 		locale = Locale.getDefault();
 	}
@@ -55,6 +56,7 @@ public class BundlesTest extends TestCase {
 		assertEquals( "Loader 2 String", Bundles.getString( loader2, "bundle", "string", null, false ) );
 	}
 
+	@Override
 	public void tearDown() {
 		Locale.setDefault( locale );
 	}

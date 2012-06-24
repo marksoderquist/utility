@@ -20,6 +20,7 @@ public class MockWritableSettingProvider extends MockSettingProvider implements 
 		set( path, value );
 	}
 
+	@Override
 	public void set( String key, String value ) {
 		if( value == null ) {
 			values.remove( key );

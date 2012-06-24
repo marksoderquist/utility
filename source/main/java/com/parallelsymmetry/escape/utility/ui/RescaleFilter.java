@@ -21,6 +21,7 @@ public class RescaleFilter extends RGBImageFilter {
 		bscale = ( ( ( mask & 0x000000ff ) >>> 0 ) - 128 ) / 128f;
 	}
 
+	@Override
 	public int filterRGB( int x, int y, int rgb ) {
 		int oa = ( rgb & 0xff000000 ) >>> 24;
 		int or = ( rgb & 0x00ff0000 ) >>> 16;

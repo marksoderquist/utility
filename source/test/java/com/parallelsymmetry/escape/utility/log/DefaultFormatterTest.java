@@ -9,6 +9,7 @@ public class DefaultFormatterTest extends TestCase {
 
 	private DefaultFormatter formatter = new DefaultFormatter();
 
+	@Override
 	public void tearDown() {
 		Log.setShowDate( false );
 		Log.setShowColor( false );

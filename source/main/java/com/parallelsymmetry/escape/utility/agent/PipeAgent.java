@@ -98,10 +98,12 @@ public abstract class PipeAgent extends Agent implements Pipe {
 		this.stopOnConnectException = stopOnConnectException;
 	}
 
+	@Override
 	public InputStream getInputStream() {
 		return input;
 	}
 
+	@Override
 	public OutputStream getOutputStream() {
 		return output;
 	}
