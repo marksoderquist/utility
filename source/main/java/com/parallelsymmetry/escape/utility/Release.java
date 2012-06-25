@@ -41,6 +41,7 @@ public class Release implements Comparable<Release> {
 		this( new Version( version ), timestamp );
 	}
 
+	@Deprecated
 	public Release( String version, String timestamp ) {
 		if( version == null ) throw new NullPointerException( "Version cannot be null." );
 		this.version = new Version( version );
@@ -50,7 +51,7 @@ public class Release implements Comparable<Release> {
 		try {
 			this.date = formatter.parse( timestamp );
 		} catch( ParseException exception ) {
-
+			// Intentionally ignore exception.
 		}
 	}
 
@@ -61,7 +62,7 @@ public class Release implements Comparable<Release> {
 	public Date getDate() {
 		return date;
 	}
-	
+
 	public String getDateString() {
 		return date == null ? "" : DateUtil.format( date, Release.DATE_FORMAT );
 	}
@@ -73,6 +74,10 @@ public class Release implements Comparable<Release> {
 
 	public String toHumanString() {
 		return format( version.toHumanString() );
+	}
+
+	public String toHumanString( TimeZone zone ) {
+		return format( version.toHumanString(), zone );
 	}
 
 	@Override
@@ -93,8 +98,12 @@ public class Release implements Comparable<Release> {
 	}
 
 	private String format( String version ) {
+		return format( version, DateUtil.DEFAULT_TIME_ZONE );
+	}
+
+	private String format( String version, TimeZone zone ) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-		dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+		dateFormat.setTimeZone( zone );
 
 		StringBuffer buffer = new StringBuffer();
 
@@ -102,6 +111,7 @@ public class Release implements Comparable<Release> {
 		if( date != null ) {
 			buffer.append( "  " );
 			buffer.append( dateFormat.format( date ) );
+			if( !zone.equals( DateUtil.DEFAULT_TIME_ZONE ) ) buffer.append( " " + zone.getDisplayName( zone.inDaylightTime( date ), TimeZone.SHORT ) );
 		}
 
 		return buffer.toString();

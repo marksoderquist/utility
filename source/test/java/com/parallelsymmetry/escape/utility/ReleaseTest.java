@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -45,6 +46,12 @@ public class ReleaseTest extends TestCase {
 	public void testToHumanString() {
 		assertEquals( "1.2.3 Update 04", new Release( versionString ).toHumanString() );
 		assertEquals( "1.2.3 Update 04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString() );
+	}
+
+	public void testToHumanStringWithTimeZone() {
+		TimeZone zone = TimeZone.getTimeZone( "America/Phoenix" );
+		assertEquals( "1.2.3 Update 04", new Release( versionString ).toHumanString(zone) );
+		assertEquals( "1.2.3 Update 04  1969-12-31 17:00:00 MST", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString( zone ) );
 	}
 
 	public void testEquals() {

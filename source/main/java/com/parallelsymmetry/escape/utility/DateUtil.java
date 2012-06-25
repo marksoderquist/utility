@@ -8,9 +8,9 @@ import java.util.TimeZone;
 
 public class DateUtil {
 
-	public static final String STANDARD_TIME_ZONE = "GMT";
-
 	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+	public static final TimeZone DEFAULT_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
 	/**
 	 * Convenience method to get the current year for the UTC time zone.
@@ -18,7 +18,17 @@ public class DateUtil {
 	 * @return
 	 */
 	public static final int getCurrentYear() {
-		return getCurrentYear( STANDARD_TIME_ZONE );
+		return getCurrentYear( DEFAULT_TIME_ZONE );
+	}
+
+	/**
+	 * Convenience method to get the current year based on time zone.
+	 * 
+	 * @param timeZone
+	 * @return
+	 */
+	public static final int getCurrentYear( String timeZone ) {
+		return getCurrentYear( TimeZone.getTimeZone( timeZone ) );
 	}
 
 	/**
@@ -27,8 +37,8 @@ public class DateUtil {
 	 * @param timezone
 	 * @return
 	 */
-	public static final int getCurrentYear( String timezone ) {
-		return Calendar.getInstance( TimeZone.getTimeZone( timezone ) ).get( Calendar.YEAR );
+	public static final int getCurrentYear( TimeZone timeZone ) {
+		return Calendar.getInstance( timeZone ).get( Calendar.YEAR );
 	}
 
 	/**
@@ -39,7 +49,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static final Date parse( String data, String format ) {
-		return parse( data, format, STANDARD_TIME_ZONE );
+		return parse( data, format, DEFAULT_TIME_ZONE );
 	}
 
 	/**
@@ -51,10 +61,22 @@ public class DateUtil {
 	 * @return
 	 */
 	public static final Date parse( String data, String format, String timeZone ) {
+		return parse( data, format, timeZone == null ? null : TimeZone.getTimeZone( timeZone ) );
+	}
+
+	/**
+	 * Parse a date string with the given format and time zone.
+	 * 
+	 * @param data
+	 * @param format
+	 * @param timeZone
+	 * @return
+	 */
+	public static final Date parse( String data, String format, TimeZone timeZone ) {
 		if( data == null ) return null;
 
 		SimpleDateFormat formatter = new SimpleDateFormat( format );
-		formatter.setTimeZone( TimeZone.getTimeZone( timeZone ) );
+		formatter.setTimeZone( timeZone );
 
 		try {
 			return formatter.parse( data );
@@ -71,7 +93,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static final String format( Date date, String format ) {
-		return format( date, format, STANDARD_TIME_ZONE );
+		return format( date, format, DEFAULT_TIME_ZONE );
 	}
 
 	/**
@@ -83,8 +105,20 @@ public class DateUtil {
 	 * @return
 	 */
 	public static final String format( Date date, String format, String timeZone ) {
+		return format( date, format, timeZone );
+	}
+
+	/**
+	 * Format a date with the given format and time zone.
+	 * 
+	 * @param date
+	 * @param format
+	 * @param timeZone
+	 * @return
+	 */
+	public static final String format( Date date, String format, TimeZone timeZone ) {
 		SimpleDateFormat formatter = new SimpleDateFormat( format );
-		formatter.setTimeZone( TimeZone.getTimeZone( timeZone ) );
+		formatter.setTimeZone( timeZone );
 		return formatter.format( date );
 	}
 

@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -23,20 +24,35 @@ public class DateUtilTest extends TestCase {
 
 	public void testParseWithTimeZone() {
 		try {
-			DateUtil.parse( "", null, null );
+			DateUtil.parse( "", null, (TimeZone)null );
 			fail( "Null format should cause a NullPointerException." );
 		} catch( NullPointerException exception ) {
 			// Intentionally ignore exception.
 		}
 
 		try {
-			DateUtil.parse( "", "", null );
+			DateUtil.parse( "", "", (TimeZone)null );
 			fail( "Null time zone should cause a NullPointerException." );
 		} catch( NullPointerException exception ) {
 			// Intentionally ignore exception.
 		}
 
-		assertNull( DateUtil.parse( null, null, null ) );
+		try {
+			DateUtil.parse( "", null, (String)null );
+			fail( "Null format should cause a NullPointerException." );
+		} catch( NullPointerException exception ) {
+			// Intentionally ignore exception.
+		}
+
+		try {
+			DateUtil.parse( "", "", (String)null );
+			fail( "Null time zone should cause a NullPointerException." );
+		} catch( NullPointerException exception ) {
+			// Intentionally ignore exception.
+		}
+
+		assertNull( DateUtil.parse( null, null, (TimeZone)null ) );
+		assertNull( DateUtil.parse( null, null, (String)null ) );
 		assertNull( DateUtil.parse( null, "", "" ) );
 		assertNull( DateUtil.parse( "", "", "" ) );
 
