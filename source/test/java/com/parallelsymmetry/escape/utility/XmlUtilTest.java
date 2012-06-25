@@ -44,7 +44,7 @@ public class XmlUtilTest extends TestCase {
 
 	@Test
 	public void testFormat() throws Exception {
-		// FIXME This test is OS dependent.
+		// FIXME This test is platform dependent.
 //		String data = "<tag><indent/></tag>";
 //		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n  <indent/>\n</tag>";
 //		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
@@ -56,7 +56,7 @@ public class XmlUtilTest extends TestCase {
 
 	@Test
 	public void testFormatWithIndentSize() throws Exception {
-		// FIXME This test is OS dependent.
+		// FIXME This test is platform dependent.
 //		String data = "<tag><indent/></tag>";
 //		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
 //		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );

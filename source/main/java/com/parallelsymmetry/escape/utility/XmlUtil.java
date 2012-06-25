@@ -16,6 +16,8 @@ import java.io.Writer;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -95,16 +97,7 @@ public class XmlUtil {
 	}
 
 	public static final void save( Node node, Writer output, int indentAmount ) throws IOException {
-		Transformer transformer;
-		TransformerFactory factory = TransformerFactory.newInstance();
-		try {
-			transformer = factory.newTransformer();
-			transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-			transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", String.valueOf( indentAmount ) );
-			transformer.transform( new DOMSource( node ), new StreamResult( output ) );
-		} catch( TransformerException exception ) {
-			throw new IOException( exception );
-		}
+		format( new DOMSource( node), new StreamResult( output ), indentAmount );
 	}
 
 	public static final void format( InputStream input, OutputStream output ) throws IOException {
@@ -133,7 +126,7 @@ public class XmlUtil {
 		return output.toString();
 	}
 
-	private static final void format( StreamSource source, StreamResult result, int indent ) throws IOException {
+	private static final void format( Source source, Result result, int indent ) throws IOException {
 		try {
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
