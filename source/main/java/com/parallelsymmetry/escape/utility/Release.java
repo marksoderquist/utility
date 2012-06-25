@@ -64,7 +64,18 @@ public class Release implements Comparable<Release> {
 	}
 
 	public String getDateString() {
-		return date == null ? "" : DateUtil.format( date, Release.DATE_FORMAT );
+		return getDateString( DateUtil.DEFAULT_TIME_ZONE );
+	}
+
+	public String getDateString( TimeZone zone ) {
+		if( date == null ) return "";
+
+		StringBuilder builder = new StringBuilder( DateUtil.format( date, Release.DATE_FORMAT, zone ) );
+		if( !zone.equals( DateUtil.DEFAULT_TIME_ZONE ) ) {
+			builder.append( " " );
+			builder.append( zone.getDisplayName( zone.inDaylightTime( date ), TimeZone.SHORT ) );
+		}
+		return builder.toString();
 	}
 
 	@Override
@@ -110,8 +121,7 @@ public class Release implements Comparable<Release> {
 		buffer.append( version );
 		if( date != null ) {
 			buffer.append( "  " );
-			buffer.append( dateFormat.format( date ) );
-			if( !zone.equals( DateUtil.DEFAULT_TIME_ZONE ) ) buffer.append( " " + zone.getDisplayName( zone.inDaylightTime( date ), TimeZone.SHORT ) );
+			buffer.append( getDateString( zone ) );
 		}
 
 		return buffer.toString();

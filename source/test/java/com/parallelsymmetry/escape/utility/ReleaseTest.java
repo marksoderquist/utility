@@ -38,6 +38,12 @@ public class ReleaseTest extends TestCase {
 		assertEquals( "1970-01-01 00:00:00", new Release( versionString, new Date( 0 ) ).getDateString() );
 	}
 
+	public void testGetDateStringWithTimeZone() {
+		TimeZone zone = TimeZone.getTimeZone( "America/Phoenix" );
+		assertEquals( "", new Release( versionString ).getDateString( zone ) );
+		assertEquals( "1969-12-31 17:00:00 MST", new Release( versionString, new Date( 0 ) ).getDateString( zone ) );
+	}
+
 	public void testToString() {
 		assertEquals( "1.2.3-u-04", new Release( versionString ).toString() );
 		assertEquals( "1.2.3-u-04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toString() );
@@ -50,7 +56,7 @@ public class ReleaseTest extends TestCase {
 
 	public void testToHumanStringWithTimeZone() {
 		TimeZone zone = TimeZone.getTimeZone( "America/Phoenix" );
-		assertEquals( "1.2.3 Update 04", new Release( versionString ).toHumanString(zone) );
+		assertEquals( "1.2.3 Update 04", new Release( versionString ).toHumanString( zone ) );
 		assertEquals( "1.2.3 Update 04  1969-12-31 17:00:00 MST", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString( zone ) );
 	}
 
