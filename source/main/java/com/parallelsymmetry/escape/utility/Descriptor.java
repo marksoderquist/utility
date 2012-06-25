@@ -189,7 +189,7 @@ public class Descriptor {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 
 		try {
-			value = (String)xpath.evaluate( path, node, XPathConstants.STRING );
+			value = (String)xpath.evaluate( "normalize-space(" + path + ")", node, XPathConstants.STRING );
 		} catch( XPathExpressionException exception ) {
 			Log.write( new Exception( path, exception ) );
 		}
@@ -227,8 +227,11 @@ public class Descriptor {
 		ArrayList<String> values = new ArrayList<String>();
 		int count = nodes.getLength();
 		for( int index = 0; index < count; index++ ) {
-			Node item = nodes.item( index );
-			values.add( item.getTextContent() );
+			try {
+				values.add( (String)xpath.evaluate( "normalize-space()", nodes.item( index ), XPathConstants.STRING ) );
+			} catch( XPathExpressionException exception ) {
+				Log.write( new Exception( path, exception ) );
+			}
 		}
 
 		return values.toArray( new String[values.size()] );

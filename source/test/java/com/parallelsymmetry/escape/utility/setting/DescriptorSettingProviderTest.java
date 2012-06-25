@@ -37,7 +37,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 	public void testGetChildNames() {
 		Set<String> names = provider.getChildNames( "" );
 
-		assertEquals( 7, names.size() );
+		assertEquals( 8, names.size() );
 		assertTrue( names.contains( "name" ) );
 		assertTrue( names.contains( "alias" ) );
 		assertTrue( names.contains( "path" ) );
@@ -45,6 +45,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertTrue( names.contains( "integer" ) );
 		assertTrue( names.contains( "list" ) );
 		assertTrue( names.contains( "nodes" ) );
+		assertTrue( names.contains( "summary" ) );
 	}
 
 	public void testNodeExists() {

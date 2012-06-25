@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -13,7 +14,6 @@ public class DescriptorTest extends TestCase {
 	public void testConstructor() throws Exception {
 		Descriptor descriptor = new Descriptor();
 		assertNotNull( descriptor );
-
 		assertNotNull( descriptor.getPaths() );
 		assertEquals( 0, descriptor.getPaths().size() );
 	}
@@ -21,7 +21,6 @@ public class DescriptorTest extends TestCase {
 	public void testConstructorWithNullNode() throws Exception {
 		Descriptor descriptor = new Descriptor( (Node)null );
 		assertNotNull( descriptor );
-
 		assertNotNull( descriptor.getPaths() );
 		assertEquals( 0, descriptor.getPaths().size() );
 	}
@@ -29,38 +28,29 @@ public class DescriptorTest extends TestCase {
 	public void testConstructorWithNullStream() throws Exception {
 		Descriptor descriptor = new Descriptor( (InputStream)null );
 		assertNotNull( descriptor );
-
 		assertNotNull( descriptor.getPaths() );
 		assertEquals( 0, descriptor.getPaths().size() );
 	}
 
 	public void testConstructorWithNode() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
-		assertNotNull( descriptor );
-
+		Descriptor descriptor = loadTestDescriptor();
 		Descriptor descriptor2 = new Descriptor( descriptor.getNode( "/test" ) );
 		assertNotNull( descriptor2 );
 		assertEquals( "test.name", descriptor2.getValue( "name" ) );
 	}
 
 	public void testConstructorWithStream() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 		assertNotNull( descriptor );
 	}
 
 	public void testGetDocument() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 		assertNotNull( descriptor.getDocument() );
 	}
 
 	public void testGetPathsWithEmptyDescriptor() throws Exception {
 		Descriptor descriptor = new Descriptor();
-
 		List<String> paths = descriptor.getPaths();
 		assertNotNull( paths );
 		assertEquals( 0, paths.size() );
@@ -84,12 +74,10 @@ public class DescriptorTest extends TestCase {
 	}
 
 	public void testGetNames() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 
 		List<String> names = descriptor.getNames( "/test" );
-		assertEquals( 7, names.size() );
+		assertEquals( 8, names.size() );
 		assertTrue( names.contains( "name" ) );
 		assertTrue( names.contains( "alias" ) );
 		assertTrue( names.contains( "path" ) );
@@ -105,23 +93,20 @@ public class DescriptorTest extends TestCase {
 	}
 
 	public void testGetPaths() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 
 		List<String> paths = descriptor.getPaths();
 		assertNotNull( paths );
-		assertEquals( 9, paths.size() );
+		assertEquals( 10, paths.size() );
 		assertEquals( "/test/name", paths.get( 0 ) );
 		assertEquals( "/test/alias", paths.get( 1 ) );
 		assertEquals( "/test/path/value", paths.get( 2 ) );
 		assertEquals( "/test/integer", paths.get( 3 ) );
+		assertEquals( "/test/summary", paths.get( 9 ) );
 	}
 
 	public void testGetNode() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 
 		Document document = descriptor.getDocument();
 
@@ -132,9 +117,7 @@ public class DescriptorTest extends TestCase {
 	}
 
 	public void testGetNodes() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 
 		assertEquals( null, descriptor.getNodes( null ) );
 		assertEquals( null, descriptor.getNodes( "" ) );
@@ -146,9 +129,8 @@ public class DescriptorTest extends TestCase {
 	}
 
 	public void testGetValue() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
+
 		assertEquals( null, descriptor.getValue( null ) );
 		assertEquals( null, descriptor.getValue( "" ) );
 		assertEquals( "test.name", descriptor.getValue( "test/name" ) );
@@ -158,9 +140,8 @@ public class DescriptorTest extends TestCase {
 	}
 
 	public void testGetValueWithDefault() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
+
 		assertEquals( null, descriptor.getValue( (String)null, null ) );
 		assertEquals( "default", descriptor.getValue( (String)null, "default" ) );
 		assertEquals( "test.name", descriptor.getValue( "test/name", null ) );
@@ -169,10 +150,14 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
 	}
 
+	public void testGetMultilineValue() throws Exception {
+		Descriptor descriptor = loadTestDescriptor();
+
+		assertEquals( "This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.", descriptor.getValue( "/test/summary" ) );
+	}
+
 	public void testGetValues() throws Exception {
-		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
-		assertNotNull( input );
-		Descriptor descriptor = new Descriptor( input );
+		Descriptor descriptor = loadTestDescriptor();
 
 		assertEquals( null, descriptor.getValues( null ) );
 		assertEquals( null, descriptor.getValues( "" ) );
@@ -182,6 +167,25 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "one", values[0] );
 		assertEquals( "two", values[1] );
 		assertEquals( "three", values[2] );
+	}
+
+	public void testGetMultilineValues() throws Exception {
+		Descriptor descriptor = loadTestDescriptor();
+
+		assertEquals( null, descriptor.getValues( null ) );
+		assertEquals( null, descriptor.getValues( "" ) );
+
+		String[] values = descriptor.getValues( "/test/summary" );
+		assertEquals( 1, values.length );
+		assertEquals( "This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.", values[0] );
+	}
+
+	private Descriptor loadTestDescriptor() throws IOException {
+		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
+		assertNotNull( input );
+		Descriptor descriptor = new Descriptor( input );
+		assertNotNull( descriptor );
+		return descriptor;
 	}
 
 }
