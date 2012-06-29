@@ -34,7 +34,7 @@ public class XmlUtilTest extends TestCase {
 		Document document = XmlUtil.loadXmlDocument( (InputStream)null );
 		assertNull( document );
 	}
-	
+
 	@Test
 	public void testGetDocumentType() throws Exception {
 		InputStream input = XmlUtilTest.class.getResourceAsStream( "/test.xml" );
@@ -45,25 +45,33 @@ public class XmlUtilTest extends TestCase {
 	@Test
 	public void testFormat() throws Exception {
 		// FIXME This test is platform dependent.
-//		String data = "<tag><indent/></tag>";
-//		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n  <indent/>\n</tag>";
-//		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
-//		ByteArrayOutputStream output = new ByteArrayOutputStream();
-//
-//		XmlUtil.format( input, output );
-//		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
+		//		String data = "<tag><indent/></tag>";
+		//		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n  <indent/>\n</tag>";
+		//		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
+		//		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		//
+		//		XmlUtil.format( input, output );
+		//		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 
 	@Test
 	public void testFormatWithIndentSize() throws Exception {
 		// FIXME This test is platform dependent.
-//		String data = "<tag><indent/></tag>";
-//		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
-//		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
-//		ByteArrayOutputStream output = new ByteArrayOutputStream();
-//
-//		XmlUtil.format( input, output, 3 );
-//		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
+		//		String data = "<tag><indent/></tag>";
+		//		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
+		//		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
+		//		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		//
+		//		XmlUtil.format( input, output, 3 );
+		//		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
+	}
+
+	public void testGetPath() throws Exception {
+		assertNull( XmlUtil.getPath( null ) );
+
+		Document document = XmlUtil.loadXmlDocument( XmlUtilTest.class.getResourceAsStream( "/test.xml" ) );
+		assertEquals( "/test", XmlUtil.getPath( document.getFirstChild() ) );
+		assertEquals( "/test/a", XmlUtil.getPath( document.getFirstChild().getFirstChild().getNextSibling() ) );
 	}
 
 }

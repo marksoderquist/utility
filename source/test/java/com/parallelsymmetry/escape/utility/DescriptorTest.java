@@ -180,6 +180,16 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.", values[0] );
 	}
 
+	public void testGetAttributeValueFromSubDescriptor() throws Exception {
+		Descriptor descriptor = loadTestDescriptor();
+		Descriptor subDescriptor = new Descriptor( descriptor.getNode( "/test/bounds" ) );
+
+		System.out.println( XmlUtil.toString( subDescriptor.getNode() ) );
+
+		assertEquals( "15", descriptor.getValue( "/test/bounds/@h" ) );
+		assertEquals( "15", subDescriptor.getValue( "@h" ) );
+	}
+
 	private Descriptor loadTestDescriptor() throws IOException {
 		InputStream input = DescriptorTest.class.getResourceAsStream( "/test.descriptor.xml" );
 		assertNotNull( input );

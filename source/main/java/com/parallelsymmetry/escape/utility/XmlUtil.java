@@ -97,7 +97,7 @@ public class XmlUtil {
 	}
 
 	public static final void save( Node node, Writer output, int indentAmount ) throws IOException {
-		format( new DOMSource( node), new StreamResult( output ), indentAmount );
+		format( new DOMSource( node ), new StreamResult( output ), indentAmount );
 	}
 
 	public static final void format( InputStream input, OutputStream output ) throws IOException {
@@ -124,6 +124,19 @@ public class XmlUtil {
 			Log.write( exception );
 		}
 		return output.toString();
+	}
+
+	public static final String getPath( Node node ) {
+		if( node == null ) return null;
+
+		StringBuilder builder = new StringBuilder();
+		while( node.getNodeType() != Node.DOCUMENT_NODE ) {
+			builder.insert( 0, node.getNodeName() );
+			builder.insert( 0, "/" );
+			node = node.getParentNode();
+		}
+
+		return builder.toString();
 	}
 
 	private static final void format( Source source, Result result, int indent ) throws IOException {
