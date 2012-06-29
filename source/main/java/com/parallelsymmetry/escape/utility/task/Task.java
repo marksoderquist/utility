@@ -159,6 +159,14 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		listeners.remove( listener );
 	}
 
+	protected TaskManager getTaskManager() {
+		return manager;
+	}
+
+	protected void setTaskManager( TaskManager manager ) {
+		this.manager = manager;
+	}
+
 	protected void fireTaskEvent( TaskEvent.Type type ) {
 		TaskEvent event = new TaskEvent( this, this, type );
 		for( TaskListener listener : listeners ) {
@@ -166,10 +174,6 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		}
 		TaskManager manager = this.manager;
 		if( manager != null ) manager.fireTaskEvent( event );
-	}
-
-	void setTaskManager( TaskManager manager ) {
-		this.manager = manager;
 	}
 
 	V invoke() throws InterruptedException, ExecutionException {
