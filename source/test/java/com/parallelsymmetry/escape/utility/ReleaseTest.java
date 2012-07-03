@@ -1,5 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -10,15 +12,22 @@ public class ReleaseTest extends TestCase {
 	private String versionString = "1.2.3-u-04";
 
 	private String timestampString = "1970-01-01 00:00:00";
+	
+	private DateFormat dateFormat = new SimpleDateFormat( Release.DATE_FORMAT );
+	
+	@Override
+	public void setUp() {
+		dateFormat.setTimeZone( DateUtil.DEFAULT_TIME_ZONE );
+	}
 
-	public void testConstructorWithStringString() throws Exception {
-		Release release = new Release( versionString, timestampString );
+	public void testConstructorWithStringAndDate() throws Exception {
+		Release release = new Release( versionString, dateFormat.parse( timestampString ) );
 		assertEquals( versionString, release.getVersion().toString() );
 		assertEquals( new Date( 0 ), release.getDate() );
 	}
 
-	public void testConstructorWithStringStringAndBadTimestamp() throws Exception {
-		Release release = new Release( versionString, "bad timestamp string" );
+	public void testConstructorWithStringStringAndNullDate() throws Exception {
+		Release release = new Release( versionString, null );
 		assertEquals( versionString, release.getVersion().toString() );
 		assertEquals( null, release.getDate() );
 	}

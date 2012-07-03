@@ -1,7 +1,5 @@
 package com.parallelsymmetry.escape.utility;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -23,16 +21,6 @@ public class Release implements Comparable<Release> {
 
 	private Date date;
 
-	public Release( Version version ) {
-		this( version, null );
-	}
-
-	public Release( Version version, Date date ) {
-		if( version == null ) throw new NullPointerException( "Version cannot be null." );
-		this.version = version;
-		this.date = date;
-	}
-
 	public Release( String version ) {
 		this( new Version( version ), null );
 	}
@@ -41,18 +29,14 @@ public class Release implements Comparable<Release> {
 		this( new Version( version ), timestamp );
 	}
 
-	@Deprecated
-	public Release( String version, String timestamp ) {
-		if( version == null ) throw new NullPointerException( "Version cannot be null." );
-		this.version = new Version( version );
+	public Release( Version version ) {
+		this( version, null );
+	}
 
-		DateFormat formatter = new SimpleDateFormat( DATE_FORMAT );
-		formatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-		try {
-			this.date = formatter.parse( timestamp );
-		} catch( ParseException exception ) {
-			// Intentionally ignore exception.
-		}
+	public Release( Version version, Date date ) {
+		if( version == null ) throw new NullPointerException( "Version cannot be null." );
+		this.version = version;
+		this.date = date;
 	}
 
 	public Version getVersion() {
@@ -94,9 +78,14 @@ public class Release implements Comparable<Release> {
 	@Override
 	public boolean equals( Object object ) {
 		if( !( object instanceof Release ) ) return false;
-
+	
 		Release that = (Release)object;
 		return this.compareTo( that ) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return version.hashCode() ^ date.hashCode();
 	}
 
 	@Override

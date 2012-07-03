@@ -415,6 +415,15 @@ public class VersionTest extends TestCase {
 		}
 	}
 
+	public void testHashCode() {
+		Version a = new Version( "1" );
+		Version b = new Version( "1" );
+		Version c = new Version( "2" );
+		assertTrue( a.hashCode() == b.hashCode() );
+		assertFalse( a.hashCode() == c.hashCode() );
+		assertFalse( b.hashCode() == c.hashCode() );
+	}
+
 	private Version newComparable( String version ) {
 		return new Version( version );
 	}
