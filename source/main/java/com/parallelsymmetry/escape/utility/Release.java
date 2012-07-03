@@ -78,14 +78,14 @@ public class Release implements Comparable<Release> {
 	@Override
 	public boolean equals( Object object ) {
 		if( !( object instanceof Release ) ) return false;
-	
+
 		Release that = (Release)object;
 		return this.compareTo( that ) == 0;
 	}
 
 	@Override
 	public int hashCode() {
-		return version.hashCode() ^ date.hashCode();
+		return version.hashCode() ^ ( date == null ? 0 : date.hashCode() );
 	}
 
 	@Override

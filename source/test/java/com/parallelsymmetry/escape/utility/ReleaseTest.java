@@ -12,9 +12,9 @@ public class ReleaseTest extends TestCase {
 	private String versionString = "1.2.3-u-04";
 
 	private String timestampString = "1970-01-01 00:00:00";
-	
+
 	private DateFormat dateFormat = new SimpleDateFormat( Release.DATE_FORMAT );
-	
+
 	@Override
 	public void setUp() {
 		dateFormat.setTimeZone( DateUtil.DEFAULT_TIME_ZONE );
@@ -77,6 +77,12 @@ public class ReleaseTest extends TestCase {
 		assertFalse( new Release( new Version( "1" ) ).equals( new Release( "2" ) ) );
 		assertTrue( new Release( new Version( "1" ), new Date( 0 ) ).equals( new Release( "1", new Date( 0 ) ) ) );
 		assertFalse( new Release( new Version( "1" ), new Date( 0 ) ).equals( new Release( "1", new Date( 1 ) ) ) );
+	}
+
+	public void testHashCode() {
+		assertTrue( new Release( versionString ).hashCode() == new Release( versionString ).hashCode() );
+		assertTrue( new Release( versionString, null ).hashCode() == new Release( versionString, null ).hashCode() );
+		assertTrue( new Release( versionString, new Date( 0 ) ).hashCode() == new Release( versionString, new Date( 0 ) ).hashCode() );
 	}
 
 	public void testCompareTo() {
