@@ -57,10 +57,12 @@ public class CompositeTask extends Task<Object> implements TaskListener {
 
 		futures = new HashSet<Future<?>>( tasks.size() );
 
+		// Submit all the tasks for execution.
 		for( Task<?> task : tasks ) {
 			futures.add( manager.submit( task ) );
 		}
 
+		// Wait for all the tasks to terminate.
 		for( Future<?> future : futures ) {
 			try {
 				future.get();
