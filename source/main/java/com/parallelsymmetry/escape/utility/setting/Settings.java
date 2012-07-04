@@ -499,17 +499,17 @@ public class Settings {
 					( (Persistent)object ).loadSettings( node );
 					list.add( type.cast( object ) );
 				} catch( InstantiationException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+					Log.write( exception, getAbsolutePath( path ) );
 				} catch( IllegalAccessException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+					Log.write( exception, getAbsolutePath( path ) );
 				} catch( SecurityException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+					Log.write( exception, getAbsolutePath( path ) );
 				} catch( NoSuchMethodException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+					Log.write( exception, getAbsolutePath( path ) );
 				} catch( IllegalArgumentException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+					Log.write( exception, getAbsolutePath( path ) );
 				} catch( InvocationTargetException exception ) {
-					Log.write( getAbsolutePath( path ), exception );
+					Log.write( exception, getAbsolutePath( path ) );
 				}
 			}
 		}
