@@ -3,6 +3,8 @@ package com.parallelsymmetry.escape.utility;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ import com.parallelsymmetry.escape.utility.log.Log;
 
 public class Descriptor {
 
-	private String source;
+	private URI source;
 
 	private Node node;
 
@@ -40,20 +42,19 @@ public class Descriptor {
 		this( null, node );
 	}
 
-	public Descriptor( String source, Node node ) {
-		this.source = source;
-		this.node = node;
+	public Descriptor( Reader reader ) throws IOException {
+		this( null, reader );
 	}
 
-	public Descriptor( URL url ) throws IOException {
-		this( url.openStream() );
+	public Descriptor( InputStream input ) throws IOException {
+		this( null, input );
 	}
 
-	public Descriptor( String uri ) throws IOException {
+	public Descriptor( URI uri ) throws IOException {
 		if( uri == null ) return;
 		source = uri;
 		try {
-			node = XmlUtil.loadXmlDocument( uri );
+			node = XmlUtil.loadXmlDocument( uri.toString() );
 		} catch( SAXException exception ) {
 			throw new IOException( exception );
 		} catch( ParserConfigurationException exception ) {
@@ -61,11 +62,12 @@ public class Descriptor {
 		}
 	}
 
-	public Descriptor( Reader reader ) throws IOException {
-		this( null, reader );
+	public Descriptor( URI source, Node node ) {
+		this.source = source;
+		this.node = node;
 	}
 
-	public Descriptor( String source, Reader reader ) throws IOException {
+	public Descriptor( URI source, Reader reader ) throws IOException {
 		if( reader == null ) return;
 		this.source = source;
 		try {
@@ -77,11 +79,7 @@ public class Descriptor {
 		}
 	}
 
-	public Descriptor( InputStream input ) throws IOException {
-		this( null, input );
-	}
-
-	public Descriptor( String source, InputStream input ) throws IOException {
+	public Descriptor( URI source, InputStream input ) throws IOException {
 		if( input == null ) return;
 		this.source = source;
 		try {
@@ -93,7 +91,16 @@ public class Descriptor {
 		}
 	}
 
-	public String getSource() {
+	public Descriptor( URL url ) throws IOException {
+		this( url.openStream() );
+		try {
+			source = url.toURI();
+		} catch( URISyntaxException exception ) {
+			throw new IOException( exception );
+		}
+	}
+
+	public URI getSource() {
 		return source;
 	}
 
