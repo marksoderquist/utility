@@ -34,6 +34,8 @@ public class OperatingSystem {
 
 	private static String arch;
 
+	private static Boolean elevated;
+
 	/**
 	 * Initialize the class.
 	 */
@@ -123,27 +125,25 @@ public class OperatingSystem {
 		return family == Family.WINDOWS;
 	}
 
-	public static final boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
-	}
-
 	/**
 	 * Check if the process has elevated privileges.
 	 * 
 	 * @return true if the process has elevated privileges.
 	 */
 	public static final boolean isProcessElevated() {
-		if( isElevatedFlagSet() ) return true;
+		if( elevated == null && isElevatedFlagSet() ) elevated = Boolean.TRUE;
 
-		if( isWindows() ) {
-			return canWriteToProgramFiles();
-		} else {
-			return System.getProperty( "user.name" ).equals( "root" );
+		if( elevated == null ) {
+			if( isWindows() ) {
+				elevated = new Boolean( canWriteToProgramFiles() );
+			} else {
+				elevated = new Boolean( System.getProperty( "user.name" ).equals( "root" ) );
+			}
 		}
 		
-		// FIXME This value can be cached for the duration of the JVM.
+		return elevated.booleanValue();
 	}
-
+	
 	public static final boolean isElevateProcessSupported() {
 		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
 	}
@@ -190,10 +190,10 @@ public class OperatingSystem {
 	 */
 	public static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
 		List<String> command = getReduceCommands();
-	
+
 		if( isWindows() ) {
 			StringBuilder inner = new StringBuilder();
-	
+
 			for( String c : builder.command() ) {
 				if( c.contains( " " ) ) {
 					inner.append( "\\\"" );
@@ -204,20 +204,20 @@ public class OperatingSystem {
 				}
 				inner.append( " " );
 			}
-	
+
 			StringBuilder outer = new StringBuilder();
 			outer.append( "\"" );
 			outer.append( inner.toString().trim() );
 			outer.append( "\"" );
-	
+
 			command.add( outer.toString() );
 		} else {
 			command.addAll( builder.command() );
 			builder.command( command );
 		}
-	
+
 		builder.command( command );
-	
+
 		return builder;
 	}
 
@@ -384,6 +384,14 @@ public class OperatingSystem {
 		}
 
 		return null;
+	}
+
+	static final boolean isElevatedFlagSet() {
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+	}
+
+	static final void clearProcessElevatedCache() {
+		elevated = null;
 	}
 
 	private static final boolean canWriteToProgramFiles() {

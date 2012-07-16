@@ -58,31 +58,37 @@ public class OperatingSystemTest extends TestCase {
 		//		assertEquals( new File( System.getenv( "appdata" ), "Test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
 		//		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
-
+	
 	@Test
 	public void testIsProcessElevatedMac() throws Exception {
 		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );
+		OperatingSystem.clearProcessElevatedCache();
 		assertFalse( OperatingSystem.isProcessElevated() );
 
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
+		OperatingSystem.clearProcessElevatedCache();
 		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
 	@Test
 	public void testIsProcessElevatedUnix() throws Exception {
 		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
+		OperatingSystem.clearProcessElevatedCache();
 		assertFalse( OperatingSystem.isProcessElevated() );
 
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
+		OperatingSystem.clearProcessElevatedCache();
 		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
 	@Test
 	public void testIsProcessElevatedWindows() throws Exception {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
+		OperatingSystem.clearProcessElevatedCache();
 		assertFalse( OperatingSystem.isProcessElevated() );
 
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
+		OperatingSystem.clearProcessElevatedCache();
 		assertTrue( OperatingSystem.isProcessElevated() );
 	}
 
