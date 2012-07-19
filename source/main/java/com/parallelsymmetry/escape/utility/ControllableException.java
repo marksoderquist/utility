@@ -18,8 +18,4 @@ public class ControllableException extends Exception {
 		super( message, cause );
 	}
 
-	public ControllableException( String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace ) {
-		super( message, cause, enableSuppression, writableStackTrace );
-	}
-
 }
