@@ -184,23 +184,27 @@ public class FileUtilTest extends TestCase {
 
 		// Check that all paths are in the zip file.
 		ZipFile zipFile = new ZipFile( zip );
-		for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
-			String zipEntryName = entries.nextElement().getName();
-			assertTrue( paths.contains( zipEntryName ) );
-		}
+		try {
+			for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
+				String zipEntryName = entries.nextElement().getName();
+				assertTrue( paths.contains( zipEntryName ) );
+			}
 
-		// Initialize for unzip tests.
-		assertTrue( FileUtil.delete( targetData ) );
-		assertFalse( targetData.exists() );
-		targetData.mkdirs();
-		assertTrue( targetData.exists() );
+			// Initialize for unzip tests.
+			assertTrue( FileUtil.delete( targetData ) );
+			assertFalse( targetData.exists() );
+			targetData.mkdirs();
+			assertTrue( targetData.exists() );
 
-		// Unzip the data.
-		FileUtil.unzip( zip, targetData );
+			// Unzip the data.
+			FileUtil.unzip( zip, targetData );
 
-		// Check that all the files are in the target.
-		for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
-			assertTrue( new File( targetData, entries.nextElement().getName() ).exists() );
+			// Check that all the files are in the target.
+			for( Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
+				assertTrue( new File( targetData, entries.nextElement().getName() ).exists() );
+			}
+		} finally {
+			if( zipFile != null ) zipFile.close();
 		}
 
 		targetData.deleteOnExit();
