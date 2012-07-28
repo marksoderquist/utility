@@ -125,7 +125,7 @@ public class PersistentQueueTest extends TestCase {
 
 	private PersistentQueue<String> createTemporaryQueue( int defragInterval ) throws IOException {
 		String filename = "store" + System.nanoTime() + ".queue";
-		File store = new File( System.getProperty( "java.io.tmpdir"), filename );
+		File store = new File( System.getProperty( "java.io.tmpdir" ), filename );
 		store.deleteOnExit();
 		return new PersistentQueue<String>( store, defragInterval );
 	}

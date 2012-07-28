@@ -296,9 +296,9 @@ public class IoPump implements Runnable {
 			byte[] bytearray = null;
 			char[] chararray = null;
 			if( reader == null ) {
-				bytearray = new byte[ bufferSize ];
+				bytearray = new byte[bufferSize];
 			} else {
-				chararray = new char[ bufferSize ];
+				chararray = new char[bufferSize];
 			}
 
 			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump started." );
@@ -327,10 +327,10 @@ public class IoPump implements Runnable {
 					int datum = 0;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
-							datum = bytearray[ index ];
+							datum = bytearray[index];
 							if( datum < 0 ) datum += 256;
 						} else {
-							datum = chararray[ index ];
+							datum = chararray[index];
 							if( datum < 0 ) datum += 65536;
 						}
 

@@ -31,7 +31,7 @@ public abstract class Worker extends Agent implements Runnable {
 		this.daemon = daemon;
 		this.runner = new WorkerRunner();
 	}
-	
+
 	public void trip() {
 		this.runner.trip();
 	}
@@ -97,7 +97,7 @@ public abstract class Worker extends Agent implements Runnable {
 		public synchronized boolean isExecutable() {
 			return execute;
 		}
-		
+
 		public synchronized boolean isWorking() {
 			return thread != null && thread.isAlive();
 		}
@@ -128,14 +128,14 @@ public abstract class Worker extends Agent implements Runnable {
 			startlock.trip();
 			Worker.this.run();
 		}
-		
+
 		public void trip() {
 			this.execute = false;
 		}
 
 		public void stop() {
 			trip();
-			
+
 			try {
 				Worker.this.stopWorker();
 			} catch( Exception exception ) {

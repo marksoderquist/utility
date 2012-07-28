@@ -101,7 +101,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	public String getName() {
 		return name == null ? getClass().getName() : name;
 	}
-	
+
 	public void setName( String name ) {
 		this.name = name;
 	}

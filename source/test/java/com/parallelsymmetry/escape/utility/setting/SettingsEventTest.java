@@ -31,11 +31,11 @@ public class SettingsEventTest extends TestCase {
 		assertEvent( rootWatcher.events.get( 1 ), "/test/a", "1", null );
 		assertEvent( rootWatcher.events.get( 2 ), "/test/value/b", null, "2" );
 		assertEvent( rootWatcher.events.get( 3 ), "/test/value/b", "2", null );
-		
+
 		assertEquals( 2, nodeWatcher.events.size() );
 		assertEvent( nodeWatcher.events.get( 0 ), "/test/value/b", null, "2" );
 		assertEvent( nodeWatcher.events.get( 1 ), "/test/value/b", "2", null );
-		
+
 		assertEquals( 2, valueWatcher.events.size() );
 		assertEvent( valueWatcher.events.get( 0 ), "/test/value/b", null, "2" );
 		assertEvent( valueWatcher.events.get( 1 ), "/test/value/b", "2", null );

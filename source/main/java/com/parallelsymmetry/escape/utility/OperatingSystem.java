@@ -140,10 +140,10 @@ public class OperatingSystem {
 				elevated = new Boolean( System.getProperty( "user.name" ).equals( "root" ) );
 			}
 		}
-		
+
 		return elevated.booleanValue();
 	}
-	
+
 	public static final boolean isElevateProcessSupported() {
 		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
 	}

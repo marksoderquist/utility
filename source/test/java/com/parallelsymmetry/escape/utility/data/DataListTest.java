@@ -7,10 +7,10 @@ import org.junit.Test;
 
 public class DataListTest extends DataTestCase {
 
-//	@Test
-//	public void testDataListIsAbstract() {
-//		assertTrue( "DataList class is not abstract.", ( DataList.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
-//	}
+	//	@Test
+	//	public void testDataListIsAbstract() {
+	//		assertTrue( "DataList class is not abstract.", ( DataList.class.getModifiers() & Modifier.ABSTRACT ) == Modifier.ABSTRACT );
+	//	}
 
 	@Test
 	public void testConstructor() {

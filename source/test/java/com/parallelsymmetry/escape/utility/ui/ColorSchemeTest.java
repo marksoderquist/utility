@@ -25,7 +25,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#7f7f7f" ), scheme.getPrimary( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
-	
+
 	public void testGetPrimaryWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -35,7 +35,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
-	
+
 	public void testGetSecondaryA() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -45,7 +45,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ff7fbf" ), scheme.getSecondaryA( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
-	
+
 	public void testGetSecondaryAWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -55,7 +55,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#7f7f7f" ), scheme.getSecondaryA( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
-	
+
 	public void testGetSecondaryAWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -65,7 +65,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
-	
+
 	public void testGetSecondaryB() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -75,7 +75,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffbf7f" ), scheme.getSecondaryB( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
 	}
-	
+
 	public void testGetSecondaryBWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -85,7 +85,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#7f7f7f" ), scheme.getSecondaryB( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
 	}
-	
+
 	public void testGetSecondaryBWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -95,7 +95,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
 	}
-	
+
 	public void testGetComplement() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -105,7 +105,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#7fffff" ), scheme.getComplement( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
 	}
-	
+
 	public void testGetComplementWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -115,7 +115,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#7f7f7f" ), scheme.getComplement( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
 	}
-	
+
 	public void testGetComplementWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -125,5 +125,5 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 0.5 ) );
 		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
 	}
-	
+
 }

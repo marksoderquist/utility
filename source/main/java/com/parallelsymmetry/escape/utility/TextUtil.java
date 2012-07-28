@@ -171,7 +171,7 @@ public final class TextUtil {
 			return String.valueOf( data );
 		} else {
 			short value = (short)data;
-			return "[" + String.valueOf( (int)(value < 0 ? value + 65536 : value) ) + "]";
+			return "[" + String.valueOf( (int)( value < 0 ? value + 65536 : value ) ) + "]";
 		}
 	}
 
@@ -454,7 +454,7 @@ public final class TextUtil {
 
 	public static final String reline( String text, int width ) {
 		if( text == null ) return null;
-		
+
 		StringBuilder line = new StringBuilder();
 		StringBuilder result = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer( text );

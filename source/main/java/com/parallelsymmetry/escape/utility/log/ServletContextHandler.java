@@ -39,5 +39,5 @@ public class ServletContextHandler extends Handler {
 		if( context == null ) return false;
 		return super.isLoggable( record );
 	}
-	
+
 }

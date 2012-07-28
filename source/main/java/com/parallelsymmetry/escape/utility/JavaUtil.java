@@ -148,9 +148,9 @@ public final class JavaUtil {
 			keys.add( key.toString() );
 		}
 		Collections.sort( keys );
-		
+
 		for( String key : keys ) {
-			System.out.println( key + " = " + properties.get( key ));
+			System.out.println( key + " = " + properties.get( key ) );
 		}
 	}
 

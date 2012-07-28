@@ -3,9 +3,9 @@ package com.parallelsymmetry.escape.utility.setting;
 public class SettingEvent {
 
 	private String fullPath;
-	
+
 	private String nodePath;
-	
+
 	private String key;
 
 	private String oldValue;
@@ -16,15 +16,15 @@ public class SettingEvent {
 		this.fullPath = path;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
-		
+
 		this.nodePath = Settings.getParentPath( path );
 		this.key = Settings.getSettingKey( path );
 	}
-	
+
 	public String getFullPath() {
 		return fullPath;
 	}
-	
+
 	public String getNodePath() {
 		return nodePath;
 	}

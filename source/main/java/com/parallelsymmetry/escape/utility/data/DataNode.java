@@ -23,7 +23,7 @@ public abstract class DataNode {
 	protected Transaction transaction;
 
 	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
-	
+
 	private boolean selfModified;
 
 	private Map<String, Object> attributes;
@@ -44,7 +44,7 @@ public abstract class DataNode {
 	public boolean isModified() {
 		return modified;
 	}
-	
+
 	/**
 	 * Set the modified flag for this node.
 	 */
@@ -55,13 +55,13 @@ public abstract class DataNode {
 			unmodify();
 		}
 	}
-	
+
 	/**
 	 * Set the modified flag for this node.
 	 */
 	protected void modify() {
 		if( modified ) return;
-		
+
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
 		getTransaction().add( new ModifyAction( this ) );
@@ -355,7 +355,7 @@ public abstract class DataNode {
 			fireMetaAttributeChanged( (MetaAttributeEvent)event );
 		}
 	}
-	
+
 	protected void doModify() {
 		selfModified = true;
 		updateModifiedFlag();
@@ -461,13 +461,13 @@ public abstract class DataNode {
 		}
 		// Do not propagate the meta attribute events to parents.
 	}
-	
+
 	public static class ModifyAction extends Action {
-		
+
 		public ModifyAction( DataNode data ) {
-			super( data);
+			super( data );
 		}
-		
+
 		@Override
 		protected ActionResult process() {
 			ActionResult result = new ActionResult( this );
@@ -476,7 +476,7 @@ public abstract class DataNode {
 
 			return result;
 		}
-		
+
 	}
 
 	private static class UnmodifyAction extends Action {

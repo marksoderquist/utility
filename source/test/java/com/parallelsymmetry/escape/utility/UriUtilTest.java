@@ -15,7 +15,7 @@ public class UriUtilTest extends TestCase {
 		assertEquals( null, UriUtil.resolve( base, null ) );
 		assertEquals( URI.create( "relative" ), UriUtil.resolve( null, relative ) );
 		assertEquals( URI.create( "file:///test/folder/absolute" ), UriUtil.resolve( null, absolute ) );
-		
+
 		assertEquals( URI.create( "file:///test/folder/absolute" ), UriUtil.resolve( base, absolute ) );
 		assertEquals( URI.create( "file:///test/folder/relative" ), UriUtil.resolve( base, relative ) );
 		assertEquals( URI.create( "file:///test/folder/relative" ), UriUtil.resolve( absolute, relative ) );

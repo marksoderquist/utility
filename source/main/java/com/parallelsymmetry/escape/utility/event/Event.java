@@ -57,7 +57,7 @@ public class Event implements Comparable<Event> {
 	public Object getScope() {
 		return scope;
 	}
-	
+
 	public void setScope( Object scope ) {
 		this.scope = scope;
 	}

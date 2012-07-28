@@ -3,9 +3,9 @@ package com.parallelsymmetry.escape.utility;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import org.junit.Test;
-
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 public class OperatingSystemTest extends TestCase {
 
@@ -58,7 +58,7 @@ public class OperatingSystemTest extends TestCase {
 		//		assertEquals( new File( System.getenv( "appdata" ), "Test" ).getCanonicalFile(), OperatingSystem.getProgramDataFolder( "test", "Test" ) );
 		//		assertEquals( new File( System.getenv( "allusersprofile" ), "Test" ).getCanonicalFile(), OperatingSystem.getSharedProgramDataFolder( "test", "Test" ) );
 	}
-	
+
 	@Test
 	public void testIsProcessElevatedMac() throws Exception {
 		OperatingSystemTest.init( "Mac OS X", "ppc", "10" );

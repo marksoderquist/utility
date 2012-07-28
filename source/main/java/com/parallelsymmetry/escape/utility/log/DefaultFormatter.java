@@ -77,23 +77,23 @@ public class DefaultFormatter extends Formatter {
 			case 11: {
 				return "";
 			}
-				// ERROR
+			// ERROR
 			case 10: {
 				return "[E] ";
 			}
-				// WARN
+			// WARN
 			case 9: {
 				return "[W] ";
 			}
-				// INFO
+			// INFO
 			case 8: {
 				return "[I] ";
 			}
-				// TRACE
+			// TRACE
 			case 7: {
 				return "[T] ";
 			}
-				// DEBUG
+			// DEBUG
 			case 6: {
 				return "[D] ";
 			}
@@ -112,23 +112,23 @@ public class DefaultFormatter extends Formatter {
 		if( index < 0 ) index = 0;
 
 		switch( index ) {
-			// ERROR
+		// ERROR
 			case 10: {
 				return "\u001b[1m\u001b[31m";
 			}
-				// WARN
+			// WARN
 			case 9: {
 				return "\u001b[1m\u001b[33m";
 			}
-				// INFO
+			// INFO
 			case 8: {
 				return "\u001b[0m";
 			}
-				// TRACE
+			// TRACE
 			case 7: {
 				return "\u001b[36m";
 			}
-				// DEBUG
+			// DEBUG
 			case 6: {
 				return "\u001b[1m\u001b[30m";
 			}
@@ -156,23 +156,23 @@ public class DefaultFormatter extends Formatter {
 			case 11: {
 				return "";
 			}
-				// ERROR
+			// ERROR
 			case 10: {
 				return "*";
 			}
-				// WARN
+			// WARN
 			case 9: {
 				return "-";
 			}
-				// INFO
+			// INFO
 			case 8: {
 				return " ";
 			}
-				// TRACE
+			// TRACE
 			case 7: {
 				return "  ";
 			}
-				// DEBUG
+			// DEBUG
 			case 6: {
 				return "   ";
 			}

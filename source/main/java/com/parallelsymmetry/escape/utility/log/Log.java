@@ -76,7 +76,7 @@ public class Log {
 		defaultLogger.setLevel( Level.ALL );
 		defaultLogger.setUseParentHandlers( false );
 		defaultLogger.addHandler( DEFAULT_HANDLER );
-		
+
 		DEFAULT_HANDLER.setLevel( DEFAULT_LOG_LEVEL );
 		defaultHandlers.put( defaultLogger, DEFAULT_HANDLER );
 	}

@@ -36,7 +36,7 @@ public class TaskTest extends TestCase {
 		assertEquals( Task.State.RUNNING, task.getState() );
 		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 		ThreadUtil.pause( 2 * delay );
-		assertEquals(  Task.State.RUNNING, task.getState() );
+		assertEquals( Task.State.RUNNING, task.getState() );
 		assertEquals( Task.Result.UNKNOWN, task.getResult() );
 		ThreadUtil.pause( 2 * delay );
 		assertEquals( Task.State.DONE, task.getState() );

@@ -63,7 +63,7 @@ public class Icons {
 	public static void save( Icon icon, File target, String name ) {
 		save( icon, target, name, icon.getIconWidth(), icon.getIconHeight() );
 	}
-	
+
 	public static void save( Icon icon, File target, String name, int size ) {
 		save( icon, target, name, size, size, null );
 	}

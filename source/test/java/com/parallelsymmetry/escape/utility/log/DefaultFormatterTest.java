@@ -31,7 +31,7 @@ public class DefaultFormatterTest extends TestCase {
 		assertEquals( "[T] Test message.\n", formatter.format( new LogRecord( Log.TRACE, "Test message." ) ) );
 		assertEquals( "[D] Test message.\n", formatter.format( new LogRecord( Log.DEBUG, "Test message." ) ) );
 	}
-	
+
 	public void testFormatWithWhitespacedRecord() {
 		assertEquals( "[E]   Test message.\n", formatter.format( new LogRecord( Log.ERROR, "  Test message." ) ) );
 		assertEquals( "[W]   Test message.\n", formatter.format( new LogRecord( Log.WARN, "  Test message." ) ) );
@@ -39,7 +39,7 @@ public class DefaultFormatterTest extends TestCase {
 		assertEquals( "[T]   Test message.\n", formatter.format( new LogRecord( Log.TRACE, "  Test message." ) ) );
 		assertEquals( "[D]   Test message.\n", formatter.format( new LogRecord( Log.DEBUG, "  Test message." ) ) );
 	}
-	
+
 	public void testFormatWithMultiLineRecord() {
 		assertEquals( "[E] Test message one.\n[E] Test message two.\n", formatter.format( new LogRecord( Log.ERROR, "Test message one.\nTest message two." ) ) );
 		assertEquals( "[W] Test message one.\n[W] Test message two.\n", formatter.format( new LogRecord( Log.WARN, "Test message one.\nTest message two." ) ) );

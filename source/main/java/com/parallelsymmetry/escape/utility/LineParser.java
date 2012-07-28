@@ -37,7 +37,7 @@ public class LineParser {
 	public String getRemaining() {
 		return content.substring( next );
 	}
-	
+
 	private void parseNextLine() {
 		if( !more() ) {
 			line = null;

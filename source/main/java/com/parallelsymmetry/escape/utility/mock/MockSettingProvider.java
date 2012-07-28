@@ -15,7 +15,7 @@ public class MockSettingProvider implements SettingProvider {
 	public final Map<String, String> values = new ConcurrentHashMap<String, String>();
 
 	private String name;
-	
+
 	public MockSettingProvider() {
 		this( null );
 	}
@@ -59,7 +59,7 @@ public class MockSettingProvider implements SettingProvider {
 
 		return names;
 	}
-	
+
 	public int getValueCount() {
 		return values.size();
 	}
@@ -73,7 +73,7 @@ public class MockSettingProvider implements SettingProvider {
 	}
 
 	public void print() {
-		System.out.println( (name == null ? "MockSettingProvider" : name ) + " data: " );
+		System.out.println( ( name == null ? "MockSettingProvider" : name ) + " data: " );
 		List<String> keys = new ArrayList<String>( values.keySet() );
 		Collections.sort( keys );
 		for( String key : keys ) {
