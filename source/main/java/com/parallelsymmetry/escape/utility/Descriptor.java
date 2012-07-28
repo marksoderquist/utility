@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +27,6 @@ import com.parallelsymmetry.escape.utility.log.Log;
 
 public class Descriptor {
 
-	private URI source;
-
 	private Node node;
 
 	private Map<String, List<String>> names = new ConcurrentHashMap<String, List<String>>();
@@ -38,21 +35,8 @@ public class Descriptor {
 
 	public Descriptor() {}
 
-	public Descriptor( Node node ) {
-		this( null, node );
-	}
-
-	public Descriptor( Reader reader ) throws IOException {
-		this( null, reader );
-	}
-
-	public Descriptor( InputStream input ) throws IOException {
-		this( null, input );
-	}
-
 	public Descriptor( URI uri ) throws IOException {
 		if( uri == null ) return;
-		source = uri;
 		try {
 			node = XmlUtil.loadXmlDocument( uri.toString() );
 		} catch( SAXException exception ) {
@@ -62,14 +46,24 @@ public class Descriptor {
 		}
 	}
 
-	public Descriptor( URI source, Node node ) {
-		this.source = source;
+	public Descriptor( URL url ) throws IOException {
+		if( url == null ) return;
+		try {
+			node = XmlUtil.loadXmlDocument( url.toString() );
+		} catch( SAXException exception ) {
+			throw new IOException( exception );
+		} catch( ParserConfigurationException exception ) {
+			throw new IOException( exception );
+		}
+	}
+
+	public Descriptor( Node node ) {
+		if( node == null ) return;
 		this.node = node;
 	}
 
-	public Descriptor( URI source, Reader reader ) throws IOException {
+	public Descriptor( Reader reader ) throws IOException {
 		if( reader == null ) return;
-		this.source = source;
 		try {
 			node = XmlUtil.loadXmlDocument( reader );
 		} catch( SAXException exception ) {
@@ -79,9 +73,8 @@ public class Descriptor {
 		}
 	}
 
-	public Descriptor( URI source, InputStream input ) throws IOException {
+	public Descriptor( InputStream input ) throws IOException {
 		if( input == null ) return;
-		this.source = source;
 		try {
 			node = XmlUtil.loadXmlDocument( input );
 		} catch( SAXException exception ) {
@@ -89,19 +82,6 @@ public class Descriptor {
 		} catch( ParserConfigurationException exception ) {
 			throw new IOException( exception );
 		}
-	}
-
-	public Descriptor( URL url ) throws IOException {
-		this( url.openStream() );
-		try {
-			source = url.toURI();
-		} catch( URISyntaxException exception ) {
-			throw new IOException( exception );
-		}
-	}
-
-	public URI getSource() {
-		return source;
 	}
 
 	public Document getDocument() {
