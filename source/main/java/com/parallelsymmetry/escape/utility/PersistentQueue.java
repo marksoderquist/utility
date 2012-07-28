@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
@@ -187,20 +188,6 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		return result;
 	}
 
-	protected void removeDefrag( int count ) {
-		removesSinceLastDefrag += count;
-		try {
-			if( removesSinceLastDefrag >= defragInterval ) {
-				defragStore( store );
-				removesSinceLastDefrag = 0;
-			} else {
-				appendToStore( store, new DeleteMarker() );
-			}
-		} catch( IOException exception ) {
-			throw new RuntimeException( exception );
-		}
-	}
-
 	@Override
 	public int size() {
 		return queue.size();
@@ -259,6 +246,20 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		removesSinceLastDefrag = 0;
 	}
 
+	protected void removeDefrag( int count ) {
+		removesSinceLastDefrag += count;
+		try {
+			if( removesSinceLastDefrag >= defragInterval ) {
+				defragStore( store );
+				removesSinceLastDefrag = 0;
+			} else {
+				appendToStore( store, new DeleteMarker() );
+			}
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
+		}
+	}
+
 	private void createNewStore( File store ) throws IOException {
 		if( !store.createNewFile() ) {
 			throw new IOException( "Could not create new store: " + store );
@@ -274,29 +275,29 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		queue.clear();
 
 		// Read all the data in the store.
-		while( fileInput.available() > 0 ) {
-			Object element;
+		try {
+			while( fileInput.available() > 0 ) {
+				// Create the object input stream using the file input stream.
+				ObjectInputStream objectInput = new CustomObjectInputStream( fileInput );
 
-			// Create the object input stream using the file input stream.
-			ObjectInputStream objectInput = new ObjectInputStream( fileInput );
-
-			// Read the next store element.
-			try {
-				element = objectInput.readObject();
-			} catch( ClassNotFoundException e ) {
-				throw new IOException( e.getMessage(), e );
-			}
-
-			// Store the element.
-			if( element instanceof DeleteMarker ) {
-				queue.remove( 0 );
-			} else {
+				// Read the next store element.
 				try {
-					queue.add( (E)element );
+					Object element = objectInput.readObject();
+					if( element instanceof DeleteMarker ) {
+						queue.remove( 0 );
+					} else {
+						queue.add( (E)element );
+					}
+				} catch( ClassNotFoundException exception ) {
+					throw new IOException( exception );
 				} catch( ClassCastException exception ) {
-					throw new IOException( exception.toString() );
+					throw new IOException( exception );
+				} finally {
+					if( objectInput != null ) objectInput.close();
 				}
 			}
+		} finally {
+			if( fileInput != null ) fileInput.close();
 		}
 	}
 
@@ -307,15 +308,31 @@ public class PersistentQueue<E extends Serializable> implements Queue<E> {
 		for( E element : queue ) {
 			objectOutput = new ObjectOutputStream( fileOutput );
 			objectOutput.writeObject( element );
-			objectOutput.flush();
 			objectOutput.close();
 		}
 
-		fileOutput.flush();
 		fileOutput.close();
 	}
 
-	protected static final class DeleteMarker implements Serializable {
+	private static final class CustomObjectInputStream extends ObjectInputStream {
+
+		public CustomObjectInputStream( InputStream input ) throws IOException {
+			super( input );
+		}
+
+		@Override
+		public void close() {
+			/*
+			 * Unlike the superclass, which closes the underlying input stream. This
+			 * implementation simply does nothing when close is called, leaving the
+			 * underlying stream open. The reason for this customization is to follow
+			 * good coding practices by closing all resources.
+			 */
+		}
+
+	}
+
+	private static final class DeleteMarker implements Serializable {
 		private static final long serialVersionUID = 6656403687908487381L;
 	}
 
