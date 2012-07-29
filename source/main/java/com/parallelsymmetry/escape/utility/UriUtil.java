@@ -6,9 +6,25 @@ import java.util.LinkedList;
 
 public final class UriUtil {
 
-	public static URI resolve( URI base, URI uri ) {
-		if( uri == null ) return null;
-		return base == null ? uri : base.resolve( uri );
+	public static URI resolve( URI uri, URI ref ) {
+		if( ref == null ) return null;
+		if( uri == null ) return ref;
+
+		Deque<String> queue = new LinkedList<String>();
+
+		while( uri.isOpaque() ) {
+			queue.add( uri.getScheme() );
+			uri = URI.create( uri.getRawSchemeSpecificPart() );
+		}
+
+		uri = uri.resolve( ref );
+
+		String scheme = null;
+		while( ( scheme = queue.pollLast() ) != null ) {
+			uri = URI.create( scheme + ":" + uri.toString() );
+		}
+
+		return uri;
 	}
 
 	/**
@@ -22,7 +38,7 @@ public final class UriUtil {
 
 		while( uri.isOpaque() ) {
 			queue.add( uri.getScheme() );
-			uri = URI.create( uri.getSchemeSpecificPart() );
+			uri = URI.create( uri.getRawSchemeSpecificPart() );
 		}
 
 		uri = uri.resolve( "." );
