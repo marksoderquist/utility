@@ -21,4 +21,14 @@ public class UriUtilTest extends TestCase {
 		assertEquals( URI.create( "file:///test/folder/relative" ), UriUtil.resolve( absolute, relative ) );
 	}
 
+	public void testGetParent() {
+		URI absolute = URI.create( "file:/test/folder/absolute" );
+		URI opaque = URI.create( "jar:" + absolute.toString() );
+		URI doubleOpaque = URI.create( "double:jar:" + absolute.toString() );
+		
+		assertEquals( "file:/test/folder/", UriUtil.getParent( absolute ).toString() );
+		assertEquals( "jar:file:/test/folder/", UriUtil.getParent( opaque ).toString() );
+		assertEquals( "double:jar:file:/test/folder/", UriUtil.getParent( doubleOpaque ).toString() );
+	}
+
 }
