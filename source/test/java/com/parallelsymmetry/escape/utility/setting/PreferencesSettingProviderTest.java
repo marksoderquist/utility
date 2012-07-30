@@ -3,8 +3,6 @@ package com.parallelsymmetry.escape.utility.setting;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import com.parallelsymmetry.escape.utility.JavaUtil;
-
 import junit.framework.TestCase;
 
 public class PreferencesSettingProviderTest extends TestCase {
@@ -15,7 +13,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 
 	@Override
 	public void setUp() {
-		preferences = Preferences.userRoot().node( JavaUtil.getPackageName( getClass() ) );
+		preferences = Preferences.userNodeForPackage( getClass() );
 		provider = new PreferencesSettingProvider( preferences );
 
 		preferences.node( "test" ).put( "path1", "value1" );
@@ -102,7 +100,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 	}
 
 	public void testPreferencesRemove() throws Exception {
-		Preferences a = preferences.node( "a" );
+		Preferences a = preferences.node( "/test/a" );
 		a.put( "key", "a" );
 		assertEquals( "a", a.get( "key", null ) );
 
@@ -114,7 +112,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 			// 
 		}
 
-		a = preferences.node( "a" );
+		a = preferences.node( "/test/a" );
 		a.put( "key", "a" );
 		assertEquals( "a", a.get( "key", null ) );
 	}

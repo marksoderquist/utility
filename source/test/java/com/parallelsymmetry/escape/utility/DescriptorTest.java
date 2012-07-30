@@ -184,8 +184,6 @@ public class DescriptorTest extends TestCase {
 		Descriptor descriptor = loadTestDescriptor();
 		Descriptor subDescriptor = new Descriptor( descriptor.getNode( "/test/bounds" ) );
 
-		System.out.println( XmlUtil.toString( subDescriptor.getNode() ) );
-
 		assertEquals( "15", descriptor.getValue( "/test/bounds/@h" ) );
 		assertEquals( "15", subDescriptor.getValue( "@h" ) );
 	}
