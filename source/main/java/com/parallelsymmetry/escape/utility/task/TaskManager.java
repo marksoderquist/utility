@@ -20,16 +20,22 @@ import com.parallelsymmetry.escape.utility.setting.Persistent;
 import com.parallelsymmetry.escape.utility.setting.Settings;
 
 public class TaskManager implements Persistent, Controllable {
+	
+	private static final int MIN_THREAD_COUNT = 4;
+	
+	private static final int MAX_THREAD_COUNT = 32;
 
 	private static final int PROCESSOR_COUNT = Runtime.getRuntime().availableProcessors();
 
-	private static final int MIN_THREAD_COUNT = 4;
+	private static final int DEFAULT_MIN_THREAD_COUNT = Math.max( 4, PROCESSOR_COUNT );
+
+	private static final int DEFAULT_MAX_THREAD_COUNT = Math.max(DEFAULT_MIN_THREAD_COUNT, PROCESSOR_COUNT * 2 );
 
 	private ThreadPoolExecutor executor;
 
-	private int maxThreadCount = Math.max( MIN_THREAD_COUNT, PROCESSOR_COUNT );
+	private int maxThreadCount = DEFAULT_MAX_THREAD_COUNT;
 
-	private int minThreadCount = maxThreadCount / 2;
+	private int minThreadCount = DEFAULT_MIN_THREAD_COUNT;
 
 	private Settings settings;
 
@@ -54,9 +60,9 @@ public class TaskManager implements Persistent, Controllable {
 	}
 
 	public void setThreadCount( int count ) {
-		if( count < MIN_THREAD_COUNT ) count = MIN_THREAD_COUNT;
-		this.maxThreadCount = count;
-		this.minThreadCount = count / 2;
+		maxThreadCount = Math.min( MAX_THREAD_COUNT, count );
+		minThreadCount = Math.max( MIN_THREAD_COUNT, count / 2 );
+		
 		saveSettings( settings );
 		if( isRunning() ) try {
 			restart();
