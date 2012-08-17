@@ -60,8 +60,9 @@ public class TaskManager implements Persistent, Controllable {
 	}
 
 	public void setThreadCount( int count ) {
-		maxThreadCount = Math.min( MAX_THREAD_COUNT, count );
+		if( count > MAX_THREAD_COUNT ) count = MAX_THREAD_COUNT;
 		minThreadCount = Math.max( MIN_THREAD_COUNT, count / 2 );
+		maxThreadCount = Math.min( MAX_THREAD_COUNT, Math.max( minThreadCount, count ) );
 		
 		saveSettings( settings );
 		if( isRunning() ) try {
