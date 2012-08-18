@@ -5,6 +5,8 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import com.parallelsymmetry.escape.utility.Parameters;
+import com.parallelsymmetry.escape.utility.log.Log;
+import com.parallelsymmetry.escape.utility.log.LogFlag;
 
 public class ParametersSettingProviderTest extends TestCase {
 
@@ -14,7 +16,7 @@ public class ParametersSettingProviderTest extends TestCase {
 
 	@Override
 	public void setUp() {
-		parameters = Parameters.parse( new String[] { "-host", "localhost", "-log.level", "debug" } );
+		parameters = Parameters.parse( new String[] { "-host", "localhost", LogFlag.LOG_LEVEL, Log.DEBUG.toString() } );
 		provider = new ParametersSettingProvider( parameters );
 	}
 
