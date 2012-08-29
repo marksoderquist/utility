@@ -101,6 +101,8 @@ public class Settings {
 	private String path;
 
 	private Map<String, Set<SettingListener>> listeners;
+	
+	private static Map<String, Object> resources = new ConcurrentHashMap<String, Object>();
 
 	public Settings() {
 		this( null );
@@ -607,6 +609,14 @@ public class Settings {
 				put( path + SEPARATOR + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
 			}
 		}
+	}
+	
+	public Object getResource( String key ) {
+		return resources.get( key );
+	}
+	
+	public void putResource( String key, Object object ) {
+		resources.put( key, object );
 	}
 
 	/**
