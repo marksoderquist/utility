@@ -90,19 +90,20 @@ public class Settings {
 
 	private Map<SettingProvider, String> mounts;
 
+	private Map<String, Object> resources;
+
+	private Map<String, Set<SettingListener>> listeners;
+	
 	/**
 	 * The root settings node.
 	 */
+
 	private Settings root;
 
 	/**
 	 * The absolute path to this node.
 	 */
 	private String path;
-
-	private Map<String, Set<SettingListener>> listeners;
-	
-	private static Map<String, Object> resources = new ConcurrentHashMap<String, Object>();
 
 	public Settings() {
 		this( null );
@@ -115,6 +116,7 @@ public class Settings {
 	public Settings( SettingProvider defaultProvider, String mount ) {
 		providers = new CopyOnWriteArrayList<SettingProvider>();
 		mounts = new ConcurrentHashMap<SettingProvider, String>();
+		resources = new ConcurrentHashMap<String, Object>();
 		listeners = new ConcurrentHashMap<String, Set<SettingListener>>();
 		root = this;
 		path = "/";
@@ -612,11 +614,11 @@ public class Settings {
 	}
 	
 	public Object getResource( String key ) {
-		return resources.get( key );
+		return root.resources.get( key );
 	}
 	
 	public void putResource( String key, Object object ) {
-		resources.put( key, object );
+		root.resources.put( key, object );
 	}
 
 	/**
