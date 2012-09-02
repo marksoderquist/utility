@@ -313,7 +313,7 @@ public class DataNode implements Comparable<DataNode> {
 		if( transaction == null ) return;
 
 		boolean changed = false;
-		for( Action action : transaction ) {
+		for( Action action : new Transaction( transaction ) ) {
 			if( !action.commit() ) continue;
 			changed = true;
 		}
