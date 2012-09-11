@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
@@ -18,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 
 public class Icons {
@@ -135,22 +138,37 @@ public class Icons {
 		proof( icon, null );
 	}
 
-	public static void proof( Icon icon, ImageFilter filter ) {
-		JOptionPane.showMessageDialog( null, new SamplePanel( icon, filter ), null, JOptionPane.PLAIN_MESSAGE );
+	public static void proof( Icon icon, int animationDelay ) {
+		proof( icon, null, animationDelay );
 	}
 
-	private static class SamplePanel extends JComponent {
+	public static void proof( Icon icon, ImageFilter filter ) {
+		proof( icon, filter, 0 );
+	}
+
+	public static void proof( Icon icon, ImageFilter filter, int animationDelay ) {
+		SamplePanel panel = new SamplePanel( icon, filter, animationDelay );
+		JOptionPane.showMessageDialog( null, panel, null, JOptionPane.PLAIN_MESSAGE );
+		panel.stopAnimation();
+	}
+
+	private static class SamplePanel extends JComponent implements ActionListener {
 
 		private static final long serialVersionUID = 7020998970315590613L;
+		
+		private Timer timer;
 
 		private Image iconImage;
 
 		private Image gridImage;
 
+		private int animateDelay;
+
 		private Color border = new Color( 255, 0, 0, 64 );
 
-		public SamplePanel( Icon icon, ImageFilter filter ) {
+		public SamplePanel( Icon icon, ImageFilter filter, int animateDelay ) {
 			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+			this.animateDelay = animateDelay;
 
 			Graphics graphics = iconImage.getGraphics();
 			icon.paintIcon( null, graphics, 0, 0 );
@@ -161,20 +179,19 @@ public class Icons {
 			gridImage = createBackgroundImage();
 			setBackground( new Color( 220, 220, 220 ) );
 			setBackground( Color.WHITE );
+
+			startAnimation();
 		}
 
-		private Image createBackgroundImage() {
-			Image image = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_RGB );
-
-			Graphics graphics = image.getGraphics();
-			for( int x = 0; x < 16; x++ ) {
-				for( int y = 0; y < 16; y++ ) {
-					graphics.setColor( ( x + y ) % 2 == 0 ? Color.WHITE : Color.LIGHT_GRAY );
-					graphics.fillRect( x, y, 1, 1 );
-				}
-			}
-
-			return image;
+		public void startAnimation() {
+			if( animateDelay <= 0 ) return;
+			timer = new Timer( animateDelay, this );
+			timer.setRepeats( true );
+			timer.start();
+		}
+		
+		public void stopAnimation() {
+			if( timer != null ) timer.stop();
 		}
 
 		@Override
@@ -196,6 +213,26 @@ public class Icons {
 			paintIcon( graphics, 296, 420, 48, false );
 		}
 
+		@Override
+		public Dimension getMinimumSize() {
+			return new Dimension( 512, 512 );
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			return getMinimumSize();
+		}
+
+		@Override
+		public Dimension getMaximumSize() {
+			return getMinimumSize();
+		}
+
+		@Override
+		public void actionPerformed( ActionEvent event ) {
+			repaint();
+		}
+
 		private void paintIcon( Graphics graphics, int x, int y, int size, boolean paintGrid ) {
 			if( paintGrid ) graphics.drawImage( gridImage, x, y, size, size, null );
 			graphics.setColor( border );
@@ -210,19 +247,18 @@ public class Icons {
 			graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, 256, 256, null );
 		}
 
-		@Override
-		public Dimension getMinimumSize() {
-			return new Dimension( 512, 512 );
-		}
+		private Image createBackgroundImage() {
+			Image image = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_RGB );
 
-		@Override
-		public Dimension getPreferredSize() {
-			return getMinimumSize();
-		}
+			Graphics graphics = image.getGraphics();
+			for( int x = 0; x < 16; x++ ) {
+				for( int y = 0; y < 16; y++ ) {
+					graphics.setColor( ( x + y ) % 2 == 0 ? Color.WHITE : Color.LIGHT_GRAY );
+					graphics.fillRect( x, y, 1, 1 );
+				}
+			}
 
-		@Override
-		public Dimension getMaximumSize() {
-			return getMinimumSize();
+			return image;
 		}
 
 	}
