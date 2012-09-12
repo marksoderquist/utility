@@ -93,7 +93,7 @@ public class Settings {
 	private Map<String, Object> resources;
 
 	private Map<String, Set<SettingListener>> listeners;
-	
+
 	/**
 	 * The root settings node.
 	 */
@@ -496,7 +496,7 @@ public class Settings {
 			list = new ArrayList<T>( count );
 			for( int index = 0; index < count; index++ ) {
 				try {
-					Constructor<T> constructor = type.getConstructor();
+					Constructor<T> constructor = type.getDeclaredConstructor();
 					constructor.setAccessible( true );
 					T object = constructor.newInstance();
 					Settings node = getNode( getItemPath( path, index ) );
@@ -578,14 +578,18 @@ public class Settings {
 			Set<String> names = getChildNames( path );
 			for( String name : names ) {
 				try {
-					Constructor<T> constructor = type.getConstructor();
+					Constructor<T> constructor = type.getDeclaredConstructor();
 					constructor.setAccessible( true );
 					T object = constructor.newInstance();
 					Settings node = getNode( path + "/" + name );
 					( (Persistent)object ).loadSettings( node );
 					map.put( name, type.cast( object ) );
+				} catch( NoSuchMethodException exception ) {
+					Log.write( Log.ERROR, "Unable to restore state: ", getAbsolutePath( path ) );
+					Log.write( Log.ERROR, exception );
 				} catch( Throwable throwable ) {
-					Log.write( Log.WARN, throwable, getAbsolutePath( path ) );
+					Log.write( Log.WARN, "Unable to restore state: ", getAbsolutePath( path ) );
+					Log.write( Log.WARN, throwable );
 				}
 			}
 		}
@@ -612,11 +616,11 @@ public class Settings {
 			}
 		}
 	}
-	
+
 	public Object getResource( String key ) {
 		return root.resources.get( key );
 	}
-	
+
 	public void putResource( String key, Object object ) {
 		root.resources.put( key, object );
 	}
