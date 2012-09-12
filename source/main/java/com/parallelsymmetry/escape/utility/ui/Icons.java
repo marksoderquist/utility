@@ -157,6 +157,10 @@ public class Icons {
 		private static final long serialVersionUID = 7020998970315590613L;
 		
 		private Timer timer;
+		
+		private Icon icon;
+		
+		private ImageFilter filter;
 
 		private Image iconImage;
 
@@ -167,8 +171,10 @@ public class Icons {
 		private Color border = new Color( 255, 0, 0, 64 );
 
 		public SamplePanel( Icon icon, ImageFilter filter, int animateDelay ) {
-			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+			this.icon = icon;
 			this.animateDelay = animateDelay;
+
+			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 
 			Graphics graphics = iconImage.getGraphics();
 			icon.paintIcon( null, graphics, 0, 0 );
@@ -186,7 +192,7 @@ public class Icons {
 		public void startAnimation() {
 			if( animateDelay <= 0 ) return;
 			timer = new Timer( animateDelay, this );
-			timer.setRepeats( true );
+			//timer.setRepeats( true );
 			timer.start();
 		}
 		
@@ -237,7 +243,14 @@ public class Icons {
 			if( paintGrid ) graphics.drawImage( gridImage, x, y, size, size, null );
 			graphics.setColor( border );
 			graphics.drawRect( x, y, size - 1, size - 1 );
-			graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
+			//graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
+			
+			BufferedImage buffer = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+			Graphics scratch = buffer.getGraphics();
+			icon.paintIcon( null, scratch, 0, 0 );
+			scratch.dispose();
+
+			graphics.drawImage( buffer.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
 		}
 
 		private void paintZoomedIcon( Graphics graphics, int x, int y, int size, boolean paintGrid ) {
