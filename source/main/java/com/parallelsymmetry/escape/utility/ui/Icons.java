@@ -155,11 +155,11 @@ public class Icons {
 	private static class SamplePanel extends JComponent implements ActionListener {
 
 		private static final long serialVersionUID = 7020998970315590613L;
-		
+
 		private Timer timer;
-		
+
 		private Icon icon;
-		
+
 		private ImageFilter filter;
 
 		private Image iconImage;
@@ -192,18 +192,30 @@ public class Icons {
 		public void startAnimation() {
 			if( animateDelay <= 0 ) return;
 			timer = new Timer( animateDelay, this );
-			//timer.setRepeats( true );
 			timer.start();
 		}
-		
+
 		public void stopAnimation() {
 			if( timer != null ) timer.stop();
 		}
 
+		private long last;
+
 		@Override
 		public void paint( Graphics graphics ) {
+			long current = System.currentTimeMillis();
+			System.out.println( "Repaint: " + ( last == 0 ? 0 : current - last ) + " Mem: " + Runtime.getRuntime().freeMemory() );
+			last = current;
+
 			graphics.setColor( getBackground() );
 			graphics.fillRect( 0, 0, getWidth(), getHeight() );
+
+			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
+			Graphics scratch = iconImage.getGraphics();
+			icon.paintIcon( null, scratch, 0, 0 );
+			scratch.dispose();
+
+			iconImage = Images.filter( iconImage, filter );
 
 			paintIcon( graphics, 0, 0, 256, true );
 			paintZoomedIcon( graphics, 256, 0, 16, false );
@@ -236,6 +248,7 @@ public class Icons {
 
 		@Override
 		public void actionPerformed( ActionEvent event ) {
+			if( icon instanceof AnimatedIcon ) ( (AnimatedIcon)icon ).incrementFrame();
 			repaint();
 		}
 
@@ -243,14 +256,7 @@ public class Icons {
 			if( paintGrid ) graphics.drawImage( gridImage, x, y, size, size, null );
 			graphics.setColor( border );
 			graphics.drawRect( x, y, size - 1, size - 1 );
-			//graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
-			
-			BufferedImage buffer = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
-			Graphics scratch = buffer.getGraphics();
-			icon.paintIcon( null, scratch, 0, 0 );
-			scratch.dispose();
-
-			graphics.drawImage( buffer.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
+			graphics.drawImage( iconImage.getScaledInstance( size, size, Image.SCALE_SMOOTH ), x, y, null );
 		}
 
 		private void paintZoomedIcon( Graphics graphics, int x, int y, int size, boolean paintGrid ) {

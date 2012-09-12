@@ -218,6 +218,7 @@ public abstract class BaseImage {
 		for( Instruction instruction : instructions ) {
 			instruction.paint( graphics, x, y );
 		}
+		instructions.clear();
 
 		graphics.setTransform( originalTransform );
 	}
