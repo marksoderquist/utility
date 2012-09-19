@@ -128,6 +128,10 @@ public class Settings {
 		this.path = path;
 	}
 
+	public Settings getRoot() {
+		return root;
+	}
+	
 	public String getName() {
 		return path.substring( path.lastIndexOf( "/" ) + 1 );
 	}
