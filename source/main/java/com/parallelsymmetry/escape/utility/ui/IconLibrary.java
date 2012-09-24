@@ -155,6 +155,7 @@ public class IconLibrary {
 		BufferedImage image = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 		Graphics graphics = image.getGraphics();
 		icon.paintIcon( null, graphics, 0, 0 );
+		graphics.dispose();
 		return image;
 	}
 
