@@ -15,7 +15,7 @@ public abstract class Worker extends Agent implements Runnable {
 	private final TripLock startlock = new TripLock();
 
 	public Worker() {
-		this( null, false );
+		this( null, true );
 	}
 
 	public Worker( boolean daemon ) {
@@ -23,7 +23,7 @@ public abstract class Worker extends Agent implements Runnable {
 	}
 
 	public Worker( String name ) {
-		this( name, false );
+		this( name, true );
 	}
 
 	public Worker( String name, boolean daemon ) {
@@ -145,7 +145,7 @@ public abstract class Worker extends Agent implements Runnable {
 
 			if( interruptOnStop ) thread.interrupt();
 
-			if( Worker.this.daemon ) return;
+			//if( Worker.this.daemon ) return;
 
 			try {
 				thread.join();
