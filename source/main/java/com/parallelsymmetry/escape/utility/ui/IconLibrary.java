@@ -156,6 +156,7 @@ public class IconLibrary {
 		Graphics graphics = image.getGraphics();
 		icon.paintIcon( null, graphics, 0, 0 );
 		graphics.dispose();
+		
 		return image;
 	}
 
