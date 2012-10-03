@@ -38,15 +38,15 @@ public class IconLibrary {
 
 	private static final String DEFAULT_ICON_PATH = "/";
 
+	private Map<String, ClassLoader> loaders;
+
+	private List<String> paths;
+
 	private Map<String, IconProxy> proxies;
 
 	private Map<IconProxy, Icon> icons;
 
 	private int size = DEFAULT_ICON_SIZE;
-
-	private List<String> paths;
-
-	private Map<String, ClassLoader> loaders;
 
 	private boolean debug = false;
 
@@ -215,6 +215,12 @@ public class IconLibrary {
 
 	public void reset() {
 		proxies.clear();
+	}
+	
+	@Override
+	protected void finalize() {
+		proxies.clear();
+		icons.clear();
 	}
 
 	private URL getIconUrl( String name ) {
