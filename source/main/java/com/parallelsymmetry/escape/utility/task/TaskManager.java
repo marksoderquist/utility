@@ -56,7 +56,7 @@ public class TaskManager implements Persistent, Controllable {
 	}
 
 	public int getThreadCount() {
-		return maxThreadCount;
+		return executor.getPoolSize();
 	}
 
 	public void setThreadCount( int count ) {
