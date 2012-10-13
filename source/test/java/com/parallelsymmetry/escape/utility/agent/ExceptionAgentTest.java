@@ -15,7 +15,7 @@ public class ExceptionAgentTest extends TestCase {
 		assertFalse( agent.isRunning() );
 		assertEquals( Agent.State.STOPPED, agent.getState() );
 		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
-		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
+		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
 	}
 
 	public void testStopFailure() throws Exception {

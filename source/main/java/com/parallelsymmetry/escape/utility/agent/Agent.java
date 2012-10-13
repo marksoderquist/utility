@@ -305,8 +305,12 @@ public abstract class Agent implements Controllable {
 			startAgent();
 			changeState( State.STARTED );
 		} catch( Throwable throwable ) {
-			changeState( State.STOPPED );
 			Log.write( throwable );
+			try {
+				shutdown();
+			} catch( Throwable stopThrowable ) {
+				Log.write( stopThrowable );
+			}
 		} finally {
 			synchronized( operationLock ) {
 				startingFlag = false;
@@ -399,7 +403,6 @@ public abstract class Agent implements Controllable {
 							break;
 						}
 					}
-
 				}
 			} catch( InterruptedException exception ) {
 				Log.write( Log.ERROR, exception, "AgentRunner terminated." );
