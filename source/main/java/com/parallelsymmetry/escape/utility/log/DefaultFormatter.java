@@ -30,7 +30,7 @@ public class DefaultFormatter extends Formatter {
 		if( Log.isShowTag() ) {
 			prefix.append( getTag( record.getLevel() ) );
 		}
-		if( Log.isShowDate() ) {
+		if( record.getLevel().intValue() < Log.NONE.intValue() && Log.isShowDate() ) {
 			prefix.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
 			prefix.append( " " );
 		}
