@@ -26,7 +26,7 @@ public final class ConsoleReader extends Thread {
 	}
 
 	public boolean isProcessRunning() {
-		if( streamClosed ) return true;
+		if( streamClosed ) return false;
 		try {
 			process.exitValue();
 			return false;
