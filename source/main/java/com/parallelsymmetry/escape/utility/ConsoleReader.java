@@ -11,6 +11,8 @@ public final class ConsoleReader extends Thread {
 	private Process process;
 
 	private OutputStream output;
+	
+	private boolean streamClosed;
 
 	public ConsoleReader( Process process ) {
 		this( process, System.out );
@@ -24,6 +26,7 @@ public final class ConsoleReader extends Thread {
 	}
 
 	public boolean isProcessRunning() {
+		if( streamClosed ) return true;
 		try {
 			process.exitValue();
 			return false;
@@ -49,6 +52,7 @@ public final class ConsoleReader extends Thread {
 				if( line != null) printer.println( line );
 			}
 		} catch( IOException exception ) {
+			streamClosed = true;
 			exception.printStackTrace(printer);
 		}
 	}
