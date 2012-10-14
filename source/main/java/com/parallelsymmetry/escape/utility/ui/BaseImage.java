@@ -405,7 +405,7 @@ public abstract class BaseImage {
 		return defaultFont;
 	}
 
-	private final Color getColor( double factor ) {
+	protected Color getColor( double factor ) {
 		switch( colorMode ) {
 			case SECONDARYA: {
 				return scheme.getSecondaryA( factor );
