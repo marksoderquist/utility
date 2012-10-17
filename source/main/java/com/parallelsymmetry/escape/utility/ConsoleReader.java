@@ -11,7 +11,7 @@ public final class ConsoleReader extends Thread {
 	private Process process;
 
 	private OutputStream output;
-	
+
 	private boolean streamClosed;
 
 	public ConsoleReader( Process process ) {
@@ -47,13 +47,19 @@ public final class ConsoleReader extends Thread {
 		BufferedReader reader = new BufferedReader( new InputStreamReader( process.getInputStream() ) );
 		BufferedReader errReader = new BufferedReader( new InputStreamReader( process.getErrorStream() ) );
 		try {
-			while( (errLine = errReader.readLine()) != null || ( line = reader.readLine() ) != null ) {
+			while( ( errLine = errReader.readLine() ) != null || ( line = reader.readLine() ) != null ) {
 				if( errLine != null ) printer.println( errLine );
-				if( line != null) printer.println( line );
+				if( line != null ) printer.println( line );
 			}
 		} catch( IOException exception ) {
 			streamClosed = true;
-			exception.printStackTrace(printer);
+			exception.printStackTrace( printer );
+		} finally {
+			try {
+				if( this.output != System.out ) this.output.close();
+			} catch( IOException exception ) {
+				exception.printStackTrace( System.out );
+			}
 		}
 	}
 }
