@@ -54,12 +54,6 @@ public final class ConsoleReader extends Thread {
 		} catch( IOException exception ) {
 			streamClosed = true;
 			exception.printStackTrace( printer );
-		} finally {
-			try {
-				if( this.output != System.out ) this.output.close();
-			} catch( IOException exception ) {
-				exception.printStackTrace( System.out );
-			}
 		}
 	}
 }
