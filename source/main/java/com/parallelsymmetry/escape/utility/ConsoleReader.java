@@ -47,9 +47,11 @@ public final class ConsoleReader extends Thread {
 			while( ( errLine = errReader.readLine() ) != null || ( line = reader.readLine() ) != null ) {
 				if( errLine != null ) printer.println( errLine );
 				if( line != null ) printer.println( line );
+				printer.flush();
 			}
 		} catch( IOException exception ) {
 			exception.printStackTrace( printer );
 		}
+		printer.flush();
 	}
 }
