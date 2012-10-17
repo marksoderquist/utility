@@ -60,6 +60,7 @@ public class ServerAgentTest extends TestCase {
 		assertFalse( "Server is not stopped.", agent.isRunning() );
 
 		server.stopAndWait();
+		assertFalse( "Server is not stopped.", server.isRunning() );
 	}
 
 	public void testRestart() throws Exception {
