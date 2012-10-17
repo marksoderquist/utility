@@ -22,15 +22,6 @@ public final class ConsoleReader extends Thread {
 		setDaemon( true );
 	}
 
-	public boolean isProcessRunning() {
-		try {
-			process.exitValue();
-			return false;
-		} catch( IllegalThreadStateException exception ) {
-			return true;
-		}
-	}
-
 	public Process getProcess() {
 		return process;
 	}
