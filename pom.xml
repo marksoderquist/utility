@@ -16,12 +16,12 @@
 	<packaging>jar</packaging>
 
 	<name>Parallel Symmetry Utility Library</name>
-	<description>This utility library contains useful classes that are generally useful for all types of applications.</description>
-	<url>http://www.parallelsymmetry.com/hudson/job/utility/site/index.html</url>
+	<description>This utility library contains classes that are generally useful for all types of applications.</description>
+	<url>http://code.parallelsymmetry.com/build/job/utility/site/index.html</url>
 	<inceptionYear>2007</inceptionYear>
 
 	<scm>
-		<connection>scm:svn:http://svn.parallelsymmetry.com/software/utility/trunk</connection>
+		<connection>scm:git:http://code.parallelsymmetry.com/git/software/utility</connection>
 	</scm>
 
 </project>
