@@ -2,7 +2,9 @@ package com.parallelsymmetry.escape.utility;
 
 import java.net.URI;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public final class UriUtil {
 
@@ -49,6 +51,30 @@ public final class UriUtil {
 		}
 
 		return uri;
+	}
+
+	public static Map<String, String> parseQuery( URI uri ) {
+		if( uri == null ) return null;
+		return parseQuery( uri.getQuery() );
+	}
+
+	public static Map<String, String> parseQuery( String query ) {
+		if( query == null ) return null;
+
+		Map<String, String> parameters = new HashMap<String, String>();
+
+		String[] values = query.split( "\\&" );
+
+		for( String value : values ) {
+			int index = value.indexOf( "=" );
+			if( index < 0 ) {
+				parameters.put( value, "true" );
+			} else {
+				parameters.put( value.substring( 0, index ), value.substring( index + 1 ) );
+			}
+		}
+
+		return parameters;
 	}
 
 }

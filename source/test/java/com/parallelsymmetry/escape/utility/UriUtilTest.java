@@ -1,6 +1,7 @@
 package com.parallelsymmetry.escape.utility;
 
 import java.net.URI;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -28,10 +29,36 @@ public class UriUtilTest extends TestCase {
 		URI absolute = URI.create( "file:/test/folder/absolute" );
 		URI opaque = URI.create( "jar:" + absolute.toString() );
 		URI doubleOpaque = URI.create( "double:jar:" + absolute.toString() );
-		
+
 		assertEquals( "file:/test/folder/", UriUtil.getParent( absolute ).toString() );
 		assertEquals( "jar:file:/test/folder/", UriUtil.getParent( opaque ).toString() );
 		assertEquals( "double:jar:file:/test/folder/", UriUtil.getParent( doubleOpaque ).toString() );
+	}
+
+	public void testParseQueryWithUri() {
+		assertNull( UriUtil.parseQuery( (URI)null ) );
+
+		URI uri = URI.create( "test:///path?attr1&attr2" );
+		Map<String, String> parameters = UriUtil.parseQuery( uri );
+		assertEquals( "true", parameters.get( "attr1" ) );
+		assertEquals( "true", parameters.get( "attr2" ) );
+
+		uri = URI.create( "test:///path?attr1=value1&attr2=value2" );
+		parameters = UriUtil.parseQuery( uri );
+		assertEquals( "value1", parameters.get( "attr1" ) );
+		assertEquals( "value2", parameters.get( "attr2" ) );
+	}
+
+	public void testParseQueryWithString() {
+		assertNull( UriUtil.parseQuery( (String)null ) );
+
+		Map<String, String> parameters = UriUtil.parseQuery( "attr1&attr2" );
+		assertEquals( "true", parameters.get( "attr1" ) );
+		assertEquals( "true", parameters.get( "attr2" ) );
+
+		parameters = UriUtil.parseQuery( "attr1=value1&attr2=value2" );
+		assertEquals( "value1", parameters.get( "attr1" ) );
+		assertEquals( "value2", parameters.get( "attr2" ) );
 	}
 
 }
