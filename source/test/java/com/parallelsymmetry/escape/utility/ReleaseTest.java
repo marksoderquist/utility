@@ -72,14 +72,14 @@ public class ReleaseTest extends TestCase {
 	public void testEncode() {
 		assertEquals( "", Release.encode( new Release( "" ) ) );
 		assertEquals( "1.2.3-u-04", Release.encode( new Release( versionString ) ) );
-		assertEquals( "1.2.3-u-04" + Release.ENCODE_DELIMITER + "0", Release.encode( new Release( versionString, new Date( 0 ) ) ) );
+		assertEquals( "1.2.3-u-04  0", Release.encode( new Release( versionString, new Date( 0 ) ) ) );
 	}
 
 	public void testDecode() {
 		assertNull( Release.decode( null ) );
 		assertEquals( new Release( "" ), Release.decode( "" ) );
 		assertEquals( new Release( versionString ), Release.decode( "1.2.3-u-04" ) );
-		assertEquals( new Release( versionString, new Date( 0 ) ), Release.decode( "1.2.3-u-04" + Release.ENCODE_DELIMITER + "0" ) );
+		assertEquals( new Release( versionString, new Date( 0 ) ), Release.decode( "1.2.3-u-04  0" ) );
 	}
 
 	public void testEquals() {
