@@ -252,6 +252,11 @@ public abstract class BaseImage {
 	protected void opacity( double opacity ) {
 		instructions.add( new CompositeInstruction( AlphaComposite.getInstance( AlphaComposite.SRC_OVER, (float)opacity ) ) );
 	}
+	
+	protected void draw( BaseImage image ) {
+		image.render();
+		instructions.addAll( image.instructions );
+	}
 
 	protected void draw( Image image ) {
 		instructions.add( new ImageInstruction( image ) );
