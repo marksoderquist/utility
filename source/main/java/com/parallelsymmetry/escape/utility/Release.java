@@ -1,5 +1,6 @@
 package com.parallelsymmetry.escape.utility;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -16,6 +17,8 @@ public class Release implements Comparable<Release> {
 	 * date format.
 	 */
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+	protected static final String ENCODE_DELIMITER = "  ";
 
 	private Version version;
 
@@ -37,6 +40,16 @@ public class Release implements Comparable<Release> {
 		if( version == null ) throw new NullPointerException( "Version cannot be null." );
 		this.version = version;
 		this.date = date;
+	}
+
+	public static final Release create( String version, String timestamp ) {
+		Date date = null;
+		try {
+			date = new SimpleDateFormat( DATE_FORMAT ).parse( timestamp );
+		} catch( ParseException exception ) {
+			//
+		}
+		return new Release( new Version( version ), date );
 	}
 
 	public Version getVersion() {
@@ -73,6 +86,27 @@ public class Release implements Comparable<Release> {
 
 	public String toHumanString( TimeZone zone ) {
 		return format( version.toHumanString(), zone );
+	}
+
+	public static final String encode( Release release ) {
+		StringBuilder builder = new StringBuilder( release.version.toString() );
+		if( release.date != null ) {
+			builder.append( ENCODE_DELIMITER );
+			builder.append( DateUtil.format( release.date, Release.DATE_FORMAT ) );
+		}
+
+		return builder.toString();
+	}
+
+	public static final Release decode( String release ) {
+		if( release == null ) return null;
+		
+		int index = release.indexOf( ENCODE_DELIMITER );
+		if( index < 0 ) return new Release( new Version( release ) );
+
+		Version version = new Version( release.substring( 0, index ) );
+		Date timestamp = DateUtil.parse( release.substring( index + ENCODE_DELIMITER.length() ), DATE_FORMAT );
+		return new Release( version, timestamp );
 	}
 
 	@Override
