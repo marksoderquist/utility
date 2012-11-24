@@ -92,7 +92,7 @@ public class Release implements Comparable<Release> {
 		StringBuilder builder = new StringBuilder( release.version.toString() );
 		if( release.date != null ) {
 			builder.append( ENCODE_DELIMITER );
-			builder.append( DateUtil.format( release.date, Release.DATE_FORMAT ) );
+			builder.append( release.date.getTime() );
 		}
 
 		return builder.toString();
@@ -100,12 +100,12 @@ public class Release implements Comparable<Release> {
 
 	public static final Release decode( String release ) {
 		if( release == null ) return null;
-		
+
 		int index = release.indexOf( ENCODE_DELIMITER );
 		if( index < 0 ) return new Release( new Version( release ) );
 
 		Version version = new Version( release.substring( 0, index ) );
-		Date timestamp = DateUtil.parse( release.substring( index + ENCODE_DELIMITER.length() ), DATE_FORMAT );
+		Date timestamp = new Date( Long.parseLong( release.substring( index + ENCODE_DELIMITER.length() ) ) );
 		return new Release( version, timestamp );
 	}
 
