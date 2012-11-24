@@ -20,16 +20,16 @@ import com.parallelsymmetry.escape.utility.setting.Persistent;
 import com.parallelsymmetry.escape.utility.setting.Settings;
 
 public class TaskManager implements Persistent, Controllable {
-	
+
 	private static final int MIN_THREAD_COUNT = 4;
-	
+
 	private static final int MAX_THREAD_COUNT = 32;
 
 	private static final int PROCESSOR_COUNT = Runtime.getRuntime().availableProcessors();
 
 	private static final int DEFAULT_MIN_THREAD_COUNT = Math.max( 4, PROCESSOR_COUNT );
 
-	private static final int DEFAULT_MAX_THREAD_COUNT = Math.max(DEFAULT_MIN_THREAD_COUNT, PROCESSOR_COUNT * 2 );
+	private static final int DEFAULT_MAX_THREAD_COUNT = Math.max( DEFAULT_MIN_THREAD_COUNT, PROCESSOR_COUNT * 2 );
 
 	private ThreadPoolExecutor executor;
 
@@ -63,7 +63,7 @@ public class TaskManager implements Persistent, Controllable {
 		if( count > MAX_THREAD_COUNT ) count = MAX_THREAD_COUNT;
 		minThreadCount = Math.max( MIN_THREAD_COUNT, count / 2 );
 		maxThreadCount = Math.min( MAX_THREAD_COUNT, Math.max( minThreadCount, count ) );
-		
+
 		saveSettings( settings );
 		if( isRunning() ) try {
 			restart();
@@ -279,12 +279,14 @@ public class TaskManager implements Persistent, Controllable {
 	}
 
 	void submitted( Task<?> task ) {
+		if( task == null ) throw new NullPointerException();
 		tasks.add( task );
 		task.setTaskManager( this );
 		fireTaskEvent( new TaskEvent( this, task, TaskEvent.Type.TASK_SUBMITTED ) );
 	}
 
 	void completed( Task<?> task ) {
+		if( task == null ) throw new NullPointerException();
 		fireTaskEvent( new TaskEvent( this, task, TaskEvent.Type.TASK_COMPLETED ) );
 		task.setTaskManager( null );
 		tasks.remove( task );

@@ -63,6 +63,19 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( manager.isRunning() );
 	}
 
+	public void testSubmitWithNull() throws Exception {
+		assertFalse( manager.isRunning() );
+		manager.startAndWait();
+		assertTrue( manager.isRunning() );
+
+		try {
+			manager.submit( null );
+			fail( "TaskManager.submit(null) should throw a NullPointerException." );
+		} catch( NullPointerException exception ) {
+			// A NullPointerException should be thrown.
+		}
+	}
+
 	public void testSubmitNullResult() throws Exception {
 		assertFalse( manager.isRunning() );
 
