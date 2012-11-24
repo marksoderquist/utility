@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -184,6 +185,10 @@ public class IconLibrary {
 	 */
 	public void registerIcon( String name, Icon renderer ) {
 		proxies.put( name, new IconProxy( name, renderer ) );
+	}
+	
+	public Set<String> getKeys() {
+		return proxies.keySet();
 	}
 
 	public void addPath( String path ) {
