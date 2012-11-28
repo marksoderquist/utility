@@ -90,7 +90,9 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		try {
 			preferences.node( path ).removeNode();
 		} catch( Exception exception ) {
-			throw new SettingsStoreException( exception );
+			SettingsStoreException storeException = new SettingsStoreException( path );
+			storeException.initCause( exception );
+			throw storeException;
 		}
 	}
 
