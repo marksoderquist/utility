@@ -50,10 +50,30 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 			node.put( prefKey, value );
 		}
 	}
+	
+	@Override
+	public Set<String> getKeys( String path ) {
+		// Incoming paths should always be absolute.
+		if( !nodeExists( path ) ) return null;
+		
+		path = path.substring( 1 );
+
+		Set<String> keys = new HashSet<String>();
+		Preferences preferences = getPreferences();
+		try {
+			keys.addAll( Arrays.asList( preferences.node( path ).keys() ) );
+		} catch( Exception exception ) {
+			Log.write( exception );
+		}
+
+		return keys;
+	}
 
 	@Override
 	public Set<String> getChildNames( String path ) {
 		// Incoming paths should always be absolute.
+		if( !nodeExists( path ) ) return null;
+		
 		path = path.substring( 1 );
 
 		Set<String> names = new HashSet<String>();

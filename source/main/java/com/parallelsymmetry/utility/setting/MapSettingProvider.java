@@ -22,39 +22,59 @@ public class MapSettingProvider implements WritableSettingProvider {
 	}
 
 	@Override
-	public boolean nodeExists( String path ) {
-		Set<String> keys = store.keySet();
-
-		if( !path.endsWith( "/" ) ) path += "/";
-		for( String key : keys ) {
-			if( key.startsWith( path ) ) return true;
-		}
-
-		return false;
-	}
-
-	@Override
 	public String get( String path ) {
 		return store.get( path );
 	}
 
 	@Override
-	public Set<String> getChildNames( String path ) {
-		Set<String> names = new HashSet<String>();
+	public Set<String> getKeys( String path ) {
+		if( !nodeExists( path ) ) return null;
 
-		Set<String> keys = store.keySet();
+		Set<String> keys = new HashSet<String>();
 		if( !path.endsWith( "/" ) ) path += "/";
-		for( String key : keys ) {
+
+		for( String key : store.keySet() ) {
+			if( key.startsWith( path ) && key.indexOf( "/", path.length() ) < 0 ) {
+				keys.add( key.substring( path.length() ) );
+			}
+		}
+
+		return keys;
+	}
+
+	@Override
+	public Set<String> getChildNames( String path ) {
+		if( !nodeExists( path ) ) return null;
+		if( !path.endsWith( "/" ) ) path += "/";
+
+		Set<String> names = new HashSet<String>();
+		for( String key : store.keySet() ) {
 			if( key.startsWith( path ) ) {
-				try {
-					names.add( key.substring( path.length(), key.indexOf( "/", path.length() ) ) );
-				} catch( StringIndexOutOfBoundsException exception ) {
-					// Intentionally ignore exception.
-				}
+				int index = key.indexOf( "/", path.length() );
+				if( index > 0 ) names.add( key.substring( path.length(), index ) );
+
+				//				if( index < 0 ) {
+				//					names.add( key.substring( path.length() ) );
+				//				} else {
+				//					names.add( key.substring( path.length(), index ) );
+				//				}
 			}
 		}
 
 		return names;
+	}
+
+	@Override
+	public boolean nodeExists( String path ) {
+		Set<String> keys = store.keySet();
+		if( !path.endsWith( "/" ) ) path += "/";
+
+		// If a key starts with the path return true.
+		for( String key : keys ) {
+			if( key.startsWith( path ) ) return true;
+		}
+
+		return false;
 	}
 
 	@Override

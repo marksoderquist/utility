@@ -12,7 +12,7 @@ import com.parallelsymmetry.utility.setting.SettingProvider;
 
 public class MockSettingProvider implements SettingProvider {
 
-	public final Map<String, String> values = new ConcurrentHashMap<String, String>();
+	protected final Map<String, String> store = new ConcurrentHashMap<String, String>();
 
 	private String name;
 
@@ -26,7 +26,7 @@ public class MockSettingProvider implements SettingProvider {
 
 	@Override
 	public boolean nodeExists( String path ) {
-		Set<String> keys = values.keySet();
+		Set<String> keys = store.keySet();
 
 		if( !path.endsWith( "/" ) ) path += "/";
 		for( String key : keys ) {
@@ -38,14 +38,29 @@ public class MockSettingProvider implements SettingProvider {
 
 	@Override
 	public String get( String path ) {
-		return values.get( path );
+		return store.get( path );
+	}
+	
+	@Override
+	public Set<String> getKeys( String path ) {
+		Set<String> keySet = new HashSet<String>();
+		if( !path.endsWith( "/" ) ) path += "/";
+
+		Set<String> keys = store.keySet();
+		for( String key : keys ) {
+			if( key.startsWith( path ) && key.indexOf( "/", path.length() ) < 0 ) {
+				keySet.add( key.substring( path.length() ) );
+			}
+		}
+
+		return keySet;
 	}
 
 	@Override
 	public Set<String> getChildNames( String path ) {
 		Set<String> names = new HashSet<String>();
 
-		Set<String> keys = values.keySet();
+		Set<String> keys = store.keySet();
 		if( !path.endsWith( "/" ) ) path += "/";
 		for( String key : keys ) {
 			if( key.startsWith( path ) ) {
@@ -61,23 +76,27 @@ public class MockSettingProvider implements SettingProvider {
 	}
 
 	public int getValueCount() {
-		return values.size();
+		return store.size();
 	}
 
 	public void set( String key, String value ) {
 		if( value == null ) {
-			values.remove( key );
+			store.remove( key );
 		} else {
-			values.put( key, value );
+			store.put( key, value );
 		}
+	}
+	
+	public Set<String> keySet() {
+		return store.keySet();
 	}
 
 	public void print() {
 		System.out.println( ( name == null ? "MockSettingProvider" : name ) + " data: " );
-		List<String> keys = new ArrayList<String>( values.keySet() );
+		List<String> keys = new ArrayList<String>( store.keySet() );
 		Collections.sort( keys );
 		for( String key : keys ) {
-			System.out.println( "Key: " + key + "  Value: " + values.get( key ) );
+			System.out.println( "Key: " + key + "  Value: " + store.get( key ) );
 		}
 	}
 

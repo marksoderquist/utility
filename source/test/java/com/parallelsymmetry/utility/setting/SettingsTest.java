@@ -13,9 +13,6 @@ import junit.framework.TestCase;
 import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.mock.MockSettingProvider;
 import com.parallelsymmetry.utility.mock.MockWritableSettingProvider;
-import com.parallelsymmetry.utility.setting.Persistent;
-import com.parallelsymmetry.utility.setting.SettingProvider;
-import com.parallelsymmetry.utility.setting.Settings;
 
 public class SettingsTest extends TestCase {
 
@@ -353,6 +350,34 @@ public class SettingsTest extends TestCase {
 		assertFalse( settings.nodeExists( "/test" ) );
 	}
 
+	public void testGetNodeList() {
+		int count = 5;
+		String path = "/test/lists/list1";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceList.add( new MockPersistent( index ) );
+		}
+
+		settings.putNodeList( path, sourceList );
+
+		List<Settings> targetList = settings.getNodeList( path, null );
+
+		// Create a check list of the settings objects.
+		List<Settings> checkList = new ArrayList<Settings>();
+		for( MockPersistent object : sourceList ) {
+			Settings settings = new Settings();
+			settings.addProvider( new MapSettingProvider() );
+			object.saveSettings( settings );
+			checkList.add( settings );
+		}
+
+		assertEquals( count, targetList.size() );
+		for( int index = 0; index < count; index++ ) {
+			assertSettingsValues( checkList.get( index ), targetList.get( index ) );
+		}
+	}
+
 	public void testGetList() {
 		int count = 5;
 		String path = "/test/lists/list1";
@@ -577,6 +602,15 @@ public class SettingsTest extends TestCase {
 		}
 	}
 
+	private void assertSettingsValues( Settings expected, Settings actual ) {
+		assertEquals( expected.getKeys().size(), actual.getKeys().size() );
+
+		Set<String> expectedKeys = expected.getKeys();
+		for( String name : expectedKeys ) {
+			assertEquals( name, expected.get( name, null ), actual.get( name, null ) );
+		}
+	}
+
 	private static final class MockPersistent implements Persistent {
 
 		private int index;
@@ -618,7 +652,7 @@ public class SettingsTest extends TestCase {
 
 		@Override
 		public void saveSettings( Settings settings ) {
-			if( value != null ) settings.put( "value", value );
+			settings.put( "value", value );
 			settings.putInt( "index", index );
 		}
 

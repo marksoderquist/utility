@@ -131,7 +131,7 @@ public class Settings {
 	public Settings getRoot() {
 		return root;
 	}
-	
+
 	public String getName() {
 		return path.substring( path.lastIndexOf( "/" ) + 1 );
 	}
@@ -221,6 +221,22 @@ public class Settings {
 
 	public Settings getIndexedNode( String path, int index ) {
 		return getNode( getItemPath( path, index ) );
+	}
+	
+	public Set<String> getKeys() {
+		Set<String> keys = new HashSet<String>();
+
+		for( SettingProvider provider : root.providers ) {
+			String full = getProviderPath( provider, path );
+			if( full != null ) keys.addAll( provider.getKeys( full ) );
+		}
+
+		if( root.defaultProvider != null ) {
+			String full = getProviderPath( root.defaultProvider, path );
+			if( full != null ) keys.addAll( root.defaultProvider.getKeys( full ) );
+		}
+
+		return keys;
 	}
 
 	public int getChildCount() {
@@ -333,7 +349,7 @@ public class Settings {
 		}
 
 	}
-
+	
 	/**
 	 * Get a value. If the value is not defined in the settings return the
 	 * specified default value.
@@ -474,6 +490,57 @@ public class Settings {
 		put( path, Colors.encode( color ) );
 	}
 
+	public <T extends Persistent> List<Settings> getNodeList( String path, List<T> defaultList ) {
+		int count = getInt( path + SEPARATOR + ITEM_COUNT, -1 );
+
+		if( count < 0 && defaultList == null ) return null;
+
+		List<Settings> list = new ArrayList<Settings>();
+		if( count < 0 ) {
+			count = defaultList.size();
+			for( int index = 0; index < count; index++ ) {
+				Settings node = getNode( getItemPath( path, index ) );
+				defaultList.get( index ).loadSettings( node );
+				list.add( node );
+			}
+		} else {
+			for( int index = 0; index < count; index++ ) {
+				Settings node = getNode( getItemPath( path, index ) );
+				list.add( node );
+			}
+		}
+
+		return list;
+	}
+
+	public <T extends Persistent> void putNodeList( String path, List<T> list ) {
+		// Remove the old list.
+		int oldCount = getInt( path + SEPARATOR + ITEM_COUNT, 0 );
+		for( int index = 0; index < oldCount; index++ ) {
+			removeNode( getItemPath( path, index ) );
+		}
+
+		// Store the new list.
+		if( list == null ) {
+			reset( path );
+		} else {
+			int newCount = list.size();
+			if( newCount > 0 ) {
+				for( int index = 0; index < newCount; index++ ) {
+					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
+				}
+				put( path + SEPARATOR + ITEM_CLASS, list.iterator().next().getClass().getName() );
+			}
+			putInt( path + SEPARATOR + ITEM_COUNT, newCount );
+		}
+	}
+
+	// NEXT Implement Settings.getNodeSet()
+	// NEXT Implement Settings.putNodeSet()
+	// NEXT Implement Settings.getNodeMap()
+	// NEXT Implement Settings.putNodeMap()
+
+	@Deprecated
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent> List<T> getList( String path, List<T> defaultList ) {
 		int count = getInt( path + SEPARATOR + ITEM_COUNT, -1 );
@@ -525,6 +592,7 @@ public class Settings {
 		return list;
 	}
 
+	@Deprecated
 	public <T extends Persistent> void putList( String path, List<T> list ) {
 		// Remove the old list.
 		int oldCount = getInt( path + SEPARATOR + ITEM_COUNT, 0 );
@@ -547,16 +615,19 @@ public class Settings {
 		}
 	}
 
+	@Deprecated
 	public <T extends Persistent> Set<T> getSet( String path, Set<T> defaultSet ) {
 		ArrayList<T> defaultList = defaultSet == null ? null : new ArrayList<T>( defaultSet );
 		List<T> list = getList( path, defaultList );
 		return list == defaultList ? defaultSet : new HashSet<T>( list );
 	}
 
+	@Deprecated
 	public <T extends Persistent> void putSet( String path, Set<T> set ) {
 		putList( path, set == null ? null : new ArrayList<T>( set ) );
 	}
 
+	@Deprecated
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent> Map<String, T> getMap( String path, Map<String, T> defaultMap ) {
 		String typeName = get( path + SEPARATOR + ITEM_CLASS, null );
@@ -601,6 +672,7 @@ public class Settings {
 		return map;
 	}
 
+	@Deprecated
 	public <T extends Persistent> void putMap( String path, Map<String, T> map ) {
 		// Remove the old map.
 		Set<String> names = getChildNames( path );
@@ -677,6 +749,17 @@ public class Settings {
 			listeners.remove( listener );
 			if( listeners.size() == 0 ) root.listeners.remove( full );
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+
+		builder.append( getClass().getName() );
+		builder.append( ": " );
+		builder.append( getPath() );
+
+		return builder.toString();
 	}
 
 	@Override

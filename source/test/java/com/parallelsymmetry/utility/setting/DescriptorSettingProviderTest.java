@@ -1,59 +1,47 @@
 package com.parallelsymmetry.utility.setting;
 
-import java.util.Set;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-import junit.framework.TestCase;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.parallelsymmetry.utility.Descriptor;
-import com.parallelsymmetry.utility.setting.DescriptorSettingProvider;
 
-public class DescriptorSettingProviderTest extends TestCase {
-
-	private Descriptor descriptor;
-
-	private DescriptorSettingProvider provider;
-
-	private DescriptorSettingProvider rootedProvider;
+public class DescriptorSettingProviderTest extends SettingProviderTest {
 
 	@Override
 	public void setUp() throws Exception {
-		descriptor = new Descriptor( getClass().getResourceAsStream( "/test.descriptor.xml" ) );
-		provider = new DescriptorSettingProvider( descriptor );
-		rootedProvider = new DescriptorSettingProvider( descriptor, false );
-	}
+		Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
-	public void testGet() {
-		assertEquals( "test.path.value", provider.get( "/path/value" ) );
-		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
-	}
+		Element root = document.createElement( "settings" );
+		document.appendChild( root );
 
-	public void testGetWithAttributes() {
-		assertNull( provider.get( "/invalid/path" ) );
-		assertEquals( "5", provider.get( "/bounds/x" ) );
-		assertEquals( "10", provider.get( "/bounds/y" ) );
-		assertEquals( "20", provider.get( "/bounds/w" ) );
-		assertEquals( "15", provider.get( "/bounds/h" ) );
-	}
+		Element key1 = document.createElement( "key1" );
+		key1.setTextContent( "value1" );
+		Element key2 = document.createElement( "key2" );
+		key2.setTextContent( "value2" );
+		Element key3 = document.createElement( "key3" );
+		key3.setTextContent( "value3" );
 
-	public void testGetChildNames() {
-		Set<String> names = provider.getChildNames( "" );
+		root.appendChild( key1 );
+		root.appendChild( key2 );
+		root.appendChild( key3 );
+		
+		Element path = document.createElement( "path");
+		root.appendChild( path );
+		
+		Element subkey1 = document.createElement( "subkey1" );
+		subkey1.setTextContent( "subvalue1" );
+		Element subkey2 = document.createElement( "subkey2" );
+		subkey2.setTextContent( "subvalue2" );
+		Element subkey3 = document.createElement( "subkey3" );
+		subkey3.setTextContent( "subvalue3" );
+		
+		path.appendChild( subkey1 );
+		path.appendChild( subkey2 );
+		path.appendChild( subkey3 );
 
-		assertEquals( 8, names.size() );
-		assertTrue( names.contains( "name" ) );
-		assertTrue( names.contains( "alias" ) );
-		assertTrue( names.contains( "path" ) );
-		assertTrue( names.contains( "bounds" ) );
-		assertTrue( names.contains( "integer" ) );
-		assertTrue( names.contains( "list" ) );
-		assertTrue( names.contains( "nodes" ) );
-		assertTrue( names.contains( "summary" ) );
-	}
-
-	public void testNodeExists() {
-		assertFalse( provider.nodeExists( "/path/invalid" ) );
-		assertFalse( rootedProvider.nodeExists( "/test/path/invalid" ) );
-		assertTrue( provider.nodeExists( "/path" ) );
-		assertTrue( rootedProvider.nodeExists( "/test/path" ) );
+		provider = new DescriptorSettingProvider( new Descriptor( document ), true );
 	}
 
 }

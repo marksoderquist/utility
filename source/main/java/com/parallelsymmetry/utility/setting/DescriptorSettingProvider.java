@@ -25,6 +25,7 @@ public class DescriptorSettingProvider implements SettingProvider {
 	@Override
 	public String get( String path ) {
 		// Incoming paths should always be absolute.
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
 		String value = descriptor.getValue( root + path );
 
 		// Check attributes.
@@ -37,15 +38,41 @@ public class DescriptorSettingProvider implements SettingProvider {
 	}
 
 	@Override
+	public Set<String> getKeys( String path ) {
+		// Incoming paths should always be absolute.
+		if( !nodeExists( path ) ) return null;
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+
+		Set<String> keys = new HashSet<String>();
+		for( String name : descriptor.getNames( root + path ) ) {
+			Node node = descriptor.getNode(root + path + "/" + name );
+			if( node != null && isKey( node ) ) keys.add( name );
+		}
+
+		return keys;
+	}
+
+	@Override
 	public Set<String> getChildNames( String path ) {
 		// Incoming paths should always be absolute.
-		return new HashSet<String>( descriptor.getNames( root + path ) );
+		if( !nodeExists( path ) ) return null;
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+
+		Set<String> names = new HashSet<String>();
+		for( String name : descriptor.getNames( root + path ) ) {
+			Node node = descriptor.getNode(root + path + "/" + name );
+			if( node != null && !isKey( node ) ) names.add( name );
+		}
+
+		return names;
 	}
 
 	@Override
 	public boolean nodeExists( String path ) {
 		// Incoming paths should always be absolute.
-		return descriptor.getNode( root + path ) != null;
+		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+		Node node = descriptor.getNode( root + path );
+		return node != null && !isKey( node );
 	}
 
 	private String getParentPath( String path ) {
@@ -60,6 +87,10 @@ public class DescriptorSettingProvider implements SettingProvider {
 		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
 		int index = path.lastIndexOf( "/" );
 		return index < 0 ? null : path.substring( index + 1 );
+	}
+
+	private boolean isKey( Node node ) {
+		return node.getChildNodes().getLength() == 1 && node.getFirstChild().getNodeType() == Node.TEXT_NODE;
 	}
 
 }

@@ -57,11 +57,6 @@ public class Descriptor {
 		}
 	}
 
-	public Descriptor( Node node ) {
-		if( node == null ) return;
-		this.node = node;
-	}
-
 	public Descriptor( Reader reader ) throws IOException {
 		if( reader == null ) return;
 		try {
@@ -72,7 +67,7 @@ public class Descriptor {
 			throw new IOException( exception );
 		}
 	}
-
+	
 	public Descriptor( InputStream input ) throws IOException {
 		if( input == null ) return;
 		try {
@@ -82,6 +77,11 @@ public class Descriptor {
 		} catch( ParserConfigurationException exception ) {
 			throw new IOException( exception );
 		}
+	}
+
+	public Descriptor( Node node ) {
+		if( node == null ) return;
+		this.node = node;
 	}
 
 	public Document getDocument() {
