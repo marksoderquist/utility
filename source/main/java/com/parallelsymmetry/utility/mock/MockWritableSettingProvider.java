@@ -17,15 +17,10 @@ public class MockWritableSettingProvider extends MockSettingProvider implements 
 
 	@Override
 	public void put( String path, String value ) {
-		set( path, value );
-	}
-
-	@Override
-	public void set( String key, String value ) {
 		if( value == null ) {
-			store.remove( key );
+			store.remove( path );
 		} else {
-			store.put( key, value );
+			store.put( path, value );
 		}
 	}
 

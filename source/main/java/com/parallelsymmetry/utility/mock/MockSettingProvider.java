@@ -24,55 +24,59 @@ public class MockSettingProvider implements SettingProvider {
 		this.name = name;
 	}
 
-	@Override
-	public boolean nodeExists( String path ) {
-		Set<String> keys = store.keySet();
-
-		if( !path.endsWith( "/" ) ) path += "/";
-		for( String key : keys ) {
-			if( key.startsWith( path ) ) return true;
-		}
-
-		return false;
+	public MockSettingProvider( String name, Map<String, String> values ) {
+		this.name = name;
+		store.putAll( values );
 	}
 
 	@Override
 	public String get( String path ) {
 		return store.get( path );
 	}
-	
+
 	@Override
 	public Set<String> getKeys( String path ) {
-		Set<String> keySet = new HashSet<String>();
+		if( !nodeExists( path ) ) return null;
+
+		Set<String> keys = new HashSet<String>();
 		if( !path.endsWith( "/" ) ) path += "/";
 
-		Set<String> keys = store.keySet();
-		for( String key : keys ) {
+		for( String key : store.keySet() ) {
 			if( key.startsWith( path ) && key.indexOf( "/", path.length() ) < 0 ) {
-				keySet.add( key.substring( path.length() ) );
+				keys.add( key.substring( path.length() ) );
 			}
 		}
 
-		return keySet;
+		return keys;
 	}
 
 	@Override
 	public Set<String> getChildNames( String path ) {
-		Set<String> names = new HashSet<String>();
-
-		Set<String> keys = store.keySet();
+		if( !nodeExists( path ) ) return null;
 		if( !path.endsWith( "/" ) ) path += "/";
-		for( String key : keys ) {
+
+		Set<String> names = new HashSet<String>();
+		for( String key : store.keySet() ) {
 			if( key.startsWith( path ) ) {
-				try {
-					names.add( key.substring( path.length(), key.indexOf( "/", path.length() ) ) );
-				} catch( StringIndexOutOfBoundsException exception ) {
-					// Intentionally ignore exception.
-				}
+				int index = key.indexOf( "/", path.length() );
+				if( index > 0 ) names.add( key.substring( path.length(), index ) );
 			}
 		}
 
 		return names;
+	}
+
+	@Override
+	public boolean nodeExists( String path ) {
+		Set<String> keys = store.keySet();
+		if( !path.endsWith( "/" ) ) path += "/";
+
+		// If a key starts with the path return true.
+		for( String key : keys ) {
+			if( key.startsWith( path ) ) return true;
+		}
+
+		return false;
 	}
 
 	public int getValueCount() {
@@ -86,12 +90,12 @@ public class MockSettingProvider implements SettingProvider {
 			store.put( key, value );
 		}
 	}
-	
+
 	public Set<String> keySet() {
 		return store.keySet();
 	}
 
-	public void print() {
+	public void show() {
 		System.out.println( ( name == null ? "MockSettingProvider" : name ) + " data: " );
 		List<String> keys = new ArrayList<String>( store.keySet() );
 		Collections.sort( keys );

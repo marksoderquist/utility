@@ -178,6 +178,8 @@ public class SettingsTest extends TestCase {
 		// Intentionally skip provider 2.
 		provider3.set( "/test/path3/value", "3" );
 		providerD.set( "/test/pathD/value", "D" );
+		
+		settings.getChildNames( "/invalid" );
 
 		Set<String> names = settings.getChildNames( "/test" );
 		assertEquals( 3, names.size() );
@@ -597,7 +599,7 @@ public class SettingsTest extends TestCase {
 		int pCount = settings.getProviderCount();
 		for( int pIndex = 0; pIndex < pCount; pIndex++ ) {
 			SettingProvider provider = settings.getProvider( pIndex );
-			( (MockSettingProvider)provider ).print();
+			( (MockSettingProvider)provider ).show();
 			System.out.println();
 		}
 	}

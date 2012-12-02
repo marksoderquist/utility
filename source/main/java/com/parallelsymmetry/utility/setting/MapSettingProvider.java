@@ -52,12 +52,6 @@ public class MapSettingProvider implements WritableSettingProvider {
 			if( key.startsWith( path ) ) {
 				int index = key.indexOf( "/", path.length() );
 				if( index > 0 ) names.add( key.substring( path.length(), index ) );
-
-				//				if( index < 0 ) {
-				//					names.add( key.substring( path.length() ) );
-				//				} else {
-				//					names.add( key.substring( path.length(), index ) );
-				//				}
 			}
 		}
 

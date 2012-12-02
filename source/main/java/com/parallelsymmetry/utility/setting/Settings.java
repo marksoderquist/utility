@@ -222,18 +222,20 @@ public class Settings {
 	public Settings getIndexedNode( String path, int index ) {
 		return getNode( getItemPath( path, index ) );
 	}
-	
+
 	public Set<String> getKeys() {
 		Set<String> keys = new HashSet<String>();
 
 		for( SettingProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
-			if( full != null ) keys.addAll( provider.getKeys( full ) );
+			Set<String> providerKeys = provider.getKeys( full );
+			if( full != null && providerKeys != null ) keys.addAll( providerKeys );
 		}
 
 		if( root.defaultProvider != null ) {
 			String full = getProviderPath( root.defaultProvider, path );
-			if( full != null ) keys.addAll( root.defaultProvider.getKeys( full ) );
+			Set<String> providerKeys = root.defaultProvider.getKeys( full );
+			if( full != null && providerKeys != null ) keys.addAll( providerKeys );
 		}
 
 		return keys;
@@ -256,12 +258,14 @@ public class Settings {
 
 		for( SettingProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
-			if( full != null ) names.addAll( provider.getChildNames( full ) );
+			Set<String> providerNames = provider.getChildNames( full );
+			if( full != null && providerNames != null ) names.addAll( providerNames );
 		}
 
 		if( root.defaultProvider != null ) {
 			String full = getProviderPath( root.defaultProvider, path );
-			if( full != null ) names.addAll( root.defaultProvider.getChildNames( full ) );
+			Set<String> providerNames = root.defaultProvider.getChildNames( full );
+			if( full != null && providerNames != null ) names.addAll( providerNames );
 		}
 
 		return names;
@@ -349,7 +353,7 @@ public class Settings {
 		}
 
 	}
-	
+
 	/**
 	 * Get a value. If the value is not defined in the settings return the
 	 * specified default value.
