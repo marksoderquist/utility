@@ -179,8 +179,6 @@ public class SettingsTest extends TestCase {
 		provider3.set( "/test/path3/value", "3" );
 		providerD.set( "/test/pathD/value", "D" );
 		
-		settings.getChildNames( "/invalid" );
-
 		Set<String> names = settings.getChildNames( "/test" );
 		assertEquals( 3, names.size() );
 		assertTrue( names.contains( "path1" ) );
