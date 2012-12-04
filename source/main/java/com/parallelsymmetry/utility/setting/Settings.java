@@ -528,21 +528,50 @@ public class Settings {
 		if( list == null ) {
 			reset( path );
 		} else {
-			int newCount = list.size();
-			if( newCount > 0 ) {
-				for( int index = 0; index < newCount; index++ ) {
+			int count = list.size();
+			if( count > 0 ) {
+				for( int index = 0; index < count; index++ ) {
 					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 				}
-				put( path + SEPARATOR + ITEM_CLASS, list.iterator().next().getClass().getName() );
+				//put( path + SEPARATOR + ITEM_CLASS, list.iterator().next().getClass().getName() );
 			}
-			putInt( path + SEPARATOR + ITEM_COUNT, newCount );
+			putInt( path + SEPARATOR + ITEM_COUNT, count );
 		}
 	}
 
-	// NEXT Implement Settings.getNodeSet()
-	// NEXT Implement Settings.putNodeSet()
+	public <T extends Persistent> Set<Settings> getNodeSet( String path, Set<T> defaultSet ) {
+		ArrayList<T> defaultList = defaultSet == null ? null : new ArrayList<T>( defaultSet );
+		List<Settings> list = getNodeList( path, defaultList );
+		return list == null ? null : new HashSet<Settings>( list );
+	}
+
+	public <T extends Persistent> void putNodeSet( String path, Set<T> set ) {
+		putNodeList( path, set == null ? null : new ArrayList<T>( set ) );
+	}
+
 	// NEXT Implement Settings.getNodeMap()
-	// NEXT Implement Settings.putNodeMap()
+
+	public <T extends Persistent> void putNodeMap( String path, Map<String, T> map ) {
+		// Remove the old map.
+		Set<String> names = getChildNames( path );
+		for( String name : names ) {
+			removeNode( path + "/" + name );
+		}
+
+		// Store the new map.
+		if( map == null ) {
+			reset( path );
+		} else {
+			int count = map.size();
+			if( count > 0 ) {
+				for( String name : map.keySet() ) {
+					map.get( name ).saveSettings( getNode( path + "/" + name ) );
+				}
+				//put( path + SEPARATOR + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
+			}
+			putInt( path + SEPARATOR + ITEM_COUNT, count );
+		}
+	}
 
 	@Deprecated
 	@SuppressWarnings( "unchecked" )
