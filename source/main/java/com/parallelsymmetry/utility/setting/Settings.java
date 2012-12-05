@@ -529,11 +529,8 @@ public class Settings {
 			reset( path );
 		} else {
 			int count = list.size();
-			if( count > 0 ) {
-				for( int index = 0; index < count; index++ ) {
-					list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
-				}
-				//put( path + SEPARATOR + ITEM_CLASS, list.iterator().next().getClass().getName() );
+			for( int index = 0; index < count; index++ ) {
+				list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 			}
 			putInt( path + SEPARATOR + ITEM_COUNT, count );
 		}
@@ -549,7 +546,28 @@ public class Settings {
 		putNodeList( path, set == null ? null : new ArrayList<T>( set ) );
 	}
 
-	// NEXT Implement Settings.getNodeMap()
+	public <T extends Persistent> Map<String, Settings> getNodeMap( String path, Map<String, T> defaultMap ) {
+		Map<String, Settings> map = new HashMap<String, Settings>();
+		Set<String> names = getChildNames( path );
+
+		int count = names.size();
+		if( names.size() == 0 && defaultMap == null ) return null;
+
+		if( count == 0 ) {
+			for( String name : defaultMap.keySet() ) {
+				Settings node = getNode( path + "/" + name );
+				defaultMap.get( name ).loadSettings( node );
+				map.put( name, node );
+			}
+		} else {
+			for( String name : names ) {
+				Settings node = getNode( path + "/" + name );
+				map.put( name, node );
+			}
+		}
+
+		return map;
+	}
 
 	public <T extends Persistent> void putNodeMap( String path, Map<String, T> map ) {
 		// Remove the old map.
@@ -562,14 +580,10 @@ public class Settings {
 		if( map == null ) {
 			reset( path );
 		} else {
-			int count = map.size();
-			if( count > 0 ) {
-				for( String name : map.keySet() ) {
-					map.get( name ).saveSettings( getNode( path + "/" + name ) );
-				}
-				//put( path + SEPARATOR + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
+			for( String name : map.keySet() ) {
+				map.get( name ).saveSettings( getNode( path + "/" + name ) );
 			}
-			putInt( path + SEPARATOR + ITEM_COUNT, count );
+			putInt( path + SEPARATOR + ITEM_COUNT, map.size() );
 		}
 	}
 

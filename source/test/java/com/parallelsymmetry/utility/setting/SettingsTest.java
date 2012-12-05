@@ -351,8 +351,6 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testGetList() {
-		assertNull( settings.getNodeList( "/invalid", null ) );
-
 		int count = 5;
 		String path = "/test/lists/list1";
 		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
@@ -360,10 +358,6 @@ public class SettingsTest extends TestCase {
 		for( int index = 0; index < count; index++ ) {
 			sourceList.add( new MockPersistent( index ) );
 		}
-
-		settings.putNodeList( path, sourceList );
-
-		List<Settings> targetList = settings.getNodeList( path, null );
 
 		// Create a check list of the settings objects.
 		List<Settings> checkList = new ArrayList<Settings>();
@@ -374,10 +368,17 @@ public class SettingsTest extends TestCase {
 			checkList.add( settings );
 		}
 
+		settings.putNodeList( path, sourceList );
+
+		List<Settings> targetList = settings.getNodeList( path, null );
 		assertEquals( count, targetList.size() );
 		for( int index = 0; index < count; index++ ) {
 			assertSettingsValues( checkList.get( index ), targetList.get( index ) );
 		}
+	}
+
+	public void testGetInvalidList() {
+		assertNull( settings.getNodeList( "/invalid", null ) );
 	}
 
 	public void testGetListWithDefault() {
@@ -436,8 +437,6 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testGetSet() {
-		assertNull( settings.getNodeSet( "/invalid", null ) );
-
 		int count = 5;
 		String path = "/test/sets/set1";
 		Set<MockPersistent> sourceSet = new HashSet<MockPersistent>();
@@ -468,6 +467,10 @@ public class SettingsTest extends TestCase {
 			}
 			assertTrue( found );
 		}
+	}
+
+	public void testGetInvalidSet() {
+		assertNull( settings.getNodeSet( "/invalid", null ) );
 	}
 
 	public void testGetSetWithDefault() {
@@ -531,36 +534,92 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testGetMap() {
-		// NEXT Implement test.
-		//		int count = 5;
-		//		String path = "/test/maps/map1";
-		//		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
-		//
-		//		for( int index = 0; index < count; index++ ) {
-		//			String name = String.valueOf( (char)( 65 + index ) );
-		//			sourceMap.put( name, new MockPersistent( name ) );
-		//		}
-		//
-		//		settings.putMap( path, sourceMap );
-		//		Map<String, MockPersistent> targetMap = settings.getMap( path, null );
-		//
-		//		assertEquals( count, targetMap.size() );
-		//		for( int index = 0; index < count; index++ ) {
-		//			String name = String.valueOf( (char)( 65 + index ) );
-		//			assertEquals( name, targetMap.get( name ).getValue() );
-		//		}
+		int count = 5;
+		String path = "/test/maps/map1";
+		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			String name = String.valueOf( (char)( 65 + index ) );
+			sourceMap.put( name, new MockPersistent( name ) );
+		}
+
+		// Create a check list of the settings objects.
+		Map<String, Settings> checkMap = new HashMap<String, Settings>();
+		for( String name : sourceMap.keySet() ) {
+			Settings settings = new Settings();
+			settings.addProvider( new MapSettingProvider() );
+			sourceMap.get( name ).saveSettings( settings );
+			checkMap.put( name, settings );
+		}
+
+		settings.putNodeMap( path, sourceMap );
+
+		Map<String, Settings> targetMap = settings.getNodeMap( path, null );
+		assertEquals( count, targetMap.size() );
+		for( int index = 0; index < count; index++ ) {
+			String name = String.valueOf( (char)( 65 + index ) );
+			assertSettingsValues( checkMap.get( name ), targetMap.get( name ) );
+		}
+	}
+
+	public void testGetInvalidMap() {
+		assertNull( settings.getNodeMap( "/invalid", null ) );
 	}
 
 	public void testGetMapWithDefault() {
-		// NEXT Implement test.
+		String path = "/test/maps/map4";
+		Map<String, Settings> map = settings.getNodeMap( path, null );
+		assertNull( map );
+
+		Map<String, MockPersistent> defaultMap = new HashMap<String, MockPersistent>();
+		defaultMap.put( "0", new MockPersistent() );
+		map = settings.getNodeMap( path, defaultMap );
+
+		assertEquals( 1, map.size() );
+		assertNotNull( defaultMap.get( "0" ).getSettings() );
+		assertEquals( map.get( "0" ), defaultMap.get( "0" ).getSettings() );
 	}
 
 	public void testPutEmptyMap() {
-		// NEXT Implement test.
+		String path = "/test/maps/map0";
+		Map<String, MockPersistent> map = new HashMap<String, MockPersistent>();
+		settings.putNodeMap( path, map );
+		assertEquals( 0, settings.getNodeSet( path, null ).size() );
 	}
 
 	public void testRemoveMap() {
-		// NEXT Implement test.
+		int count = 5;
+		String path = "/test/maps/map2";
+		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			String name = String.valueOf( (char)( 65 + index ) );
+			sourceMap.put( name, new MockPersistent( name ) );
+		}
+
+		// Create a check list of the settings objects.
+		Map<String, Settings> checkMap = new HashMap<String, Settings>();
+		for( String name : sourceMap.keySet() ) {
+			Settings settings = new Settings();
+			settings.addProvider( new MapSettingProvider() );
+			sourceMap.get( name ).saveSettings( settings );
+			checkMap.put( name, settings );
+		}
+
+		settings.putNodeMap( path, sourceMap );
+
+		Map<String, Settings> targetMap = settings.getNodeMap( path, null );
+		assertEquals( count, targetMap.size() );
+		for( int index = 0; index < count; index++ ) {
+			String name = String.valueOf( (char)( 65 + index ) );
+			assertSettingsValues( checkMap.get( name ), targetMap.get( name ) );
+		}
+
+		settings.putNodeMap( path, null );
+
+		targetMap = settings.getNodeMap( path, null );
+		assertFalse( settings.nodeExists( path ) );
+		assertNull( targetMap );
 	}
 
 	public void testGetBadList() {
