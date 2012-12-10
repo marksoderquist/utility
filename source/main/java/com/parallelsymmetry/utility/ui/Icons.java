@@ -20,7 +20,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 import javax.swing.border.LineBorder;
 
 public class Icons {
@@ -149,14 +148,12 @@ public class Icons {
 	public static void proof( Icon icon, ImageFilter filter, int animationDelay ) {
 		SamplePanel panel = new SamplePanel( icon, filter, animationDelay );
 		JOptionPane.showMessageDialog( null, panel, null, JOptionPane.PLAIN_MESSAGE );
-		panel.stopAnimation();
+		if( icon instanceof AnimatedIcon ) ((AnimatedIcon)icon).stopAnimation();
 	}
 
 	private static class SamplePanel extends JComponent implements ActionListener {
 
 		private static final long serialVersionUID = 7020998970315590613L;
-
-		private Timer timer;
 
 		private Icon icon;
 
@@ -166,13 +163,10 @@ public class Icons {
 
 		private Image gridImage;
 
-		private int animateDelay;
-
 		private Color border = new Color( 255, 0, 0, 64 );
 
 		public SamplePanel( Icon icon, ImageFilter filter, int animateDelay ) {
 			this.icon = icon;
-			this.animateDelay = animateDelay;
 
 			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 
@@ -186,27 +180,11 @@ public class Icons {
 			setBackground( new Color( 220, 220, 220 ) );
 			setBackground( Color.WHITE );
 
-			startAnimation();
+			if( icon instanceof AnimatedIcon ) ((AnimatedIcon)icon).startAnimation( this, animateDelay );
 		}
-
-		public void startAnimation() {
-			if( animateDelay <= 0 ) return;
-			timer = new Timer( animateDelay, this );
-			timer.start();
-		}
-
-		public void stopAnimation() {
-			if( timer != null ) timer.stop();
-		}
-
-		private long last;
 
 		@Override
 		public void paint( Graphics graphics ) {
-			long current = System.currentTimeMillis();
-			System.out.println( "Repaint: " + ( last == 0 ? 0 : current - last ) + " Mem: " + Runtime.getRuntime().freeMemory() );
-			last = current;
-
 			graphics.setColor( getBackground() );
 			graphics.fillRect( 0, 0, getWidth(), getHeight() );
 
