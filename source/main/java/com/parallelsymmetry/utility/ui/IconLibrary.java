@@ -71,10 +71,14 @@ public class IconLibrary {
 		icons = new ConcurrentHashMap<IconProxy, Icon>();
 
 		ClassLoader loader = getClass().getClassLoader();
-		addPath( path, loader );
+		addSearchPath( path, loader );
 
 		// No other icons need to be installed. See JavaDoc.
-		registerIcon( BROKEN, new BrokenIcon() );
+		putIcon( BROKEN, new BrokenIcon() );
+	}
+
+	public Set<String> getKeys() {
+		return proxies.keySet();
 	}
 
 	/**
@@ -103,7 +107,7 @@ public class IconLibrary {
 			URL url = getIconUrl( name );
 			if( url != null ) {
 				try {
-					registerIcon( name, new ImageIcon( ImageIO.read( url ) ) );
+					putIcon( name, new ImageIcon( ImageIO.read( url ) ) );
 					proxy = proxies.get( name );
 				} catch( IOException e ) {
 					// Intentionally ignore exception.
@@ -183,16 +187,12 @@ public class IconLibrary {
 	/**
 	 * Create a named cached icon.
 	 */
-	public void registerIcon( String name, Icon renderer ) {
+	public void putIcon( String name, Icon renderer ) {
 		proxies.put( name, new IconProxy( name, renderer ) );
 	}
 	
-	public Set<String> getKeys() {
-		return proxies.keySet();
-	}
-
-	public void addPath( String path ) {
-		addPath( path, getClass().getClassLoader() );
+	public void addSearchPath( String path ) {
+		addSearchPath( path, getClass().getClassLoader() );
 	}
 
 	/**
@@ -200,7 +200,7 @@ public class IconLibrary {
 	 * 
 	 * @param path
 	 */
-	public void addPath( String path, ClassLoader loader ) {
+	public void addSearchPath( String path, ClassLoader loader ) {
 		if( path == null || loader == null || paths.contains( path ) ) return;
 		if( path.startsWith( "/" ) ) path = path.substring( 1 );
 		loaders.put( path, loader );
@@ -212,7 +212,7 @@ public class IconLibrary {
 	 * 
 	 * @param path
 	 */
-	public void removePath( String path ) {
+	public void removeSearchPath( String path ) {
 		if( path.startsWith( "/" ) ) path = path.substring( 1 );
 		paths.remove( path );
 		loaders.remove( path );
