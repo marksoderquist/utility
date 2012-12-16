@@ -63,7 +63,7 @@ public abstract class BaseImage {
 
 	private static final double OUTLINE_COLOR_FACTOR = -0.75;
 
-	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 44f;
+	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
 
 	protected static final double RADIANS_PER_DEGREE = Math.PI / 180;
 

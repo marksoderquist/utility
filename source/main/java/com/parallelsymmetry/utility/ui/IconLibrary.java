@@ -7,7 +7,11 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -19,6 +23,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+
+import com.parallelsymmetry.utility.FileUtil;
+import com.parallelsymmetry.utility.HashUtil;
+import com.parallelsymmetry.utility.IoUtil;
+import com.parallelsymmetry.utility.log.Log;
 
 /**
  * The IconLibrary is the class where the program can easily obtain an icon by
@@ -38,6 +47,8 @@ public class IconLibrary {
 	public static final String BROKEN = "broken";
 
 	private static final String DEFAULT_ICON_PATH = "/";
+
+	private File cachePath;
 
 	private List<String> paths;
 
@@ -73,17 +84,36 @@ public class IconLibrary {
 		putIcon( BROKEN, new BrokenIcon() );
 	}
 
+	public File getCachePath() {
+		return cachePath;
+	}
+
+	public void setCachePath( File path ) {
+		if( this.cachePath != null ) FileUtil.delete( cachePath );
+		
+		this.cachePath = path;
+		
+		if( this.cachePath != null ) cachePath.mkdirs();
+	}
+
 	public Set<String> getKeys() {
 		return icons.keySet();
 	}
 
 	public Icon getIcon( URI uri ) {
-		return getIcon( uri, DEFAULT_ICON_SIZE );
+		return getProxiedIcon( uri, size, null );
 	}
 
 	public Icon getIcon( URI uri, int size ) {
-		// NEXT Implement getIcon(URI,int)
-		return null;
+		return getProxiedIcon( uri, size, null );
+	}
+
+	public Icon getIcon( URI uri, ImageFilter filter ) {
+		return getProxiedIcon( uri, size, filter );
+	}
+
+	public Icon getIcon( URI uri, int size, ImageFilter filter ) {
+		return getProxiedIcon( uri, size, filter );
 	}
 
 	/**
@@ -221,10 +251,10 @@ public class IconLibrary {
 		proxy = proxies.get( key );
 		if( proxy != null ) return proxy;
 
-		// Get an icon renderer.
+		// Get the icon renderer.
 		Icon renderer = icons.get( name );
 
-		// If the renderer is null, try to load an image from the class loader.
+		// If the renderer is null, try to load the image from the class loader.
 		if( renderer == null ) {
 			URL url = getIconUrl( name );
 			if( url != null ) {
@@ -234,6 +264,74 @@ public class IconLibrary {
 					// Intentionally ignore exception.
 				}
 			}
+		}
+
+		// If there is still no renderer use the broken icon.
+		if( renderer == null ) renderer = icons.get( BROKEN );
+
+		// Create a new icon proxy.
+		proxy = new IconProxy( name, renderer, size, filter );
+		proxies.put( key, proxy );
+
+		return proxy;
+	}
+
+	private IconProxy getProxiedIcon( URI uri, int size, ImageFilter filter ) {
+		if( uri == null ) return getProxiedIcon( (String)null, size, filter );
+
+		// NEXT Implement getProxiedIcon( URI, int, ImageFilter )
+		IconProxy proxy = null;
+		String name = HashUtil.hash( uri.toString() );
+		String key = name + ":" + size;
+
+		// Get a proxy from the cache.
+		proxy = proxies.get( key );
+		if( proxy != null ) return proxy;
+
+		// Get the icon renderer.
+		Icon renderer = icons.get( name );
+
+		// If the renderer is null, load the image from the cache.
+		if( renderer == null ) {
+			Image image = null;
+			InputStream input = null;
+			OutputStream output = null;
+
+			File file = new File( cachePath, name );
+
+			// If the image is not in the cache, download it.
+			if( !file.exists() ) {
+				try {
+					input = uri.toURL().openStream();
+					output = new FileOutputStream( file );
+					IoUtil.copy( input, output );
+				} catch( IOException exception ) {
+					Log.write( exception );
+					return null;
+				} finally {
+					try {
+						if( input != null ) input.close();
+					} catch( IOException exception ) {
+						// Intentionally ignore exception.
+					}
+					try {
+						if( output != null ) output.close();
+					} catch( IOException exception ) {
+						// Intentionally ignore exception.
+					}
+				}
+			}
+
+			if( file.exists() && file.length() > 0 ) {
+				try {
+					image = ImageIO.read( file );
+					renderer = new ImageIcon( image );
+				} catch( IOException exception ) {
+					return null;
+				}
+			}
+
+			//			if( image != null ) renderer = new ImageIcon( image );
 		}
 
 		// If there is still no renderer use the broken icon.

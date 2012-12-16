@@ -19,6 +19,10 @@ import javax.swing.border.LineBorder;
 
 public final class Images {
 
+	public static final double DEFUALT_CUMULATIVE_TOLERANCE = 1d / 256d;
+
+	public static final double DEFAULT_COMPONENT_TOLERANCE = 16d / 256d;
+
 	/**
 	 * Forces pixels to opaque or transparent.
 	 */
@@ -123,7 +127,33 @@ public final class Images {
 		return buffer;
 	}
 
-	public static byte[] getArrayFromImage( Image image ) throws InterruptedException {
+	public static boolean areSimilar( Image a, Image b ) {
+		return areSimilar( a, b, DEFUALT_CUMULATIVE_TOLERANCE, DEFAULT_COMPONENT_TOLERANCE );
+	}
+
+	public static boolean areSimilar( Image a, Image b, double cumulativeTolerance ) {
+		return areSimilar( a, b, cumulativeTolerance, DEFAULT_COMPONENT_TOLERANCE );
+	}
+
+	public static boolean areSimilar( Image a, Image b, double cumulativeTolerance, double componentTolerance ) {
+		byte[] s = Images.getArrayFromImage( a );
+		byte[] t = Images.getArrayFromImage( b );
+
+		if( s.length != t.length ) return false;
+
+		int cumulative = 0;
+		for( int index = 0; index < s.length; index++ ) {
+			int error = Math.abs( s[index] - t[index] );
+			if( error / 256f > componentTolerance ) return false;
+			cumulative += error;
+		}
+
+		double variance = (double)cumulative / (double)( s.length << 8 );
+
+		return variance <= cumulativeTolerance;
+	}
+
+	public static byte[] getArrayFromImage( Image image ) {
 		int width = image.getWidth( null );
 		int height = image.getHeight( null );
 
@@ -131,7 +161,12 @@ public final class Images {
 		PixelGrabber grabber = new PixelGrabber( image, 0, 0, width, height, pixels, 0, width );
 
 		// Grab the pixel data.
-		grabber.grabPixels();
+		try {
+			grabber.grabPixels();
+		} catch( InterruptedException exception ) {
+			return null;
+		}
+
 		return convertIntsToBytes( pixels );
 	}
 
