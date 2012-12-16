@@ -90,9 +90,9 @@ public class IconLibrary {
 
 	public void setCachePath( File path ) {
 		if( this.cachePath != null ) FileUtil.delete( cachePath );
-		
+
 		this.cachePath = path;
-		
+
 		if( this.cachePath != null ) cachePath.mkdirs();
 	}
 
@@ -301,12 +301,13 @@ public class IconLibrary {
 
 			// If the image is not in the cache, download it.
 			if( !file.exists() ) {
+				Log.write( Log.DEBUG, "Download icon: " + uri );
 				try {
 					input = uri.toURL().openStream();
 					output = new FileOutputStream( file );
 					IoUtil.copy( input, output );
 				} catch( IOException exception ) {
-					Log.write( exception );
+					Log.write( exception, uri.toString() );
 					return null;
 				} finally {
 					try {
