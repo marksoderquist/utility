@@ -61,6 +61,8 @@ public abstract class BaseImage {
 
 	}
 
+	public static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( Color.YELLOW );
+
 	private static final double OUTLINE_COLOR_FACTOR = -0.75;
 
 	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
@@ -69,9 +71,9 @@ public abstract class BaseImage {
 
 	protected static final double DEGREES_PER_RADIAN = 180 / Math.PI;
 
-	private static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( Color.BLUE );
-
 	protected static final Font DEFAULT_FONT = new Font( Font.SANS_SERIF, Font.PLAIN, 24 );
+
+	private static ColorScheme defaultColorScheme = DEFAULT_COLOR_SCHEME.clone();
 
 	protected int size;
 
@@ -79,7 +81,7 @@ public abstract class BaseImage {
 
 	protected int height;
 
-	protected ColorScheme scheme = DEFAULT_COLOR_SCHEME.clone();
+	private ColorScheme scheme;
 
 	private double outlineSize = DEFAULT_OUTLINE_SIZE;
 
@@ -108,12 +110,20 @@ public abstract class BaseImage {
 		return height;
 	}
 
+	public static ColorScheme getDefaultColorScheme() {
+		return defaultColorScheme;
+	}
+
+	public static void setDefaultColorScheme( ColorScheme scheme ) {
+		BaseImage.defaultColorScheme = scheme != null ? scheme : DEFAULT_COLOR_SCHEME.clone();
+	}
+
 	public ColorScheme getColorScheme() {
-		return scheme;
+		return scheme == null ? getDefaultColorScheme() : scheme;
 	}
 
 	public void setColorScheme( ColorScheme scheme ) {
-		this.scheme = scheme != null ? scheme : DEFAULT_COLOR_SCHEME;
+		this.scheme = scheme;
 	}
 
 	public double getOutlineSize() {
@@ -415,16 +425,16 @@ public abstract class BaseImage {
 	protected Color getColor( double factor ) {
 		switch( colorMode ) {
 			case SECONDARYA: {
-				return scheme.getSecondaryA( factor );
+				return getColorScheme().getSecondaryA( factor );
 			}
 			case SECONDARYB: {
-				return scheme.getSecondaryB( factor );
+				return getColorScheme().getSecondaryB( factor );
 			}
 			case COMPLEMENT: {
-				return scheme.getComplement( factor );
+				return getColorScheme().getComplement( factor );
 			}
 			default: {
-				return scheme.getPrimary( factor );
+				return getColorScheme().getPrimary( factor );
 			}
 		}
 	}
