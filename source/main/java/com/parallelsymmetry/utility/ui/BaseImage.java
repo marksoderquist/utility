@@ -61,13 +61,15 @@ public abstract class BaseImage {
 
 	}
 
-	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
+	private static final double OUTLINE_COLOR_FACTOR = -0.75;
+
+	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 44f;
 
 	protected static final double RADIANS_PER_DEGREE = Math.PI / 180;
 
 	protected static final double DEGREES_PER_RADIAN = 180 / Math.PI;
 
-	private static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( Color.GRAY );
+	private static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( Color.BLUE );
 
 	protected static final Font DEFAULT_FONT = new Font( Font.SANS_SERIF, Font.PLAIN, 24 );
 
@@ -252,7 +254,7 @@ public abstract class BaseImage {
 	protected void opacity( double opacity ) {
 		instructions.add( new CompositeInstruction( AlphaComposite.getInstance( AlphaComposite.SRC_OVER, (float)opacity ) ) );
 	}
-	
+
 	protected void draw( BaseImage image ) {
 		image.render();
 		instructions.addAll( image.instructions );
@@ -275,7 +277,7 @@ public abstract class BaseImage {
 	}
 
 	protected void draw( Shape shape, Paint paint, Stroke stroke ) {
-		if( paint == null ) paint = getColor( -0.75 );
+		if( paint == null ) paint = getColor( OUTLINE_COLOR_FACTOR );
 		if( stroke == null ) stroke = new BasicStroke( (float)outlineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 		instructions.add( new DrawInstruction( shape, paint, stroke ) );
 	}
@@ -293,7 +295,7 @@ public abstract class BaseImage {
 	}
 
 	protected void draw( Text text, Paint paint, Stroke stroke ) {
-		if( paint == null ) paint = getColor( -0.75 );
+		if( paint == null ) paint = getColor( OUTLINE_COLOR_FACTOR );
 		if( stroke == null ) stroke = new BasicStroke( (float)outlineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 		instructions.add( new TextInstruction( text, paint, stroke ) );
 	}
@@ -669,7 +671,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics) {
+		public void paint( Graphics2D graphics ) {
 			graphics.translate( this.x, this.y );
 		}
 	}
@@ -761,7 +763,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics) {
+		public void paint( Graphics2D graphics ) {
 			graphics.setPaint( paint );
 			graphics.setStroke( stroke );
 			//graphics.translate( x, y );

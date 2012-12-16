@@ -148,7 +148,7 @@ public class Icons {
 	public static void proof( Icon icon, ImageFilter filter, int animationDelay ) {
 		SamplePanel panel = new SamplePanel( icon, filter, animationDelay );
 		JOptionPane.showMessageDialog( null, panel, null, JOptionPane.PLAIN_MESSAGE );
-		if( icon instanceof AnimatedIcon ) ((AnimatedIcon)icon).stopAnimation();
+		if( icon instanceof AnimatedIcon ) ( (AnimatedIcon)icon ).stopAnimation();
 	}
 
 	private static class SamplePanel extends JComponent implements ActionListener {
@@ -180,7 +180,7 @@ public class Icons {
 			setBackground( new Color( 220, 220, 220 ) );
 			setBackground( Color.WHITE );
 
-			if( icon instanceof AnimatedIcon ) ((AnimatedIcon)icon).startAnimation( this, animateDelay );
+			if( icon instanceof AnimatedIcon ) ( (AnimatedIcon)icon ).startAnimation( this, animateDelay );
 		}
 
 		@Override
@@ -197,16 +197,18 @@ public class Icons {
 
 			paintIcon( graphics, 0, 0, 256, true );
 			paintZoomedIcon( graphics, 256, 0, 16, false );
+			paintZoomedIcon( graphics, 256, 256, 24, false );
 
-			paintIcon( graphics, 0, 256, 256, false );
-			paintIcon( graphics, 256, 256, 128, false );
-			paintIcon( graphics, 384, 384, 64, false );
-			paintIcon( graphics, 448, 448, 32, false );
-			paintIcon( graphics, 480, 480, 16, false );
+			int x = 0;
+			int y = 256;
+			paintIcon( graphics, x + 0, y + 0, 128, false );
+			paintIcon( graphics, x + 128, y + 128, 64, false );
+			paintIcon( graphics, x + 192, y + 192, 32, false );
+			paintIcon( graphics, x + 224, y + 224, 16, false );
 
 			// Center 448
-			paintIcon( graphics, 436, 308, 24, false );
-			paintIcon( graphics, 296, 420, 48, false );
+			paintIcon( graphics, x + 180, y + 52, 24, false );
+			paintIcon( graphics, x + 40, y + 164, 48, false );
 		}
 
 		@Override
@@ -245,11 +247,13 @@ public class Icons {
 		}
 
 		private Image createBackgroundImage() {
-			Image image = new BufferedImage( 16, 16, BufferedImage.TYPE_INT_RGB );
+			int count = 24;
+			
+			Image image = new BufferedImage( count, count, BufferedImage.TYPE_INT_RGB );
 
 			Graphics graphics = image.getGraphics();
-			for( int x = 0; x < 16; x++ ) {
-				for( int y = 0; y < 16; y++ ) {
+			for( int x = 0; x < count; x++ ) {
+				for( int y = 0; y < count; y++ ) {
 					graphics.setColor( ( x + y ) % 2 == 0 ? Color.WHITE : Color.LIGHT_GRAY );
 					graphics.fillRect( x, y, 1, 1 );
 				}

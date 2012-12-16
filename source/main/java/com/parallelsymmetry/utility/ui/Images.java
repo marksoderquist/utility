@@ -9,13 +9,15 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
+import java.awt.image.MemoryImageSource;
+import java.awt.image.PixelGrabber;
 import java.awt.image.RGBImageFilter;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
-public class Images {
+public final class Images {
 
 	/**
 	 * Forces pixels to opaque or transparent.
@@ -62,12 +64,12 @@ public class Images {
 		JOptionPane.showMessageDialog( null, border, null, JOptionPane.PLAIN_MESSAGE );
 	}
 
-	public static final Image filter( Image image, ImageFilter filter ) {
+	public static Image filter( Image image, ImageFilter filter ) {
 		if( filter == null ) return image;
 		return Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( image.getSource(), filter ) );
 	}
 
-	public static final BufferedImage filter( BufferedImage image, ImageFilter filter ) {
+	public static BufferedImage filter( BufferedImage image, ImageFilter filter ) {
 		if( image == null ) return null;
 		if( filter == null ) return image;
 
@@ -81,11 +83,11 @@ public class Images {
 		return result;
 	}
 
-	public static final BufferedImage scale( Image image, int width, int height ) {
+	public static BufferedImage scale( Image image, int width, int height ) {
 		return scale( image, width, height, BufferedImage.TYPE_INT_ARGB );
 	}
 
-	public static final BufferedImage scale( Image image, int width, int height, int type ) {
+	public static BufferedImage scale( Image image, int width, int height, int type ) {
 		Image result = image;
 		BufferedImage buffer = null;
 
@@ -119,6 +121,37 @@ public class Images {
 		} while( w != width || h != height );
 
 		return buffer;
+	}
+
+	public static byte[] getArrayFromImage( Image image ) throws InterruptedException {
+		int width = image.getWidth( null );
+		int height = image.getHeight( null );
+
+		int[] pixels = new int[width * height];
+		PixelGrabber grabber = new PixelGrabber( image, 0, 0, width, height, pixels, 0, width );
+
+		// Grab the pixel data.
+		grabber.grabPixels();
+		return convertIntsToBytes( pixels );
+	}
+
+	public static Image getImageFromArray( int[] pixels, int width, int height ) {
+		MemoryImageSource source = new MemoryImageSource( width, height, pixels, 0, width );
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		return toolkit.createImage( source );
+	}
+
+	private static byte[] convertIntsToBytes( int[] ints ) {
+		int length = ints.length;
+		byte[] bytes = new byte[length * 4];
+		for( int index = 0; index < length; index++ ) {
+			int value = ints[index];
+			bytes[index * 4 + 0] = (byte)( value >> 0 );
+			bytes[index * 4 + 1] = (byte)( value >> 8 );
+			bytes[index * 4 + 2] = (byte)( value >> 16 );
+			bytes[index * 4 + 3] = (byte)( value >> 24 );
+		}
+		return bytes;
 	}
 
 }
