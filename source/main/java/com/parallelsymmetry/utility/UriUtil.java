@@ -12,6 +12,8 @@ public final class UriUtil {
 		if( ref == null ) return null;
 		if( uri == null ) return ref;
 
+		// NEXT If two URIs are absolute, this method causes double schemes.
+		
 		Deque<String> queue = new LinkedList<String>();
 
 		while( uri.isOpaque() ) {
