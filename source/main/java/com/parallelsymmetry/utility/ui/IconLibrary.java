@@ -162,6 +162,7 @@ public class IconLibrary {
 	public BufferedImage getImage( Icon icon ) {
 		if( icon == null ) icon = icons.get( BROKEN );
 
+		// FIXME Something is keeping the image data in memory during unit tests.
 		BufferedImage image = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 		Graphics graphics = image.getGraphics();
 		icon.paintIcon( null, graphics, 0, 0 );
@@ -463,6 +464,7 @@ public class IconLibrary {
 		public String toString() {
 			return name;
 		}
+		
 		private Icon getRenderedIcon() {
 			if( renderedIcon == null ) renderedIcon = createRenderedIcon( icon, size, filter );
 			return renderedIcon;
