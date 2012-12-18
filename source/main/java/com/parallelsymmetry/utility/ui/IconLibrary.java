@@ -350,7 +350,7 @@ public class IconLibrary {
 	 * <code>BufferedImage</code> the size of the icon and painting the icon on
 	 * the image's graphics object.
 	 */
-	private Icon createRenderedIcon( Icon icon, ImageFilter filter ) {
+	private ImageIcon createRenderedIcon( Icon icon, ImageFilter filter ) {
 		return createRenderedIcon( icon, icon.getIconWidth(), icon.getIconHeight(), filter );
 	}
 
@@ -359,7 +359,7 @@ public class IconLibrary {
 	 * <code>BufferedImage</code> the size of the icon and painting the icon on
 	 * the image's graphics object.
 	 */
-	private Icon createRenderedIcon( Icon icon, int size, ImageFilter filter ) {
+	private ImageIcon createRenderedIcon( Icon icon, int size, ImageFilter filter ) {
 		return createRenderedIcon( icon, size, size, filter );
 	}
 
@@ -368,7 +368,7 @@ public class IconLibrary {
 	 * <code>BufferedImage</code> the size of the icon and painting the icon on
 	 * the image's graphics object.
 	 */
-	private Icon createRenderedIcon( Icon icon, int width, int height, ImageFilter filter ) {
+	private ImageIcon createRenderedIcon( Icon icon, int width, int height, ImageFilter filter ) {
 		// Create the rendered image from the icon.
 		Image image = getImage( icon );
 
@@ -421,7 +421,7 @@ public class IconLibrary {
 		/**
 		 * The rendered icon.
 		 */
-		private Icon renderedIcon;
+		private ImageIcon renderedIcon;
 
 		/**
 		 * Construct a <code>IconProxy</code>.
@@ -463,7 +463,6 @@ public class IconLibrary {
 		public String toString() {
 			return name;
 		}
-
 		private Icon getRenderedIcon() {
 			if( renderedIcon == null ) renderedIcon = createRenderedIcon( icon, size, filter );
 			return renderedIcon;
