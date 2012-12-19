@@ -90,8 +90,6 @@ public class Settings {
 
 	private Map<SettingProvider, String> mounts;
 
-	private Map<String, Object> resources;
-
 	private Map<String, Set<SettingListener>> listeners;
 
 	/**
@@ -116,7 +114,6 @@ public class Settings {
 	public Settings( SettingProvider defaultProvider, String mount ) {
 		providers = new CopyOnWriteArrayList<SettingProvider>();
 		mounts = new ConcurrentHashMap<SettingProvider, String>();
-		resources = new ConcurrentHashMap<String, Object>();
 		listeners = new ConcurrentHashMap<String, Set<SettingListener>>();
 		root = this;
 		path = "/";
@@ -738,14 +735,6 @@ public class Settings {
 				put( path + SEPARATOR + ITEM_CLASS, map.values().iterator().next().getClass().getName() );
 			}
 		}
-	}
-
-	public Object getResource( String key ) {
-		return root.resources.get( key );
-	}
-
-	public void putResource( String key, Object object ) {
-		root.resources.put( key, object );
 	}
 
 	/**

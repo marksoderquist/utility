@@ -655,14 +655,6 @@ public class SettingsTest extends TestCase {
 		assertEquals( "setting", Settings.getSettingKey( "/path/to/setting" ) );
 	}
 
-	public void testSettingResources() {
-		String key = "key";
-		String object = new String( "value" );
-		settings.putResource( key, object );
-		assertEquals( object, settings.getResource( key ) );
-		assertEquals( object, settings.getNode( "/test/path" ).getResource( key ) );
-	}
-
 	protected void showProviderData( Settings settings ) {
 		int pCount = settings.getProviderCount();
 		for( int pIndex = 0; pIndex < pCount; pIndex++ ) {
