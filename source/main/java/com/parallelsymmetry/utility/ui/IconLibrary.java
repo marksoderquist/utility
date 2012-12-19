@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.SoftReference;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -162,7 +163,6 @@ public class IconLibrary {
 	public BufferedImage getImage( Icon icon ) {
 		if( icon == null ) icon = icons.get( BROKEN );
 
-		// FIXME Something is keeping the image data in memory during unit tests.
 		BufferedImage image = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
 		Graphics graphics = image.getGraphics();
 		icon.paintIcon( null, graphics, 0, 0 );
@@ -421,7 +421,7 @@ public class IconLibrary {
 		/**
 		 * The rendered icon.
 		 */
-		private ImageIcon renderedIcon;
+		private SoftReference<ImageIcon> renderedIcon;
 
 		/**
 		 * Construct a <code>IconProxy</code>.
@@ -463,10 +463,14 @@ public class IconLibrary {
 		public String toString() {
 			return name;
 		}
-		
+
 		private Icon getRenderedIcon() {
-			if( renderedIcon == null ) renderedIcon = createRenderedIcon( icon, size, filter );
-			return renderedIcon;
+			ImageIcon icon = renderedIcon == null ? null : renderedIcon.get();
+			if( icon == null ) {
+				icon = createRenderedIcon( this.icon, size, filter );
+				renderedIcon = new SoftReference<ImageIcon>( icon );
+			}
+			return icon;
 		}
 
 	}
