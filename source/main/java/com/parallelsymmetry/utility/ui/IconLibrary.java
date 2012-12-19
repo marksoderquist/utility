@@ -280,7 +280,6 @@ public class IconLibrary {
 	private IconProxy getProxiedIcon( URI uri, int size, ImageFilter filter ) {
 		if( uri == null ) return getProxiedIcon( (String)null, size, filter );
 
-		// NEXT Implement getProxiedIcon( URI, int, ImageFilter )
 		IconProxy proxy = null;
 		String name = HashUtil.hash( uri.toString() );
 		String key = name + ":" + size;
