@@ -40,7 +40,8 @@ public class IconLibraryTest extends TestCase {
 	}
 
 	public void testGetIconWithNull() {
-		assertEquals( "broken", library.getIcon( (URI)null ).toString() );
+		//assertEquals( "broken", library.getIcon( (URI)null ).toString() );
+		assertNull( library.getIcon( (URI)null ) );
 	}
 
 	public void testGetIcon() throws Exception {

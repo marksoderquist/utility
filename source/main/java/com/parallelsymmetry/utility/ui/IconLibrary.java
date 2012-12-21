@@ -278,7 +278,8 @@ public class IconLibrary {
 	}
 
 	private IconProxy getProxiedIcon( URI uri, int size, ImageFilter filter ) {
-		if( uri == null ) return getProxiedIcon( (String)null, size, filter );
+		//if( uri == null ) return getProxiedIcon( (String)null, size, filter );
+		if( uri == null ) return null;
 
 		IconProxy proxy = null;
 		String name = HashUtil.hash( uri.toString() );
@@ -304,8 +305,6 @@ public class IconLibrary {
 				Log.write( Log.DEBUG, "Download icon: " + uri );
 				try {
 					input = uri.toURL().openStream();
-					
-					// NEXT FileNotFoundException loading file.
 					output = new FileOutputStream( file );
 					IoUtil.copy( input, output );
 				} catch( IOException exception ) {
@@ -338,7 +337,8 @@ public class IconLibrary {
 		}
 
 		// If there is still no renderer use the broken icon.
-		if( renderer == null ) renderer = icons.get( BROKEN );
+		//if( renderer == null ) renderer = icons.get( BROKEN );
+		if( renderer == null ) return null;
 
 		// Create a new icon proxy.
 		proxy = new IconProxy( name, renderer, size, filter );
