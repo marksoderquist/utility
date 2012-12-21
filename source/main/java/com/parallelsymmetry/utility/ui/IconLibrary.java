@@ -304,6 +304,8 @@ public class IconLibrary {
 				Log.write( Log.DEBUG, "Download icon: " + uri );
 				try {
 					input = uri.toURL().openStream();
+					
+					// NEXT FileNotFoundException loading file.
 					output = new FileOutputStream( file );
 					IoUtil.copy( input, output );
 				} catch( IOException exception ) {
