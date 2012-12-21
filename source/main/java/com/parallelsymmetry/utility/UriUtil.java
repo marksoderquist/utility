@@ -12,20 +12,22 @@ public final class UriUtil {
 		if( ref == null ) return null;
 		if( uri == null ) return ref;
 
-		// NEXT If two URIs are absolute, this method causes double schemes.
-		
 		Deque<String> queue = new LinkedList<String>();
 
-		while( uri.isOpaque() ) {
-			queue.add( uri.getScheme() );
-			uri = URI.create( uri.getRawSchemeSpecificPart() );
+		if( "jar".equals( uri.getScheme() ) ) {
+			while( uri.isOpaque() ) {
+				queue.add( uri.getScheme() );
+				uri = URI.create( uri.getRawSchemeSpecificPart() );
+			}
 		}
 
 		uri = uri.resolve( ref );
 
-		String scheme = null;
-		while( ( scheme = queue.pollLast() ) != null ) {
-			uri = URI.create( scheme + ":" + uri.toString() );
+		if( "file".equals( uri.getScheme() ) ) {
+			String scheme = null;
+			while( ( scheme = queue.pollLast() ) != null ) {
+				uri = URI.create( scheme + ":" + uri.toString() );
+			}
 		}
 
 		return uri;

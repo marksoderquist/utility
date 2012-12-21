@@ -25,6 +25,9 @@ public class UriUtilTest extends TestCase {
 		assertEquals( URI.create( "file:/test/folder/relative" ), UriUtil.resolve( absolute, relative ) );
 
 		assertEquals( URI.create( "jar:file:/test/folder%20with%20spaces/file.jar!/path/to/relative" ), UriUtil.resolve( jar, relative ) );
+
+		URI icon = URI.create( "http://www.parallelsymmetry.com/images/icons/escape.png" );
+		assertEquals( URI.create( "http://www.parallelsymmetry.com/images/icons/escape.png" ), UriUtil.resolve( jar, icon ) );
 	}
 
 	public void testGetParent() {
