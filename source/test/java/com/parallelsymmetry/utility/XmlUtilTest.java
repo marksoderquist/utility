@@ -1,5 +1,7 @@
 package com.parallelsymmetry.utility;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 
@@ -7,8 +9,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.w3c.dom.Document;
-
-import com.parallelsymmetry.utility.XmlUtil;
 
 public class XmlUtilTest extends TestCase {
 
@@ -46,26 +46,39 @@ public class XmlUtilTest extends TestCase {
 
 	@Test
 	public void testFormat() throws Exception {
-		// FIXME This test is platform dependent.
-		//		String data = "<tag><indent/></tag>";
-		//		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n  <indent/>\n</tag>";
-		//		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
-		//		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		//
-		//		XmlUtil.format( input, output );
-		//		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
+		String data = "<tag><indent/></tag>";
+		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tag>\n  <indent/>\n</tag>";
+
+		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		XmlUtil.format( input, output );
+
+		// As of Java 7, the transformer creates slightly different output.
+		Version current = new Version( System.getProperty( "java.version" ) );
+		if( current.compareTo( new Version( "1.7" ) ) >= 0 ) {
+			test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n  <indent/>\n</tag>";
+		}
+
+		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 
 	@Test
 	public void testFormatWithIndentSize() throws Exception {
-		// FIXME This test is platform dependent.
-		//		String data = "<tag><indent/></tag>";
-		//		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
-		//		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
-		//		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		//
-		//		XmlUtil.format( input, output, 3 );
-		//		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
+		String data = "<tag><indent/></tag>";
+		String test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<tag>\n   <indent/>\n</tag>";
+		ByteArrayInputStream input = new ByteArrayInputStream( data.getBytes() );
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		XmlUtil.format( input, output, 3 );
+
+		// As of Java 7, the transformer creates slightly different output.
+		Version current = new Version( System.getProperty( "java.version" ) );
+		if( current.compareTo( new Version( "1.7" ) ) >= 0 ) {
+			test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
+		}
+		
+		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 
 	public void testGetPath() throws Exception {

@@ -143,6 +143,9 @@ public class XmlUtil {
 		try {
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
+			transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "no" );
+			transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
+			transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
 			transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
 			transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", String.valueOf( indent ) );
 			transformer.transform( source, result );
