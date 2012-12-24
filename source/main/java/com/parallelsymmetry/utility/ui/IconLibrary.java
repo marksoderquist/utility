@@ -197,10 +197,6 @@ public class IconLibrary {
 		icons.put( name, renderer );
 	}
 
-	public void addSearchPath( String path ) {
-		addSearchPath( path, getClass().getClassLoader() );
-	}
-
 	/**
 	 * Add path to the search paths.
 	 * 

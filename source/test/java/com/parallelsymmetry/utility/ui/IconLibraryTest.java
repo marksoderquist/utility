@@ -33,7 +33,7 @@ public class IconLibraryTest extends TestCase {
 
 	public void testGetIconUrl() throws Exception {
 		IconLibrary library = new IconLibrary();
-		library.addSearchPath( JavaUtil.getPackagePath( getClass() ) );
+		library.addSearchPath( JavaUtil.getPackagePath( getClass() ), getClass().getClassLoader() );
 
 		assertNull( "Null icon should not be found and was.", Accessor.callMethod( library, "getIconUrl", "null" ) );
 		assertNotNull( "Test icon should be found and was not.", Accessor.callMethod( library, "getIconUrl", "test" ) );
