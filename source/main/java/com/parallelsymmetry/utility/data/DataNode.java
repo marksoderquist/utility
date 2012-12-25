@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.utility.ObjectUtil;
-import com.parallelsymmetry.utility.log.Log;
 
 public abstract class DataNode {
 
@@ -54,44 +53,6 @@ public abstract class DataNode {
 		} else {
 			unmodify();
 		}
-	}
-
-	/**
-	 * Set the modified flag for this node.
-	 */
-	protected void modify() {
-		if( modified ) return;
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-		getTransaction().add( new ModifyAction( this ) );
-		if( atomic ) getTransaction().commit();
-	}
-
-	/**
-	 * Clear the modified flag for this node and all child nodes.
-	 */
-	protected void unmodify() {
-		if( !modified ) return;
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-		getTransaction().add( new UnmodifyAction( this ) );
-
-		// Clear the modified flag of any attribute nodes.
-		if( attributes != null ) {
-			for( Object child : attributes.values() ) {
-				if( child instanceof DataNode ) {
-					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) {
-						childNode.setTransaction( getTransaction() );
-						childNode.unmodify();
-					}
-				}
-			}
-		}
-
-		if( atomic ) getTransaction().commit();
 	}
 
 	/**
@@ -321,6 +282,44 @@ public abstract class DataNode {
 	}
 
 	/**
+	 * Set the modified flag for this node.
+	 */
+	protected void modify() {
+		if( modified ) return;
+
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+		getTransaction().add( new ModifyAction( this ) );
+		if( atomic ) getTransaction().commit();
+	}
+
+	/**
+	 * Clear the modified flag for this node and all child nodes.
+	 */
+	protected void unmodify() {
+		if( !modified ) return;
+
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+		getTransaction().add( new UnmodifyAction( this ) );
+
+		// Clear the modified flag of any attribute nodes.
+		if( attributes != null ) {
+			for( Object child : attributes.values() ) {
+				if( child instanceof DataNode ) {
+					DataNode childNode = (DataNode)child;
+					if( childNode.isModified() ) {
+						childNode.setTransaction( getTransaction() );
+						childNode.unmodify();
+					}
+				}
+			}
+		}
+
+		if( atomic ) getTransaction().commit();
+	}
+
+	/**
 	 * Compares the object using the class and attributes for equality testing.
 	 */
 	protected boolean equalsUsingAttributes( Object object ) {
@@ -342,7 +341,6 @@ public abstract class DataNode {
 			if( modifiedAttributeCount < 0 ) modifiedAttributeCount = 0;
 		}
 
-		Log.write( Log.WARN, "Modified attribute count( " + toString() + "): " + modifiedAttributeCount );
 		updateModifiedFlag();
 	}
 

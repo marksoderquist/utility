@@ -6,12 +6,6 @@ import java.util.Collection;
 import org.junit.Test;
 
 import com.parallelsymmetry.utility.Accessor;
-import com.parallelsymmetry.utility.data.DataAttributeEvent;
-import com.parallelsymmetry.utility.data.DataChangedEvent;
-import com.parallelsymmetry.utility.data.DataEvent;
-import com.parallelsymmetry.utility.data.DataListener;
-import com.parallelsymmetry.utility.data.DataNode;
-import com.parallelsymmetry.utility.data.MetaAttributeEvent;
 
 public class DataNodeTest extends DataTestCase {
 
@@ -229,23 +223,6 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 3, 3, 1 );
 	}
-
-	//	@Test
-	//	public void testIsModifiedByCollectionAttributes() {
-	//		MockDataNode node = new MockDataNode();
-	//
-	//		String COLLECTION = "collection";
-	//		node.setAttribute( COLLECTION, new CopyOnWriteArraySet<String>() );
-	//
-	//		node.clearModified();
-	//		assertFalse( node.isModified() );
-	//
-	//		node.addElement( COLLECTION, "test" );
-	//		assertTrue( node.isModified() );
-	//
-	//		node.removeElement( COLLECTION, "test" );
-	//		assertFalse( node.isModified() );
-	//	}
 
 	@Test
 	public void testUnmodifiedByUnsetAttribute() {
