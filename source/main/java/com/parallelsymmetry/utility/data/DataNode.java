@@ -314,11 +314,45 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
-//	@Override
-//	public boolean equals( Object object ) {
-//		// TODO Might need to enhance constructor to select equals method.
-//		return equalsUsingAttributes( object );
-//	}
+	//	@Override
+	//	public boolean equals( Object object ) {
+	//		return equalsUsingAttributes( object );
+	//	}
+
+	/**
+	 * Compares the object using the class and attributes for equality testing.
+	 */
+	public boolean equalsUsingAttributes( Object object ) {
+		if( !( object instanceof DataNode ) ) return false;
+	
+		DataNode that = (DataNode)object;
+	
+		Map<String, Object> thisAttr = this.attributes;
+		Map<String, Object> thatAttr = that.attributes;
+	
+		if( thisAttr == null && thatAttr == null ) return true;
+		if( thisAttr == null && thatAttr != null ) return false;
+		if( thisAttr != null && thatAttr == null ) return false;
+	
+		if( thisAttr.size() != thatAttr.size() ) return false;
+	
+		Set<String> thisKeys = thisAttr.keySet();
+		Set<String> thatKeys = thatAttr.keySet();
+		for( String key : thisKeys ) {
+			if( !thatKeys.contains( key ) ) return false;
+	
+			Object thisObject = thisAttr.get( key );
+			Object thatObject = thatAttr.get( key );
+	
+			if( thisObject instanceof DataNode ) {
+				if( !( (DataNode)thisObject ).equalsUsingAttributes( thatObject ) ) return false;
+			} else {
+				if( !ObjectUtil.areEqual( thisObject, thatObject ) ) return false;
+			}
+		}
+	
+		return true;
+	}
 
 	/**
 	 * Set the modified flag for this node.
@@ -356,17 +390,6 @@ public abstract class DataNode {
 		}
 
 		if( atomic ) getTransaction().commit();
-	}
-
-	/**
-	 * Compares the object using the class and attributes for equality testing.
-	 */
-	protected boolean equalsUsingAttributes( Object object ) {
-		if( !( object instanceof DataNode ) ) return false;
-
-		DataNode that = (DataNode)object;
-
-		return this.getClass() == that.getClass() && ObjectUtil.areEqual( this.attributes, that.attributes );
 	}
 
 	protected void attributeNodeModified( boolean modified ) {

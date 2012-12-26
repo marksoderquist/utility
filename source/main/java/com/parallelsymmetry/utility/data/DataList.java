@@ -240,6 +240,39 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 //		return equalsUsingAttributesAndChildren( object );
 //	}
 
+	public boolean equalsUsingChildren( Object object ) {
+		if( !( object instanceof DataList<?> ) ) return false;
+	
+		DataList<?> that = (DataList<?>)object;
+	
+		List<? extends DataNode> thisChildren = this.children;
+		List<? extends DataNode> thatChildren = that.children;
+	
+		if( thisChildren == null && thatChildren == null ) return true;
+		if( thisChildren == null && thatChildren != null ) return false;
+		if( thisChildren != null && thatChildren == null ) return false;
+	
+		if( thisChildren.size() != thatChildren.size() ) return false;
+		int count = thisChildren.size();
+		for( int index = 0; index < count; index++ ) {
+			DataNode thisChild = thisChildren.get( index );
+			DataNode thatChild = thatChildren.get( index );
+	
+			if( !thisChild.equalsUsingAttributes( thatChild ) ) return false;
+	
+			if( thisChild instanceof DataList<?> ) {
+				if( !( thatChild instanceof DataList<?> ) ) return false;
+				if( !( (DataList<?>)thisChild ).equalsUsingChildren( thatChild ) ) return false;
+			}
+		}
+	
+		return true;
+	}
+
+	public boolean equalsUsingAttributesAndChildren( Object object ) {
+		return equalsUsingAttributes( object ) & equalsUsingChildren( object );
+	}
+
 	@Override
 	protected void unmodify() {
 		if( !modified ) return;
@@ -263,39 +296,6 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		}
 
 		if( atomic ) getTransaction().commit();
-	}
-
-	protected boolean equalsUsingChildren( Object object ) {
-		if( !( object instanceof DataList<?> ) ) return false;
-
-		DataList<?> that = (DataList<?>)object;
-
-		List<? extends DataNode> thisChildren = this.children;
-		List<? extends DataNode> thatChildren = that.children;
-
-		if( thisChildren == null && thatChildren == null ) return true;
-		if( thisChildren == null && thatChildren != null ) return false;
-		if( thisChildren != null && thatChildren == null ) return false;
-
-		if( thisChildren.size() != thatChildren.size() ) return false;
-		int count = thisChildren.size();
-		for( int index = 0; index < count; index++ ) {
-			DataNode thisChild = thisChildren.get( index );
-			DataNode thatChild = thatChildren.get( index );
-
-			if( !thisChild.equalsUsingAttributes( thatChild ) ) return false;
-
-			if( thisChild instanceof DataList<?> ) {
-				if( !( thatChild instanceof DataList<?> ) ) return false;
-				if( !( (DataList<?>)thisChild ).equalsUsingChildren( thatChild ) ) return false;
-			}
-		}
-
-		return true;
-	}
-
-	protected boolean equalsUsingAttributesAndChildren( Object object ) {
-		return equalsUsingAttributes( object ) & equalsUsingChildren( object );
 	}
 
 	protected void childNodeModified( boolean modified ) {
