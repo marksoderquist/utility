@@ -1,7 +1,9 @@
 package com.parallelsymmetry.utility.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,9 +19,7 @@ public abstract class DataNode {
 
 	protected boolean modified;
 
-	protected DataNode parent;
-
-	protected Transaction transaction;
+	protected Set<DataNode> parents = new CopyOnWriteArraySet<DataNode>();
 
 	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
@@ -32,6 +32,8 @@ public abstract class DataNode {
 	private Map<String, Object> modifiedAttributes;
 
 	private Map<String, Object> resources;
+
+	protected Transaction transaction;
 
 	/**
 	 * Is the node modified. The node is modified if any attribute has been
@@ -109,7 +111,7 @@ public abstract class DataNode {
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
-		if( newValue instanceof DataNode ) isolateNode( (DataNode)newValue );
+		if( newValue instanceof DataNode ) checkForCircularReference( (DataNode)newValue );
 		getTransaction().add( new SetAttributeAction( this, name, oldValue, newValue ) );
 		if( atomic ) getTransaction().commit();
 	}
@@ -169,8 +171,8 @@ public abstract class DataNode {
 	 * 
 	 * @return The parent node or null if there is no parent.
 	 */
-	public DataNode getParent() {
-		return parent;
+	public Set<DataNode> getParents() {
+		return Collections.unmodifiableSet( parents );
 	}
 
 	/**
@@ -194,7 +196,7 @@ public abstract class DataNode {
 		DataNode parent = this;
 		while( parent != stop ) {
 			count++;
-			parent = parent.getParent();
+			//parent = parent.getParent();
 		}
 
 		if( stop != null ) count++;
@@ -203,10 +205,34 @@ public abstract class DataNode {
 		DataNode[] path = new DataNode[count];
 		for( int index = count - 1; index > -1; index-- ) {
 			path[index] = parent;
-			parent = parent.getParent();
+			//parent = parent.getParent();
 		}
 
 		return path;
+	}
+
+	public Set<List<DataNode>> getNodePaths() {
+		return getNodePaths( null );
+	}
+
+	public Set<List<DataNode>> getNodePaths( DataNode stop ) {
+		Set<List<DataNode>> paths = new HashSet<List<DataNode>>();
+
+		if( this == stop || parents.size() == 0 ) {
+			List<DataNode> path = new ArrayList<DataNode>();
+			path.add( this );
+			paths.add( path );
+		} else {
+			for( DataNode parent : parents ) {
+				System.out.println( "Parent: " + parent );
+				for( List<DataNode> path : parent.getNodePaths( stop ) ) {
+					path.add( this );
+					paths.add( path );
+				}
+			}
+		}
+
+		return paths;
 	}
 
 	/**
@@ -257,8 +283,20 @@ public abstract class DataNode {
 		return transaction;
 	}
 
+	/**
+	 * Warning: If there are two active transactions this method will return
+	 * inconsistent results.
+	 * 
+	 * @return
+	 */
 	public final Transaction getTransaction() {
-		if( transaction == null && parent != null ) return parent.getTransaction();
+		if( transaction == null ) {
+			for( DataNode parent : parents ) {
+				Transaction transaction = parent.getTransaction();
+				if( transaction != null ) return transaction;
+			}
+		}
+
 		return transaction;
 	}
 
@@ -276,10 +314,11 @@ public abstract class DataNode {
 		listeners.remove( listener );
 	}
 
-	@Override
-	public boolean equals( Object object ) {
-		return equalsUsingAttributes( object );
-	}
+//	@Override
+//	public boolean equals( Object object ) {
+//		// TODO Might need to enhance constructor to select equals method.
+//		return equalsUsingAttributes( object );
+//	}
 
 	/**
 	 * Set the modified flag for this node.
@@ -370,40 +409,50 @@ public abstract class DataNode {
 		modified = selfModified || modifiedAttributeCount != 0;
 	}
 
-	void setParent( DataNode parent ) {
-		this.parent = parent;
-	}
-
-	/**
-	 * This method removes the specified node from any parent nodes.
-	 */
-	void isolateNode( DataNode node ) {
-		if( getTransaction() == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
-
-		DataNode parent = node.getParent();
-		if( parent == null ) return;
-
-		if( parent.attributes != null ) {
-			// Because Map.containsValue() traverses the map it only decreases performance.
-			String key = null;
-			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
-			while( iterator.hasNext() ) {
-				Map.Entry<String, Object> entry = iterator.next();
-				if( entry.getValue().equals( node ) ) {
-					key = entry.getKey();
-					break;
-				}
-			}
-
-			if( key != null ) {
-				parent.setTransaction( getTransaction() );
-				parent.setAttribute( key, null );
-			}
-		} else if( parent instanceof DataList ) {
-			parent.setTransaction( getTransaction() );
-			( (DataList<?>)parent ).remove( node );
+	protected void checkForCircularReference( DataNode node ) {
+		for( DataNode parent : parents ) {
+			if( parent == node ) throw new RuntimeException( "Circular reference detected: " + node );
 		}
 	}
+
+	void addParent( DataNode parent ) {
+		this.parents.add( parent );
+	}
+
+	void removeParent( DataNode parent ) {
+		this.parents.remove( parent );
+	}
+
+	//	/**
+	//	 * This method removes the specified node from any parent nodes.
+	//	 */
+	//	void isolateNode( DataNode node ) {
+	//		if( getTransaction() == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
+	//
+	//		DataNode parent = node.getParent();
+	//		if( parent == null ) return;
+	//
+	//		if( parent.attributes != null ) {
+	//			// Because Map.containsValue() traverses the map it only decreases performance.
+	//			String key = null;
+	//			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
+	//			while( iterator.hasNext() ) {
+	//				Map.Entry<String, Object> entry = iterator.next();
+	//				if( entry.getValue().equals( node ) ) {
+	//					key = entry.getKey();
+	//					break;
+	//				}
+	//			}
+	//
+	//			if( key != null ) {
+	//				parent.setTransaction( getTransaction() );
+	//				parent.setAttribute( key, null );
+	//			}
+	//		} else if( parent instanceof DataList ) {
+	//			parent.setTransaction( getTransaction() );
+	//			( (DataList<?>)parent ).remove( node );
+	//		}
+	//	}
 
 	private void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
@@ -412,13 +461,11 @@ public abstract class DataNode {
 		// Set the attribute value.
 		if( newValue == null ) {
 			attributes.remove( name );
+			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
 		} else {
 			attributes.put( name, newValue );
+			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
 		}
-
-		// Handle data nodes in attributes.
-		if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
-		if( newValue instanceof DataNode ) ( (DataNode)newValue ).setParent( this );
 
 		// Remove the attribute map if necessary.
 		if( attributes.size() == 0 ) attributes = null;
@@ -443,14 +490,18 @@ public abstract class DataNode {
 		for( DataListener listener : this.listeners ) {
 			listener.dataChanged( event );
 		}
-		if( parent != null ) parent.dispatchEvent( event );
+		for( DataNode parent : parents ) {
+			parent.dispatchEvent( event );
+		}
 	}
 
 	private void fireDataAttributeChanged( DataAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.dataAttributeChanged( event );
 		}
-		if( parent != null ) parent.dispatchEvent( event );
+		for( DataNode parent : parents ) {
+			parent.dispatchEvent( event );
+		}
 	}
 
 	private void fireMetaAttributeChanged( MetaAttributeEvent event ) {

@@ -181,19 +181,19 @@ public class DataListTest extends DataTestCase {
 		MockDataList child2 = new MockDataList();
 
 		node.add( child0 );
-		assertEquals( node, child0.getParent() );
+		assertTrue( child0.getParents().contains( node ) );
 		assertSame( child0, node.get( 0 ) );
 		assertListState( node, true, 0, 1 );
 		assertEventCounts( handler, 1, 0, 1, 1, 0 );
 
 		node.add( child1 );
-		assertEquals( node, child1.getParent() );
+		assertTrue( child1.getParents().contains( node ) );
 		assertSame( child1, node.get( 1 ) );
 		assertListState( node, true, 0, 2 );
 		assertEventCounts( handler, 2, 0, 1, 2, 0 );
 
 		node.add( child2 );
-		assertEquals( node, child2.getParent() );
+		assertTrue( child2.getParents().contains( node ) );
 		assertSame( child2, node.get( 2 ) );
 		assertListState( node, true, 0, 3 );
 		assertEventCounts( handler, 3, 0, 1, 3, 0 );
@@ -212,13 +212,13 @@ public class DataListTest extends DataTestCase {
 		node.add( child2 );
 		transaction.commit();
 
-		assertEquals( node, child0.getParent() );
+		assertTrue( child0.getParents().contains( node ) );
 		assertSame( child0, node.get( 0 ) );
 
-		assertEquals( node, child1.getParent() );
+		assertTrue( child1.getParents().contains( node ) );
 		assertSame( child1, node.get( 1 ) );
 
-		assertEquals( node, child2.getParent() );
+		assertTrue( child2.getParents().contains( node ) );
 		assertSame( child2, node.get( 2 ) );
 	}
 
@@ -230,15 +230,15 @@ public class DataListTest extends DataTestCase {
 		MockDataList child2 = new MockDataList();
 
 		node.add( child0 );
-		assertEquals( node, child0.getParent() );
+		assertTrue( child0.getParents().contains( node ) );
 		assertSame( child0, node.get( 0 ) );
 
 		node.add( child2 );
-		assertEquals( node, child2.getParent() );
+		assertTrue( child2.getParents().contains( node ) );
 		assertSame( child2, node.get( 1 ) );
 
 		node.add( 1, child1 );
-		assertEquals( node, child1.getParent() );
+		assertTrue( child1.getParents().contains( node ) );
 		assertSame( child1, node.get( 1 ) );
 	}
 
@@ -254,8 +254,8 @@ public class DataListTest extends DataTestCase {
 		assertEquals( 1, node0.size() );
 
 		node1.add( child );
-		assertTrue( node0.isModified() );
-		assertEquals( 0, node0.size() );
+		assertFalse( node0.isModified() );
+		assertEquals( 1, node0.size() );
 		assertEquals( 1, node1.size() );
 	}
 
@@ -369,7 +369,7 @@ public class DataListTest extends DataTestCase {
 		} catch( IndexOutOfBoundsException exception ) {}
 
 		node.add( child );
-		assertEquals( node, child.getParent() );
+		assertTrue( child.getParents().contains( node ) );
 		assertEquals( child, node.get( 0 ) );
 
 		try {
@@ -383,7 +383,7 @@ public class DataListTest extends DataTestCase {
 		} catch( IndexOutOfBoundsException exception ) {}
 
 		node.remove( 0 );
-		assertNull( child.getParent() );
+		assertEquals( 0, child.getParents().size() );
 		assertEquals( 0, node.size() );
 	}
 
@@ -428,31 +428,17 @@ public class DataListTest extends DataTestCase {
 		MockDataList child = new MockDataList( "child" );
 
 		node0.add( child );
-		node0.unmodify();
+		node0.setModified( false );
+		assertEquals( 1, child.getParents().size() );
 		assertFalse( node0.isModified() );
 		assertEquals( 1, node0.size() );
+		assertTrue( node0.contains( child ) );
 
 		node1.setAttribute( key, child );
-		assertTrue( node0.isModified() );
-		assertEquals( 0, node0.size() );
-		assertEquals( child, node1.getAttribute( key ) );
-	}
-
-	@Test
-	public void testSetAttributeWithUsedAttributeNode() {
-		String key = "key";
-		MockDataList node0 = new MockDataList();
-		MockDataList node1 = new MockDataList();
-		MockDataList child = new MockDataList();
-
-		node0.setAttribute( key, child );
-		node0.unmodify();
+		assertEquals( 2, child.getParents().size() );
 		assertFalse( node0.isModified() );
-		assertEquals( child, node0.getAttribute( key ) );
-
-		node1.setAttribute( key, child );
-		assertTrue( node0.isModified() );
-		assertEquals( 0, node0.size() );
+		assertEquals( 1, node0.size() );
+		assertTrue( node0.contains( child ) );
 		assertEquals( child, node1.getAttribute( key ) );
 	}
 
@@ -942,15 +928,15 @@ public class DataListTest extends DataTestCase {
 
 		node1 = new MockDataList();
 		node2 = new MockDataList();
-		assertTrue( node1.equals( node2 ) );
-		assertTrue( node2.equals( node1 ) );
+		assertFalse( node1.equals( node2 ) );
+		assertFalse( node2.equals( node1 ) );
 
 		node1 = new MockDataList();
 		node2 = new MockDataList();
 		node1.setAttribute( "key", "value" );
 		node2.setAttribute( "key", "value" );
-		assertTrue( node1.equals( node2 ) );
-		assertTrue( node2.equals( node1 ) );
+		assertFalse( node1.equals( node2 ) );
+		assertFalse( node2.equals( node1 ) );
 
 		node1 = new MockDataList();
 		node2 = new MockDataList();
@@ -960,8 +946,8 @@ public class DataListTest extends DataTestCase {
 		child2.setAttribute( "key", "a" );
 		node1.add( child1 );
 		node2.add( child2 );
-		assertTrue( node1.equals( node2 ) );
-		assertTrue( node2.equals( node1 ) );
+		assertFalse( node1.equals( node2 ) );
+		assertFalse( node2.equals( node1 ) );
 
 		child1.setAttribute( "key", "a" );
 		child2.setAttribute( "key", "b" );

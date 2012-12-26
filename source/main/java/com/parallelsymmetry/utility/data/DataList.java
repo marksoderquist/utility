@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.parallelsymmetry.utility.ObjectUtil;
-
 public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private List<T> children;
@@ -47,29 +45,8 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		return treeModified;
 	}
 
-	@Override
-	public void unmodify() {
-		if( !modified ) return;
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-
-		super.unmodify();
-
-		// Clear the modified flag of any child nodes.
-		if( children != null ) {
-			for( Object child : children ) {
-				if( child instanceof DataNode ) {
-					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) {
-						childNode.setTransaction( getTransaction() );
-						childNode.unmodify();
-					}
-				}
-			}
-		}
-
-		if( atomic ) getTransaction().commit();
+	public int getModifiedChildCount() {
+		return modifiedChildCount;
 	}
 
 	@Override
@@ -113,7 +90,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
-		if( element instanceof DataNode ) isolateNode( (DataNode)element );
+		if( element instanceof DataNode ) checkForCircularReference( (DataNode)element );
 		getTransaction().add( new AddChildAction<T>( this, index, element ) );
 		if( atomic ) getTransaction().commit();
 	}
@@ -153,7 +130,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 		boolean atomic = !isTransactionActive();
 		if( atomic ) startTransaction();
-		if( element instanceof DataNode ) isolateNode( (DataNode)element );
+		if( element instanceof DataNode ) checkForCircularReference( (DataNode)element );
 		T result = get( index );
 		getTransaction().add( new RemoveChildAction<T>( this, result ) );
 		getTransaction().add( new AddChildAction<T>( this, index, element ) );
@@ -222,10 +199,6 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		return children == null;
 	}
 
-	public int getModifiedChildCount() {
-		return modifiedChildCount;
-	}
-
 	@Override
 	public Object[] toArray() {
 		if( children == null ) return new Object[0];
@@ -262,16 +235,63 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		return children.subList( fromIndex, toIndex );
 	}
 
+//	@Override
+//	public boolean equals( Object object ) {
+//		return equalsUsingAttributesAndChildren( object );
+//	}
+
 	@Override
-	public boolean equals( Object object ) {
-		return equalsUsingAttributesAndChildren( object );
+	protected void unmodify() {
+		if( !modified ) return;
+
+		boolean atomic = !isTransactionActive();
+		if( atomic ) startTransaction();
+
+		super.unmodify();
+
+		// Clear the modified flag of any child nodes.
+		if( children != null ) {
+			for( Object child : children ) {
+				if( child instanceof DataNode ) {
+					DataNode childNode = (DataNode)child;
+					if( childNode.isModified() ) {
+						childNode.setTransaction( getTransaction() );
+						childNode.unmodify();
+					}
+				}
+			}
+		}
+
+		if( atomic ) getTransaction().commit();
 	}
 
 	protected boolean equalsUsingChildren( Object object ) {
 		if( !( object instanceof DataList<?> ) ) return false;
 
 		DataList<?> that = (DataList<?>)object;
-		return ObjectUtil.areEqual( this.children, that.children );
+
+		List<? extends DataNode> thisChildren = this.children;
+		List<? extends DataNode> thatChildren = that.children;
+
+		if( thisChildren == null && thatChildren == null ) return true;
+		if( thisChildren == null && thatChildren != null ) return false;
+		if( thisChildren != null && thatChildren == null ) return false;
+
+		if( thisChildren.size() != thatChildren.size() ) return false;
+		int count = thisChildren.size();
+		for( int index = 0; index < count; index++ ) {
+			DataNode thisChild = thisChildren.get( index );
+			DataNode thatChild = thatChildren.get( index );
+
+			if( !thisChild.equalsUsingAttributes( thatChild ) ) return false;
+
+			if( thisChild instanceof DataList<?> ) {
+				if( !( thatChild instanceof DataList<?> ) ) return false;
+				if( !( (DataList<?>)thisChild ).equalsUsingChildren( thatChild ) ) return false;
+			}
+		}
+
+		return true;
 	}
 
 	protected boolean equalsUsingAttributesAndChildren( Object object ) {
@@ -325,14 +345,18 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		for( DataListener listener : listeners ) {
 			listener.childInserted( event );
 		}
-		if( parent != null ) parent.dispatchEvent( event );
+		for( DataNode parent : parents ) {
+			parent.dispatchEvent( event );
+		}
 	}
 
 	private void fireChildRemovedEvent( DataChildEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.childRemoved( event );
 		}
-		if( parent != null ) parent.dispatchEvent( event );
+		for( DataNode parent : parents ) {
+			parent.dispatchEvent( event );
+		}
 	}
 
 	@Override
@@ -348,7 +372,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( index > children.size() ) index = children.size();
 
 		children.add( index, child );
-		child.setParent( this );
+		child.addParent( this );
 
 		if( addRemoveChildren == null ) {
 			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
@@ -367,7 +391,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private void doRemoveChild( T child ) {
 		children.remove( child );
-		child.setParent( null );
+		child.removeParent( this );
 
 		if( addRemoveChildren == null ) {
 			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();

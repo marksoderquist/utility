@@ -92,22 +92,8 @@ public class Transaction {
 				node.putResource( PREVIOUS_MODIFIED_STATE, null );
 
 				if( newModified != oldModified ) {
-					// Notify the parent.
-					DataNode parent = node.getParent();
-					while( parent != null ) {
-						boolean parentOldModified = parent.isModified();
-						if( parent instanceof DataList ) {
-							( (DataList<?>)parent ).childNodeModified( newModified );
-						} else {
-							parent.attributeNodeModified( newModified );
-						}
-						boolean parentNewModified = parent.isModified();
-
-						// Dispatch events for parent.
-						if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
-
-						parent = parent.getParent();
-					}
+					// Notify the parents.
+					notify( node, oldModified, newModified );
 
 					// A meta attribute change event needs to be sent.
 					node.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
@@ -142,6 +128,23 @@ public class Transaction {
 	@Override
 	public String toString() {
 		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
+	}
+
+	private void notify( DataNode node, boolean oldModified, boolean newModified ) {
+		for( DataNode parent : node.getParents() ) {
+			boolean parentOldModified = parent.isModified();
+			if( parent instanceof DataList ) {
+				( (DataList<?>)parent ).childNodeModified( newModified );
+			} else {
+				parent.attributeNodeModified( newModified );
+			}
+			boolean parentNewModified = parent.isModified();
+	
+			// Dispatch events for parent.
+			if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
+	
+			notify( parent, oldModified, newModified );
+		}
 	}
 
 	private void cleanup() {
