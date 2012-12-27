@@ -410,7 +410,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		updateModifiedFlag();
 	}
 
-	private static class AddChildAction<T extends DataNode> extends Action {
+	private static class AddChildAction<T extends DataNode> extends Operation {
 
 		private DataList<T> list;
 
@@ -426,8 +426,8 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		}
 
 		@Override
-		protected ActionResult process() {
-			ActionResult result = new ActionResult( this );
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
 
 			list.doAddChild( index, child );
 			result.addEvent( new DataChildEvent( DataEvent.Type.INSERT, getData(), index, child ) );
@@ -437,7 +437,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	}
 
-	private static class RemoveChildAction<T extends DataNode> extends Action {
+	private static class RemoveChildAction<T extends DataNode> extends Operation {
 
 		private DataList<T> list;
 
@@ -450,8 +450,8 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		}
 
 		@Override
-		protected ActionResult process() {
-			ActionResult result = new ActionResult( this );
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
 
 			if( list != null && list.children != null ) {
 				int index = list.children.indexOf( child );

@@ -3,18 +3,18 @@ package com.parallelsymmetry.utility.data;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ActionResult {
+public class OperationResult {
 
-	private Action action;
+	private Operation action;
 
 	private List<DataEvent> events;
 
-	public ActionResult( Action action ) {
+	public OperationResult( Operation action ) {
 		this.action = action;
 		this.events = new CopyOnWriteArrayList<DataEvent>();
 	}
 
-	public Action getAction() {
+	public Operation getAction() {
 		return action;
 	}
 

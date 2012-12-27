@@ -533,15 +533,15 @@ public abstract class DataNode {
 		// Do not propagate the meta attribute events to parents.
 	}
 
-	public static class ModifyAction extends Action {
+	public static class ModifyAction extends Operation {
 
 		public ModifyAction( DataNode data ) {
 			super( data );
 		}
 
 		@Override
-		protected ActionResult process() {
-			ActionResult result = new ActionResult( this );
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
 
 			getData().doModify();
 
@@ -550,15 +550,15 @@ public abstract class DataNode {
 
 	}
 
-	private static class UnmodifyAction extends Action {
+	private static class UnmodifyAction extends Operation {
 
 		public UnmodifyAction( DataNode data ) {
 			super( data );
 		}
 
 		@Override
-		protected ActionResult process() {
-			ActionResult result = new ActionResult( this );
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
 
 			getData().doUnmodify();
 
@@ -566,7 +566,7 @@ public abstract class DataNode {
 		}
 	}
 
-	private static class SetAttributeAction extends Action {
+	private static class SetAttributeAction extends Operation {
 
 		private String name;
 
@@ -582,8 +582,8 @@ public abstract class DataNode {
 		}
 
 		@Override
-		protected ActionResult process() {
-			ActionResult result = new ActionResult( this );
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
 
 			getData().doSetAttribute( name, oldValue, newValue );
 

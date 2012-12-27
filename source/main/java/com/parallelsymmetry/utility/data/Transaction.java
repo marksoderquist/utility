@@ -15,7 +15,7 @@ public class Transaction {
 
 	private static final String EVENT_LIST = Transaction.class.getName() + ".eventList";
 
-	private Queue<Action> actions;
+	private Queue<Operation> actions;
 
 	private List<DataNode> nodes;
 
@@ -24,11 +24,11 @@ public class Transaction {
 	private AtomicInteger depth = new AtomicInteger();
 
 	public Transaction() {
-		actions = new ConcurrentLinkedQueue<Action>();
+		actions = new ConcurrentLinkedQueue<Operation>();
 		nodes = new CopyOnWriteArrayList<DataNode>();
 	}
 
-	public void add( Action action ) {
+	public void add( Operation action ) {
 		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
 
 		Log.write( Log.DETAIL, "Transaction: " + toString() + " adding action: " + action );
@@ -53,8 +53,8 @@ public class Transaction {
 			}
 
 			// Process the actions.
-			Action action = null;
-			List<ActionResult> results = new ArrayList<ActionResult>();
+			Operation action = null;
+			List<OperationResult> results = new ArrayList<OperationResult>();
 			while( !actions.isEmpty() ) {
 				action = actions.poll();
 				Log.write( Log.DETAIL, "Transaction: " + toString() + " processing action: " + action );
@@ -62,7 +62,7 @@ public class Transaction {
 			}
 
 			// Collect events from the action results.
-			for( ActionResult result : results ) {
+			for( OperationResult result : results ) {
 				DataNode node = result.getAction().getData();
 
 				List<DataEvent> datumEvents = node.getResource( EVENT_LIST );

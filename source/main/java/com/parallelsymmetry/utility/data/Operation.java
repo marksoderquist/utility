@@ -2,11 +2,11 @@ package com.parallelsymmetry.utility.data;
 
 import com.parallelsymmetry.utility.JavaUtil;
 
-public abstract class Action {
+public abstract class Operation {
 
 	private DataNode data;
 
-	public Action( DataNode data ) {
+	public Operation( DataNode data ) {
 		this.data = data;
 	}
 
@@ -20,6 +20,6 @@ public abstract class Action {
 		return name + "[" + System.identityHashCode( this ) + "]";
 	}
 
-	protected abstract ActionResult process();
+	protected abstract OperationResult process();
 
 }

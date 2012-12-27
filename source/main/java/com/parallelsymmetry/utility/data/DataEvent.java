@@ -3,7 +3,7 @@ package com.parallelsymmetry.utility.data;
 public abstract class DataEvent {
 
 	public enum Type {
-		INSERT, REMOVE, MODIFY
+		MODIFY, INSERT, REMOVE
 	}
 
 	private Type type;

@@ -2,8 +2,8 @@ package com.parallelsymmetry.utility.data;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.utility.data.Action;
-import com.parallelsymmetry.utility.data.ActionResult;
+import com.parallelsymmetry.utility.data.Operation;
+import com.parallelsymmetry.utility.data.OperationResult;
 import com.parallelsymmetry.utility.data.DataAdapter;
 import com.parallelsymmetry.utility.data.DataAttributeEvent;
 import com.parallelsymmetry.utility.data.DataChangedEvent;
@@ -224,15 +224,15 @@ public class TransactionTest extends DataTestCase {
 
 	}
 
-	private class MockAction extends Action {
+	private class MockAction extends Operation {
 
 		public MockAction( DataNode data ) {
 			super( data );
 		}
 
 		@Override
-		public ActionResult process() {
-			ActionResult result = new ActionResult( this );
+		public OperationResult process() {
+			OperationResult result = new OperationResult( this );
 
 			result.addEvent( new DataAttributeEvent( DataEvent.Type.MODIFY, getData(), "name", "value0", "value1" ) );
 
