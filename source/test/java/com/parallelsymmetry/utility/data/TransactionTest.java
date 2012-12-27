@@ -2,16 +2,6 @@ package com.parallelsymmetry.utility.data;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.utility.data.Operation;
-import com.parallelsymmetry.utility.data.OperationResult;
-import com.parallelsymmetry.utility.data.DataAdapter;
-import com.parallelsymmetry.utility.data.DataAttributeEvent;
-import com.parallelsymmetry.utility.data.DataChangedEvent;
-import com.parallelsymmetry.utility.data.DataEvent;
-import com.parallelsymmetry.utility.data.DataNode;
-import com.parallelsymmetry.utility.data.MetaAttributeEvent;
-import com.parallelsymmetry.utility.data.Transaction;
-
 public class TransactionTest extends DataTestCase {
 
 	@Test
@@ -36,11 +26,11 @@ public class TransactionTest extends DataTestCase {
 		assertEventCounts( handler, 1, 3, 1 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute0", null, "value0" );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute1", null, "value1" );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute2", null, "value2" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute0", null, "value0" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute1", null, "value1" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute2", null, "value2" );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -60,8 +50,8 @@ public class TransactionTest extends DataTestCase {
 		assertEventCounts( handler, 1, 1, 0 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.MODIFY, data, "name", "value0", "value1" );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, "name", "value0", "value1" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -134,7 +124,7 @@ public class TransactionTest extends DataTestCase {
 		transaction.commit();
 		assertTrue( parent.isModified() );
 		assertTrue( child.isModified() );
-		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
 		watcher.reset();
 
 		transaction = parent.startTransaction();
@@ -143,7 +133,7 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 
 		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
 		watcher.reset();
 	}
 
@@ -168,7 +158,7 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 
 		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 3, 0, 0 );
 		watcher.reset();
 
 		transaction = parent.startTransaction();
@@ -177,7 +167,7 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 
 		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 3, 0, 0 );
 		watcher.reset();
 	}
 
@@ -245,7 +235,7 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public void dataAttributeChanged( DataAttributeEvent event ) {
-			event.getData().setAttribute( "time", System.nanoTime() );
+			event.getCause().setAttribute( "time", System.nanoTime() );
 		}
 
 	}

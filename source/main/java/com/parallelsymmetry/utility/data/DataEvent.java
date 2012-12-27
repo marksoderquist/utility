@@ -13,13 +13,15 @@ public abstract class DataEvent {
 	private Type type;
 	
 	private Action action;
-
+	
 	private DataNode data;
+	
+	private DataNode cause;
 
-	public DataEvent( Type type, Action action, DataNode data ) {
+	public DataEvent( Type type, Action action, DataNode cause ) {
 		this.type = type;
 		this.action = action;
-		this.data = data;
+		this.cause = cause;
 	}
 	
 	public Type getType() {
@@ -29,9 +31,17 @@ public abstract class DataEvent {
 	public Action getAction() {
 		return action;
 	}
-
+	
 	public DataNode getData() {
 		return data;
+	}
+	
+	public DataNode getCause() {
+		return cause;
+	}
+	
+	void setData( DataNode data ) {
+		this.data = data;
 	}
 
 }

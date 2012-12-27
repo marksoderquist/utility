@@ -316,14 +316,58 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( handler, 3, 3, 2 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.MODIFY, data, "attribute", "value0", "value1" );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.REMOVE, data, "attribute", "value1", null );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute", null, "value0" );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, "attribute", "value0", "value1" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, data, data, "attribute", "value1", null );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEquals( index++, handler.getEvents().size() );
+	}
+
+	public void testParentDataEventNotification() {
+		MockDataNode data = new MockDataNode();
+		MockDataNode child = new MockDataNode();
+		data.setAttribute( "child", child );
+		DataEventHandler handler = data.getDataEventHandler();
+		assertNodeState( child, false, 0 );
+		assertEventCounts( handler, 1, 1, 1 );
+
+		// Insert an attribute.
+		child.setAttribute( "attribute", "value0" );
+		assertNodeState( child, true, 1 );
+		assertEventCounts( handler, 2, 2, 2 );
+
+		// Modify the attribute to the same value. Should do nothing.
+		child.setAttribute( "attribute", "value0" );
+		assertNodeState( child, true, 1 );
+		assertEventCounts( handler, 2, 2, 2 );
+
+		// Modify the attribute.
+		child.setAttribute( "attribute", "value1" );
+		assertNodeState( child, true, 1 );
+		assertEventCounts( handler, 3, 3, 2 );
+
+		// Remove the attribute.
+		child.setAttribute( "attribute", null );
+		assertNodeState( child, false, 0 );
+		assertEventCounts( handler, 4, 4, 3 );
+
+		int index = 0;
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "child", null, child );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, child, "attribute", null, "value0" );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, child, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, child );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, child, "attribute", "value0", "value1" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, child );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, data, child, "attribute", "value1", null );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, child, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, child );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -349,11 +393,11 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( handler, 2, 1, 2 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute", null, "value0" );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -421,13 +465,13 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( 2, paths.size() );
 
 		Iterator<List<DataNode>> iterator = paths.iterator();
-		
+
 		// Check the first path.
 		path = iterator.next();
 		assertEquals( 2, path.size() );
 		assertTrue( list1 == path.get( 0 ) || list0 == path.get( 0 ) );
 		assertEquals( child, path.get( 1 ) );
-		
+
 		// Check the second path.
 		path = iterator.next();
 		assertEquals( 2, path.size() );
@@ -497,14 +541,14 @@ public class DataNodeTest extends DataTestCase {
 
 		assertNodeState( attribute, true, 1 );
 		assertNodeState( node, true, 1 );
-		assertEventCounts( nodeHandler, 3, 2, 3 );
+		assertEventCounts( nodeHandler, 3, 2, 4 );
 		assertEventCounts( attributeHandler, 1, 1, 1 );
 
 		// Test unsetting an attribute on the attribute node unmodified the parent.
 		attribute.setAttribute( "attribute", null );
 		assertNodeState( attribute, false, 0 );
 		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 4, 3, 4 );
+		assertEventCounts( nodeHandler, 4, 3, 6 );
 		assertEventCounts( attributeHandler, 2, 2, 2 );
 	}
 
@@ -532,14 +576,14 @@ public class DataNodeTest extends DataTestCase {
 
 		assertNodeState( attribute, true, 1 );
 		assertNodeState( node, true, 1 );
-		assertEventCounts( nodeHandler, 3, 2, 3 );
+		assertEventCounts( nodeHandler, 3, 2, 4 );
 		assertEventCounts( attributeHandler, 1, 1, 1 );
 
 		// Test unsetting an attribute on the attribute node unmodified the parent.
 		attribute.setModified( false );
 		assertNodeState( attribute, false, 0 );
 		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 4, 2, 4 );
+		assertEventCounts( nodeHandler, 4, 2, 6 );
 		assertEventCounts( attributeHandler, 2, 1, 2 );
 	}
 
@@ -565,13 +609,13 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1 );
 		assertNodeState( parent, true, 1 );
-		assertEventCounts( parentHandler, 3, 2, 3 );
+		assertEventCounts( parentHandler, 3, 2, 4 );
 
 		parent.setModified( false );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 2, 1, 2 );
 		assertNodeState( parent, false, 0 );
-		assertEventCounts( parentHandler, 5, 2, 4 );
+		assertEventCounts( parentHandler, 5, 2, 6 );
 	}
 
 	public void testAddNodeAttributeToDifferentParent() {

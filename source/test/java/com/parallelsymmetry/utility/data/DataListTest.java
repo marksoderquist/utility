@@ -469,7 +469,7 @@ public class DataListTest extends DataTestCase {
 		child.setAttribute( "attribute", "value" );
 		assertListState( list, true, 0, 1 );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( listHandler, 3, 1, 3, 1, 0 );
+		assertEventCounts( listHandler, 3, 1, 4, 1, 0 );
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1, 0, 0 );
 	}
@@ -500,13 +500,13 @@ public class DataListTest extends DataTestCase {
 
 		child.setAttribute( "attribute", "value" );
 		assertListState( list, true, 0, 1 );
-		assertEventCounts( listHandler, 3, 1, 3, 1, 0 );
+		assertEventCounts( listHandler, 3, 1, 4, 1, 0 );
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1, 0, 0 );
 
 		list.unmodify();
 		assertListState( list, false, 0, 0 );
-		assertEventCounts( listHandler, 5, 1, 4, 1, 0 );
+		assertEventCounts( listHandler, 5, 1, 6, 1, 0 );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 2, 1, 2, 0, 0 );
 	}
@@ -735,7 +735,7 @@ public class DataListTest extends DataTestCase {
 		handler.reset();
 
 		child.setAttribute( "key1", "value1" );
-		assertEventCounts( handler, 1, 1, 1, 0, 0 );
+		assertEventCounts( handler, 1, 1, 2, 0, 0 );
 		handler.reset();
 
 		child.setAttribute( "key1", "value1" );
@@ -762,12 +762,12 @@ public class DataListTest extends DataTestCase {
 		// Setting an attribute on the attribute node should cause a data change event.
 		attribute.setAttribute( "key", "value1" );
 		assertTrue( node.isModified() );
-		assertEventCounts( watcher, 2, 2, 1, 0, 0 );
+		assertEventCounts( watcher, 2, 2, 2, 0, 0 );
 
 		// Setting another attribute on the attribute node should cause a data change event.
 		attribute.setAttribute( "key", "value2" );
 		assertTrue( node.isModified() );
-		assertEventCounts( watcher, 3, 3, 1, 0, 0 );
+		assertEventCounts( watcher, 3, 3, 2, 0, 0 );
 	}
 
 	@Test
@@ -790,7 +790,7 @@ public class DataListTest extends DataTestCase {
 		assertFalse( "The attribute should not be modified.", attribute.isModified() );
 
 		attribute.setAttribute( "key", "value1" );
-		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 4, 0, 0 );
 		watcher.reset();
 
 		attribute.setAttribute( "key", "value1" );
@@ -802,7 +802,7 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		attribute.unmodify();
-		assertEventCounts( watcher, 1, 0, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 0, 4, 0, 0 );
 		watcher.reset();
 	}
 
@@ -867,11 +867,11 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		list.add( child );
-		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 0, 2, 1, 0 );
 		watcher.reset();
 
 		list.remove( child );
-		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		assertEventCounts( watcher, 1, 0, 2, 0, 1 );
 		watcher.reset();
 	}
 
@@ -892,11 +892,11 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		list.add( child2 );
-		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 0, 3, 1, 0 );
 		watcher.reset();
 
 		list.remove( child2 );
-		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		assertEventCounts( watcher, 1, 0, 3, 0, 1 );
 		watcher.reset();
 	}
 

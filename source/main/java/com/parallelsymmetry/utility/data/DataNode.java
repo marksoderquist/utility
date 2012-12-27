@@ -406,6 +406,8 @@ public abstract class DataNode {
 	}
 
 	protected void dispatchEvent( DataEvent event ) {
+		event.setData( this );
+		
 		switch( event.getType() ) {
 			case DATA_CHANGED : {
 				fireDataChanged( (DataChangedEvent)event );
@@ -537,7 +539,9 @@ public abstract class DataNode {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
-		// Do not propagate the meta attribute events to parents.
+		for( DataNode parent : parents ) {
+			parent.dispatchEvent( event );
+		}
 	}
 
 	public static class ModifyAction extends Operation {

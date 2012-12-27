@@ -22,7 +22,7 @@ public class DataChildEvent extends DataEvent {
 
 	@Override
 	public String toString() {
-		return getAction().toString() + ": " + getData() + "(" + index + "): " + child;
+		return getAction().toString() + ": " + getCause() + "(" + index + "): " + child;
 	}
 
 }
