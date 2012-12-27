@@ -5,8 +5,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Locale;
 
-import com.parallelsymmetry.utility.Bundles;
-
 import junit.framework.TestCase;
 
 public class BundlesTest extends TestCase {
@@ -20,6 +18,11 @@ public class BundlesTest extends TestCase {
 	@Override
 	public void setUp() {
 		locale = Locale.getDefault();
+	}
+
+	@Override
+	public void tearDown() {
+		Locale.setDefault( locale );
 	}
 
 	public void testGetString() throws Exception {
@@ -50,17 +53,12 @@ public class BundlesTest extends TestCase {
 	}
 
 	public void testClassLoaderHandling() throws Exception {
-		ClassLoader loader1 = new URLClassLoader( new URL[] { new File( "target/test/java/loader1" ).toURI().toURL() }, null );
-		ClassLoader loader2 = new URLClassLoader( new URL[] { new File( "target/test/java/loader2" ).toURI().toURL() }, null );
+		ClassLoader loader1 = new URLClassLoader( new URL[] { new File( "source/test/resources/loader1" ).toURI().toURL() }, null );
+		ClassLoader loader2 = new URLClassLoader( new URL[] { new File( "source/test/resources/loader2" ).toURI().toURL() }, null );
 
 		assertNull( Bundles.getString( "bundle", "string", null, false ) );
 		assertEquals( "Loader 1 String", Bundles.getString( loader1, "bundle", "string", null, false ) );
 		assertEquals( "Loader 2 String", Bundles.getString( loader2, "bundle", "string", null, false ) );
-	}
-
-	@Override
-	public void tearDown() {
-		Locale.setDefault( locale );
 	}
 
 }

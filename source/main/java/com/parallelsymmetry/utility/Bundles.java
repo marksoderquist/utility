@@ -29,31 +29,31 @@ public class Bundles {
 	 * Get a string from a resource bundle.
 	 * 
 	 * @param path
-	 * @param key
+	 * @param name
 	 * @return
 	 */
-	public static final String getString( String path, String key ) {
-		return getKeyOrString( null, path, key, null, true );
+	public static final String getString( String path, String name ) {
+		return getKeyOrString( null, path, name, null, true );
 	}
 
-	public static final String getString( ClassLoader loader, String path, String key ) {
-		return getKeyOrString( loader, path, key, null, true );
+	public static final String getString( ClassLoader loader, String path, String name ) {
+		return getKeyOrString( loader, path, name, null, true );
 	}
 
 	/**
 	 * Get a string from a resource bundle.
 	 * 
 	 * @param path
-	 * @param key
+	 * @param name
 	 * @param defaultValue
 	 * @return
 	 */
-	public static final String getString( String path, String key, String defaultValue ) {
-		return getKeyOrString( null, path, key, defaultValue, true );
+	public static final String getString( String path, String name, String defaultValue ) {
+		return getKeyOrString( null, path, name, defaultValue, true );
 	}
 
-	public static final String getString( ClassLoader loader, String path, String key, String defaultValue ) {
-		return getKeyOrString( loader, path, key, defaultValue, true );
+	public static final String getString( ClassLoader loader, String path, String name, String defaultValue ) {
+		return getKeyOrString( loader, path, name, defaultValue, true );
 	}
 
 	/**
@@ -64,16 +64,16 @@ public class Bundles {
 	 * Note: This method allows the caller to get a value of null.
 	 * 
 	 * @param path
-	 * @param key
+	 * @param name
 	 * @param showKey
 	 * @return
 	 */
-	public static final String getString( String path, String key, boolean showKey ) {
-		return getKeyOrString( null, path, key, null, showKey );
+	public static final String getString( String path, String name, boolean showKey ) {
+		return getKeyOrString( null, path, name, null, showKey );
 	}
 
-	public static final String getString( ClassLoader loader, String path, String key, boolean showKey ) {
-		return getKeyOrString( loader, path, key, null, showKey );
+	public static final String getString( ClassLoader loader, String path, String name, boolean showKey ) {
+		return getKeyOrString( loader, path, name, null, showKey );
 	}
 
 	/**
@@ -84,38 +84,43 @@ public class Bundles {
 	 * Note: This method allows the caller to get a value of null.
 	 * 
 	 * @param path
-	 * @param key
+	 * @param name
 	 * @param defaultValue
 	 * @param showKey
 	 * @return
 	 */
-	public static final String getString( String path, String key, String defaultValue, boolean showKey ) {
-		return getKeyOrString( null, path, key, defaultValue, showKey );
+	public static final String getString( String path, String name, String defaultValue, boolean showKey ) {
+		return getKeyOrString( null, path, name, defaultValue, showKey );
 	}
 
-	public static final String getString( ClassLoader loader, String path, String key, String defaultValue, boolean showKey ) {
-		return getKeyOrString( loader, path, key, defaultValue, showKey );
+	public static final String getString( ClassLoader loader, String path, String name, String defaultValue, boolean showKey ) {
+		return getKeyOrString( loader, path, name, defaultValue, showKey );
 	}
 
-	private static final String getKeyOrString( ClassLoader loader, String path, String key, String defaultValue, boolean showKey ) {
-		String string = null;
+	private static final String getKeyOrString( ClassLoader loader, String path, String name, String defaultValue, boolean showKey ) {
 		if( loader == null ) loader = ClassLoader.getSystemClassLoader();
-		ResourceBundle bundle = getBundle( loader, path, Locale.getDefault() );
+		ResourceBundle bundle = getBundle( loader, path, name, Locale.getDefault() );
 
+		// Define the string.
+		String string = null;
+
+		// If the string is null try and get the string from the bundle.
 		try {
-			if( bundle != null ) string = bundle.getString( key );
+			if( bundle != null ) string = bundle.getString( name );
 		} catch( MissingResourceException exception ) {
 			// Intentionally ignore exception.
 		}
 
+		// If the string is null try and use the default value.
 		if( string == null ) string = defaultValue;
 
-		if( string == null && showKey ) string = defaultValue == null ? "[" + path + ":" + key + "]" : defaultValue;
+		// If the string is null use the path and name to create a string
+		if( string == null && showKey ) string = "[" + path + ":" + name + "]";
 
 		return string;
 	}
 
-	private static ResourceBundle getBundle( ClassLoader loader, String path, Locale locale ) {
+	private static ResourceBundle getBundle( ClassLoader loader, String path, String name, Locale locale ) {
 		StringBuilder builder = new StringBuilder( path );
 		builder.append( "." );
 		builder.append( locale.toString() );
@@ -145,12 +150,13 @@ public class Bundles {
 			// Load the bundle if it does not exist.
 			if( bundle == null ) {
 
-				List<InputStream> streams = getResourceStreams( path, locale, loader );
+				List<URL> urls = getResources( loader, path, locale );
 
-				for( InputStream input : streams ) {
+				for( URL url : urls ) {
 					if( bundle == null ) bundle = new MappedResourceBundle();
 					try {
-						bundle.add( new PropertyResourceBundle( new InputStreamReader( input, TextUtil.DEFAULT_ENCODING ) ) );
+						PropertyResourceBundle propertyBundle = new PropertyResourceBundle( new InputStreamReader( url.openStream(), TextUtil.DEFAULT_ENCODING ) );
+						bundle.add( propertyBundle );
 					} catch( IOException exception ) {
 						// Intentionally ignore exception.
 					}
@@ -165,6 +171,62 @@ public class Bundles {
 		}
 
 		return bundle;
+	}
+
+	private static List<URL> getResources( ClassLoader loader, String path, Locale locale ) {
+		List<URL> resources = new ArrayList<URL>();
+		InputStream input = null;
+
+		String[] parts = getLocaleParts( locale );
+
+		for( int count = parts.length; count > -1; count-- ) {
+			if( input == null ) {
+				StringBuilder builder = new StringBuilder( path );
+				builder.append( "." );
+				builder.append( TextUtil.toString( parts, "_", 0, count ) );
+				builder.append( ".properties" );
+				try {
+					Enumeration<URL> urls = loader.getResources( builder.toString() );
+					while( urls.hasMoreElements() ) {
+						URL url = urls.nextElement();
+						if( !resources.contains( url ) ) resources.add( url );
+
+					}
+				} catch( IOException exception ) {
+					// Intentionally ignore exception.
+				}
+			}
+		}
+
+		if( input == null ) {
+			StringBuilder builder = new StringBuilder( path );
+			builder.append( ".en.properties" );
+			try {
+				Enumeration<URL> urls = loader.getResources( builder.toString() );
+				while( urls.hasMoreElements() ) {
+					URL url = urls.nextElement();
+					if( !resources.contains( url ) ) resources.add( url );
+				}
+			} catch( IOException exception ) {
+				// Intentionally ignore exception.
+			}
+		}
+
+		if( input == null ) {
+			StringBuilder builder = new StringBuilder( path );
+			builder.append( ".properties" );
+			try {
+				Enumeration<URL> urls = loader.getResources( builder.toString() );
+				while( urls.hasMoreElements() ) {
+					URL url = urls.nextElement();
+					if( !resources.contains( url ) ) resources.add( url );
+				}
+			} catch( IOException exception ) {
+				// Intentionally ignore exception.
+			}
+		}
+
+		return resources;
 	}
 
 	private static String[] getLocaleParts( Locale locale ) {
@@ -189,58 +251,6 @@ public class Bundles {
 		if( v ) parts[index++] = variant;
 
 		return parts;
-	}
-
-	private static List<InputStream> getResourceStreams( String path, Locale locale, ClassLoader loader ) {
-		List<InputStream> streams = new ArrayList<InputStream>();
-		InputStream input = null;
-
-		String[] parts = getLocaleParts( locale );
-
-		for( int count = parts.length; count > -1; count-- ) {
-			if( input == null ) {
-				StringBuilder builder = new StringBuilder( path );
-				builder.append( "." );
-				builder.append( TextUtil.toString( parts, "_", 0, count ) );
-				builder.append( ".properties" );
-				try {
-					Enumeration<URL> urls = loader.getResources( builder.toString() );
-					while( urls.hasMoreElements() ) {
-						streams.add( urls.nextElement().openStream() );
-					}
-				} catch( IOException exception ) {
-					// Intentionally ignore exception.
-				}
-			}
-		}
-
-		if( input == null ) {
-			StringBuilder builder = new StringBuilder( path );
-			builder.append( ".en.properties" );
-			try {
-				Enumeration<URL> urls = loader.getResources( builder.toString() );
-				while( urls.hasMoreElements() ) {
-					streams.add( urls.nextElement().openStream() );
-				}
-			} catch( IOException exception ) {
-				// Intentionally ignore exception.
-			}
-		}
-
-		if( input == null ) {
-			StringBuilder builder = new StringBuilder( path );
-			builder.append( ".properties" );
-			try {
-				Enumeration<URL> urls = loader.getResources( builder.toString() );
-				while( urls.hasMoreElements() ) {
-					streams.add( urls.nextElement().openStream() );
-				}
-			} catch( IOException exception ) {
-				// Intentionally ignore exception.
-			}
-		}
-
-		return streams;
 	}
 
 	private static class LoaderResources {
