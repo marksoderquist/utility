@@ -224,7 +224,6 @@ public abstract class DataNode {
 			paths.add( path );
 		} else {
 			for( DataNode parent : parents ) {
-				System.out.println( "Parent: " + parent );
 				for( List<DataNode> path : parent.getNodePaths( stop ) ) {
 					path.add( this );
 					paths.add( path );
