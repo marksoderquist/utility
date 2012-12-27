@@ -298,18 +298,11 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( atomic ) getTransaction().commit();
 	}
 
-	protected void childNodeModified( boolean modified ) {
-		if( modified ) {
-			modifiedChildCount++;
-		} else {
-			modifiedChildCount--;
-
-			// The reason for the following line is that doClearModifed() is 
-			// processed by transactions before processing child and parent nodes.
-			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
-		}
-
-		updateModifiedFlag();
+	@Override
+	protected void doUnmodify() {
+		addRemoveChildren = null;
+		modifiedChildCount = 0;
+		super.doUnmodify();
 	}
 
 	@Override
@@ -327,7 +320,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	protected void dispatchEvent( DataEvent event ) {
 		super.dispatchEvent( event );
 
-		if( event instanceof DataChildEvent ) {
+		if( event.getType() == DataEvent.Type.DATA_CHILD ) {
 			switch( event.getAction() ) {
 				case INSERT: {
 					fireChildInsertedEvent( (DataChildEvent)event );
@@ -339,6 +332,20 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 				}
 			}
 		}
+	}
+
+	protected void childNodeModified( boolean modified ) {
+		if( modified ) {
+			modifiedChildCount++;
+		} else {
+			modifiedChildCount--;
+	
+			// The reason for the following line is that doClearModifed() is 
+			// processed by transactions before processing child and parent nodes.
+			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
+		}
+	
+		updateModifiedFlag();
 	}
 
 	private void fireChildInsertedEvent( DataChildEvent event ) {
@@ -357,13 +364,6 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		for( DataNode parent : parents ) {
 			parent.dispatchEvent( event );
 		}
-	}
-
-	@Override
-	protected void doUnmodify() {
-		addRemoveChildren = null;
-		modifiedChildCount = 0;
-		super.doUnmodify();
 	}
 
 	private void doAddChild( int index, T child ) {
