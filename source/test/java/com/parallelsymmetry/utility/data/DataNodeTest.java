@@ -316,14 +316,14 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( handler, 3, 3, 2 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.MODIFY, data, "attribute", "value0", "value1" );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.REMOVE, data, "attribute", "value1", null );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute", null, "value0" );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.MODIFY, data, "attribute", "value0", "value1" );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.REMOVE, data, "attribute", "value1", null );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -349,11 +349,11 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( handler, 2, 1, 2 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute", null, "value0" );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 

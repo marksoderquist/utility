@@ -17,7 +17,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	private boolean treeModified;
 
-	private Map<DataNode, DataEvent.Type> addRemoveChildren;
+	private Map<DataNode, DataEvent.Action> addRemoveChildren;
 
 	private int modifiedChildCount;
 
@@ -328,7 +328,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		super.dispatchEvent( event );
 
 		if( event instanceof DataChildEvent ) {
-			switch( event.getType() ) {
+			switch( event.getAction() ) {
 				case INSERT: {
 					fireChildInsertedEvent( (DataChildEvent)event );
 					return;
@@ -375,14 +375,14 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		child.addParent( this );
 
 		if( addRemoveChildren == null ) {
-			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
-			addRemoveChildren.put( child, DataEvent.Type.INSERT );
+			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Action>();
+			addRemoveChildren.put( child, DataEvent.Action.INSERT );
 		} else {
-			if( addRemoveChildren.get( child ) == DataEvent.Type.REMOVE ) {
+			if( addRemoveChildren.get( child ) == DataEvent.Action.REMOVE ) {
 				addRemoveChildren.remove( child );
 				if( addRemoveChildren.size() == 0 ) addRemoveChildren = null;
 			} else {
-				addRemoveChildren.put( child, DataEvent.Type.INSERT );
+				addRemoveChildren.put( child, DataEvent.Action.INSERT );
 			}
 		}
 
@@ -394,14 +394,14 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		child.removeParent( this );
 
 		if( addRemoveChildren == null ) {
-			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Type>();
-			addRemoveChildren.put( child, DataEvent.Type.REMOVE );
+			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Action>();
+			addRemoveChildren.put( child, DataEvent.Action.REMOVE );
 		} else {
-			if( addRemoveChildren.get( child ) == DataEvent.Type.INSERT ) {
+			if( addRemoveChildren.get( child ) == DataEvent.Action.INSERT ) {
 				addRemoveChildren.remove( child );
 				if( addRemoveChildren.size() == 0 ) addRemoveChildren = null;
 			} else {
-				addRemoveChildren.put( child, DataEvent.Type.REMOVE );
+				addRemoveChildren.put( child, DataEvent.Action.REMOVE );
 			}
 		}
 
@@ -430,7 +430,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 			OperationResult result = new OperationResult( this );
 
 			list.doAddChild( index, child );
-			result.addEvent( new DataChildEvent( DataEvent.Type.INSERT, getData(), index, child ) );
+			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, getData(), index, child ) );
 
 			return result;
 		}
@@ -456,7 +456,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 			if( list != null && list.children != null ) {
 				int index = list.children.indexOf( child );
 				list.doRemoveChild( child );
-				result.addEvent( new DataChildEvent( DataEvent.Type.REMOVE, list, index, child ) );
+				result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, index, child ) );
 			}
 
 			return result;

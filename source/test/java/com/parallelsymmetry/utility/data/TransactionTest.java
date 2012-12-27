@@ -36,11 +36,11 @@ public class TransactionTest extends DataTestCase {
 		assertEventCounts( handler, 1, 3, 1 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute0", null, "value0" );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute1", null, "value1" );
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.INSERT, data, "attribute2", null, "value2" );
-		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Type.MODIFY, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute0", null, "value0" );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute1", null, "value1" );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.INSERT, data, "attribute2", null, "value2" );
+		assertEventState( handler, index++, MetaAttributeEvent.class, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -60,8 +60,8 @@ public class TransactionTest extends DataTestCase {
 		assertEventCounts( handler, 1, 1, 0 );
 
 		int index = 0;
-		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Type.MODIFY, data, "name", "value0", "value1" );
-		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Type.MODIFY, data );
+		assertEventState( handler, index++, DataAttributeEvent.class, DataEvent.Action.MODIFY, data, "name", "value0", "value1" );
+		assertEventState( handler, index++, DataChangedEvent.class, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -234,7 +234,7 @@ public class TransactionTest extends DataTestCase {
 		public OperationResult process() {
 			OperationResult result = new OperationResult( this );
 
-			result.addEvent( new DataAttributeEvent( DataEvent.Type.MODIFY, getData(), "name", "value0", "value1" ) );
+			result.addEvent( new DataAttributeEvent( DataEvent.Action.MODIFY, getData(), "name", "value0", "value1" ) );
 
 			return result;
 		}

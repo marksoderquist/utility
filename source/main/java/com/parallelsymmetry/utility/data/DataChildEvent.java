@@ -6,8 +6,8 @@ public class DataChildEvent extends DataEvent {
 
 	private DataNode child;
 
-	public DataChildEvent( Type type, DataNode node, int index, DataNode child ) {
-		super( type, node );
+	public DataChildEvent( Action action, DataNode node, int index, DataNode child ) {
+		super( DataEvent.Type.DATA_CHILD, action, node );
 		this.index = index;
 		this.child = child;
 	}
@@ -22,7 +22,7 @@ public class DataChildEvent extends DataEvent {
 
 	@Override
 	public String toString() {
-		return getType().toString() + ": " + getData() + "(" + index + "): " + child;
+		return getAction().toString() + ": " + getData() + "(" + index + "): " + child;
 	}
 
 }

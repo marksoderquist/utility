@@ -42,14 +42,14 @@ public abstract class DataTestCase extends TestCase {
 		assertEquals( childRemoveEventCount, handler.getChildRemovedEvents().size() );
 	}
 
-	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data ) {
+	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Action type, DataNode data ) {
 		assertEventState( handler, index, clazz, type, data, null, null, null );
 	}
 
-	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Type type, DataNode data, String name, Object oldValue, Object newValue ) {
+	protected void assertEventState( DataEventHandler handler, int index, Class<?> clazz, DataEvent.Action type, DataNode data, String name, Object oldValue, Object newValue ) {
 		DataEvent event = handler.getEvents().get( index );
 		assertEquals( clazz, event.getClass() );
-		assertEquals( type, event.getType() );
+		assertEquals( type, event.getAction() );
 		assertEquals( data, event.getData() );
 
 		if( name == null ) return;

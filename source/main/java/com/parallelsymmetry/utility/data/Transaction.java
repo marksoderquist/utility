@@ -96,11 +96,11 @@ public class Transaction {
 					notify( node, oldModified, newModified );
 
 					// A meta attribute change event needs to be sent.
-					node.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
+					node.dispatchEvent( new MetaAttributeEvent( DataEvent.Action.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
 					changed = true;
 				}
 
-				if( changed ) node.dispatchEvent( new DataChangedEvent( DataEvent.Type.MODIFY, node ) );
+				if( changed ) node.dispatchEvent( new DataChangedEvent( DataEvent.Action.MODIFY, node ) );
 			}
 		} finally {
 			cleanup();
@@ -141,7 +141,7 @@ public class Transaction {
 			boolean parentNewModified = parent.isModified();
 	
 			// Dispatch events for parent.
-			if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Type.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
+			if( parentNewModified != parentOldModified ) parent.dispatchEvent( new MetaAttributeEvent( DataEvent.Action.MODIFY, node, DataNode.MODIFIED, oldModified, newModified ) );
 	
 			notify( parent, oldModified, newModified );
 		}

@@ -406,12 +406,19 @@ public abstract class DataNode {
 	}
 
 	protected void dispatchEvent( DataEvent event ) {
-		if( event instanceof DataChangedEvent ) {
-			fireDataChanged( (DataChangedEvent)event );
-		} else if( event instanceof DataAttributeEvent ) {
-			fireDataAttributeChanged( (DataAttributeEvent)event );
-		} else if( event instanceof MetaAttributeEvent ) {
-			fireMetaAttributeChanged( (MetaAttributeEvent)event );
+		switch( event.getType() ) {
+			case DATA_CHANGED : {
+				fireDataChanged( (DataChangedEvent)event );
+				break;
+			}
+			case DATA_ATTRIBUTE : {
+				fireDataAttributeChanged( (DataAttributeEvent)event );
+				break;
+			}
+			case META_ATTRIBUTE: {
+				fireMetaAttributeChanged( (MetaAttributeEvent)event );
+				break;
+			}
 		}
 	}
 
@@ -587,9 +594,9 @@ public abstract class DataNode {
 
 			getData().doSetAttribute( name, oldValue, newValue );
 
-			DataEvent.Type type = DataEvent.Type.MODIFY;
-			type = oldValue == null ? DataEvent.Type.INSERT : type;
-			type = newValue == null ? DataEvent.Type.REMOVE : type;
+			DataEvent.Action type = DataEvent.Action.MODIFY;
+			type = oldValue == null ? DataEvent.Action.INSERT : type;
+			type = newValue == null ? DataEvent.Action.REMOVE : type;
 			result.addEvent( new DataAttributeEvent( type, getData(), name, oldValue, newValue ) );
 
 			return result;
