@@ -271,6 +271,7 @@ public abstract class DataNode {
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
+	@Deprecated
 	public boolean isTransactionActive() {
 		return getTransaction() != null;
 	}
@@ -278,6 +279,7 @@ public abstract class DataNode {
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
+	@Deprecated
 	public Transaction startTransaction() {
 		if( !isTransactionActive() ) setTransaction( new Transaction() );
 
@@ -292,6 +294,7 @@ public abstract class DataNode {
 	 * 
 	 * @return
 	 */
+	@Deprecated
 	public Transaction getTransaction() {
 		if( transaction == null ) {
 			for( DataNode parent : parents ) {
@@ -303,6 +306,7 @@ public abstract class DataNode {
 		return transaction;
 	}
 
+	@Deprecated
 	public void setTransaction( Transaction transaction ) {
 		if( ObjectUtil.areEqual( getTransaction(), transaction ) ) return;
 		if( transaction != null && getTransaction() != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
