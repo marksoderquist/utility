@@ -16,7 +16,7 @@ public abstract class DataEvent {
 	
 	private Action action;
 	
-	// FIXME E - Rename data to sender.
+	// TODO Rename data to sender once all modules are converted.
 	private DataNode data;
 	
 	public DataEvent( Type type, Action action, DataNode sender ) {
