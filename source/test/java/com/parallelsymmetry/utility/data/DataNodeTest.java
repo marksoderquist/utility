@@ -402,17 +402,17 @@ public class DataNodeTest extends DataTestCase {
 	}
 
 	@Test
-	public void testGetParent() {
-		MockDataNode node = new MockDataNode();
+	public void testGetParents() {
+		MockDataNode parent = new MockDataNode();
 		MockDataNode child = new MockDataNode();
 		assertEquals( 0, child.getParents().size() );
 
 		String key = "key";
 
-		node.setAttribute( key, child );
-		assertTrue( child.getParents().contains( node ) );
+		parent.setAttribute( key, child );
+		assertTrue( child.getParents().contains( parent ) );
 
-		node.setAttribute( key, null );
+		parent.setAttribute( key, null );
 		assertEquals( 0, child.getParents().size() );
 	}
 
@@ -479,46 +479,6 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( child, path.get( 1 ) );
 	}
 
-	//	@Test
-	//	public void testGetTreePath() {
-	//		MockDataList list = new MockDataList();
-	//		MockDataNode child = new MockDataNode();
-	//
-	//		list.add( child );
-	//
-	//		DataNode[] path = list.getTreePath();
-	//		assertEquals( 1, path.length );
-	//		assertEquals( list, path[0] );
-	//
-	//		DataNode[] childPath = child.getTreePath();
-	//		assertEquals( 2, childPath.length );
-	//		assertEquals( list, childPath[0] );
-	//		assertEquals( child, childPath[1] );
-	//	}
-
-	//	@Test
-	//	public void testGetTreePathWithNode() {
-	//		MockDataList list = new MockDataList();
-	//		MockDataList child = new MockDataList();
-	//		MockDataList grandchild = new MockDataList();
-	//
-	//		list.add( child );
-	//		child.add( grandchild );
-	//
-	//		DataNode[] path = list.getTreePath( list );
-	//		assertEquals( 1, path.length );
-	//		assertEquals( list, path[0] );
-	//
-	//		path = child.getTreePath( child );
-	//		assertEquals( 1, path.length );
-	//		assertEquals( child, path[0] );
-	//
-	//		path = grandchild.getTreePath( child );
-	//		assertEquals( 2, path.length );
-	//		assertEquals( child, path[0] );
-	//		assertEquals( grandchild, path[1] );
-	//	}
-
 	public void testParentModifiedByChildNodeAttributeChange() {
 		MockDataNode parent = new MockDataNode();
 		MockDataNode child = new MockDataNode();
@@ -552,7 +512,6 @@ public class DataNodeTest extends DataTestCase {
 		assertEventCounts( childHandler, 2, 2, 2 );
 	}
 
-	// FIXME F - Finish test.
 	public void testParentModifiedByChildNodeAttributeRippleChange() {
 		MockDataNode parent = new MockDataNode();
 		MockDataNode child = new MockDataNode();
@@ -579,13 +538,14 @@ public class DataNodeTest extends DataTestCase {
 		parentHandler.reset();
 		childHandler.reset();
 
-		// Set the 'b' attribute to '2';
-		child.setAttribute( "b", "2" );
+		// Set the 'b' attribute to '1';
+		child.setAttribute( "b", "1" );
 		assertEventCounts( parentHandler, 1, 1, 0 );
 		assertEventCounts( childHandler, 1, 1, 0 );
 		parentHandler.reset();
 		childHandler.reset();
 
+		// Set this state as the new unmodified state.
 		child.setModified( false );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
@@ -601,33 +561,39 @@ public class DataNodeTest extends DataTestCase {
 		parentHandler.reset();
 		childHandler.reset();
 
-		//		// Test setting 'a' attribute on the child node modifies the parent.
-		//		child.setAttribute( "a", "1" );
-		//		assertNodeState( child, true, 1 );
-		//		assertNodeState( parent, true, 1 );
-		//		assertEventCounts( parentHandler, 1, 1, 1 );
-		//		assertEventCounts( childHandler, 1, 1, 1 );
-		//
-		//		// Test setting the 'b' attribute on the child leaves the parent modified. 
-		//		child.setAttribute( "b", "2" );
-		//		assertNodeState( child, true, 2 );
-		//		assertNodeState( parent, true, 1 );
-		//		assertEventCounts( parentHandler, 4, 3, 4 );
-		//		assertEventCounts( childHandler, 2, 2, 1 );
-		//
-		//		// Test unsetting 'a' attribute on the child leaves the parent modified.
-		//		child.setAttribute( "a", null );
-		//		assertNodeState( child, true, 1 );
-		//		assertNodeState( parent, true, 1 );
-		//		assertEventCounts( parentHandler, 5, 4, 4 );
-		//		assertEventCounts( childHandler, 3, 3, 1 );
-		//
-		//		// Test unsetting the 'b' attribute on the child returns the parent to unmodified. 
-		//		child.setAttribute( "b", null );
-		//		assertNodeState( child, false, 0 );
-		//		assertNodeState( parent, false, 0 );
-		//		assertEventCounts( parentHandler, 6, 5, 6 );
-		//		assertEventCounts( childHandler, 4, 4, 2 );
+		// Test setting 'a' attribute on the child node modifies the parent.
+		child.setAttribute( "a", "2" );
+		assertNodeState( child, true, 1 );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 1, 1, 1 );
+		assertEventCounts( childHandler, 1, 1, 1 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		// Test setting the 'b' attribute on the child leaves the parent modified. 
+		child.setAttribute( "b", "2" );
+		assertNodeState( child, true, 2 );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 1, 1, 0 );
+		assertEventCounts( childHandler, 1, 1, 0 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		// Test unsetting 'a' attribute on the child leaves the parent modified.
+		child.setAttribute( "a", "1" );
+		assertNodeState( child, true, 1 );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 1, 1, 0 );
+		assertEventCounts( childHandler, 1, 1, 0 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		// Test unsetting the 'b' attribute on the child returns the parent to unmodified. 
+		child.setAttribute( "b", "1" );
+		assertNodeState( child, false, 0 );
+		assertNodeState( parent, false, 0 );
+		assertEventCounts( parentHandler, 1, 1, 1 );
+		assertEventCounts( childHandler, 1, 1, 1 );
 	}
 
 	public void testParentModifiedByNodeAttributeClearModified() {
