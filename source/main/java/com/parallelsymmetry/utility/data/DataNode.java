@@ -180,7 +180,9 @@ public abstract class DataNode {
 	 * element is this node.
 	 * 
 	 * @return The tree path of this node.
+	 * @deprecated Use getNodePaths()
 	 */
+	@Deprecated
 	public DataNode[] getTreePath() {
 		return getTreePath( null );
 	}
@@ -190,13 +192,14 @@ public abstract class DataNode {
 	 * element is this node.
 	 * 
 	 * @return The tree path of this node.
+	 * @deprecated Use getNodePaths( DataNode stop )
 	 */
+	@Deprecated
 	public DataNode[] getTreePath( DataNode stop ) {
 		int count = 0;
 		DataNode parent = this;
 		while( parent != stop ) {
 			count++;
-			//parent = parent.getParent();
 		}
 
 		if( stop != null ) count++;
@@ -205,7 +208,8 @@ public abstract class DataNode {
 		DataNode[] path = new DataNode[count];
 		for( int index = count - 1; index > -1; index-- ) {
 			path[index] = parent;
-			//parent = parent.getParent();
+			// This will return inconsistent results.
+			parent = parents.iterator().next();
 		}
 
 		return path;
@@ -267,14 +271,14 @@ public abstract class DataNode {
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
-	public final boolean isTransactionActive() {
+	public boolean isTransactionActive() {
 		return getTransaction() != null;
 	}
 
 	/**
 	 * Note: This method is not thread safe for performance reasons.
 	 */
-	public final Transaction startTransaction() {
+	public Transaction startTransaction() {
 		if( !isTransactionActive() ) setTransaction( new Transaction() );
 
 		Transaction transaction = getTransaction();
@@ -288,7 +292,7 @@ public abstract class DataNode {
 	 * 
 	 * @return
 	 */
-	public final Transaction getTransaction() {
+	public Transaction getTransaction() {
 		if( transaction == null ) {
 			for( DataNode parent : parents ) {
 				Transaction transaction = parent.getTransaction();
@@ -323,40 +327,40 @@ public abstract class DataNode {
 	 */
 	public boolean equalsUsingAttributes( Object object ) {
 		if( !( object instanceof DataNode ) ) return false;
-	
+
 		DataNode that = (DataNode)object;
-	
+
 		Map<String, Object> thisAttr = this.attributes;
 		Map<String, Object> thatAttr = that.attributes;
-	
+
 		if( thisAttr == null && thatAttr == null ) return true;
 		if( thisAttr == null && thatAttr != null ) return false;
 		if( thisAttr != null && thatAttr == null ) return false;
-	
+
 		if( thisAttr.size() != thatAttr.size() ) return false;
-	
+
 		Set<String> thisKeys = thisAttr.keySet();
 		Set<String> thatKeys = thatAttr.keySet();
 		for( String key : thisKeys ) {
 			if( !thatKeys.contains( key ) ) return false;
-	
+
 			Object thisObject = thisAttr.get( key );
 			Object thatObject = thatAttr.get( key );
-	
+
 			if( thisObject instanceof DataNode ) {
 				if( !( (DataNode)thisObject ).equalsUsingAttributes( thatObject ) ) return false;
 			} else {
 				if( !ObjectUtil.areEqual( thisObject, thatObject ) ) return false;
 			}
 		}
-	
+
 		return true;
 	}
 
 	/**
 	 * Set the modified flag for this node.
 	 */
-	protected void modify() {
+	void modify() {
 		if( modified ) return;
 
 		boolean atomic = !isTransactionActive();
@@ -368,7 +372,7 @@ public abstract class DataNode {
 	/**
 	 * Clear the modified flag for this node and all child nodes.
 	 */
-	protected void unmodify() {
+	void unmodify() {
 		if( !modified ) return;
 
 		boolean atomic = !isTransactionActive();
@@ -380,10 +384,7 @@ public abstract class DataNode {
 			for( Object child : attributes.values() ) {
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) {
-						childNode.setTransaction( getTransaction() );
-						childNode.unmodify();
-					}
+					if( childNode.isModified() ) childNode.unmodify();
 				}
 			}
 		}
@@ -391,7 +392,23 @@ public abstract class DataNode {
 		if( atomic ) getTransaction().commit();
 	}
 
-	protected void attributeNodeModified( boolean modified ) {
+	void doModify() {
+		selfModified = true;
+		updateModifiedFlag();
+	}
+
+	void doUnmodify() {
+		selfModified = false;
+		modifiedAttributes = null;
+		modifiedAttributeCount = 0;
+		updateModifiedFlag();
+	}
+
+	void updateModifiedFlag() {
+		modified = selfModified || modifiedAttributeCount != 0;
+	}
+
+	void attributeNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedAttributeCount++;
 		} else {
@@ -405,47 +422,6 @@ public abstract class DataNode {
 		updateModifiedFlag();
 	}
 
-	protected void dispatchEvent( DataEvent event ) {
-		event.setData( this );
-		
-		switch( event.getType() ) {
-			case DATA_CHANGED : {
-				fireDataChanged( (DataChangedEvent)event );
-				break;
-			}
-			case DATA_ATTRIBUTE : {
-				fireDataAttributeChanged( (DataAttributeEvent)event );
-				break;
-			}
-			case META_ATTRIBUTE: {
-				fireMetaAttributeChanged( (MetaAttributeEvent)event );
-				break;
-			}
-		}
-	}
-
-	protected void doModify() {
-		selfModified = true;
-		updateModifiedFlag();
-	}
-
-	protected void doUnmodify() {
-		selfModified = false;
-		modifiedAttributes = null;
-		modifiedAttributeCount = 0;
-		updateModifiedFlag();
-	}
-
-	protected void updateModifiedFlag() {
-		modified = selfModified || modifiedAttributeCount != 0;
-	}
-
-	protected void checkForCircularReference( DataNode node ) {
-		for( DataNode parent : parents ) {
-			if( parent == node ) throw new RuntimeException( "Circular reference detected: " + node );
-		}
-	}
-
 	void addParent( DataNode parent ) {
 		this.parents.add( parent );
 	}
@@ -454,36 +430,28 @@ public abstract class DataNode {
 		this.parents.remove( parent );
 	}
 
-	//	/**
-	//	 * This method removes the specified node from any parent nodes.
-	//	 */
-	//	void isolateNode( DataNode node ) {
-	//		if( getTransaction() == null ) throw new RuntimeException( "DataNode.isolateNode() should not be called without a transaction." );
-	//
-	//		DataNode parent = node.getParent();
-	//		if( parent == null ) return;
-	//
-	//		if( parent.attributes != null ) {
-	//			// Because Map.containsValue() traverses the map it only decreases performance.
-	//			String key = null;
-	//			Iterator<Map.Entry<String, Object>> iterator = parent.attributes.entrySet().iterator();
-	//			while( iterator.hasNext() ) {
-	//				Map.Entry<String, Object> entry = iterator.next();
-	//				if( entry.getValue().equals( node ) ) {
-	//					key = entry.getKey();
-	//					break;
-	//				}
-	//			}
-	//
-	//			if( key != null ) {
-	//				parent.setTransaction( getTransaction() );
-	//				parent.setAttribute( key, null );
-	//			}
-	//		} else if( parent instanceof DataList ) {
-	//			parent.setTransaction( getTransaction() );
-	//			( (DataList<?>)parent ).remove( node );
-	//		}
-	//	}
+	void dispatchEvent( DataEvent event ) {
+		switch( event.getType() ) {
+			case DATA_CHANGED: {
+				fireDataChanged( (DataChangedEvent)event );
+				break;
+			}
+			case META_ATTRIBUTE: {
+				fireMetaAttributeChanged( (MetaAttributeEvent)event );
+				break;
+			}
+			case DATA_ATTRIBUTE: {
+				fireDataAttributeChanged( (DataAttributeEvent)event );
+				break;
+			}
+		}
+	}
+
+	void checkForCircularReference( DataNode node ) {
+		for( DataNode parent : parents ) {
+			if( parent == node ) throw new RuntimeException( "Circular reference detected: " + node );
+		}
+	}
 
 	private void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
@@ -521,26 +489,17 @@ public abstract class DataNode {
 		for( DataListener listener : this.listeners ) {
 			listener.dataChanged( event );
 		}
-		for( DataNode parent : parents ) {
-			parent.dispatchEvent( event );
-		}
 	}
 
 	private void fireDataAttributeChanged( DataAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.dataAttributeChanged( event );
 		}
-		for( DataNode parent : parents ) {
-			parent.dispatchEvent( event );
-		}
 	}
 
 	private void fireMetaAttributeChanged( MetaAttributeEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
-		}
-		for( DataNode parent : parents ) {
-			parent.dispatchEvent( event );
 		}
 	}
 
@@ -601,7 +560,7 @@ public abstract class DataNode {
 			DataEvent.Action type = DataEvent.Action.MODIFY;
 			type = oldValue == null ? DataEvent.Action.INSERT : type;
 			type = newValue == null ? DataEvent.Action.REMOVE : type;
-			result.addEvent( new DataAttributeEvent( type, getData(), name, oldValue, newValue ) );
+			result.addEvent( new DataAttributeEvent( type, data, data, name, oldValue, newValue ) );
 
 			return result;
 		}

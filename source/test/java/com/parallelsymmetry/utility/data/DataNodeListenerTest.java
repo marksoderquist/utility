@@ -7,7 +7,7 @@ public class DataNodeListenerTest extends DataTestCase {
 	@Test
 	public void testMetadataModifedTrue() {
 		MockDataList data = new MockDataList();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 
 		assertEventCounts( handler, 0, 0, 0, 0, 0 );
 		handler.reset();
@@ -20,7 +20,7 @@ public class DataNodeListenerTest extends DataTestCase {
 	@Test
 	public void testMetadataModifiedFalse() {
 		MockDataList data = new MockDataList();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 
 		assertEventCounts( handler, 0, 0, 0, 0, 0 );
 		handler.reset();

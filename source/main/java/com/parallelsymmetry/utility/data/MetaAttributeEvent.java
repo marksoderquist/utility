@@ -8,8 +8,8 @@ public class MetaAttributeEvent extends DataEvent {
 
 	private Object oldValue;
 
-	public MetaAttributeEvent( DataEvent.Action action, DataNode data, String name, Object oldValue, Object newValue ) {
-		super( DataEvent.Type.META_ATTRIBUTE, action, data );
+	public MetaAttributeEvent( DataEvent.Action action, DataNode sender, String name, Object oldValue, Object newValue ) {
+		super( DataEvent.Type.META_ATTRIBUTE, action, sender );
 		this.name = name;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
@@ -25,6 +25,11 @@ public class MetaAttributeEvent extends DataEvent {
 
 	public Object getNewValue() {
 		return newValue;
+	}
+	
+	@Override
+	public DataEvent cloneWithNewSender( DataNode sender ) {
+		return new MetaAttributeEvent( getAction(), sender, name, oldValue, newValue );
 	}
 
 }

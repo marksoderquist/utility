@@ -3,11 +3,11 @@ package com.parallelsymmetry.utility.data;
 import com.parallelsymmetry.utility.data.DataList;
 import com.parallelsymmetry.utility.data.DataNode;
 
-public class MockDataList extends DataList<DataNode> {
+public class MockDataList extends DataList<DataNode> implements WatchedMockData {
 
 	private String name;
 
-	private DataEventHandler handler;
+	private DataEventWatcher handler;
 
 	public MockDataList() {
 		super();
@@ -31,7 +31,7 @@ public class MockDataList extends DataList<DataNode> {
 
 	private void init( String name ) {
 		this.name = name;
-		handler = new DataEventHandler();
+		handler = new DataEventWatcher( name );
 		addDataListener( handler );
 	}
 
@@ -40,7 +40,8 @@ public class MockDataList extends DataList<DataNode> {
 		return name == null ? super.toString() : name;
 	}
 
-	public DataEventHandler getDataEventHandler() {
+	@Override
+	public DataEventWatcher getDataEventWatcher() {
 		return handler;
 	}
 

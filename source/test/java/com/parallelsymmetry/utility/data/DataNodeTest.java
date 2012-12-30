@@ -26,7 +26,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testModifyUnmodify() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
 		assertEventCounts( handler, 0, 0, 0 );
@@ -45,7 +45,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testSetAttributeUnmodify() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
 		assertEventCounts( handler, 0, 0, 0 );
@@ -119,7 +119,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testSetNullAttributeToNull() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		data.setAttribute( "attribute", null );
 		assertEventCounts( handler, 0, 0, 0 );
 	}
@@ -127,7 +127,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testSetAttributeWithNullName() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 
 		try {
 			data.setAttribute( null, "value" );
@@ -153,7 +153,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testNullAttributeValues() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNull( data.getAttribute( "attribute" ) );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
@@ -189,7 +189,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testGetAndSetAttribute() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 
 		assertEquals( null, data.getAttribute( "x" ) );
 		assertEquals( null, data.getAttribute( "y" ) );
@@ -215,7 +215,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testModifiedBySetAttribute() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertFalse( data.isModified() );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
@@ -230,7 +230,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testUnmodifiedByUnsetAttribute() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
@@ -257,7 +257,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testModifiedAttributeCountResetByCommit() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
@@ -274,7 +274,7 @@ public class DataNodeTest extends DataTestCase {
 
 	public void testResources() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
@@ -291,7 +291,7 @@ public class DataNodeTest extends DataTestCase {
 
 	public void testDataEventNotification() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
@@ -317,13 +317,13 @@ public class DataNodeTest extends DataTestCase {
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, "attribute", "value0", "value1" );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, data, data, "attribute", "value1", null );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -331,49 +331,49 @@ public class DataNodeTest extends DataTestCase {
 		MockDataNode data = new MockDataNode();
 		MockDataNode child = new MockDataNode();
 		data.setAttribute( "child", child );
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNodeState( child, false, 0 );
 		assertEventCounts( handler, 1, 1, 1 );
 
 		// Insert an attribute.
 		child.setAttribute( "attribute", "value0" );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( handler, 2, 2, 2 );
+		assertEventCounts( handler, 2, 2, 1 );
 
 		// Modify the attribute to the same value. Should do nothing.
 		child.setAttribute( "attribute", "value0" );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( handler, 2, 2, 2 );
+		assertEventCounts( handler, 2, 2, 1 );
 
 		// Modify the attribute.
 		child.setAttribute( "attribute", "value1" );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( handler, 3, 3, 2 );
+		assertEventCounts( handler, 3, 3, 1 );
 
 		// Remove the attribute.
 		child.setAttribute( "attribute", null );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( handler, 4, 4, 3 );
+		assertEventCounts( handler, 4, 4, 1 );
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "child", null, child );
 		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, child, "attribute", null, "value0" );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, child, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, child );
+		//assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, child, "attribute", "value0", "value1" );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, child );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, data, child, "attribute", "value1", null );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, child, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, child );
+		//assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
 	public void testEventsWithCommit() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = data.getDataEventHandler();
+		DataEventWatcher handler = data.getDataEventWatcher();
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
@@ -394,10 +394,10 @@ public class DataNodeTest extends DataTestCase {
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute", null, "value0" );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, true, false );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, true, false );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
@@ -519,44 +519,122 @@ public class DataNodeTest extends DataTestCase {
 	//		assertEquals( grandchild, path[1] );
 	//	}
 
-	public void testParentModifiedByNodeAttributeSetAttribute() {
-		MockDataNode node = new MockDataNode();
-		MockDataNode attribute = new MockDataNode();
-		DataEventHandler nodeHandler = node.getDataEventHandler();
-		DataEventHandler attributeHandler = attribute.getDataEventHandler();
-		assertNodeState( node, false, 0 );
+	public void testParentModifiedByChildNodeAttributeChange() {
+		MockDataNode parent = new MockDataNode();
+		MockDataNode child = new MockDataNode();
+		DataEventWatcher parentHandler = parent.getDataEventWatcher();
+		DataEventWatcher childHandler = child.getDataEventWatcher();
+		assertNodeState( parent, false, 0 );
 
-		node.setAttribute( "attribute", attribute );
-		assertNodeState( node, true, 1 );
-		assertEventCounts( nodeHandler, 1, 1, 1 );
-		assertEventCounts( attributeHandler, 0, 0, 0 );
+		parent.setAttribute( "child", child );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 1, 1, 1 );
+		assertEventCounts( childHandler, 0, 0, 0 );
 
-		node.setModified( false );
-		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 2, 1, 2 );
+		parent.setModified( false );
+		assertNodeState( parent, false, 0 );
+		assertEventCounts( parentHandler, 2, 1, 2 );
 
-		// Test setting an attribute on the attribute node modifies the parent.
-		attribute.setAttribute( "attribute", "value" );
-		assertTrue( attribute.getParents().contains( node ) );
+		// Test setting an attribute on the child node modifies the parent.
+		child.setAttribute( "attribute", "value" );
+		assertTrue( child.getParents().contains( parent ) );
 
-		assertNodeState( attribute, true, 1 );
-		assertNodeState( node, true, 1 );
-		assertEventCounts( nodeHandler, 3, 2, 4 );
-		assertEventCounts( attributeHandler, 1, 1, 1 );
+		assertNodeState( child, true, 1 );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 3, 2, 3 );
+		assertEventCounts( childHandler, 1, 1, 1 );
 
-		// Test unsetting an attribute on the attribute node unmodified the parent.
-		attribute.setAttribute( "attribute", null );
-		assertNodeState( attribute, false, 0 );
-		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 4, 3, 6 );
-		assertEventCounts( attributeHandler, 2, 2, 2 );
+		// Test unsetting an attribute on the child node unmodifies the parent.
+		child.setAttribute( "attribute", null );
+		assertNodeState( child, false, 0 );
+		assertNodeState( parent, false, 0 );
+		assertEventCounts( parentHandler, 4, 3, 4 );
+		assertEventCounts( childHandler, 2, 2, 2 );
+	}
+
+	// FIXME F - Finish test.
+	public void testParentModifiedByChildNodeAttributeRippleChange() {
+		MockDataNode parent = new MockDataNode();
+		MockDataNode child = new MockDataNode();
+		DataEventWatcher parentHandler = parent.getDataEventWatcher();
+		DataEventWatcher childHandler = child.getDataEventWatcher();
+		assertNodeState( parent, false, 0 );
+
+		parent.setAttribute( "child", child );
+		assertTrue( child.getParents().contains( parent ) );
+		assertNodeState( parent, true, 1 );
+		assertEventCounts( parentHandler, 1, 1, 1 );
+		assertEventCounts( childHandler, 0, 0, 0 );
+		parentHandler.reset();
+
+		parent.setModified( false );
+		assertNodeState( parent, false, 0 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		// Set the 'a' attribute to '1'.
+		child.setAttribute( "a", "1" );
+		assertEventCounts( parentHandler, 1, 1, 1 );
+		assertEventCounts( childHandler, 1, 1, 1 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		// Set the 'b' attribute to '2';
+		child.setAttribute( "b", "2" );
+		assertEventCounts( parentHandler, 1, 1, 0 );
+		assertEventCounts( childHandler, 1, 1, 0 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		child.setModified( false );
+		assertNodeState( parent, false, 0 );
+		assertNodeState( child, false, 0 );
+		assertEventCounts( parentHandler, 1, 0, 1 );
+		assertEventCounts( childHandler, 1, 0, 1 );
+
+		// The parent is already not modified no event should be sent.
+		parent.setModified( false );
+		assertNodeState( parent, false, 0 );
+		assertNodeState( child, false, 0 );
+		assertEventCounts( parentHandler, 1, 0, 1 );
+		assertEventCounts( childHandler, 1, 0, 1 );
+		parentHandler.reset();
+		childHandler.reset();
+
+		//		// Test setting 'a' attribute on the child node modifies the parent.
+		//		child.setAttribute( "a", "1" );
+		//		assertNodeState( child, true, 1 );
+		//		assertNodeState( parent, true, 1 );
+		//		assertEventCounts( parentHandler, 1, 1, 1 );
+		//		assertEventCounts( childHandler, 1, 1, 1 );
+		//
+		//		// Test setting the 'b' attribute on the child leaves the parent modified. 
+		//		child.setAttribute( "b", "2" );
+		//		assertNodeState( child, true, 2 );
+		//		assertNodeState( parent, true, 1 );
+		//		assertEventCounts( parentHandler, 4, 3, 4 );
+		//		assertEventCounts( childHandler, 2, 2, 1 );
+		//
+		//		// Test unsetting 'a' attribute on the child leaves the parent modified.
+		//		child.setAttribute( "a", null );
+		//		assertNodeState( child, true, 1 );
+		//		assertNodeState( parent, true, 1 );
+		//		assertEventCounts( parentHandler, 5, 4, 4 );
+		//		assertEventCounts( childHandler, 3, 3, 1 );
+		//
+		//		// Test unsetting the 'b' attribute on the child returns the parent to unmodified. 
+		//		child.setAttribute( "b", null );
+		//		assertNodeState( child, false, 0 );
+		//		assertNodeState( parent, false, 0 );
+		//		assertEventCounts( parentHandler, 6, 5, 6 );
+		//		assertEventCounts( childHandler, 4, 4, 2 );
 	}
 
 	public void testParentModifiedByNodeAttributeClearModified() {
 		MockDataNode node = new MockDataNode();
 		MockDataNode attribute = new MockDataNode();
-		DataEventHandler nodeHandler = node.getDataEventHandler();
-		DataEventHandler attributeHandler = attribute.getDataEventHandler();
+		DataEventWatcher nodeHandler = node.getDataEventWatcher();
+		DataEventWatcher attributeHandler = attribute.getDataEventWatcher();
 		assertNodeState( node, false, 0 );
 		assertEventCounts( nodeHandler, 0, 0, 0 );
 		assertEventCounts( attributeHandler, 0, 0, 0 );
@@ -576,22 +654,22 @@ public class DataNodeTest extends DataTestCase {
 
 		assertNodeState( attribute, true, 1 );
 		assertNodeState( node, true, 1 );
-		assertEventCounts( nodeHandler, 3, 2, 4 );
+		assertEventCounts( nodeHandler, 3, 2, 3 );
 		assertEventCounts( attributeHandler, 1, 1, 1 );
 
 		// Test unsetting an attribute on the attribute node unmodified the parent.
 		attribute.setModified( false );
 		assertNodeState( attribute, false, 0 );
 		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 4, 2, 6 );
+		assertEventCounts( nodeHandler, 4, 2, 4 );
 		assertEventCounts( attributeHandler, 2, 1, 2 );
 	}
 
 	public void testChildNodeAttributesClearedByParentClearModified() {
 		MockDataNode child = new MockDataNode( "child" );
 		MockDataNode parent = new MockDataNode( "parent" );
-		DataEventHandler childHandler = child.getDataEventHandler();
-		DataEventHandler parentHandler = parent.getDataEventHandler();
+		DataEventWatcher childHandler = child.getDataEventWatcher();
+		DataEventWatcher parentHandler = parent.getDataEventWatcher();
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 0, 0, 0 );
 		assertNodeState( parent, false, 0 );
@@ -609,22 +687,22 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1 );
 		assertNodeState( parent, true, 1 );
-		assertEventCounts( parentHandler, 3, 2, 4 );
+		assertEventCounts( parentHandler, 3, 2, 3 );
 
 		parent.setModified( false );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 2, 1, 2 );
 		assertNodeState( parent, false, 0 );
-		assertEventCounts( parentHandler, 5, 2, 6 );
+		assertEventCounts( parentHandler, 4, 2, 4 );
 	}
 
 	public void testAddNodeAttributeToDifferentParent() {
 		MockDataNode child = new MockDataNode();
 		MockDataNode parent0 = new MockDataNode();
 		MockDataNode parent1 = new MockDataNode();
-		DataEventHandler childHandler = child.getDataEventHandler();
-		DataEventHandler parent0Handler = parent0.getDataEventHandler();
-		DataEventHandler parent1Handler = parent1.getDataEventHandler();
+		DataEventWatcher childHandler = child.getDataEventWatcher();
+		DataEventWatcher parent0Handler = parent0.getDataEventWatcher();
+		DataEventWatcher parent1Handler = parent1.getDataEventWatcher();
 
 		// Add the child attribute to parent 0.
 		parent0.setAttribute( "child", child );
@@ -655,7 +733,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testAddDataListener() throws Exception {
 		MockDataNode node = new MockDataNode();
-		DataEventHandler handler = node.getDataEventHandler();
+		DataEventWatcher handler = node.getDataEventWatcher();
 		Collection<DataListener> listeners = Accessor.getField( node, "listeners" );
 
 		assertNotNull( listeners );
@@ -666,7 +744,7 @@ public class DataNodeTest extends DataTestCase {
 	@Test
 	public void testRemoveDataListener() throws Exception {
 		MockDataNode node = new MockDataNode();
-		DataEventHandler handler = node.getDataEventHandler();
+		DataEventWatcher handler = node.getDataEventWatcher();
 		Collection<DataListener> listeners = Accessor.getField( node, "listeners" );
 
 		assertNotNull( listeners );

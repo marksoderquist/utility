@@ -235,37 +235,37 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		return children.subList( fromIndex, toIndex );
 	}
 
-//	@Override
-//	public boolean equals( Object object ) {
-//		return equalsUsingAttributesAndChildren( object );
-//	}
+	//	@Override
+	//	public boolean equals( Object object ) {
+	//		return equalsUsingAttributesAndChildren( object );
+	//	}
 
 	public boolean equalsUsingChildren( Object object ) {
 		if( !( object instanceof DataList<?> ) ) return false;
-	
+
 		DataList<?> that = (DataList<?>)object;
-	
+
 		List<? extends DataNode> thisChildren = this.children;
 		List<? extends DataNode> thatChildren = that.children;
-	
+
 		if( thisChildren == null && thatChildren == null ) return true;
 		if( thisChildren == null && thatChildren != null ) return false;
 		if( thisChildren != null && thatChildren == null ) return false;
-	
+
 		if( thisChildren.size() != thatChildren.size() ) return false;
 		int count = thisChildren.size();
 		for( int index = 0; index < count; index++ ) {
 			DataNode thisChild = thisChildren.get( index );
 			DataNode thatChild = thatChildren.get( index );
-	
+
 			if( !thisChild.equalsUsingAttributes( thatChild ) ) return false;
-	
+
 			if( thisChild instanceof DataList<?> ) {
 				if( !( thatChild instanceof DataList<?> ) ) return false;
 				if( !( (DataList<?>)thisChild ).equalsUsingChildren( thatChild ) ) return false;
 			}
 		}
-	
+
 		return true;
 	}
 
@@ -308,10 +308,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	@Override
 	protected void updateModifiedFlag() {
 		super.updateModifiedFlag();
-		selfModified = modified;
 
-		int addRemoveChildCount = addRemoveChildren == null ? 0 : addRemoveChildren.size();
-		treeModified = modifiedChildCount != 0 | addRemoveChildCount != 0;
+		selfModified = modified;
+		treeModified = modifiedChildCount != 0 | ( addRemoveChildren != null && addRemoveChildren.size() > 0 );
 
 		modified = selfModified | treeModified;
 	}
@@ -339,12 +338,12 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 			modifiedChildCount++;
 		} else {
 			modifiedChildCount--;
-	
+
 			// The reason for the following line is that doClearModifed() is 
 			// processed by transactions before processing child and parent nodes.
 			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
 		}
-	
+
 		updateModifiedFlag();
 	}
 
@@ -352,17 +351,11 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		for( DataListener listener : listeners ) {
 			listener.childInserted( event );
 		}
-		for( DataNode parent : parents ) {
-			parent.dispatchEvent( event );
-		}
 	}
 
 	private void fireChildRemovedEvent( DataChildEvent event ) {
 		for( DataListener listener : listeners ) {
 			listener.childRemoved( event );
-		}
-		for( DataNode parent : parents ) {
-			parent.dispatchEvent( event );
 		}
 	}
 
@@ -430,7 +423,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 			OperationResult result = new OperationResult( this );
 
 			list.doAddChild( index, child );
-			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, getData(), index, child ) );
+			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, list, list, index, child ) );
 
 			return result;
 		}
@@ -456,7 +449,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 			if( list != null && list.children != null ) {
 				int index = list.children.indexOf( child );
 				list.doRemoveChild( child );
-				result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, index, child ) );
+				result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, list, index, child ) );
 			}
 
 			return result;

@@ -2,11 +2,11 @@ package com.parallelsymmetry.utility.data;
 
 import com.parallelsymmetry.utility.data.DataNode;
 
-class MockDataNode extends DataNode {
+class MockDataNode extends DataNode implements WatchedMockData {
 
 	private String name;
 
-	private DataEventHandler handler;
+	private DataEventWatcher handler;
 
 	public MockDataNode() {
 		this( null );
@@ -17,7 +17,7 @@ class MockDataNode extends DataNode {
 		setAttribute( "name", name );
 		unmodify();
 
-		handler = new DataEventHandler();
+		handler = new DataEventWatcher( name );
 		addDataListener( handler );
 	}
 
@@ -26,7 +26,8 @@ class MockDataNode extends DataNode {
 		return name == null ? super.toString() : name;
 	}
 
-	public DataEventHandler getDataEventHandler() {
+	@Override
+	public DataEventWatcher getDataEventWatcher() {
 		return handler;
 	}
 

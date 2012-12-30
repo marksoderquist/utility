@@ -11,51 +11,61 @@ import com.parallelsymmetry.utility.data.DataListener;
 import com.parallelsymmetry.utility.data.MetaAttributeEvent;
 import com.parallelsymmetry.utility.log.Log;
 
-class DataEventHandler implements DataListener {
+class DataEventWatcher implements DataListener {
+
+	private String name;
 
 	private List<DataEvent> events = new ArrayList<DataEvent>();
 
 	private List<DataChangedEvent> dataChangedEvents = new ArrayList<DataChangedEvent>();
 
-	private List<DataAttributeEvent> dataAttributeEvents = new ArrayList<DataAttributeEvent>();
-
 	private List<MetaAttributeEvent> metaAttributeEvents = new ArrayList<MetaAttributeEvent>();
+
+	private List<DataAttributeEvent> dataAttributeEvents = new ArrayList<DataAttributeEvent>();
 
 	private List<DataChildEvent> childInsertedEvents = new ArrayList<DataChildEvent>();
 
 	private List<DataChildEvent> childRemovedEvents = new ArrayList<DataChildEvent>();
 
+	public DataEventWatcher() {
+		this( null );
+	}
+
+	public DataEventWatcher( String name ) {
+		this.name = ( name == null ? "" : name );
+	}
+
 	@Override
 	public void dataChanged( DataChangedEvent event ) {
-		Log.write( Log.TRACE, "Data change event received." );
+		Log.write( Log.TRACE, name, ": Data change event received." );
 		dataChangedEvents.add( event );
 		events.add( event );
 	}
 
 	@Override
-	public void dataAttributeChanged( DataAttributeEvent event ) {
-		Log.write( Log.TRACE, "Data attribute change event received." );
-		dataAttributeEvents.add( event );
-		events.add( event );
-	}
-
-	@Override
 	public void metaAttributeChanged( MetaAttributeEvent event ) {
-		Log.write( Log.TRACE, "Meta attribute change event received." );
+		Log.write( Log.TRACE, name, ": Meta attribute change event received." );
 		metaAttributeEvents.add( event );
 		events.add( event );
 	}
 
 	@Override
+	public void dataAttributeChanged( DataAttributeEvent event ) {
+		Log.write( Log.TRACE, name, ": Data attribute change event received." );
+		dataAttributeEvents.add( event );
+		events.add( event );
+	}
+
+	@Override
 	public void childInserted( DataChildEvent event ) {
-		Log.write( Log.TRACE, "Child inserted event received." );
+		Log.write( Log.TRACE, name, ": Child inserted event received." );
 		childInsertedEvents.add( event );
 		events.add( event );
 	}
 
 	@Override
 	public void childRemoved( DataChildEvent event ) {
-		Log.write( Log.TRACE, "Child removed event received." );
+		Log.write( Log.TRACE, name, ": Child removed event received." );
 		childRemovedEvents.add( event );
 		events.add( event );
 	}
@@ -68,12 +78,12 @@ class DataEventHandler implements DataListener {
 		return dataChangedEvents;
 	}
 
-	public List<DataAttributeEvent> getDataAttributeEvents() {
-		return dataAttributeEvents;
-	}
-
 	public List<MetaAttributeEvent> getMetaAttributeEvents() {
 		return metaAttributeEvents;
+	}
+
+	public List<DataAttributeEvent> getDataAttributeEvents() {
+		return dataAttributeEvents;
 	}
 
 	public List<DataChildEvent> getChildInsertedEvents() {
@@ -90,6 +100,7 @@ class DataEventHandler implements DataListener {
 		dataAttributeEvents.clear();
 		childInsertedEvents.clear();
 		childRemovedEvents.clear();
+		events.clear();
 	}
 
 }

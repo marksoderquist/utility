@@ -4,7 +4,7 @@ import com.parallelsymmetry.utility.JavaUtil;
 
 public abstract class Operation {
 
-	private DataNode data;
+	protected DataNode data;
 
 	public Operation( DataNode data ) {
 		this.data = data;

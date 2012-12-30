@@ -1,9 +1,11 @@
 package com.parallelsymmetry.utility.data;
 
+import com.parallelsymmetry.utility.JavaUtil;
+
 public abstract class DataEvent {
 	
 	public enum Type {
-		DATA_CHANGED, DATA_ATTRIBUTE, META_ATTRIBUTE, DATA_CHILD
+		DATA_CHANGED, META_ATTRIBUTE, DATA_ATTRIBUTE, DATA_CHILD
 	}
 
 	public enum Action {
@@ -14,14 +16,13 @@ public abstract class DataEvent {
 	
 	private Action action;
 	
+	// FIXME E - Rename data to sender.
 	private DataNode data;
 	
-	private DataNode cause;
-
-	public DataEvent( Type type, Action action, DataNode cause ) {
+	public DataEvent( Type type, Action action, DataNode sender ) {
 		this.type = type;
 		this.action = action;
-		this.cause = cause;
+		this.data = sender;
 	}
 	
 	public Type getType() {
@@ -36,12 +37,21 @@ public abstract class DataEvent {
 		return data;
 	}
 	
-	public DataNode getCause() {
-		return cause;
-	}
+	public abstract DataEvent cloneWithNewSender( DataNode parent );
 	
-	void setData( DataNode data ) {
-		this.data = data;
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append( JavaUtil.getClassName( getClass() ) );
+		builder.append( "  type: " );
+		builder.append( type.name() );
+		builder.append( "  action: " );
+		builder.append( action.name() );
+		builder.append( "  sender: " );
+		builder.append( data.toString() );
+		
+		return builder.toString();
 	}
 
 }

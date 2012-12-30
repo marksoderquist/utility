@@ -4,9 +4,9 @@ public interface DataListener {
 
 	void dataChanged( DataChangedEvent event );
 
-	void dataAttributeChanged( DataAttributeEvent event );
-
 	void metaAttributeChanged( MetaAttributeEvent event );
+
+	void dataAttributeChanged( DataAttributeEvent event );
 
 	void childInserted( DataChildEvent event );
 

@@ -1,6 +1,6 @@
 package com.parallelsymmetry.utility.data;
 
-public class DataAttributeEvent extends DataEvent {
+public class DataAttributeEvent extends DataValueEvent {
 
 	private String name;
 
@@ -8,8 +8,8 @@ public class DataAttributeEvent extends DataEvent {
 
 	private Object oldValue;
 
-	public DataAttributeEvent( DataEvent.Action action, DataNode data, String name, Object oldValue, Object newValue ) {
-		super( DataEvent.Type.DATA_ATTRIBUTE, action, data );
+	public DataAttributeEvent( DataEvent.Action action,DataNode sender, DataNode cause, String name, Object oldValue, Object newValue ) {
+		super( DataEvent.Type.DATA_ATTRIBUTE, action, sender, cause );
 		this.name = name;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
@@ -25,6 +25,11 @@ public class DataAttributeEvent extends DataEvent {
 
 	public Object getNewValue() {
 		return newValue;
+	}
+
+	@Override
+	public DataEvent cloneWithNewSender( DataNode sender ) {
+		return new DataAttributeEvent( getAction(), sender, getCause(), name, oldValue, newValue );
 	}
 
 }

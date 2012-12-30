@@ -1,13 +1,13 @@
 package com.parallelsymmetry.utility.data;
 
-public class DataChildEvent extends DataEvent {
+public class DataChildEvent extends DataValueEvent {
 
 	private int index;
 
 	private DataNode child;
 
-	public DataChildEvent( Action action, DataNode node, int index, DataNode child ) {
-		super( DataEvent.Type.DATA_CHILD, action, node );
+	public DataChildEvent( Action action, DataNode sender, DataNode cause, int index, DataNode child ) {
+		super( DataEvent.Type.DATA_CHILD, action, sender, cause );
 		this.index = index;
 		this.child = child;
 	}
@@ -23,6 +23,11 @@ public class DataChildEvent extends DataEvent {
 	@Override
 	public String toString() {
 		return getAction().toString() + ": " + getCause() + "(" + index + "): " + child;
+	}
+
+	@Override
+	public DataEvent cloneWithNewSender( DataNode sender ) {
+		return new DataChildEvent( getAction(), sender, getCause(), index, child );
 	}
 
 }

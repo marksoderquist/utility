@@ -2,12 +2,14 @@ package com.parallelsymmetry.utility.data;
 
 import org.junit.Test;
 
+import com.parallelsymmetry.utility.ObjectUtil;
+
 public class TransactionTest extends DataTestCase {
 
 	@Test
 	public void testTransaction() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = new DataEventHandler();
+		DataEventWatcher handler = new DataEventWatcher();
 		data.addDataListener( handler );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
@@ -29,21 +31,21 @@ public class TransactionTest extends DataTestCase {
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute0", null, "value0" );
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute1", null, "value1" );
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute2", null, "value2" );
-		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, DataNode.MODIFIED, false, true );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
 	@Test
-	public void testTransactionAction() {
+	public void testTransactionOperation() {
 		MockDataNode data = new MockDataNode();
-		DataEventHandler handler = new DataEventHandler();
+		DataEventWatcher handler = new DataEventWatcher();
 		data.addDataListener( handler );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
 		Transaction transaction = new Transaction();
-		transaction.add( new MockAction( data ) );
+		transaction.add( new MockOperation( data ) );
 
 		transaction.commit();
 		assertNodeState( data, false, 0 );
@@ -51,14 +53,14 @@ public class TransactionTest extends DataTestCase {
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, "name", "value0", "value1" );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data, data );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
 	@Test
 	public void testTransactionNested() throws Exception {
 		MockDataNode node = new MockDataNode();
-		DataEventHandler handler = node.getDataEventHandler();
+		DataEventWatcher handler = node.getDataEventWatcher();
 
 		// Initial transaction.
 		Transaction transaction0 = node.startTransaction();
@@ -104,37 +106,72 @@ public class TransactionTest extends DataTestCase {
 
 	@Test
 	public void testTransactionByModifyingChild() {
-		MockDataList parent = new MockDataList();
-		MockDataNode child = new MockDataNode();
-		DataEventHandler watcher = parent.getDataEventHandler();
+		MockDataList parent = new MockDataList( "parent" );
+		MockDataNode child = new MockDataNode( "child" );
+		DataEventWatcher parentWatcher = parent.getDataEventWatcher();
+		DataEventWatcher childWatcher = child.getDataEventWatcher();
 
+		// Set up the data model.
 		parent.add( child );
-		parent.unmodify();
+
+		// Set the parent unmodified.
+		parent.setModified( false );
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
-		watcher.reset();
+		parentWatcher.reset();
+		childWatcher.reset();
 
+		// Start a transaction
 		Transaction transaction = parent.startTransaction();
+
+		// Set the child attribute but nothing should happen
+		// because the transaction has not been committed yet.
 		child.setAttribute( "key1", "value1" );
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
-		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
-		watcher.reset();
+		assertEventCounts( parentWatcher, 0, 0, 0, 0, 0 );
+		assertEventCounts( childWatcher, 0, 0, 0, 0, 0 );
+		parentWatcher.reset();
+		childWatcher.reset();
 
+		// Commit the transaction.
 		transaction.commit();
 		assertTrue( parent.isModified() );
 		assertTrue( child.isModified() );
-		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
-		watcher.reset();
+		assertEquals( "value1", child.getAttribute( "key1" ) );
+		assertEventCounts( parentWatcher, 1, 1, 1, 0, 0 );
+		assertEventState( parentWatcher, 0, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, parent, child, "key1", null, "value1" );
+		assertEventState( parentWatcher, 1, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, false, true );
+		assertEventState( parentWatcher, 2, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
+		assertEventCounts( childWatcher, 1, 1, 1, 0, 0 );
+		assertEventState( childWatcher, 0, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, child, child, "key1", null, "value1" );
+		assertEventState( childWatcher, 1, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, child, DataNode.MODIFIED, false, true );
+		assertEventState( childWatcher, 2, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
+		parentWatcher.reset();
+		childWatcher.reset();
 
+		// Unset the the child attribute but nothing should happen 
+		// because the transaction has not been committed yet.
 		transaction = parent.startTransaction();
 		child.setAttribute( "key1", null );
-		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
-		watcher.reset();
+		assertEventCounts( parentWatcher, 0, 0, 0, 0, 0 );
+		assertEventCounts( childWatcher, 0, 0, 0, 0, 0 );
+		parentWatcher.reset();
+		childWatcher.reset();
 
+		// Commit the transaction.
 		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
-		watcher.reset();
+		assertFalse( parent.isModified() );
+		assertFalse( child.isModified() );
+		assertEquals( null, child.getAttribute( "key1" ) );
+		assertEventCounts( parentWatcher, 1, 1, 1, 0, 0 );
+		assertEventState( parentWatcher, 0, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, parent, child, "key1", "value1", null );
+		assertEventState( parentWatcher, 1, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, true, false );
+		assertEventState( parentWatcher, 2, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
+		assertEventCounts( childWatcher, 1, 1, 1, 0, 0 );
+		assertEventState( childWatcher, 0, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, child, child, "key1", "value1", null );
+		assertEventState( childWatcher, 1, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, child, DataNode.MODIFIED, true, false );
+		assertEventState( childWatcher, 2, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
 
 	@Test
@@ -142,7 +179,7 @@ public class TransactionTest extends DataTestCase {
 		MockDataList parent = new MockDataList( "parent" );
 		MockDataList child = new MockDataList( "child" );
 		MockDataNode grandchild = new MockDataNode( "grandchild" );
-		DataEventHandler watcher = parent.getDataEventHandler();
+		DataEventWatcher watcher = parent.getDataEventWatcher();
 
 		parent.add( child );
 		child.add( grandchild );
@@ -158,7 +195,7 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 
 		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 3, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
 		watcher.reset();
 
 		transaction = parent.startTransaction();
@@ -167,7 +204,7 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 
 		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 3, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
 		watcher.reset();
 	}
 
@@ -203,20 +240,22 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public int hashCode() {
-			return getKey().hashCode();
+			String key = getKey();
+			return key == null ? 0 : key.hashCode();
 		}
 
 		@Override
 		public boolean equals( Object object ) {
 			if( !( object instanceof AttributeDependentHashCodeType ) ) return false;
-			return getKey().equals( ( (AttributeDependentHashCodeType)object ).getKey() );
+			String key = getKey();
+			return ObjectUtil.areEqual( key, ( (AttributeDependentHashCodeType)object ).getKey() );
 		}
 
 	}
 
-	private class MockAction extends Operation {
+	private class MockOperation extends Operation {
 
-		public MockAction( DataNode data ) {
+		public MockOperation( DataNode data ) {
 			super( data );
 		}
 
@@ -224,7 +263,7 @@ public class TransactionTest extends DataTestCase {
 		public OperationResult process() {
 			OperationResult result = new OperationResult( this );
 
-			result.addEvent( new DataAttributeEvent( DataEvent.Action.MODIFY, getData(), "name", "value0", "value1" ) );
+			result.addEvent( new DataAttributeEvent( DataEvent.Action.MODIFY, data, data, "name", "value0", "value1" ) );
 
 			return result;
 		}

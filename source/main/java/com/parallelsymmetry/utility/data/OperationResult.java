@@ -14,7 +14,7 @@ public class OperationResult {
 		this.events = new CopyOnWriteArrayList<DataEvent>();
 	}
 
-	public Operation getAction() {
+	public Operation getOperation() {
 		return action;
 	}
 
