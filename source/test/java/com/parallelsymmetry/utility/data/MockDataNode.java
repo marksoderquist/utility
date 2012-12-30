@@ -15,7 +15,7 @@ class MockDataNode extends DataNode implements WatchedMockData {
 	public MockDataNode( String name ) {
 		this.name = name;
 		setAttribute( "name", name );
-		unmodify();
+		setModified( false );
 
 		handler = new DataEventWatcher( name );
 		addDataListener( handler );
