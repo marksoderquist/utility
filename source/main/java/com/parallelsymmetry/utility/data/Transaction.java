@@ -26,6 +26,10 @@ public class Transaction {
 
 	private boolean commitInProgress;
 
+	/**
+	 * @deprecated Once the bulk of the transaction updates have been completed, this can be removed.
+	 */
+	@Deprecated
 	private AtomicInteger depth = new AtomicInteger();
 
 	private Map<DataNode, FinalEvents> finalEvents = new ConcurrentHashMap<DataNode, FinalEvents>();
@@ -115,14 +119,17 @@ public class Transaction {
 		cleanup();
 	}
 
+	@Deprecated
 	public int getDepth() {
 		return depth.get();
 	}
 
+	@Deprecated
 	public int incrementDepth() {
 		return depth.incrementAndGet();
 	}
 
+	@Deprecated
 	public int decrementDepth() {
 		return depth.decrementAndGet();
 	}
