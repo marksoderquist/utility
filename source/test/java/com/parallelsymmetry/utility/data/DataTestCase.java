@@ -21,14 +21,14 @@ public abstract class DataTestCase extends TestCase {
 	}
 
 	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
-		assertNodeState( node, modified, modifiedAttributeCount, false );
-	}
-
-	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount, boolean transactionActive ) {
 		assertEquals( modified, node.isModified() );
 		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
-		assertEquals( transactionActive, node.isTransactionActive() );
 	}
+
+//	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
+//		assertEquals( modified, node.isModified() );
+//		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
+//	}
 
 	protected void assertListState( DataList<?> node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
 		assertNodeState( node, modified, modifiedAttributeCount );
