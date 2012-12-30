@@ -359,7 +359,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		}
 	}
 
-	private void doAddChild( int index, T child ) {
+	void doAddChild( int index, T child ) {
 		if( children == null ) children = new CopyOnWriteArrayList<T>();
 
 		if( index > children.size() ) index = children.size();
@@ -382,7 +382,32 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		updateModifiedFlag();
 	}
 
-	private void doRemoveChild( T child ) {
+	T doRemoveChild( int index ) {
+		T child = children.get( index );
+		children.remove( index );
+		child.removeParent( this );
+
+		if( addRemoveChildren == null ) {
+			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Action>();
+			addRemoveChildren.put( child, DataEvent.Action.REMOVE );
+		} else {
+			if( addRemoveChildren.get( child ) == DataEvent.Action.INSERT ) {
+				addRemoveChildren.remove( child );
+				if( addRemoveChildren.size() == 0 ) addRemoveChildren = null;
+			} else {
+				addRemoveChildren.put( child, DataEvent.Action.REMOVE );
+			}
+		}
+
+		if( children.size() == 0 ) children = null;
+
+		updateModifiedFlag();
+		
+		return child;
+	}
+
+	@Deprecated
+	void doRemoveChild( T child ) {
 		children.remove( child );
 		child.removeParent( this );
 
@@ -403,6 +428,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		updateModifiedFlag();
 	}
 
+	@Deprecated
 	private static class AddChildAction<T extends DataNode> extends Operation {
 
 		private DataList<T> list;
@@ -430,6 +456,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	}
 
+	@Deprecated
 	private static class RemoveChildAction<T extends DataNode> extends Operation {
 
 		private DataList<T> list;

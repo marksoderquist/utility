@@ -361,6 +361,38 @@ public abstract class DataNode {
 		return true;
 	}
 
+	void doSetAttribute( String name, Object oldValue, Object newValue ) {
+		// Create the attribute map if necessary.
+		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
+	
+		// Set the attribute value.
+		if( newValue == null ) {
+			attributes.remove( name );
+			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
+		} else {
+			attributes.put( name, newValue );
+			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
+		}
+	
+		// Remove the attribute map if necessary.
+		if( attributes.size() == 0 ) attributes = null;
+	
+		// Update the modified attribute value map.
+		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
+		if( preValue == null ) {
+			// Only add the value if there is not an existing previous value.
+			if( modifiedAttributes == null ) modifiedAttributes = new ConcurrentHashMap<String, Object>();
+			modifiedAttributes.put( name, oldValue == null ? NULL : oldValue );
+			modifiedAttributeCount++;
+		} else if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
+			modifiedAttributes.remove( name );
+			modifiedAttributeCount--;
+			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
+		}
+	
+		updateModifiedFlag();
+	}
+
 	/**
 	 * Set the modified flag for this node.
 	 */
@@ -457,38 +489,6 @@ public abstract class DataNode {
 		}
 	}
 
-	private void doSetAttribute( String name, Object oldValue, Object newValue ) {
-		// Create the attribute map if necessary.
-		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
-
-		// Set the attribute value.
-		if( newValue == null ) {
-			attributes.remove( name );
-			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
-		} else {
-			attributes.put( name, newValue );
-			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
-		}
-
-		// Remove the attribute map if necessary.
-		if( attributes.size() == 0 ) attributes = null;
-
-		// Update the modified attribute value map.
-		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
-		if( preValue == null ) {
-			// Only add the value if there is not an existing previous value.
-			if( modifiedAttributes == null ) modifiedAttributes = new ConcurrentHashMap<String, Object>();
-			modifiedAttributes.put( name, oldValue == null ? NULL : oldValue );
-			modifiedAttributeCount++;
-		} else if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
-			modifiedAttributes.remove( name );
-			modifiedAttributeCount--;
-			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
-		}
-
-		updateModifiedFlag();
-	}
-
 	private void fireDataChanged( DataChangedEvent event ) {
 		for( DataListener listener : this.listeners ) {
 			listener.dataChanged( event );
@@ -507,6 +507,7 @@ public abstract class DataNode {
 		}
 	}
 
+	@Deprecated
 	public static class ModifyAction extends Operation {
 
 		public ModifyAction( DataNode data ) {
@@ -524,6 +525,7 @@ public abstract class DataNode {
 
 	}
 
+	@Deprecated
 	private static class UnmodifyAction extends Operation {
 
 		public UnmodifyAction( DataNode data ) {
@@ -540,6 +542,7 @@ public abstract class DataNode {
 		}
 	}
 
+	@Deprecated
 	private static class SetAttributeAction extends Operation {
 
 		private String name;

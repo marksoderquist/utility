@@ -20,9 +20,9 @@ public class Transaction {
 
 	private static final Object COMMIT_LOCK = new Object();
 
-	private Queue<Operation> operations;
-
 	private Set<DataNode> nodes;
+
+	private Queue<Operation> operations;
 
 	private boolean commitInProgress;
 
@@ -31,17 +31,24 @@ public class Transaction {
 	private Map<DataNode, FinalEvents> finalEvents = new ConcurrentHashMap<DataNode, FinalEvents>();
 
 	public Transaction() {
-		operations = new ConcurrentLinkedQueue<Operation>();
 		nodes = new CopyOnWriteArraySet<DataNode>();
+		operations = new ConcurrentLinkedQueue<Operation>();
 	}
 
-	public void add( Operation operation ) {
-		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
+	public void setAttribute( DataNode node, String name, Object newValue ) {
+		add( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
+	}
 
-		Log.write( Log.DETAIL, "Transaction: " + toString() + " adding operation: " + operation );
+	public <T extends DataNode> void insertChild( DataList<T> list, int index, T child ) {
+		add( new InsertChildOperation<T>( list, index, child ) );
+	}
 
-		operations.offer( operation );
-		nodes.add( operation.getData() );
+	public <T extends DataNode> void removeChild( DataList<T> list, T child ) {
+		removeChild( list, list.indexOf( child ) );
+	}
+
+	public <T extends DataNode> void removeChild( DataList<T> list, int index ) {
+		add( new RemoveChildOperation<T>( list, index ) );
 	}
 
 	public void commit() {
@@ -125,6 +132,16 @@ public class Transaction {
 		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
 	}
 
+	// NEXT Make this method private and fix all references.
+	void add( Operation operation ) {
+		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
+
+		Log.write( Log.DETAIL, "Transaction: " + toString() + " adding operation: " + operation );
+
+		operations.offer( operation );
+		nodes.add( operation.getData() );
+	}
+
 	private void dispatchEvent( DataEvent event ) {
 		DataNode sender = event.getData();
 
@@ -203,6 +220,88 @@ public class Transaction {
 		}
 		operations.clear();
 		nodes.clear();
+	}
+
+	private static class SetAttributeOperation extends Operation {
+
+		private String name;
+
+		private Object oldValue;
+
+		private Object newValue;
+
+		public SetAttributeOperation( DataNode data, String name, Object oldValue, Object newValue ) {
+			super( data );
+			this.name = name;
+			this.oldValue = oldValue;
+			this.newValue = newValue;
+		}
+
+		@Override
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
+
+			getData().doSetAttribute( name, oldValue, newValue );
+
+			DataEvent.Action type = DataEvent.Action.MODIFY;
+			type = oldValue == null ? DataEvent.Action.INSERT : type;
+			type = newValue == null ? DataEvent.Action.REMOVE : type;
+			result.addEvent( new DataAttributeEvent( type, data, data, name, oldValue, newValue ) );
+
+			return result;
+		}
+
+	}
+
+	private static class InsertChildOperation<T extends DataNode> extends Operation {
+
+		private DataList<T> list;
+
+		private int index;
+
+		private T child;
+
+		public InsertChildOperation( DataList<T> list, int index, T child ) {
+			super( list );
+			this.list = list;
+			this.index = index;
+			this.child = child;
+		}
+
+		@Override
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
+
+			list.doAddChild( index, child );
+			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, list, list, index, child ) );
+
+			return result;
+		}
+
+	}
+
+	private static class RemoveChildOperation<T extends DataNode> extends Operation {
+
+		private DataList<T> list;
+
+		private int index;
+
+		public RemoveChildOperation( DataList<T> list, int index ) {
+			super( list );
+			this.list = list;
+			this.index = index;
+		}
+
+		@Override
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
+
+			T child = list.doRemoveChild( index );
+			result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, list, index, child ) );
+
+			return result;
+		}
+
 	}
 
 	private class FinalEvents {
