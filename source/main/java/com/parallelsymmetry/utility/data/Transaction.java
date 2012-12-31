@@ -1,6 +1,7 @@
 package com.parallelsymmetry.utility.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -8,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.parallelsymmetry.utility.log.Log;
 
@@ -20,45 +20,89 @@ public class Transaction {
 
 	private static final Object COMMIT_LOCK = new Object();
 
+	private static boolean commitInProgress;
+
 	private Set<DataNode> nodes;
 
 	private Queue<Operation> operations;
 
-	private boolean commitInProgress;
+	private Map<DataNode, FinalEvents> finalEvents;
 
-	/**
-	 * @deprecated Once the bulk of the transaction updates have been completed, this can be removed.
-	 */
-	@Deprecated
-	private AtomicInteger depth = new AtomicInteger();
-
-	private Map<DataNode, FinalEvents> finalEvents = new ConcurrentHashMap<DataNode, FinalEvents>();
+	private boolean committed;
 
 	public Transaction() {
 		nodes = new CopyOnWriteArraySet<DataNode>();
 		operations = new ConcurrentLinkedQueue<Operation>();
+		finalEvents = new ConcurrentHashMap<DataNode, FinalEvents>();
 	}
 
 	public void setAttribute( DataNode node, String name, Object newValue ) {
 		add( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
 	}
 
-	public <T extends DataNode> void insertChild( DataList<T> list, int index, T child ) {
+	public <T extends DataNode> boolean add( DataList<T> list, T child ) {
+		return add( list, Integer.MAX_VALUE, child );
+	}
+
+	public <T extends DataNode> boolean add( DataList<T> list, int index, T child ) {
+		if( child == null ) return false;
+
 		add( new InsertChildOperation<T>( list, index, child ) );
+
+		return true;
 	}
 
-	public <T extends DataNode> void removeChild( DataList<T> list, T child ) {
-		removeChild( list, list.indexOf( child ) );
+	public <T extends DataNode> boolean addAll( DataList<T> list, Collection<? extends T> collection ) {
+		return addAll( list, Integer.MAX_VALUE, collection );
 	}
 
-	public <T extends DataNode> void removeChild( DataList<T> list, int index ) {
-		add( new RemoveChildOperation<T>( list, index ) );
+	public <T extends DataNode> boolean addAll( DataList<T> list, int index, Collection<? extends T> collection ) {
+		if( collection == null ) return false;
+
+		// Figure out if nodes need to be added.
+		List<T> children = new ArrayList<T>();
+		for( T node : collection ) {
+			if( !list.contains( node ) ) children.add( node );
+		}
+		if( children.size() == 0 ) return false;
+
+		// Add the nodes.
+		for( T node : children ) {
+			add( list, index, node );
+			if( index < Integer.MAX_VALUE ) index++;
+		}
+
+		return true;
+	}
+
+	public <T extends DataNode> boolean remove( DataList<T> list, T child ) {
+		if( child == null || !( child instanceof DataNode ) || !list.contains( child ) ) return false;
+		return remove( list, list.indexOf( child ) );
+	}
+
+	public <T extends DataNode> boolean remove( DataList<T> list, int index ) {
+		if( index < 0 || index >= list.size() ) throw new ArrayIndexOutOfBoundsException( index );
+		add( new RemoveChildOperation<T>( list, list.get( index ) ) );
+		return true;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public <T extends DataNode> boolean removeAll( DataList<T> list, Collection<?> collection ) {
+		if( collection == null ) return false;
+
+		int count = 0;
+		for( Object node : collection ) {
+			if( !( node instanceof DataNode ) ) continue;
+			if( remove( list, (T)node ) ) count++;
+		}
+
+		return count > 0;
 	}
 
 	public void commit() {
 		synchronized( COMMIT_LOCK ) {
-			int depth = decrementDepth();
-			if( depth > 0 ) return;
+			if( committed ) throw new RuntimeException( "Transaction can only be committed once." );
+			committed = true;
 
 			commitInProgress = true;
 			Log.write( Log.DETAIL, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
@@ -108,30 +152,10 @@ public class Transaction {
 
 				fireFinalEvents();
 			} finally {
-				cleanup();
 				Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
 				commitInProgress = false;
 			}
 		}
-	}
-
-	public void cancel() {
-		cleanup();
-	}
-
-	@Deprecated
-	public int getDepth() {
-		return depth.get();
-	}
-
-	@Deprecated
-	public int incrementDepth() {
-		return depth.incrementAndGet();
-	}
-
-	@Deprecated
-	public int decrementDepth() {
-		return depth.decrementAndGet();
 	}
 
 	@Override
@@ -139,8 +163,15 @@ public class Transaction {
 		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
 	}
 
-	// NEXT Make this method private and fix all references.
-	void add( Operation operation ) {
+	void modify( DataNode node ) {
+		add( new ModifyAction( node ) );
+	}
+
+	void unmodify( DataNode node ) {
+		add( new UnmodifyAction( node ) );
+	}
+
+	private void add( Operation operation ) {
 		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
 
 		Log.write( Log.DETAIL, "Transaction: " + toString() + " adding operation: " + operation );
@@ -205,13 +236,6 @@ public class Transaction {
 		for( DataNode node : finalEvents.keySet() ) {
 			FinalEvents events = finalEvents.get( node );
 			if( events.modified != null ) node.dispatchEvent( events.modified );
-
-			//			MetaAttributeEvent event = events.modified;
-			//			if( event == null ) {
-			//				Log.write( "Event: ", node, "  null" );
-			//			} else {
-			//				Log.write( "Event: ", event.getData(), "  cause: " + event.getCause(), "  old: ", event.getOldValue(), "  new: ", event.getNewValue() );
-			//			}
 		}
 
 		// Fire the data changed events last.
@@ -221,12 +245,37 @@ public class Transaction {
 		}
 	}
 
-	private void cleanup() {
-		for( DataNode node : nodes ) {
-			node.setTransaction( null );
+	public static class ModifyAction extends Operation {
+
+		public ModifyAction( DataNode data ) {
+			super( data );
 		}
-		operations.clear();
-		nodes.clear();
+
+		@Override
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
+
+			getData().doModify();
+
+			return result;
+		}
+
+	}
+
+	private static class UnmodifyAction extends Operation {
+
+		public UnmodifyAction( DataNode data ) {
+			super( data );
+		}
+
+		@Override
+		protected OperationResult process() {
+			OperationResult result = new OperationResult( this );
+
+			getData().doUnmodify();
+
+			return result;
+		}
 	}
 
 	private static class SetAttributeOperation extends Operation {
@@ -291,19 +340,20 @@ public class Transaction {
 
 		private DataList<T> list;
 
-		private int index;
+		private T child;
 
-		public RemoveChildOperation( DataList<T> list, int index ) {
+		public RemoveChildOperation( DataList<T> list, T child ) {
 			super( list );
 			this.list = list;
-			this.index = index;
+			this.child = child;
 		}
 
 		@Override
 		protected OperationResult process() {
 			OperationResult result = new OperationResult( this );
 
-			T child = list.doRemoveChild( index );
+			int index = list.indexOf( child );
+			list.doRemoveChild( child );
 			result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, list, index, child ) );
 
 			return result;

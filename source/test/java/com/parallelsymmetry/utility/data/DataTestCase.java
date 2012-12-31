@@ -25,16 +25,9 @@ public abstract class DataTestCase extends TestCase {
 		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
 	}
 
-//	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
-//		assertEquals( modified, node.isModified() );
-//		assertEquals( modifiedAttributeCount, node.getModifiedAttributeCount() );
-//	}
-
 	protected void assertListState( DataList<?> node, boolean modified, int modifiedAttributeCount, int modifiedChildCount ) {
 		assertNodeState( node, modified, modifiedAttributeCount );
-
-		// FIXME - C Re-enable modified child count check.
-		//assertEquals( modifiedChildCount, node.getModifiedChildCount() );
+		assertEquals( modifiedChildCount, node.getModifiedChildCount() );
 	}
 
 	protected void assertEventCounts( DataEventWatcher handler, int dataEventCount, int dataAttributeEventCount, int metaAttributeEventCount ) {
@@ -62,14 +55,14 @@ public abstract class DataTestCase extends TestCase {
 	protected void assertEventState( DataEventWatcher handler, int index, DataEvent.Type type, DataEvent.Action action, DataNode data, String name, Object oldValue, Object newValue ) {
 		assertEventState( handler, index, type, action, data, null, name, oldValue, newValue, -1, null );
 	}
-	
+
 	/**
 	 * For use with DataAttributeEvents.
 	 */
 	protected void assertEventState( DataEventWatcher handler, int index, DataEvent.Type type, DataEvent.Action action, DataNode data, DataNode cause, String name, Object oldValue, Object newValue ) {
 		assertEventState( handler, index, type, action, data, cause, name, oldValue, newValue, -1, null );
 	}
-	
+
 	/**
 	 * For use with DataChildEvents.
 	 */
@@ -79,14 +72,14 @@ public abstract class DataTestCase extends TestCase {
 
 	private void assertEventState( DataEventWatcher handler, int index, DataEvent.Type type, DataEvent.Action action, DataNode data, DataNode cause, String name, Object oldValue, Object newValue, int listIndex, DataNode child ) {
 		DataEvent event = handler.getEvents().get( index );
-		
+
 		// Check things common to all event types.
 		assertEquals( type, event.getType() );
 		assertEquals( action, event.getAction() );
 		assertEquals( data, event.getData() );
 
 		switch( event.getType() ) {
-			case DATA_CHANGED : {
+			case DATA_CHANGED: {
 				break;
 			}
 			case META_ATTRIBUTE: {

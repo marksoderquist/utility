@@ -33,8 +33,6 @@ public abstract class DataNode {
 
 	private Map<String, Object> resources;
 
-	protected Transaction transaction;
-
 	/**
 	 * Is the node modified. The node is modified if any attribute has been
 	 * modified or any child node has been modified since the last time
@@ -53,7 +51,7 @@ public abstract class DataNode {
 		if( modified ) {
 			modify();
 		} else {
-			unmodify();
+			unmodify( null );
 		}
 	}
 
@@ -109,11 +107,11 @@ public abstract class DataNode {
 		Object oldValue = getAttribute( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
 		if( newValue instanceof DataNode ) checkForCircularReference( (DataNode)newValue );
-		getTransaction().add( new SetAttributeAction( this, name, oldValue, newValue ) );
-		if( atomic ) getTransaction().commit();
+
+		Transaction transaction = new Transaction();
+		transaction.setAttribute( this, name, newValue );
+		transaction.commit();
 	}
 
 	public int getModifiedAttributeCount() {
@@ -268,51 +266,6 @@ public abstract class DataNode {
 		}
 	}
 
-	/**
-	 * Note: This method is not thread safe for performance reasons.
-	 */
-	@Deprecated
-	public boolean isTransactionActive() {
-		return getTransaction() != null;
-	}
-
-	/**
-	 * Note: This method is not thread safe for performance reasons.
-	 */
-	@Deprecated
-	public Transaction startTransaction() {
-		if( !isTransactionActive() ) setTransaction( new Transaction() );
-
-		Transaction transaction = getTransaction();
-		transaction.incrementDepth();
-		return transaction;
-	}
-
-	/**
-	 * Warning: If there are two active transactions this method will return
-	 * inconsistent results.
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	public Transaction getTransaction() {
-		if( transaction == null ) {
-			for( DataNode parent : parents ) {
-				Transaction transaction = parent.getTransaction();
-				if( transaction != null ) return transaction;
-			}
-		}
-
-		return transaction;
-	}
-
-	@Deprecated
-	public void setTransaction( Transaction transaction ) {
-		if( ObjectUtil.areEqual( getTransaction(), transaction ) ) return;
-		if( transaction != null && getTransaction() != null ) throw new RuntimeException( "Only one transaction can be active at a time." );
-		this.transaction = transaction;
-	}
-
 	public void addDataListener( DataListener listener ) {
 		listeners.add( listener );
 	}
@@ -361,6 +314,57 @@ public abstract class DataNode {
 		return true;
 	}
 
+	/**
+	 * Set the modified flag for this node.
+	 */
+	void modify() {
+		if( modified ) return;
+
+		Transaction transaction = new Transaction();
+		transaction.modify( this );
+		transaction.commit();
+	}
+
+	/**
+	 * Clear the modified flag for this node and all child nodes.
+	 */
+	void unmodify( Transaction transaction ) {
+		if( !modified ) return;
+
+		boolean commit = transaction == null;
+		if( transaction == null ) transaction = new Transaction();
+
+		transaction.unmodify( this );
+
+		// Clear the modified flag of any attribute nodes.
+		if( attributes != null ) {
+			for( Object child : attributes.values() ) {
+				if( child instanceof DataNode ) {
+					DataNode childNode = (DataNode)child;
+					if( childNode.isModified() ) childNode.unmodify( transaction );
+				}
+			}
+		}
+
+		if( commit ) transaction.commit();
+	}
+
+	void doModify() {
+		selfModified = true;
+		updateModifiedFlag();
+	}
+
+	void doUnmodify() {
+		selfModified = false;
+		modifiedAttributes = null;
+		modifiedAttributeCount = 0;
+		updateModifiedFlag();
+	}
+
+	void updateModifiedFlag() {
+		modified = selfModified || modifiedAttributeCount != 0;
+	}
+
 	void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
 		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
@@ -393,64 +397,16 @@ public abstract class DataNode {
 		updateModifiedFlag();
 	}
 
-	/**
-	 * Set the modified flag for this node.
+	/*
+	 * Similar logic is found in DataList.childNodeModified().
 	 */
-	void modify() {
-		if( modified ) return;
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-		getTransaction().add( new ModifyAction( this ) );
-		if( atomic ) getTransaction().commit();
-	}
-
-	/**
-	 * Clear the modified flag for this node and all child nodes.
-	 */
-	void unmodify() {
-		if( !modified ) return;
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-		getTransaction().add( new UnmodifyAction( this ) );
-
-		// Clear the modified flag of any attribute nodes.
-		if( attributes != null ) {
-			for( Object child : attributes.values() ) {
-				if( child instanceof DataNode ) {
-					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) childNode.unmodify();
-				}
-			}
-		}
-
-		if( atomic ) getTransaction().commit();
-	}
-
-	void doModify() {
-		selfModified = true;
-		updateModifiedFlag();
-	}
-
-	void doUnmodify() {
-		selfModified = false;
-		modifiedAttributes = null;
-		modifiedAttributeCount = 0;
-		updateModifiedFlag();
-	}
-
-	void updateModifiedFlag() {
-		modified = selfModified || modifiedAttributeCount != 0;
-	}
-
 	void attributeNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedAttributeCount++;
 		} else {
 			modifiedAttributeCount--;
 
-			// The reason for the following line is that doClearModifed() is 
+			// The reason for the following line is that doUnmodify() is 
 			// processed by transactions before processing child and parent nodes.
 			if( modifiedAttributeCount < 0 ) modifiedAttributeCount = 0;
 		}
@@ -505,73 +461,6 @@ public abstract class DataNode {
 		for( DataListener listener : listeners ) {
 			listener.metaAttributeChanged( event );
 		}
-	}
-
-	@Deprecated
-	public static class ModifyAction extends Operation {
-
-		public ModifyAction( DataNode data ) {
-			super( data );
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			getData().doModify();
-
-			return result;
-		}
-
-	}
-
-	@Deprecated
-	private static class UnmodifyAction extends Operation {
-
-		public UnmodifyAction( DataNode data ) {
-			super( data );
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			getData().doUnmodify();
-
-			return result;
-		}
-	}
-
-	@Deprecated
-	private static class SetAttributeAction extends Operation {
-
-		private String name;
-
-		private Object oldValue;
-
-		private Object newValue;
-
-		public SetAttributeAction( DataNode data, String name, Object oldValue, Object newValue ) {
-			super( data );
-			this.name = name;
-			this.oldValue = oldValue;
-			this.newValue = newValue;
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			getData().doSetAttribute( name, oldValue, newValue );
-
-			DataEvent.Action type = DataEvent.Action.MODIFY;
-			type = oldValue == null ? DataEvent.Action.INSERT : type;
-			type = newValue == null ? DataEvent.Action.REMOVE : type;
-			result.addEvent( new DataAttributeEvent( type, data, data, name, oldValue, newValue ) );
-
-			return result;
-		}
-
 	}
 
 }

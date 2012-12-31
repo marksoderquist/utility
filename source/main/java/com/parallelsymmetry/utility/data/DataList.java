@@ -1,6 +1,5 @@
 package com.parallelsymmetry.utility.data;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -27,14 +26,14 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		for( T child : children ) {
 			add( child );
 		}
-		unmodify();
+		setModified( false );
 	}
 
 	public DataList( Collection<T> children ) {
 		for( T child : children ) {
 			add( child );
 		}
-		unmodify();
+		setModified( false );
 	}
 
 	public boolean isSelfModified() {
@@ -87,12 +86,11 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	@Override
 	public void add( int index, T element ) {
 		if( element == null ) return;
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
 		if( element instanceof DataNode ) checkForCircularReference( (DataNode)element );
-		getTransaction().add( new AddChildAction<T>( this, index, element ) );
-		if( atomic ) getTransaction().commit();
+
+		Transaction transaction = new Transaction();
+		transaction.add( this, index, element );
+		transaction.commit();
 	}
 
 	@Override
@@ -104,37 +102,24 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean addAll( int index, Collection<? extends T> collection ) {
 		if( collection == null ) return false;
 
-		// Figure out if nodes need to be added.
-		List<T> list = new ArrayList<T>();
-		for( T node : collection ) {
-			if( !contains( node ) ) list.add( node );
-		}
-		if( list.size() == 0 ) return false;
-
-		// Add the nodes.
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-		for( T node : list ) {
-			getTransaction().add( new AddChildAction<T>( this, index, node ) );
-			if( index < Integer.MAX_VALUE ) index++;
-		}
-		if( atomic ) getTransaction().commit();
-
-		return true;
+		Transaction transaction = new Transaction();
+		boolean result = transaction.addAll( this, index, collection );
+		transaction.commit();
+		return result;
 	}
 
 	@Override
 	public T set( int index, T element ) {
 		if( index < 0 || index >= size() ) throw new ArrayIndexOutOfBoundsException( index );
 		if( element == null ) throw new NullPointerException();
-
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
 		if( element instanceof DataNode ) checkForCircularReference( (DataNode)element );
+
 		T result = get( index );
-		getTransaction().add( new RemoveChildAction<T>( this, result ) );
-		getTransaction().add( new AddChildAction<T>( this, index, element ) );
-		if( atomic ) getTransaction().commit();
+
+		Transaction transaction = new Transaction();
+		transaction.remove( this, index );
+		transaction.add( this, index, element );
+		transaction.commit();
 
 		return result;
 	}
@@ -144,38 +129,34 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean remove( Object object ) {
 		if( object == null || !( object instanceof DataNode ) || !contains( object ) ) return false;
 
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
-		getTransaction().add( new RemoveChildAction<T>( this, (T)object ) );
-		if( atomic ) getTransaction().commit();
+		Transaction transaction = new Transaction();
+		boolean result = transaction.remove( this, (T)object );
+		transaction.commit();
 
-		return true;
+		return result;
 	}
 
 	@Override
 	public T remove( int index ) {
 		if( index < 0 || index >= size() ) throw new ArrayIndexOutOfBoundsException( index );
 		T child = children.get( index );
-		remove( child );
+
+		Transaction transaction = new Transaction();
+		transaction.remove( this, index );
+		transaction.commit();
+
 		return child;
 	}
 
 	@Override
-	@SuppressWarnings( "unchecked" )
 	public boolean removeAll( Collection<?> collection ) {
 		if( collection == null ) return false;
 
-		int count = 0;
-		boolean needsTransaction = !isTransactionActive();
-		if( needsTransaction ) startTransaction();
-		for( Object node : collection ) {
-			if( !( node instanceof DataNode ) ) continue;
-			getTransaction().add( new RemoveChildAction<T>( this, (T)node ) );
-			count++;
-		}
-		if( needsTransaction ) getTransaction().commit();
+		Transaction transaction = new Transaction();
+		boolean result = transaction.removeAll( this, collection );
+		transaction.commit();
 
-		return count > 0;
+		return result;
 	}
 
 	@Override
@@ -274,28 +255,25 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	}
 
 	@Override
-	protected void unmodify() {
+	protected void unmodify( Transaction transaction ) {
 		if( !modified ) return;
 
-		boolean atomic = !isTransactionActive();
-		if( atomic ) startTransaction();
+		boolean commit = transaction == null;
+		if( transaction == null ) transaction = new Transaction();
 
-		super.unmodify();
+		super.unmodify( transaction );
 
 		// Clear the modified flag of any child nodes.
 		if( children != null ) {
 			for( Object child : children ) {
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) {
-						childNode.setTransaction( getTransaction() );
-						childNode.unmodify();
-					}
+					if( childNode.isModified() ) childNode.unmodify( transaction );
 				}
 			}
 		}
 
-		if( atomic ) getTransaction().commit();
+		if( commit ) transaction.commit();
 	}
 
 	@Override
@@ -333,30 +311,21 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		}
 	}
 
+	/*
+	 * Similar logic is found in DataNode.attributeNodeModified().
+	 */
 	protected void childNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedChildCount++;
 		} else {
 			modifiedChildCount--;
 
-			// The reason for the following line is that doClearModifed() is 
+			// The reason for the following line is that doUnmodify() is 
 			// processed by transactions before processing child and parent nodes.
 			if( modifiedChildCount < 0 ) modifiedChildCount = 0;
 		}
 
 		updateModifiedFlag();
-	}
-
-	private void fireChildInsertedEvent( DataChildEvent event ) {
-		for( DataListener listener : listeners ) {
-			listener.childInserted( event );
-		}
-	}
-
-	private void fireChildRemovedEvent( DataChildEvent event ) {
-		for( DataListener listener : listeners ) {
-			listener.childRemoved( event );
-		}
 	}
 
 	void doAddChild( int index, T child ) {
@@ -382,31 +351,6 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		updateModifiedFlag();
 	}
 
-	T doRemoveChild( int index ) {
-		T child = children.get( index );
-		children.remove( index );
-		child.removeParent( this );
-
-		if( addRemoveChildren == null ) {
-			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Action>();
-			addRemoveChildren.put( child, DataEvent.Action.REMOVE );
-		} else {
-			if( addRemoveChildren.get( child ) == DataEvent.Action.INSERT ) {
-				addRemoveChildren.remove( child );
-				if( addRemoveChildren.size() == 0 ) addRemoveChildren = null;
-			} else {
-				addRemoveChildren.put( child, DataEvent.Action.REMOVE );
-			}
-		}
-
-		if( children.size() == 0 ) children = null;
-
-		updateModifiedFlag();
-		
-		return child;
-	}
-
-	@Deprecated
 	void doRemoveChild( T child ) {
 		children.remove( child );
 		child.removeParent( this );
@@ -428,60 +372,16 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		updateModifiedFlag();
 	}
 
-	@Deprecated
-	private static class AddChildAction<T extends DataNode> extends Operation {
-
-		private DataList<T> list;
-
-		private int index;
-
-		private T child;
-
-		public AddChildAction( DataList<T> list, int index, T child ) {
-			super( list );
-			this.list = list;
-			this.index = index;
-			this.child = child;
+	private void fireChildInsertedEvent( DataChildEvent event ) {
+		for( DataListener listener : listeners ) {
+			listener.childInserted( event );
 		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			list.doAddChild( index, child );
-			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, list, list, index, child ) );
-
-			return result;
-		}
-
 	}
 
-	@Deprecated
-	private static class RemoveChildAction<T extends DataNode> extends Operation {
-
-		private DataList<T> list;
-
-		private T child;
-
-		public RemoveChildAction( DataList<T> list, T child ) {
-			super( list );
-			this.list = list;
-			this.child = child;
+	private void fireChildRemovedEvent( DataChildEvent event ) {
+		for( DataListener listener : listeners ) {
+			listener.childRemoved( event );
 		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			if( list != null && list.children != null ) {
-				int index = list.children.indexOf( child );
-				list.doRemoveChild( child );
-				result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, list, index, child ) );
-			}
-
-			return result;
-		}
-
 	}
 
 }

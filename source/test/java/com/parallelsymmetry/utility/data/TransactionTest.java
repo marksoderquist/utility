@@ -36,27 +36,6 @@ public class TransactionTest extends DataTestCase {
 	}
 
 	@Test
-	public void testTransactionOperation() {
-		MockDataNode data = new MockDataNode();
-		DataEventWatcher handler = new DataEventWatcher();
-		data.addDataListener( handler );
-		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 0, 0, 0 );
-
-		Transaction transaction = new Transaction();
-		transaction.add( new MockOperation( data ) );
-
-		transaction.commit();
-		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 1, 1, 0 );
-
-		int index = 0;
-		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.MODIFY, data, data, "name", "value0", "value1" );
-		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
-		assertEquals( index++, handler.getEvents().size() );
-	}
-
-	@Test
 	public void testOverlappingTransactions() throws Exception {
 		MockDataNode node = new MockDataNode();
 		DataEventWatcher watcher = node.getDataEventWatcher();
@@ -188,7 +167,7 @@ public class TransactionTest extends DataTestCase {
 
 		parent.add( child );
 		child.add( grandchild );
-		parent.unmodify();
+		parent.setModified( false );
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
 		assertFalse( grandchild.isModified() );
@@ -232,6 +211,15 @@ public class TransactionTest extends DataTestCase {
 		assertNull( type.getKey() );
 	}
 
+	private class ModifyingDataHandler extends DataAdapter {
+
+		@Override
+		public void dataAttributeChanged( DataAttributeEvent event ) {
+			event.getCause().setAttribute( "time", System.nanoTime() );
+		}
+
+	}
+
 	private class AttributeDependentHashCodeType extends DataNode {
 
 		private static final String KEY = "key";
@@ -255,32 +243,6 @@ public class TransactionTest extends DataTestCase {
 			if( !( object instanceof AttributeDependentHashCodeType ) ) return false;
 			String key = getKey();
 			return ObjectUtil.areEqual( key, ( (AttributeDependentHashCodeType)object ).getKey() );
-		}
-
-	}
-
-	private class MockOperation extends Operation {
-
-		public MockOperation( DataNode data ) {
-			super( data );
-		}
-
-		@Override
-		public OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			result.addEvent( new DataAttributeEvent( DataEvent.Action.MODIFY, data, data, "name", "value0", "value1" ) );
-
-			return result;
-		}
-
-	}
-
-	private class ModifyingDataHandler extends DataAdapter {
-
-		@Override
-		public void dataAttributeChanged( DataAttributeEvent event ) {
-			event.getCause().setAttribute( "time", System.nanoTime() );
 		}
 
 	}
