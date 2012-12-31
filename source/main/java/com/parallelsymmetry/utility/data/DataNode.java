@@ -173,46 +173,6 @@ public abstract class DataNode {
 		return Collections.unmodifiableSet( parents );
 	}
 
-	/**
-	 * Get tree path of this node. Element zero is the root node and the last
-	 * element is this node.
-	 * 
-	 * @return The tree path of this node.
-	 * @deprecated Use getNodePaths()
-	 */
-	@Deprecated
-	public DataNode[] getTreePath() {
-		return getTreePath( null );
-	}
-
-	/**
-	 * Get tree path of this node. Element zero is the root node and the last
-	 * element is this node.
-	 * 
-	 * @return The tree path of this node.
-	 * @deprecated Use getNodePaths( DataNode stop )
-	 */
-	@Deprecated
-	public DataNode[] getTreePath( DataNode stop ) {
-		int count = 0;
-		DataNode parent = this;
-		while( parent != stop ) {
-			count++;
-		}
-
-		if( stop != null ) count++;
-
-		parent = this;
-		DataNode[] path = new DataNode[count];
-		for( int index = count - 1; index > -1; index-- ) {
-			path[index] = parent;
-			// This will return inconsistent results.
-			parent = parents.iterator().next();
-		}
-
-		return path;
-	}
-
 	public Set<List<DataNode>> getNodePaths() {
 		return getNodePaths( null );
 	}
