@@ -1,5 +1,6 @@
 package com.parallelsymmetry.utility.task;
 
+import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -170,6 +171,8 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> Future<T> invoke( Task<T> task ) throws InterruptedException {
+		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( task );
 		} else {
@@ -192,6 +195,8 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> Future<T> invoke( Task<T> task, long timeout, TimeUnit unit ) throws InterruptedException {
+		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( task, timeout, unit );
 		} else {
@@ -211,6 +216,8 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks ) throws InterruptedException {
+		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+
 		checkRunning();
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks );
@@ -234,6 +241,8 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks, long timeout, TimeUnit unit ) throws InterruptedException {
+		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+
 		checkRunning();
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( tasks, timeout, unit );
