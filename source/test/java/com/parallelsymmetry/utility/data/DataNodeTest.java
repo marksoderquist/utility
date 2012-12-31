@@ -398,6 +398,26 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
+	public void testCollapsingEventsWithTransaction() {
+		MockDataNode data = new MockDataNode();
+		DataEventWatcher handler = data.getDataEventWatcher();
+		assertNodeState( data, false, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		Transaction transaction = new Transaction();
+		transaction.setAttribute( data, "a", "1" );
+		transaction.setAttribute( data, "a", "2" );
+		transaction.setAttribute( data, "a", "3" );
+		transaction.setAttribute( data, "a", "4" );
+		transaction.setAttribute( data, "a", "5" );
+		transaction.commit();
+		assertEquals( "5", data.getAttribute( "a" ) );
+		assertNodeState( data, true, 1 );
+		
+		// FIXME The following event counts should be 1,1,1 not 1,5,1.
+		assertEventCounts( handler, 1, 5, 1 );
+	}
+
 	@Test
 	public void testGetParents() {
 		MockDataNode parent = new MockDataNode();
