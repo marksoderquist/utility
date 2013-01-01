@@ -190,7 +190,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertNodeState( grandparent, false, 0 );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( grandparentWatcher, 1, 0, 1 );
+		assertEventCounts( grandparentWatcher, 1, 1, 0 );
 		assertEventState( grandparentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( grandparentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, grandparent );
 		assertEventCounts( parentWatcher, 0, 0, 0 );
@@ -205,10 +205,10 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertNodeState( grandparent, false, 0 );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( grandparentWatcher, 1, 0, 1 );
+		assertEventCounts( grandparentWatcher, 1, 1, 0 );
 		assertEventState( grandparentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( grandparentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, grandparent );
-		assertEventCounts( parentWatcher, 1, 0, 1 );
+		assertEventCounts( parentWatcher, 1, 1, 0 );
 		assertEventState( parentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, true, false );
 		assertEventState( parentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
 		assertEventCounts( childWatcher, 0, 0, 0 );
@@ -222,13 +222,13 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertNodeState( grandparent, false, 0 );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( grandparentWatcher, 1, 0, 1 );
+		assertEventCounts( grandparentWatcher, 1, 1, 0 );
 		assertEventState( grandparentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( grandparentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, grandparent );
-		assertEventCounts( parentWatcher, 1, 0, 1 );
+		assertEventCounts( parentWatcher, 1, 1, 0 );
 		assertEventState( parentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, true, false );
 		assertEventState( parentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
-		assertEventCounts( childWatcher, 1, 0, 1 );
+		assertEventCounts( childWatcher, 1, 1, 0 );
 		assertEventState( childWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, child, DataNode.MODIFIED, true, false );
 		assertEventState( childWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
@@ -241,10 +241,10 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertNodeState( grandparent, false, 0 );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( grandparentWatcher, 1, 0, 1 );
+		assertEventCounts( grandparentWatcher, 1, 1, 0 );
 		assertEventState( grandparentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( grandparentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, grandparent );
-		assertEventCounts( parentWatcher, 1, 0, 1 );
+		assertEventCounts( parentWatcher, 1, 1, 0 );
 		assertEventState( parentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, true, false );
 		assertEventState( parentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
 		assertEventCounts( childWatcher, 0, 0, 0 );
@@ -258,13 +258,13 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertNodeState( grandparent, false, 0 );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( grandparentWatcher, 1, 0, 1 );
+		assertEventCounts( grandparentWatcher, 1, 1, 0 );
 		assertEventState( grandparentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, grandparent, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( grandparentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, grandparent );
-		assertEventCounts( parentWatcher, 1, 0, 1 );
+		assertEventCounts( parentWatcher, 1, 1, 0 );
 		assertEventState( parentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( parentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
-		assertEventCounts( childWatcher, 1, 0, 1 );
+		assertEventCounts( childWatcher, 1, 1, 0 );
 		assertEventState( childWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, child, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( childWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
@@ -277,13 +277,13 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertNodeState( grandparent, false, 0 );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( grandparentWatcher, 1, 0, 1 );
+		assertEventCounts( grandparentWatcher, 1, 1, 0 );
 		assertEventState( grandparentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, grandparent, DataNode.MODIFIED, true, false );
 		assertEventState( grandparentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, grandparent );
-		assertEventCounts( parentWatcher, 1, 0, 1 );
+		assertEventCounts( parentWatcher, 1, 1, 0 );
 		assertEventState( parentWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, true, false );
 		assertEventState( parentWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, parent );
-		assertEventCounts( childWatcher, 1, 0, 1 );
+		assertEventCounts( childWatcher, 1, 1, 0 );
 		assertEventState( childWatcher, 0, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, child, DataNode.MODIFIED, true, false );
 		assertEventState( childWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}

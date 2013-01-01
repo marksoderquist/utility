@@ -34,12 +34,12 @@ public class DataNodeTest extends DataTestCase {
 		data.setModified( true );
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertTrue( data.isModified() );
-		assertEventCounts( handler, 1, 0, 1 );
+		assertEventCounts( handler, 1, 1, 0 );
 
 		data.setModified( false );
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
-		assertEventCounts( handler, 2, 0, 2 );
+		assertEventCounts( handler, 2, 2, 0 );
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class DataNodeTest extends DataTestCase {
 		data.setModified( false );
 		assertEquals( 0, data.getModifiedAttributeCount() );
 		assertFalse( data.isModified() );
-		assertEventCounts( handler, 2, 1, 2 );
+		assertEventCounts( handler, 2, 2, 1 );
 	}
 
 	@Test
@@ -209,7 +209,7 @@ public class DataNodeTest extends DataTestCase {
 		assertEquals( null, data.getAttribute( "y" ) );
 		assertEquals( null, data.getAttribute( "z" ) );
 		assertNodeState( data, true, 1 );
-		assertEventCounts( handler, 2, 2, 1 );
+		assertEventCounts( handler, 2, 1, 2 );
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class DataNodeTest extends DataTestCase {
 		data.setAttribute( "y", 2 );
 		data.setAttribute( "z", 3 );
 		assertNodeState( data, true, 3 );
-		assertEventCounts( handler, 3, 3, 1 );
+		assertEventCounts( handler, 3, 1, 3 );
 	}
 
 	@Test
@@ -239,19 +239,19 @@ public class DataNodeTest extends DataTestCase {
 		data.setAttribute( "z", 0 );
 		data.setModified( false );
 		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 4, 3, 2 );
+		assertEventCounts( handler, 4, 2, 3 );
 
 		data.setAttribute( "x", 1 );
 		data.setAttribute( "y", 2 );
 		data.setAttribute( "z", 3 );
 		assertNodeState( data, true, 3 );
-		assertEventCounts( handler, 7, 6, 3 );
+		assertEventCounts( handler, 7, 3, 6 );
 
 		data.setAttribute( "x", 0 );
 		data.setAttribute( "y", 0 );
 		data.setAttribute( "z", 0 );
 		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 10, 9, 4 );
+		assertEventCounts( handler, 10, 4, 9 );
 	}
 
 	@Test
@@ -265,11 +265,11 @@ public class DataNodeTest extends DataTestCase {
 		data.setAttribute( "y", 2 );
 		data.setAttribute( "z", 3 );
 		assertNodeState( data, true, 3 );
-		assertEventCounts( handler, 3, 3, 1 );
+		assertEventCounts( handler, 3, 1, 3 );
 
 		data.setModified( false );
 		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 4, 3, 2 );
+		assertEventCounts( handler, 4, 2, 3 );
 	}
 
 	public void testResources() {
@@ -308,12 +308,12 @@ public class DataNodeTest extends DataTestCase {
 		// Modify the attribute.
 		data.setAttribute( "attribute", "value1" );
 		assertNodeState( data, true, 1 );
-		assertEventCounts( handler, 2, 2, 1 );
+		assertEventCounts( handler, 2, 1, 2 );
 
 		// Remove the attribute.
 		data.setAttribute( "attribute", null );
 		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 3, 3, 2 );
+		assertEventCounts( handler, 3, 2, 3 );
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute", null, "value0" );
@@ -338,22 +338,22 @@ public class DataNodeTest extends DataTestCase {
 		// Insert an attribute.
 		child.setAttribute( "attribute", "value0" );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( handler, 2, 2, 1 );
+		assertEventCounts( handler, 2, 1, 2 );
 
 		// Modify the attribute to the same value. Should do nothing.
 		child.setAttribute( "attribute", "value0" );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( handler, 2, 2, 1 );
+		assertEventCounts( handler, 2, 1, 2 );
 
 		// Modify the attribute.
 		child.setAttribute( "attribute", "value1" );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( handler, 3, 3, 1 );
+		assertEventCounts( handler, 3, 1, 3 );
 
 		// Remove the attribute.
 		child.setAttribute( "attribute", null );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( handler, 4, 4, 1 );
+		assertEventCounts( handler, 4, 1, 4 );
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "child", null, child );
@@ -382,12 +382,12 @@ public class DataNodeTest extends DataTestCase {
 		// Commit the changes.
 		data.setModified( false );
 		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 2, 1, 2 );
+		assertEventCounts( handler, 2, 2, 1 );
 
 		// Commit again to test that nothing else happens.
 		data.setModified( false );
 		assertNodeState( data, false, 0 );
-		assertEventCounts( handler, 2, 1, 2 );
+		assertEventCounts( handler, 2, 2, 1 );
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute", null, "value0" );
@@ -415,7 +415,7 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( data, true, 1 );
 		
 		// FIXME The following event counts should be 1,1,1 not 1,5,1.
-		assertEventCounts( handler, 1, 5, 1 );
+		assertEventCounts( handler, 1, 1, 5 );
 	}
 
 	@Test
@@ -510,7 +510,7 @@ public class DataNodeTest extends DataTestCase {
 
 		parent.setModified( false );
 		assertNodeState( parent, false, 0 );
-		assertEventCounts( parentHandler, 2, 1, 2 );
+		assertEventCounts( parentHandler, 2, 2, 1 );
 
 		// Test setting an attribute on the child node modifies the parent.
 		child.setAttribute( "attribute", "value" );
@@ -518,14 +518,14 @@ public class DataNodeTest extends DataTestCase {
 
 		assertNodeState( child, true, 1 );
 		assertNodeState( parent, true, 1 );
-		assertEventCounts( parentHandler, 3, 2, 3 );
+		assertEventCounts( parentHandler, 3, 3, 2 );
 		assertEventCounts( childHandler, 1, 1, 1 );
 
 		// Test unsetting an attribute on the child node unmodifies the parent.
 		child.setAttribute( "attribute", null );
 		assertNodeState( child, false, 0 );
 		assertNodeState( parent, false, 0 );
-		assertEventCounts( parentHandler, 4, 3, 4 );
+		assertEventCounts( parentHandler, 4, 4, 3 );
 		assertEventCounts( childHandler, 2, 2, 2 );
 	}
 
@@ -557,8 +557,8 @@ public class DataNodeTest extends DataTestCase {
 
 		// Set the 'b' attribute to '1';
 		child.setAttribute( "b", "1" );
-		assertEventCounts( parentHandler, 1, 1, 0 );
-		assertEventCounts( childHandler, 1, 1, 0 );
+		assertEventCounts( parentHandler, 1, 0, 1 );
+		assertEventCounts( childHandler, 1, 0, 1 );
 		parentHandler.reset();
 		childHandler.reset();
 
@@ -566,15 +566,15 @@ public class DataNodeTest extends DataTestCase {
 		child.setModified( false );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( parentHandler, 1, 0, 1 );
-		assertEventCounts( childHandler, 1, 0, 1 );
+		assertEventCounts( parentHandler, 1, 1, 0 );
+		assertEventCounts( childHandler, 1, 1, 0 );
 
 		// The parent is already not modified no event should be sent.
 		parent.setModified( false );
 		assertNodeState( parent, false, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( parentHandler, 1, 0, 1 );
-		assertEventCounts( childHandler, 1, 0, 1 );
+		assertEventCounts( parentHandler, 1, 1, 0 );
+		assertEventCounts( childHandler, 1, 1, 0 );
 		parentHandler.reset();
 		childHandler.reset();
 
@@ -591,8 +591,8 @@ public class DataNodeTest extends DataTestCase {
 		child.setAttribute( "b", "2" );
 		assertNodeState( child, true, 2 );
 		assertNodeState( parent, true, 1 );
-		assertEventCounts( parentHandler, 1, 1, 0 );
-		assertEventCounts( childHandler, 1, 1, 0 );
+		assertEventCounts( parentHandler, 1, 0, 1 );
+		assertEventCounts( childHandler, 1, 0, 1 );
 		parentHandler.reset();
 		childHandler.reset();
 
@@ -600,8 +600,8 @@ public class DataNodeTest extends DataTestCase {
 		child.setAttribute( "a", "1" );
 		assertNodeState( child, true, 1 );
 		assertNodeState( parent, true, 1 );
-		assertEventCounts( parentHandler, 1, 1, 0 );
-		assertEventCounts( childHandler, 1, 1, 0 );
+		assertEventCounts( parentHandler, 1, 0, 1 );
+		assertEventCounts( childHandler, 1, 0, 1 );
 		parentHandler.reset();
 		childHandler.reset();
 
@@ -629,7 +629,7 @@ public class DataNodeTest extends DataTestCase {
 
 		node.setModified( false );
 		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 2, 1, 2 );
+		assertEventCounts( nodeHandler, 2, 2, 1 );
 
 		// Test setting an attribute on the attribute node modifies the parent.
 		attribute.setAttribute( "attribute", "value" );
@@ -637,15 +637,15 @@ public class DataNodeTest extends DataTestCase {
 
 		assertNodeState( attribute, true, 1 );
 		assertNodeState( node, true, 1 );
-		assertEventCounts( nodeHandler, 3, 2, 3 );
+		assertEventCounts( nodeHandler, 3, 3, 2 );
 		assertEventCounts( attributeHandler, 1, 1, 1 );
 
 		// Test unsetting an attribute on the attribute node unmodified the parent.
 		attribute.setModified( false );
 		assertNodeState( attribute, false, 0 );
 		assertNodeState( node, false, 0 );
-		assertEventCounts( nodeHandler, 4, 2, 4 );
-		assertEventCounts( attributeHandler, 2, 1, 2 );
+		assertEventCounts( nodeHandler, 4, 4, 2 );
+		assertEventCounts( attributeHandler, 2, 2, 1 );
 	}
 
 	public void testChildNodeAttributesClearedByParentClearModified() {
@@ -664,19 +664,19 @@ public class DataNodeTest extends DataTestCase {
 
 		parent.setModified( false );
 		assertNodeState( parent, false, 0 );
-		assertEventCounts( parentHandler, 2, 1, 2 );
+		assertEventCounts( parentHandler, 2, 2, 1 );
 
 		child.setAttribute( "attribute", "value" );
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1 );
 		assertNodeState( parent, true, 1 );
-		assertEventCounts( parentHandler, 3, 2, 3 );
+		assertEventCounts( parentHandler, 3, 3, 2 );
 
 		parent.setModified( false );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( childHandler, 2, 1, 2 );
+		assertEventCounts( childHandler, 2, 2, 1 );
 		assertNodeState( parent, false, 0 );
-		assertEventCounts( parentHandler, 4, 2, 4 );
+		assertEventCounts( parentHandler, 4, 4, 2 );
 	}
 
 	public void testAddNodeAttributeToDifferentParent() {
@@ -698,7 +698,7 @@ public class DataNodeTest extends DataTestCase {
 		parent0.setModified( false );
 		assertNodeState( parent0, false, 0 );
 		assertEventCounts( childHandler, 0, 0, 0 );
-		assertEventCounts( parent0Handler, 2, 1, 2 );
+		assertEventCounts( parent0Handler, 2, 2, 1 );
 		assertEventCounts( parent1Handler, 0, 0, 0 );
 
 		// Add the child attribute to parent 1.
@@ -709,7 +709,7 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( parent0, false, 0 );
 		assertNodeState( parent1, true, 1 );
 		assertEventCounts( childHandler, 0, 0, 0 );
-		assertEventCounts( parent0Handler, 2, 1, 2 );
+		assertEventCounts( parent0Handler, 2, 2, 1 );
 		assertEventCounts( parent1Handler, 1, 1, 1 );
 	}
 

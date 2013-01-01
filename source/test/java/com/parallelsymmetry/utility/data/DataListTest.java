@@ -78,12 +78,12 @@ public class DataListTest extends DataTestCase {
 		MockDataNode child = new MockDataNode( "child" );
 		parent.add( child );
 		assertListState( parent, true, 0, 0 );
-		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 1, 0, 1, 0 );
 		watcher.reset();
 
 		parent.setModified( false );
 		assertListState( parent, false, 0, 0 );
-		assertEventCounts( watcher, 1, 0, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 0, 0, 0 );
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class DataListTest extends DataTestCase {
 		list.add( child );
 		assertEquals( child, list.get( 0 ) );
 		assertListState( list, true, 0, 0 );
-		assertEventCounts( handler, 1, 0, 1, 1, 0 );
+		assertEventCounts( handler, 1, 1, 0, 1, 0 );
 	}
 
 	@Test
@@ -177,19 +177,19 @@ public class DataListTest extends DataTestCase {
 		assertTrue( child0.getParents().contains( node ) );
 		assertSame( child0, node.get( 0 ) );
 		assertListState( node, true, 0, 0 );
-		assertEventCounts( handler, 1, 0, 1, 1, 0 );
+		assertEventCounts( handler, 1, 1, 0, 1, 0 );
 
 		node.add( child1 );
 		assertTrue( child1.getParents().contains( node ) );
 		assertSame( child1, node.get( 1 ) );
 		assertListState( node, true, 0, 0 );
-		assertEventCounts( handler, 2, 0, 1, 2, 0 );
+		assertEventCounts( handler, 2, 1, 0, 2, 0 );
 
 		node.add( child2 );
 		assertTrue( child2.getParents().contains( node ) );
 		assertSame( child2, node.get( 2 ) );
 		assertListState( node, true, 0, 0 );
-		assertEventCounts( handler, 3, 0, 1, 3, 0 );
+		assertEventCounts( handler, 3, 1, 0, 3, 0 );
 	}
 
 	@Test
@@ -310,13 +310,13 @@ public class DataListTest extends DataTestCase {
 		MockDataNode child0 = new MockDataNode();
 		list.add( child0 );
 		assertListState( list, true, 0, 0 );
-		assertEventCounts( handler, 1, 0, 1, 1, 0 );
+		assertEventCounts( handler, 1, 1, 0, 1, 0 );
 
 		MockDataNode child1 = new MockDataNode();
 		list.set( 0, child1 );
 		assertEquals( 1, list.size() );
 		assertListState( list, true, 0, 0 );
-		assertEventCounts( handler, 2, 0, 1, 2, 1 );
+		assertEventCounts( handler, 2, 1, 0, 2, 1 );
 	}
 
 	@Test
@@ -333,12 +333,12 @@ public class DataListTest extends DataTestCase {
 		MockDataNode child = new MockDataNode();
 		list.add( child );
 		assertListState( list, true, 0, 0 );
-		assertEventCounts( handler, 1, 0, 1, 1, 0 );
+		assertEventCounts( handler, 1, 1, 0, 1, 0 );
 
 		list.remove( child );
 		assertEquals( 0, list.size() );
 		assertListState( list, false, 0, 0 );
-		assertEventCounts( handler, 2, 0, 2, 1, 1 );
+		assertEventCounts( handler, 2, 2, 0, 1, 1 );
 	}
 
 	@Test
@@ -449,20 +449,20 @@ public class DataListTest extends DataTestCase {
 		list.add( child );
 		assertEquals( child, list.get( 0 ) );
 		assertListState( list, true, 0, 0 );
-		assertEventCounts( listHandler, 1, 0, 1, 1, 0 );
+		assertEventCounts( listHandler, 1, 1, 0, 1, 0 );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 0, 0, 0, 0, 0 );
 
 		list.setModified( false );
 		assertListState( list, false, 0, 0 );
-		assertEventCounts( listHandler, 2, 0, 2, 1, 0 );
+		assertEventCounts( listHandler, 2, 2, 0, 1, 0 );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childHandler, 0, 0, 0, 0, 0 );
 
 		child.setAttribute( "attribute", "value" );
 		assertListState( list, true, 0, 1 );
 		assertNodeState( child, true, 1 );
-		assertEventCounts( listHandler, 3, 1, 3, 1, 0 );
+		assertEventCounts( listHandler, 3, 3, 1, 1, 0 );
 		assertNodeState( child, true, 1 );
 		assertEventCounts( childHandler, 1, 1, 1, 0, 0 );
 	}
@@ -485,7 +485,7 @@ public class DataListTest extends DataTestCase {
 		parent.add( child );
 		assertEquals( child, parent.get( 0 ) );
 		assertListState( parent, true, 0, 0 );
-		assertEventCounts( parentWatcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( parentWatcher, 1, 1, 0, 1, 0 );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childWatcher, 0, 0, 0, 0, 0 );
 		parentWatcher.reset();
@@ -494,7 +494,7 @@ public class DataListTest extends DataTestCase {
 		// Set the parent unmodified.
 		parent.setModified( false );
 		assertListState( parent, false, 0, 0 );
-		assertEventCounts( parentWatcher, 1, 0, 1, 0, 0 );
+		assertEventCounts( parentWatcher, 1, 1, 0, 0, 0 );
 		assertNodeState( child, false, 0 );
 		assertEventCounts( childWatcher, 0, 0, 0, 0, 0 );
 		parentWatcher.reset();
@@ -512,9 +512,9 @@ public class DataListTest extends DataTestCase {
 		// Set the parent unmodified.
 		parent.setModified( false );
 		assertListState( parent, false, 0, 0 );
-		assertEventCounts( parentWatcher, 1, 0, 1, 0, 0 );
+		assertEventCounts( parentWatcher, 1, 1, 0, 0, 0 );
 		assertNodeState( child, false, 0 );
-		assertEventCounts( childWatcher, 1, 0, 1, 0, 0 );
+		assertEventCounts( childWatcher, 1, 1, 0, 0, 0 );
 	}
 
 	@Test
@@ -737,7 +737,7 @@ public class DataListTest extends DataTestCase {
 		parent.setModified( false );
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
-		assertEventCounts( handler, 2, 0, 2, 1, 0 );
+		assertEventCounts( handler, 2, 2, 0, 1, 0 );
 		handler.reset();
 
 		child.setAttribute( "key1", "value1" );
@@ -749,7 +749,7 @@ public class DataListTest extends DataTestCase {
 		handler.reset();
 
 		child.setAttribute( "key1", "value2" );
-		assertEventCounts( handler, 1, 1, 0, 0, 0 );
+		assertEventCounts( handler, 1, 0, 1, 0, 0 );
 		handler.reset();
 	}
 
@@ -768,12 +768,12 @@ public class DataListTest extends DataTestCase {
 		// Setting an attribute on the attribute node should cause a data change event.
 		attribute.setAttribute( "key", "value1" );
 		assertTrue( node.isModified() );
-		assertEventCounts( watcher, 2, 2, 1, 0, 0 );
+		assertEventCounts( watcher, 2, 1, 2, 0, 0 );
 
 		// Setting another attribute on the attribute node should cause a data change event.
 		attribute.setAttribute( "key", "value2" );
 		assertTrue( node.isModified() );
-		assertEventCounts( watcher, 3, 3, 1, 0, 0 );
+		assertEventCounts( watcher, 3, 1, 3, 0, 0 );
 	}
 
 	@Test
@@ -808,7 +808,7 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		attribute.setAttribute( "key", "value2" );
-		assertEventCounts( watcher, 1, 1, 0, 0, 0 );
+		assertEventCounts( watcher, 1, 0, 1, 0, 0 );
 		watcher.reset();
 
 		attribute.setModified( false );
@@ -816,7 +816,7 @@ public class DataListTest extends DataTestCase {
 		assertFalse( "The child should not be modified.", child.isModified() );
 		assertFalse( "The list should not be modified.", list.isModified() );
 		assertFalse( "The node should not be modified.", node.isModified() );
-		assertEventCounts( watcher, 1, 0, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 0, 0, 0 );
 		watcher.reset();
 	}
 
@@ -831,7 +831,7 @@ public class DataListTest extends DataTestCase {
 		transaction.setAttribute( node, "key2", "value2" );
 		transaction.commit();
 
-		assertEventCounts( watcher, 1, 2, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
 		assertEquals( "key1", watcher.getDataAttributeEvents().get( 0 ).getAttributeName() );
 		assertEquals( "key2", watcher.getDataAttributeEvents().get( 1 ).getAttributeName() );
 		watcher.reset();
@@ -841,7 +841,7 @@ public class DataListTest extends DataTestCase {
 		transaction.setAttribute( node, "key2", null );
 		transaction.commit();
 
-		assertEventCounts( watcher, 1, 2, 1, 0, 0 );
+		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
 		assertEquals( "key1", watcher.getDataAttributeEvents().get( 0 ).getAttributeName() );
 		assertEquals( "key2", watcher.getDataAttributeEvents().get( 1 ).getAttributeName() );
 		watcher.reset();
@@ -881,11 +881,11 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		list.add( child );
-		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 1, 0, 1, 0 );
 		watcher.reset();
 
 		list.remove( child );
-		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		assertEventCounts( watcher, 1, 1, 0, 0, 1 );
 		watcher.reset();
 	}
 
@@ -906,11 +906,11 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		list.add( child2 );
-		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 1, 0, 1, 0 );
 		watcher.reset();
 
 		list.remove( child2 );
-		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		assertEventCounts( watcher, 1, 1, 0, 0, 1 );
 		watcher.reset();
 	}
 
@@ -925,11 +925,11 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		node.add( child );
-		assertEventCounts( watcher, 1, 0, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 1, 0, 1, 0 );
 		watcher.reset();
 
 		node.remove( child );
-		assertEventCounts( watcher, 1, 0, 1, 0, 1 );
+		assertEventCounts( watcher, 1, 1, 0, 0, 1 );
 		watcher.reset();
 	}
 

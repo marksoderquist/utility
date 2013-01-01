@@ -24,7 +24,7 @@ public class TransactionTest extends DataTestCase {
 
 		transaction.commit();
 		assertNodeState( data, true, 3 );
-		assertEventCounts( handler, 1, 3, 1 );
+		assertEventCounts( handler, 1, 1, 3 );
 
 		int index = 0;
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute0", null, "value0" );
@@ -53,7 +53,7 @@ public class TransactionTest extends DataTestCase {
 		assertEventCounts( watcher, 0, 0, 0 );
 		transaction.commit();
 		assertEquals( "value2", node.getAttribute( "key1" ) );
-		assertEventCounts( watcher, 1, 1, 0 );
+		assertEventCounts( watcher, 1, 0, 1 );
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class TransactionTest extends DataTestCase {
 
 		// Final commit.
 		transaction0.commit();
-		assertEventCounts( watcher, 1, 2, 0, 0, 0 );
+		assertEventCounts( watcher, 1, 0, 2, 0, 0 );
 		assertEquals( "value1", node.getAttribute( "key1" ) );
 		assertEquals( "value2", node.getAttribute( "key2" ) );
 		assertEquals( "value3", node.getAttribute( "key3" ) );
