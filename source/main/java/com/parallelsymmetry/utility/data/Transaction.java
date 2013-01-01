@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.parallelsymmetry.utility.log.Log;
 
@@ -16,28 +17,24 @@ public class Transaction {
 
 	private static final String PREVIOUS_MODIFIED_STATE = Transaction.class.getName() + ".previousModifiedState";
 
-	private static final String EVENT_LIST = Transaction.class.getName() + ".eventList";
+	private static final ReentrantLock COMMIT_LOCK = new ReentrantLock();
 
-	private static final Object COMMIT_LOCK = new Object();
+	private static Transaction activeTransaction;
 
-	private static boolean commitInProgress;
-
-	private Set<DataNode> nodes;
+	private Map<DataNode, TransactionEvents> finalEvents;
 
 	private Queue<Operation> operations;
 
-	private Map<DataNode, FinalEvents> finalEvents;
-
-	private boolean committed;
+	private Set<DataNode> nodes;
 
 	public Transaction() {
 		nodes = new CopyOnWriteArraySet<DataNode>();
 		operations = new ConcurrentLinkedQueue<Operation>();
-		finalEvents = new ConcurrentHashMap<DataNode, FinalEvents>();
+		finalEvents = new ConcurrentHashMap<DataNode, TransactionEvents>();
 	}
 
 	public void setAttribute( DataNode node, String name, Object newValue ) {
-		add( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
+		addOperation( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
 	}
 
 	public <T extends DataNode> boolean add( DataList<T> list, T child ) {
@@ -47,7 +44,7 @@ public class Transaction {
 	public <T extends DataNode> boolean add( DataList<T> list, int index, T child ) {
 		if( child == null ) return false;
 
-		add( new InsertChildOperation<T>( list, index, child ) );
+		addOperation( new InsertChildOperation<T>( list, index, child ) );
 
 		return true;
 	}
@@ -82,7 +79,7 @@ public class Transaction {
 
 	public <T extends DataNode> boolean remove( DataList<T> list, int index ) {
 		if( index < 0 || index >= list.size() ) throw new ArrayIndexOutOfBoundsException( index );
-		add( new RemoveChildOperation<T>( list, list.get( index ) ) );
+		addOperation( new RemoveChildOperation<T>( list, list.get( index ) ) );
 		return true;
 	}
 
@@ -100,62 +97,52 @@ public class Transaction {
 	}
 
 	public void commit() {
-		synchronized( COMMIT_LOCK ) {
-			if( committed ) throw new RuntimeException( "Transaction can only be committed once." );
-			committed = true;
-
-			commitInProgress = true;
+		try {
 			Log.write( Log.DETAIL, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
-			try {
-				// Store the current modified state of each data object.
-				for( DataNode node : nodes ) {
-					node.putResource( PREVIOUS_MODIFIED_STATE, node.isModified() );
-				}
+			COMMIT_LOCK.lock();
 
-				// Process the operations.
-				List<OperationResult> results = new ArrayList<OperationResult>();
-				for( Operation operation : operations ) {
-					Log.write( Log.DETAIL, "Transaction: " + toString() + " processing operation: " + operation );
-					results.add( operation.process() );
-				}
+			activeTransaction = this;
 
-				// Go through each operation result and collect the events for each node.
-				for( OperationResult result : results ) {
-					DataNode node = result.getOperation().getData();
-
-					List<DataEvent> resultEvents = result.getEvents();
-					List<DataEvent> nodeEvents = node.getResource( EVENT_LIST );
-					if( nodeEvents == null ) {
-						nodeEvents = new ArrayList<DataEvent>( resultEvents.size() );
-						node.putResource( EVENT_LIST, nodeEvents );
-					}
-
-					nodeEvents.addAll( resultEvents );
-				}
-
-				// Send the events for each data node.
-				for( DataNode node : nodes ) {
-					List<DataEvent> events = node.getResource( EVENT_LIST );
-					if( events != null ) {
-						node.putResource( EVENT_LIST, null );
-						for( DataEvent event : events ) {
-							dispatchEvent( event );
-						}
-					}
-
-					boolean oldModified = (Boolean)node.getResource( PREVIOUS_MODIFIED_STATE );
-					boolean newModified = node.isModified();
-					node.putResource( PREVIOUS_MODIFIED_STATE, null );
-
-					collectFinalEvents( node, node, oldModified, newModified );
-				}
-
-				fireFinalEvents();
-			} finally {
-				Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
-				commitInProgress = false;
+			// Store the current modified state of each data object.
+			for( DataNode node : nodes ) {
+				node.putResource( PREVIOUS_MODIFIED_STATE, node.isModified() );
 			}
+
+			// Process the operations.
+			List<OperationResult> results = new ArrayList<OperationResult>();
+			for( Operation operation : operations ) {
+				Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] processing operation: " + operation );
+				results.add( operation.process() );
+			}
+
+			// Go through each operation result and collect the events for each node.
+			for( OperationResult result : results ) {
+				DataNode node = result.getOperation().getData();
+				getTransactionEvents( node ).events.addAll( result.getEvents() );
+			}
+
+			// Send the events for each data node.
+			for( DataNode node : nodes ) {
+				boolean oldModified = (Boolean)node.getResource( PREVIOUS_MODIFIED_STATE );
+				boolean newModified = node.isModified();
+				node.putResource( PREVIOUS_MODIFIED_STATE, null );
+
+				collectFinalEvents( node, node, oldModified, newModified );
+			}
+
+			dispatchTransactionEvents();
+		} finally {
+			reset();
+			activeTransaction = null;
+			COMMIT_LOCK.unlock();
+			Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
 		}
+	}
+
+	public void reset() {
+		finalEvents.clear();
+		operations.clear();
+		nodes.clear();
 	}
 
 	@Override
@@ -164,36 +151,30 @@ public class Transaction {
 	}
 
 	void modify( DataNode node ) {
-		add( new ModifyAction( node ) );
+		addOperation( new ModifyOperation( node ) );
 	}
 
 	void unmodify( DataNode node ) {
-		add( new UnmodifyAction( node ) );
+		addOperation( new UnmodifyOperation( node ) );
 	}
 
-	private void add( Operation operation ) {
-		if( commitInProgress ) throw new RuntimeException( "Data should not be modified from data listeners." );
+	private void addOperation( Operation operation ) {
+		if( COMMIT_LOCK.isLocked() && inActiveTransaction( operation.getData() ) ) throw new RuntimeException( "Data should not be modified from data listeners." );
 
-		Log.write( Log.DETAIL, "Transaction: " + toString() + " adding operation: " + operation );
+		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] adding operation: " + operation );
 
-		operations.offer( operation );
 		nodes.add( operation.getData() );
+		operations.offer( operation );
 	}
 
-	private void dispatchEvent( DataEvent event ) {
-		DataNode sender = event.getData();
-
-		sender.dispatchEvent( event );
-
-		for( DataNode parent : sender.getParents() ) {
-			dispatchEvent( event.cloneWithNewSender( parent ) );
-		}
+	private boolean inActiveTransaction( DataNode node ) {
+		return activeTransaction != null && activeTransaction.nodes.contains( node );
 	}
 
-	private FinalEvents getFinalEvents( DataNode node ) {
-		FinalEvents events = finalEvents.get( node );
+	private TransactionEvents getTransactionEvents( DataNode node ) {
+		TransactionEvents events = finalEvents.get( node );
 		if( events == null ) {
-			events = new FinalEvents();
+			events = new TransactionEvents();
 			finalEvents.put( node, events );
 		}
 		return events;
@@ -224,30 +205,57 @@ public class Transaction {
 	}
 
 	private void postModifiedEvent( MetaAttributeEvent event ) {
-		getFinalEvents( event.getData() ).modified = event;
+		getTransactionEvents( event.getData() ).modified = event;
 	}
 
 	private void postChangedEvent( DataChangedEvent event ) {
-		getFinalEvents( event.getData() ).changed = event;
+		getTransactionEvents( event.getData() ).changed = event;
 	}
 
-	private void fireFinalEvents() {
+	private void dispatchTransactionEvents() {
+		for( DataNode node : finalEvents.keySet() ) {
+			TransactionEvents events = finalEvents.get( node );
+			for( DataValueEvent event : events.events ) {
+				dispatchValueEvent( event );
+			}
+		}
+
 		// Fire the modified events first.
 		for( DataNode node : finalEvents.keySet() ) {
-			FinalEvents events = finalEvents.get( node );
+			TransactionEvents events = finalEvents.get( node );
 			if( events.modified != null ) node.dispatchEvent( events.modified );
 		}
 
 		// Fire the data changed events last.
 		for( DataNode node : finalEvents.keySet() ) {
-			FinalEvents events = finalEvents.get( node );
+			TransactionEvents events = finalEvents.get( node );
 			if( events.changed != null ) node.dispatchEvent( events.changed );
 		}
 	}
 
-	public static class ModifyAction extends Operation {
+	private void dispatchValueEvent( DataEvent event ) {
+		DataNode sender = event.getData();
 
-		public ModifyAction( DataNode data ) {
+		sender.dispatchEvent( event );
+
+		for( DataNode parent : sender.getParents() ) {
+			dispatchValueEvent( event.cloneWithNewSender( parent ) );
+		}
+	}
+
+	private class TransactionEvents {
+	
+		public List<DataValueEvent> events = new ArrayList<DataValueEvent>();
+	
+		public DataChangedEvent changed;
+	
+		public MetaAttributeEvent modified;
+	
+	}
+
+	private static class ModifyOperation extends Operation {
+
+		public ModifyOperation( DataNode data ) {
 			super( data );
 		}
 
@@ -262,9 +270,9 @@ public class Transaction {
 
 	}
 
-	private static class UnmodifyAction extends Operation {
+	private static class UnmodifyOperation extends Operation {
 
-		public UnmodifyAction( DataNode data ) {
+		public UnmodifyOperation( DataNode data ) {
 			super( data );
 		}
 
@@ -328,6 +336,7 @@ public class Transaction {
 		protected OperationResult process() {
 			OperationResult result = new OperationResult( this );
 
+			if( index == Integer.MAX_VALUE ) index = list.size();
 			list.doAddChild( index, child );
 			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, list, list, index, child ) );
 
@@ -358,14 +367,6 @@ public class Transaction {
 
 			return result;
 		}
-
-	}
-
-	private class FinalEvents {
-
-		public DataChangedEvent changed;
-
-		public MetaAttributeEvent modified;
 
 	}
 

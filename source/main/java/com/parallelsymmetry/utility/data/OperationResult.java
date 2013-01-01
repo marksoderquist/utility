@@ -7,22 +7,22 @@ public class OperationResult {
 
 	private Operation action;
 
-	private List<DataEvent> events;
+	private List<DataValueEvent> events;
 
 	public OperationResult( Operation action ) {
 		this.action = action;
-		this.events = new CopyOnWriteArrayList<DataEvent>();
+		this.events = new CopyOnWriteArrayList<DataValueEvent>();
 	}
 
 	public Operation getOperation() {
 		return action;
 	}
 
-	public List<DataEvent> getEvents() {
+	public List<DataValueEvent> getEvents() {
 		return events;
 	}
 
-	public void addEvent( DataEvent event ) {
+	public void addEvent( DataValueEvent event ) {
 		events.add( event );
 	}
 

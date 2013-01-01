@@ -36,6 +36,27 @@ public class TransactionTest extends DataTestCase {
 	}
 
 	@Test
+	public void testReuseTransaction() throws Exception {
+		MockDataNode node = new MockDataNode();
+		DataEventWatcher watcher = node.getDataEventWatcher();
+
+		Transaction transaction = new Transaction();
+
+		transaction.setAttribute( node, "key1", "value1" );
+		assertEventCounts( watcher, 0, 0, 0 );
+		transaction.commit();
+		assertEventCounts( watcher, 1, 1, 1 );
+		assertEquals( "value1", node.getAttribute( "key1" ) );
+		watcher.reset();
+
+		transaction.setAttribute( node, "key1", "value2" );
+		assertEventCounts( watcher, 0, 0, 0 );
+		transaction.commit();
+		assertEquals( "value2", node.getAttribute( "key1" ) );
+		assertEventCounts( watcher, 1, 1, 0 );
+	}
+
+	@Test
 	public void testOverlappingTransactions() throws Exception {
 		MockDataNode node = new MockDataNode();
 		DataEventWatcher watcher = node.getDataEventWatcher();
@@ -75,9 +96,9 @@ public class TransactionTest extends DataTestCase {
 	}
 
 	@Test
-	public void testTransactionWithModifingEvent() {
+	public void testTransactionWithEventModifingNode() {
 		MockDataNode node = new MockDataNode();
-		node.addDataListener( new ModifyingDataHandler() );
+		node.addDataListener( new ModifyingDataHandler( node, "time", System.nanoTime() ) );
 		Transaction transaction = new Transaction();
 		try {
 			transaction.setAttribute( node, "fire", "event" );
@@ -86,6 +107,17 @@ public class TransactionTest extends DataTestCase {
 		} catch( RuntimeException exception ) {
 
 		}
+	}
+
+	@Test
+	public void testTransactionWithEventModifyingSeparateNode() {
+		MockDataNode node0 = new MockDataNode();
+		MockDataNode node1 = new MockDataNode();
+		node0.addDataListener( new ModifyingDataHandler( node1, "name", "node1" ) );
+		Transaction transaction = new Transaction();
+		transaction.setAttribute( node0, "fire", "event" );
+		transaction.commit();
+		assertEquals( "node1", node1.getAttribute( "name" ) );
 	}
 
 	@Test
@@ -213,9 +245,21 @@ public class TransactionTest extends DataTestCase {
 
 	private class ModifyingDataHandler extends DataAdapter {
 
+		private DataNode node;
+
+		private String name;
+
+		private Object value;
+
+		public ModifyingDataHandler( DataNode node, String name, Object value ) {
+			this.node = node;
+			this.name = name;
+			this.value = value;
+		}
+
 		@Override
 		public void dataAttributeChanged( DataAttributeEvent event ) {
-			event.getCause().setAttribute( "time", System.nanoTime() );
+			node.setAttribute( name, value );
 		}
 
 	}
