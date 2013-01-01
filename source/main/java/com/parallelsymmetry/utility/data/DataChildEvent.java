@@ -27,7 +27,7 @@ public class DataChildEvent extends DataValueEvent {
 
 	@Override
 	public DataEvent cloneWithNewSender( DataNode sender ) {
-		return new DataChildEvent( getAction(), sender, getCause(), index, child );
+		return new DataChildEvent( getAction(), sender, getCause(), index, child ).setClone( true );
 	}
 
 }

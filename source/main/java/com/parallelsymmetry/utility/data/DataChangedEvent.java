@@ -8,7 +8,7 @@ public class DataChangedEvent extends DataEvent {
 
 	@Override
 	public DataEvent cloneWithNewSender( DataNode sender ) {
-		return new DataChangedEvent( getAction(), sender );
+		return new DataChangedEvent( getAction(), sender ).setClone( true );
 	}
 
 }

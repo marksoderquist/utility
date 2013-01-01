@@ -29,7 +29,7 @@ public class MetaAttributeEvent extends DataEvent {
 	
 	@Override
 	public DataEvent cloneWithNewSender( DataNode sender ) {
-		return new MetaAttributeEvent( getAction(), sender, name, oldValue, newValue );
+		return new MetaAttributeEvent( getAction(), sender, name, oldValue, newValue ).setClone( true );
 	}
 
 }

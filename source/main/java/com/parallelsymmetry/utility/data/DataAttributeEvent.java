@@ -29,7 +29,7 @@ public class DataAttributeEvent extends DataValueEvent {
 
 	@Override
 	public DataEvent cloneWithNewSender( DataNode sender ) {
-		return new DataAttributeEvent( getAction(), sender, getCause(), name, oldValue, newValue );
+		return new DataAttributeEvent( getAction(), sender, getCause(), name, oldValue, newValue ).setClone( true );
 	}
 
 }

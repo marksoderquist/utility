@@ -16,6 +16,8 @@ public abstract class DataEvent {
 	
 	private Action action;
 	
+	private boolean isClone;
+	
 	// TODO Rename data to sender once all modules are converted.
 	private DataNode data;
 	
@@ -35,6 +37,15 @@ public abstract class DataEvent {
 	
 	public DataNode getData() {
 		return data;
+	}
+	
+	public boolean isClone() {
+		return isClone;
+	}
+	
+	DataEvent setClone( boolean isClone ) {
+		this.isClone = isClone;
+		return this;
 	}
 	
 	public abstract DataEvent cloneWithNewSender( DataNode parent );
