@@ -2,6 +2,9 @@ package com.parallelsymmetry.utility.data;
 
 import org.junit.Test;
 
+import com.parallelsymmetry.utility.mock.DataEventWatcher;
+import com.parallelsymmetry.utility.mock.MockDataList;
+
 public class DataNodeListenerTest extends DataTestCase {
 
 	@Test

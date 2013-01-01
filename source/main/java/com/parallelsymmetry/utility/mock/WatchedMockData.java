@@ -1,4 +1,5 @@
-package com.parallelsymmetry.utility.data;
+package com.parallelsymmetry.utility.mock;
+
 
 public interface WatchedMockData {
 

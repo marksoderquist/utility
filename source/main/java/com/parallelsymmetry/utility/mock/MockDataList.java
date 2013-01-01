@@ -1,4 +1,4 @@
-package com.parallelsymmetry.utility.data;
+package com.parallelsymmetry.utility.mock;
 
 import com.parallelsymmetry.utility.data.DataList;
 import com.parallelsymmetry.utility.data.DataNode;

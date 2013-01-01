@@ -1,5 +1,8 @@
 package com.parallelsymmetry.utility.data;
 
+import com.parallelsymmetry.utility.mock.DataEventWatcher;
+import com.parallelsymmetry.utility.mock.WatchedMockData;
+
 public abstract class DataTreeEventTest extends DataTestCase {
 
 	protected DataNode grandparent;

@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.parallelsymmetry.utility.mock.DataEventWatcher;
+import com.parallelsymmetry.utility.mock.MockDataList;
+import com.parallelsymmetry.utility.mock.MockDataNode;
+
 public class DataListTest extends DataTestCase {
 
 	@Test

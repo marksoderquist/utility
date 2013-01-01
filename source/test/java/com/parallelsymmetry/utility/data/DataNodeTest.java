@@ -9,6 +9,9 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.parallelsymmetry.utility.Accessor;
+import com.parallelsymmetry.utility.mock.DataEventWatcher;
+import com.parallelsymmetry.utility.mock.MockDataList;
+import com.parallelsymmetry.utility.mock.MockDataNode;
 
 public class DataNodeTest extends DataTestCase {
 

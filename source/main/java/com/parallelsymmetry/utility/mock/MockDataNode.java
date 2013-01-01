@@ -1,8 +1,8 @@
-package com.parallelsymmetry.utility.data;
+package com.parallelsymmetry.utility.mock;
 
 import com.parallelsymmetry.utility.data.DataNode;
 
-class MockDataNode extends DataNode implements WatchedMockData {
+public class MockDataNode extends DataNode implements WatchedMockData {
 
 	private String name;
 

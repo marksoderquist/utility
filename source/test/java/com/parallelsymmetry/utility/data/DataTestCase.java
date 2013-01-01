@@ -7,6 +7,7 @@ import com.parallelsymmetry.utility.data.DataEvent;
 import com.parallelsymmetry.utility.data.DataNode;
 import com.parallelsymmetry.utility.data.MetaAttributeEvent;
 import com.parallelsymmetry.utility.log.Log;
+import com.parallelsymmetry.utility.mock.DataEventWatcher;
 
 public abstract class DataTestCase extends TestCase {
 

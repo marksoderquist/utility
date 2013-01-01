@@ -1,5 +1,7 @@
 package com.parallelsymmetry.utility.data;
 
+import com.parallelsymmetry.utility.mock.MockDataNode;
+
 public class DataNodeTreeEventTest extends DataTreeEventTest {
 
 	@Override

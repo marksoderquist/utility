@@ -1,4 +1,4 @@
-package com.parallelsymmetry.utility.data;
+package com.parallelsymmetry.utility.mock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import com.parallelsymmetry.utility.data.DataListener;
 import com.parallelsymmetry.utility.data.MetaAttributeEvent;
 import com.parallelsymmetry.utility.log.Log;
 
-class DataEventWatcher implements DataListener {
+public class DataEventWatcher implements DataListener {
 
 	private String name;
 
