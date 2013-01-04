@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.parallelsymmetry.utility.ObjectUtil;
 import com.parallelsymmetry.utility.log.Log;
 
 public class Transaction {
@@ -34,6 +35,10 @@ public class Transaction {
 	}
 
 	public void setAttribute( DataNode node, String name, Object newValue ) {
+		// If the old value is equal to the new value no changes are necessary.
+		Object oldValue = node.getAttribute( name );
+		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
+
 		addOperation( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
 	}
 
@@ -244,13 +249,13 @@ public class Transaction {
 	}
 
 	private class TransactionEvents {
-	
+
 		public List<DataValueEvent> events = new ArrayList<DataValueEvent>();
-	
+
 		public DataChangedEvent changed;
-	
+
 		public MetaAttributeEvent modified;
-	
+
 	}
 
 	private static class ModifyOperation extends Operation {

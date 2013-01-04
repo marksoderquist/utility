@@ -99,6 +99,46 @@ public class TransactionTest extends DataTestCase {
 	}
 
 	@Test
+	public void testSetAttributeToSameValue() {
+		MockDataNode data = new MockDataNode();
+		DataEventWatcher handler = new DataEventWatcher();
+		data.addDataListener( handler );
+		assertNodeState( data, false, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		Transaction transaction = new Transaction();
+
+		transaction.setAttribute( data, "attribute0", "value0" );
+		transaction.setAttribute( data, "attribute1", "value1" );
+		transaction.setAttribute( data, "attribute2", "value2" );
+		assertNodeState( data, false, 0 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		transaction.commit();
+		assertNodeState( data, true, 3 );
+		assertEventCounts( handler, 1, 1, 3 );
+
+		int index = 0;
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute0", null, "value0" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute1", null, "value1" );
+		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute2", null, "value2" );
+		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
+		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
+		assertEquals( index++, handler.getEvents().size() );
+
+		handler.reset();
+		transaction.setAttribute( data, "attribute0", "value0" );
+		transaction.setAttribute( data, "attribute1", "value1" );
+		transaction.setAttribute( data, "attribute2", "value2" );
+		assertNodeState( data, true, 3 );
+		assertEventCounts( handler, 0, 0, 0 );
+
+		transaction.commit();
+		assertNodeState( data, true, 3 );
+		assertEventCounts( handler, 0, 0, 0 );
+	}
+
+	@Test
 	public void testTransactionWithEventModifingNode() {
 		MockDataNode node = new MockDataNode();
 		node.addDataListener( new ModifyingDataHandler( node, "time", System.nanoTime() ) );
