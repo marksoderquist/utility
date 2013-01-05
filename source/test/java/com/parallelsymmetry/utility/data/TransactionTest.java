@@ -267,23 +267,91 @@ public class TransactionTest extends DataTestCase {
 		watcher.reset();
 	}
 
-	// TODO Revisit this test.
 	/**
-	 * This is a particular case where data nodes have redefined the hashCode and
-	 * equals methods to be dependent on an attribute. Transaction code cannot
-	 * depend on the hashCode() method returning a valid value, therefore it
-	 * cannot put the node into any collections that use the hashCode() method.
+	 * This is a fairly complex test to ensure that the transaction handling can
+	 * handle two nodes that have overridden the equals() and hashCode() methods
+	 * to cause the two nodes to have the same hash code and are equal according
+	 * to the equals() method.
 	 */
 	@Test
-	public void testNodeWithAttributeDependentHashcode() {
-		AttributeDependentHashCodeType type = new AttributeDependentHashCodeType();
-		assertNull( type.getKey() );
+	public void testNodesThatOverrideHashcodeAndEqualsWithZeroHashcode() {
+		EqualHashOverrideNode node1 = new EqualHashOverrideNode();
+		EqualHashOverrideNode node2 = new EqualHashOverrideNode();
+		DataEventWatcher watcher1 = new DataEventWatcher();
+		DataEventWatcher watcher2 = new DataEventWatcher();
+		node1.addDataListener( watcher1 );
+		node2.addDataListener( watcher2 );
 
-		type.setKey( "test" );
-		assertEquals( "test", type.getKey() );
+		// Ensure that the nodes are in the correct state.
+		assertEquals( node1, node2 );
+		assertEquals( node1.hashCode(), node2.hashCode() );
+		assertFalse( node1 == node2 );
+		assertEventCounts( watcher1, 0, 0, 0 );
+		assertEventCounts( watcher2, 0, 0, 0 );
 
-		type.setKey( null );
-		assertNull( type.getKey() );
+		// Use a transaction to change both nodes at the same time.
+		Transaction transaction = new Transaction();
+		transaction.setAttribute( node1, "name", "node1" );
+		transaction.setAttribute( node2, "name", "node2" );
+		transaction.commit();
+
+		// Check the attributes.
+		assertEquals( "node1", node1.getAttribute( "name" ) );
+		assertEquals( "node2", node2.getAttribute( "name" ) );
+		// Check the equals() and hashCode() methods.
+		assertEquals( node1, node2 );
+		assertEquals( node1.hashCode(), node2.hashCode() );
+		assertFalse( node1 == node2 );
+		// Check the event counts.
+		assertEventCounts( watcher1, 1, 1, 1 );
+		assertEventCounts( watcher2, 1, 1, 1 );
+	}
+
+	/**
+	 * This is a fairly complex test to ensure that the transaction handling can
+	 * handle two nodes that have overridden the equals() and hashCode() methods
+	 * to cause the two nodes to have the same hash code and are equal according
+	 * to the equals() method.
+	 */
+	@Test
+	public void testNodesThatOverrideHashcodeAndEqualsWithNonZeroHashcode() {
+		EqualHashOverrideNode node1 = new EqualHashOverrideNode();
+		EqualHashOverrideNode node2 = new EqualHashOverrideNode();
+		DataEventWatcher watcher1 = new DataEventWatcher();
+		DataEventWatcher watcher2 = new DataEventWatcher();
+		node1.addDataListener( watcher1 );
+		node2.addDataListener( watcher2 );
+
+		// Ensure that the nodes are in the correct state.
+		assertEquals( node1, node2 );
+		assertEquals( node1.hashCode(), node2.hashCode() );
+		assertFalse( node1 == node2 );
+		assertEventCounts( watcher1, 0, 0, 0 );
+		assertEventCounts( watcher2, 0, 0, 0 );
+
+		node1.setKey( "value1" );
+		node2.setKey( "value1" );
+		node1.setModified( false );
+		node2.setModified( false );
+		watcher1.reset();
+		watcher2.reset();
+
+		// Use a transaction to change both nodes at the same time.
+		Transaction transaction = new Transaction();
+		transaction.setAttribute( node1, "name", "node1" );
+		transaction.setAttribute( node2, "name", "node2" );
+		transaction.commit();
+
+		// Check the attributes.
+		assertEquals( "node1", node1.getAttribute( "name" ) );
+		assertEquals( "node2", node2.getAttribute( "name" ) );
+		// Check the equals() and hashCode() methods.
+		assertEquals( node1, node2 );
+		assertEquals( node1.hashCode(), node2.hashCode() );
+		assertFalse( node1 == node2 );
+		// Check the event counts.
+		assertEventCounts( watcher1, 1, 1, 1 );
+		assertEventCounts( watcher2, 1, 1, 1 );
 	}
 
 	private class ModifyingDataHandler extends DataAdapter {
@@ -307,7 +375,7 @@ public class TransactionTest extends DataTestCase {
 
 	}
 
-	private class AttributeDependentHashCodeType extends DataNode {
+	private class EqualHashOverrideNode extends DataNode {
 
 		private static final String KEY = "key";
 
@@ -327,9 +395,9 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public boolean equals( Object object ) {
-			if( !( object instanceof AttributeDependentHashCodeType ) ) return false;
+			if( !( object instanceof EqualHashOverrideNode ) ) return false;
 			String key = getKey();
-			return ObjectUtil.areEqual( key, ( (AttributeDependentHashCodeType)object ).getKey() );
+			return ObjectUtil.areEqual( key, ( (EqualHashOverrideNode)object ).getKey() );
 		}
 
 	}

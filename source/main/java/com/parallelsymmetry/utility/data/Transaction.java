@@ -22,16 +22,19 @@ public class Transaction {
 
 	private static Transaction activeTransaction;
 
-	private Map<DataNode, TransactionEvents> finalEvents;
-
 	private Queue<Operation> operations;
 
-	private Set<DataNode> nodes;
+	private Set<Integer> nodeKeys;
+
+	private Map<Integer, DataNode> nodes;
+
+	private Map<Integer, ResultCollector> collectors;
 
 	public Transaction() {
-		nodes = new CopyOnWriteArraySet<DataNode>();
+		nodeKeys = new CopyOnWriteArraySet<Integer>();
 		operations = new ConcurrentLinkedQueue<Operation>();
-		finalEvents = new ConcurrentHashMap<DataNode, TransactionEvents>();
+		nodes = new ConcurrentHashMap<Integer, DataNode>();
+		collectors = new ConcurrentHashMap<Integer, ResultCollector>();
 	}
 
 	public void setAttribute( DataNode node, String name, Object newValue ) {
@@ -109,29 +112,28 @@ public class Transaction {
 			activeTransaction = this;
 
 			// Store the current modified state of each data object.
-			for( DataNode node : nodes ) {
+			for( DataNode node : nodes.values() ) {
 				node.putResource( PREVIOUS_MODIFIED_STATE, node.isModified() );
 			}
 
 			// Process the operations.
-			List<OperationResult> results = new ArrayList<OperationResult>();
+			List<OperationResult> operationResults = new ArrayList<OperationResult>();
 			for( Operation operation : operations ) {
 				Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] processing operation: " + operation );
-				results.add( operation.process() );
+				operationResults.add( operation.process() );
 			}
 
 			// Go through each operation result and collect the events for each node.
-			for( OperationResult result : results ) {
-				DataNode node = result.getOperation().getData();
-				getTransactionEvents( node ).events.addAll( result.getEvents() );
+			for( OperationResult operationResult : operationResults ) {
+				DataNode node = operationResult.getOperation().getData();
+				getResultCollector( node ).events.addAll( operationResult.getEvents() );
 			}
 
 			// Send the events for each data node.
-			for( DataNode node : nodes ) {
+			for( DataNode node : nodes.values() ) {
 				boolean oldModified = (Boolean)node.getResource( PREVIOUS_MODIFIED_STATE );
 				boolean newModified = node.isModified();
 				node.putResource( PREVIOUS_MODIFIED_STATE, null );
-
 				collectFinalEvents( node, node, oldModified, newModified );
 			}
 
@@ -145,8 +147,9 @@ public class Transaction {
 	}
 
 	public void reset() {
-		finalEvents.clear();
+		collectors.clear();
 		operations.clear();
+		nodeKeys.clear();
 		nodes.clear();
 	}
 
@@ -163,36 +166,45 @@ public class Transaction {
 		addOperation( new UnmodifyOperation( node ) );
 	}
 
+	private void addNode( DataNode node ) {
+		Integer key = System.identityHashCode( node );
+		synchronized( nodeKeys ) {
+			if( nodeKeys.contains( key ) ) return;
+			nodeKeys.add( key );
+			nodes.put( key, node );
+		}
+	}
+
 	private void addOperation( Operation operation ) {
 		if( COMMIT_LOCK.isLocked() && inActiveTransaction( operation.getData() ) ) throw new RuntimeException( "Data should not be modified from data listeners." );
 
 		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] adding operation: " + operation );
 
-		nodes.add( operation.getData() );
+		addNode( operation.getData() );
 		operations.offer( operation );
 	}
 
 	private boolean inActiveTransaction( DataNode node ) {
-		return activeTransaction != null && activeTransaction.nodes.contains( node );
+		return activeTransaction != null && activeTransaction.nodeKeys.contains( System.identityHashCode( node ) );
 	}
 
-	private TransactionEvents getTransactionEvents( DataNode node ) {
-		TransactionEvents events = finalEvents.get( node );
-		if( events == null ) {
-			events = new TransactionEvents();
-			finalEvents.put( node, events );
+	private ResultCollector getResultCollector( DataNode node ) {
+		Integer key = System.identityHashCode( node );
+		ResultCollector collector = collectors.get( key );
+		if( collector == null ) {
+			collector = new ResultCollector();
+			collectors.put( key, collector );
 		}
-		return events;
+		return collector;
 	}
 
 	private void collectFinalEvents( DataNode sender, DataNode cause, boolean oldModified, boolean newModified ) {
-		boolean modifiedChanged = oldModified != newModified;
+		// Post the changed event.
+		storeChangedEvent( new DataChangedEvent( DataEvent.Action.MODIFY, sender ) );
 
 		// Post the modified event.
-		if( modifiedChanged ) postModifiedEvent( new MetaAttributeEvent( DataEvent.Action.MODIFY, sender, DataNode.MODIFIED, oldModified, newModified ) );
-
-		// Post the changed event.
-		postChangedEvent( new DataChangedEvent( DataEvent.Action.MODIFY, sender ) );
+		boolean modifiedChanged = oldModified != newModified;
+		if( modifiedChanged ) storeModifiedEvent( new MetaAttributeEvent( DataEvent.Action.MODIFY, sender, DataNode.MODIFIED, oldModified, newModified ) );
 
 		for( DataNode parent : sender.getParents() ) {
 			boolean parentOldModified = parent.isModified();
@@ -209,32 +221,32 @@ public class Transaction {
 		}
 	}
 
-	private void postModifiedEvent( MetaAttributeEvent event ) {
-		getTransactionEvents( event.getData() ).modified = event;
+	private void storeModifiedEvent( MetaAttributeEvent event ) {
+		getResultCollector( event.getData() ).modified = event;
 	}
 
-	private void postChangedEvent( DataChangedEvent event ) {
-		getTransactionEvents( event.getData() ).changed = event;
+	private void storeChangedEvent( DataChangedEvent event ) {
+		getResultCollector( event.getData() ).changed = event;
 	}
 
 	private void dispatchTransactionEvents() {
-		for( DataNode node : finalEvents.keySet() ) {
-			TransactionEvents events = finalEvents.get( node );
-			for( DataValueEvent event : events.events ) {
+		for( Integer key : collectors.keySet() ) {
+			ResultCollector collector = collectors.get( key );
+			for( DataValueEvent event : collector.events ) {
 				dispatchValueEvent( event );
 			}
 		}
 
 		// Fire the modified events first.
-		for( DataNode node : finalEvents.keySet() ) {
-			TransactionEvents events = finalEvents.get( node );
-			if( events.modified != null ) node.dispatchEvent( events.modified );
+		for( Integer key : collectors.keySet() ) {
+			ResultCollector collector = collectors.get( key );
+			if( collector.modified != null ) dispatchEvent( collector.modified );
 		}
 
 		// Fire the data changed events last.
-		for( DataNode node : finalEvents.keySet() ) {
-			TransactionEvents events = finalEvents.get( node );
-			if( events.changed != null ) node.dispatchEvent( events.changed );
+		for( Integer key : collectors.keySet() ) {
+			ResultCollector collector = collectors.get( key );
+			if( collector.changed != null ) dispatchEvent( collector.changed );
 		}
 	}
 
@@ -248,7 +260,11 @@ public class Transaction {
 		}
 	}
 
-	private class TransactionEvents {
+	private void dispatchEvent( DataEvent event ) {
+		event.getData().dispatchEvent( event );
+	}
+
+	private class ResultCollector {
 
 		public List<DataValueEvent> events = new ArrayList<DataValueEvent>();
 
