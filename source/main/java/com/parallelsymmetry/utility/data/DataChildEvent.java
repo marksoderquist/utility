@@ -6,8 +6,8 @@ public class DataChildEvent extends DataValueEvent {
 
 	private DataNode child;
 
-	public DataChildEvent( Action action, DataNode sender, DataNode cause, int index, DataNode child ) {
-		super( DataEvent.Type.DATA_CHILD, action, sender, cause );
+	public DataChildEvent( Action action, DataNode sender, DataNode parent, int index, DataNode child ) {
+		super( DataEvent.Type.DATA_CHILD, action, sender, parent );
 		this.index = index;
 		this.child = child;
 	}

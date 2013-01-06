@@ -172,7 +172,7 @@ public abstract class DataNode {
 	public Set<DataNode> getParents() {
 		return Collections.unmodifiableSet( parents );
 	}
-
+	
 	public Set<List<DataNode>> getNodePaths() {
 		return getNodePaths( null );
 	}
