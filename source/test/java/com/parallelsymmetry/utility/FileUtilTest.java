@@ -49,6 +49,13 @@ public class FileUtilTest extends TestCase {
 		assertEquals( 1152921504606846976L, FileUtil.EiB );
 	}
 
+	public void testGlobToRE() {
+		assertEquals( null, FileUtil.globToRE( null ) );
+		assertEquals( "", FileUtil.globToRE( "" ) );
+		assertEquals( ".*\\.txt", FileUtil.globToRE( "*.txt" ) );
+		assertEquals( "test\\.txt", FileUtil.globToRE( "test.txt" ) );
+	}
+
 	public void testGetExtensionWithFile() throws Exception {
 		assertEquals( "Incorrect extension.", null, FileUtil.getExtension( (File)null ) );
 		assertEquals( "Incorrect extension.", "", FileUtil.getExtension( new File( "test" ) ) );

@@ -47,6 +47,73 @@ public final class FileUtil {
 
 	public static final FileFilter JAR_FILE_FILTER = new JarFileFilter();
 
+	/**
+	 * Converts a Unix-style glob to a regular expression. This does the following
+	 * substitutions: ? becomes ., * becomes .*, {aa,bb} becomes (aa|bb).
+	 * 
+	 * @param glob The glob pattern.
+	 */
+	public static String globToRE( String glob ) {
+		if( glob == null ) return null;
+		
+		boolean inside = false;
+		boolean escape = false;
+		StringBuffer buffer = new StringBuffer();
+
+		for( int index = 0; index < glob.length(); index++ ) {
+			char c = glob.charAt( index );
+
+			if( escape ) {
+				buffer.append( '\\' );
+				buffer.append( c );
+				escape = false;
+				continue;
+			}
+
+			switch( c ) {
+				case '\\': {
+					escape = true;
+					break;
+				}
+				case '?': {
+					buffer.append( '.' );
+					break;
+				}
+				case '.': {
+					buffer.append( "\\." );
+					break;
+				}
+				case '*': {
+					buffer.append( ".*" );
+					break;
+				}
+				case '{': {
+					buffer.append( '(' );
+					inside = true;
+					break;
+				}
+				case ',': {
+					if( inside ) {
+						buffer.append( '|' );
+					} else {
+						buffer.append( ',' );
+					}
+					break;
+				}
+				case '}': {
+					buffer.append( ')' );
+					inside = false;
+					break;
+				}
+				default: {
+					buffer.append( c );
+				}
+			}
+		}
+
+		return buffer.toString();
+	}
+
 	public static String getExtension( File file ) {
 		if( file == null ) return null;
 		return getExtension( file.getName() );
