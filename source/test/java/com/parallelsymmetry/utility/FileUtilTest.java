@@ -12,10 +12,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import com.parallelsymmetry.utility.FileUtil;
 
 import junit.framework.TestCase;
 
@@ -54,6 +53,11 @@ public class FileUtilTest extends TestCase {
 		assertEquals( "", FileUtil.globToRE( "" ) );
 		assertEquals( ".*\\.txt", FileUtil.globToRE( "*.txt" ) );
 		assertEquals( "test\\.txt", FileUtil.globToRE( "test.txt" ) );
+		assertEquals( ".*", FileUtil.globToRE( "*" ) );
+		assertEquals( ".*\\..*", FileUtil.globToRE( "*.*" ) );
+
+		Pattern.compile( FileUtil.globToRE( "*" ) );
+		Pattern.compile( FileUtil.globToRE( "*.*" ) );
 	}
 
 	public void testGetExtensionWithFile() throws Exception {
