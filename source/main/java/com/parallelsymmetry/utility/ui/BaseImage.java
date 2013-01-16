@@ -63,7 +63,7 @@ public abstract class BaseImage {
 
 	public static final ColorScheme DEFAULT_COLOR_SCHEME = new ColorScheme( new Color( 160, 160, 160 ) );
 
-	private static final double OUTLINE_COLOR_FACTOR = -0.75;
+	protected static final double OUTLINE_COLOR_FACTOR = -0.75;
 
 	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
 
