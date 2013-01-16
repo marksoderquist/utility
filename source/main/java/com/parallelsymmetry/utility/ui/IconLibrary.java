@@ -194,7 +194,11 @@ public class IconLibrary {
 	 * Create a named cached icon.
 	 */
 	public void putIcon( String name, Icon renderer ) {
-		icons.put( name, renderer );
+		if( renderer == null ) {
+			icons.remove( name );
+		} else {
+			icons.put( name, renderer );
+		}
 	}
 
 	/**
