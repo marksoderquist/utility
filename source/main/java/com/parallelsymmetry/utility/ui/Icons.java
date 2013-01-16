@@ -247,7 +247,7 @@ public class Icons {
 		}
 
 		private Image createBackgroundImage() {
-			int count = 24;
+			int count = 16;
 			
 			Image image = new BufferedImage( count, count, BufferedImage.TYPE_INT_RGB );
 
