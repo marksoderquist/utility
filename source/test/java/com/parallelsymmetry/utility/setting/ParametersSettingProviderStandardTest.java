@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.parallelsymmetry.utility.Parameters;
 
-public class ParametersSettingProviderTest extends SettingProviderTest {
+public class ParametersSettingProviderStandardTest extends SettingProviderStandardTest {
 
 	@Override
 	public void setUp() {

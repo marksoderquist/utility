@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public abstract class SettingProviderTest extends TestCase {
+public abstract class SettingProviderStandardTest extends TestCase {
 
 	protected SettingProvider provider;
 
@@ -25,7 +25,7 @@ public abstract class SettingProviderTest extends TestCase {
 
 	@Test
 	public void testGetKeys() {
-		assertNull( provider.getKeys( "/invalid" ) );
+		assertEquals( 0, provider.getKeys( "/invalid" ).size() );
 
 		Set<String> keys = provider.getKeys( "/" );
 		assertEquals( 3, keys.size() );
@@ -43,7 +43,7 @@ public abstract class SettingProviderTest extends TestCase {
 
 	@Test
 	public void testGetChildNames() {
-		assertNull( provider.getChildNames( "/invalid" ) );
+		assertEquals( 0, provider.getChildNames( "/invalid" ).size() );
 
 		Set<String> names = provider.getChildNames( "/" );
 		assertEquals( 1, names.size() );

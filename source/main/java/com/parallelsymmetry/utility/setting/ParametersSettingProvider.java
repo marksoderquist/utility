@@ -22,14 +22,15 @@ public class ParametersSettingProvider implements SettingProvider {
 
 	@Override
 	public Set<String> getKeys( String path ) {
+		Set<String> keys = new HashSet<String>();
+		if( parameters == null ) return keys;
+		if( !nodeExists( path ) ) return keys;
+
 		// Incoming paths should always be absolute.
-		if( parameters == null ) return null;
-		if( !nodeExists( path ) ) return null;
 		if( !path.endsWith( "/" ) ) path += "/";
 
 		String node = getName( path );
 
-		Set<String> keys = new HashSet<String>();
 		for( String name : parameters.getNames() ) {
 			if( name.startsWith( node ) && name.indexOf( ".", node.length() ) < 0 ) {
 				keys.add( name.substring( node.length() ) );
@@ -42,22 +43,23 @@ public class ParametersSettingProvider implements SettingProvider {
 
 	@Override
 	public Set<String> getChildNames( String path ) {
+		Set<String> names = new HashSet<String>();
+		if( parameters == null ) return names;
+		if( !nodeExists( path ) ) return names;
+
 		// Incoming paths should always be absolute.
-		if( parameters == null ) return null;
-		if( !nodeExists( path ) ) return null;
 		if( !path.endsWith( "/" ) ) path += "/";
 
 		String node = getName( path );
 
-		Set<String> names = new HashSet<String>();
 		for( String name : parameters.getNames() ) {
 			if( name.startsWith( node ) ) {
 				int index = name.indexOf( ".", node.length() );
-//				if( index < 0 ) {
-//					names.add( name.substring( node.length() ) );
-//				} else {
-//					names.add( name.substring( node.length(), index ) );
-//				}
+				//				if( index < 0 ) {
+				//					names.add( name.substring( node.length() ) );
+				//				} else {
+				//					names.add( name.substring( node.length(), index ) );
+				//				}
 				if( index > 0 ) names.add( name.substring( node.length(), index ) );
 			}
 		}

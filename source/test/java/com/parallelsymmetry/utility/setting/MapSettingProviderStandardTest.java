@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MapSettingProviderTest extends SettingProviderTest {
+public class MapSettingProviderStandardTest extends SettingProviderStandardTest {
 
 	@Override
 	public void setUp() {

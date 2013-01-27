@@ -39,13 +39,15 @@ public class DescriptorSettingProvider implements SettingProvider {
 
 	@Override
 	public Set<String> getKeys( String path ) {
+		Set<String> keys = new HashSet<String>();
+		if( descriptor == null ) return keys;
+		if( !nodeExists( path ) ) return keys;
+
 		// Incoming paths should always be absolute.
-		if( !nodeExists( path ) ) return null;
 		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
 
-		Set<String> keys = new HashSet<String>();
 		for( String name : descriptor.getNames( root + path ) ) {
-			Node node = descriptor.getNode(root + path + "/" + name );
+			Node node = descriptor.getNode( root + path + "/" + name );
 			if( node != null && isKey( node ) ) keys.add( name );
 		}
 
@@ -54,13 +56,15 @@ public class DescriptorSettingProvider implements SettingProvider {
 
 	@Override
 	public Set<String> getChildNames( String path ) {
+		Set<String> names = new HashSet<String>();
+		if( descriptor == null ) return names;
+		if( !nodeExists( path ) ) return names;
+
 		// Incoming paths should always be absolute.
-		if( !nodeExists( path ) ) return null;
 		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
 
-		Set<String> names = new HashSet<String>();
 		for( String name : descriptor.getNames( root + path ) ) {
-			Node node = descriptor.getNode(root + path + "/" + name );
+			Node node = descriptor.getNode( root + path + "/" + name );
 			if( node != null && !isKey( node ) ) names.add( name );
 		}
 

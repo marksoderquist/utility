@@ -173,7 +173,36 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", settings.get( "/test/path/D", null ) );
 	}
 
+	public void testGetKeys() {
+		Set<String> keys = settings.getKeys();
+		assertEquals( 0, keys.size() );
+	}
+
+	public void testGetChildCount() {
+		assertEquals( 0, settings.getChildCount() );
+
+		provider1.set( "/test/path1/value", "1" );
+		// Intentionally skip provider 2.
+		provider3.set( "/test/path3/value", "3" );
+		providerD.set( "/test/pathD/value", "D" );
+
+		assertEquals( 1, settings.getChildCount() );
+	}
+
+	public void testGetChildCountWithString() {
+		assertEquals( 0, settings.getChildCount( "/test" ) );
+
+		provider1.set( "/test/path1/value", "1" );
+		// Intentionally skip provider 2.
+		provider3.set( "/test/path3/value", "3" );
+		providerD.set( "/test/pathD/value", "D" );
+
+		assertEquals( 3, settings.getChildCount( "/test" ) );
+	}
+
 	public void testGetChildNames() {
+		assertEquals( 0, settings.getChildNames().size() );
+
 		provider1.set( "/test/path1/value", "1" );
 		// Intentionally skip provider 2.
 		provider3.set( "/test/path3/value", "3" );

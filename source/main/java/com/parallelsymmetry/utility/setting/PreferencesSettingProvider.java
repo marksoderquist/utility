@@ -53,12 +53,12 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 	
 	@Override
 	public Set<String> getKeys( String path ) {
-		// Incoming paths should always be absolute.
-		if( !nodeExists( path ) ) return null;
+		Set<String> keys = new HashSet<String>();
+		if( !nodeExists( path ) ) return keys;
 		
+		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
 
-		Set<String> keys = new HashSet<String>();
 		Preferences preferences = getPreferences();
 		try {
 			keys.addAll( Arrays.asList( preferences.node( path ).keys() ) );
@@ -71,12 +71,12 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public Set<String> getChildNames( String path ) {
-		// Incoming paths should always be absolute.
-		if( !nodeExists( path ) ) return null;
+		Set<String> names = new HashSet<String>();
+		if( !nodeExists( path ) ) return names;
 		
+		// Incoming paths should always be absolute.
 		path = path.substring( 1 );
 
-		Set<String> names = new HashSet<String>();
 		Preferences preferences = getPreferences();
 		try {
 			names.addAll( Arrays.asList( preferences.node( path ).childrenNames() ) );

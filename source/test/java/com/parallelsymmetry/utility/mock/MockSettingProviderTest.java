@@ -3,9 +3,9 @@ package com.parallelsymmetry.utility.mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.parallelsymmetry.utility.setting.SettingProviderTest;
+import com.parallelsymmetry.utility.setting.SettingProviderStandardTest;
 
-public class MockSettingProviderTest extends SettingProviderTest {
+public class MockSettingProviderTest extends SettingProviderStandardTest {
 
 	@Override
 	public void setUp() {

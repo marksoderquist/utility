@@ -36,9 +36,9 @@ public class MockSettingProvider implements SettingProvider {
 
 	@Override
 	public Set<String> getKeys( String path ) {
-		if( !nodeExists( path ) ) return null;
-
 		Set<String> keys = new HashSet<String>();
+		if( !nodeExists( path ) ) return keys;
+
 		if( !path.endsWith( "/" ) ) path += "/";
 
 		for( String key : store.keySet() ) {
@@ -52,10 +52,11 @@ public class MockSettingProvider implements SettingProvider {
 
 	@Override
 	public Set<String> getChildNames( String path ) {
-		if( !nodeExists( path ) ) return null;
+		Set<String> names = new HashSet<String>();
+		if( !nodeExists( path ) ) return names;
+		
 		if( !path.endsWith( "/" ) ) path += "/";
 
-		Set<String> names = new HashSet<String>();
 		for( String key : store.keySet() ) {
 			if( key.startsWith( path ) ) {
 				int index = key.indexOf( "/", path.length() );
