@@ -83,6 +83,10 @@ public class BaseSettingProvider implements SettingProvider {
 		return exists;
 	}
 
+	public void setProvider( SettingProvider provider ) {
+		this.provider = provider;
+	}
+
 	public void addProvider( SettingProvider provider ) {
 		providers.add( provider );
 	}
