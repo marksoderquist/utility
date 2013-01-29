@@ -30,7 +30,7 @@ public class DefaultFormatter extends Formatter {
 		if( Log.isShowTag() ) {
 			prefix.append( getTag( record.getLevel() ) );
 		}
-		if( record.getLevel().intValue() < Log.NONE.intValue() && Log.isShowDate() ) {
+		if( record.getLevel().intValue() < Log.HELP.intValue() && Log.isShowDate() ) {
 			prefix.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
 			prefix.append( " " );
 		}
@@ -97,6 +97,10 @@ public class DefaultFormatter extends Formatter {
 			case 6: {
 				return "[D] ";
 			}
+			// DETAIL
+			case 5: {
+				return "[L] ";
+			}
 		}
 
 		return "[?]";
@@ -112,7 +116,10 @@ public class DefaultFormatter extends Formatter {
 		if( index < 0 ) index = 0;
 
 		switch( index ) {
-		// ERROR
+			case 11: {
+				return "";
+			}
+			// ERROR
 			case 10: {
 				return "\u001b[1m\u001b[31m";
 			}
@@ -130,6 +137,10 @@ public class DefaultFormatter extends Formatter {
 			}
 			// DEBUG
 			case 6: {
+				return "\u001b[1m\u001b[30m";
+			}
+			// DETAIL
+			case 5: {
 				return "\u001b[1m\u001b[30m";
 			}
 		}
@@ -175,6 +186,10 @@ public class DefaultFormatter extends Formatter {
 			// DEBUG
 			case 6: {
 				return "   ";
+			}
+			// DETAIL
+			case 5: {
+				return "    ";
 			}
 		}
 

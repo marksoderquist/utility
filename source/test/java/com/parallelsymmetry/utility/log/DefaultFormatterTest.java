@@ -117,7 +117,9 @@ public class DefaultFormatterTest extends TestCase {
 
 		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( Log.DEBUG ) );
 
-		assertEquals( "", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.DEBUG.intValue() - 1 ) ) );
+		assertEquals( "\u001b[1m\u001b[30m", DefaultFormatter.getColorPrefix( Log.DETAIL ) );
+
+		assertEquals( "", DefaultFormatter.getColorPrefix( new TestLevel( "", Log.DETAIL.intValue() - 1 ) ) );
 	}
 
 	public void testGetColorSuffix() throws Exception {

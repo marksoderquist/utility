@@ -33,6 +33,8 @@ public class Log {
 
 	public static final Level NONE = new CustomLevel( "NONE", Integer.MAX_VALUE );
 
+	public static final Level HELP = new CustomLevel( "HELP", Integer.MAX_VALUE - 1 );
+
 	public static final Level ERROR = new CustomLevel( "ERROR", 1000 );
 
 	public static final Level WARN = new CustomLevel( "WARN", 900 );

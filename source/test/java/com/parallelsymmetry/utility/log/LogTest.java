@@ -214,7 +214,7 @@ public class LogTest extends TestCase {
 
 	public void testGetLevels() {
 		SortedSet<? extends Level> levels = Log.getLevels();
-		assertEquals( 8, levels.size() );
+		assertEquals( 9, levels.size() );
 
 		Iterator<? extends Level> iterator = levels.iterator();
 		assertEquals( Log.ALL, iterator.next() );
@@ -224,6 +224,7 @@ public class LogTest extends TestCase {
 		assertEquals( Log.INFO, iterator.next() );
 		assertEquals( Log.WARN, iterator.next() );
 		assertEquals( Log.ERROR, iterator.next() );
+		assertEquals( Log.HELP, iterator.next() );
 		assertEquals( Log.NONE, iterator.next() );
 	}
 
