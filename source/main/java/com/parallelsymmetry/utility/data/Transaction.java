@@ -42,7 +42,7 @@ public class Transaction {
 		Object oldValue = node.getAttribute( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
-		addOperation( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
+		submit( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
 	}
 
 	public <T extends DataNode> boolean add( DataList<T> list, T child ) {
@@ -52,7 +52,7 @@ public class Transaction {
 	public <T extends DataNode> boolean add( DataList<T> list, int index, T child ) {
 		if( child == null ) return false;
 
-		addOperation( new InsertChildOperation<T>( list, index, child ) );
+		submit( new InsertChildOperation<T>( list, index, child ) );
 
 		return true;
 	}
@@ -87,7 +87,7 @@ public class Transaction {
 
 	public <T extends DataNode> boolean remove( DataList<T> list, int index ) {
 		if( index < 0 || index >= list.size() ) throw new ArrayIndexOutOfBoundsException( index );
-		addOperation( new RemoveChildOperation<T>( list, list.get( index ) ) );
+		submit( new RemoveChildOperation<T>( list, list.get( index ) ) );
 		return true;
 	}
 
@@ -102,6 +102,15 @@ public class Transaction {
 		}
 
 		return count > 0;
+	}
+
+	public void submit( Operation operation ) {
+		if( COMMIT_LOCK.isLocked() && inActiveTransaction( operation.getData() ) ) throw new RuntimeException( "Data should not be modified from data listeners." );
+	
+		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] adding operation: " + operation );
+	
+		addNode( operation.getData() );
+		operations.offer( operation );
 	}
 
 	public void commit() {
@@ -159,11 +168,11 @@ public class Transaction {
 	}
 
 	void modify( DataNode node ) {
-		addOperation( new ModifyOperation( node ) );
+		submit( new ModifyOperation( node ) );
 	}
 
 	void unmodify( DataNode node ) {
-		addOperation( new UnmodifyOperation( node ) );
+		submit( new UnmodifyOperation( node ) );
 	}
 
 	private void addNode( DataNode node ) {
@@ -173,15 +182,6 @@ public class Transaction {
 			nodeKeys.add( key );
 			nodes.put( key, node );
 		}
-	}
-
-	private void addOperation( Operation operation ) {
-		if( COMMIT_LOCK.isLocked() && inActiveTransaction( operation.getData() ) ) throw new RuntimeException( "Data should not be modified from data listeners." );
-
-		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] adding operation: " + operation );
-
-		addNode( operation.getData() );
-		operations.offer( operation );
 	}
 
 	private boolean inActiveTransaction( DataNode node ) {
