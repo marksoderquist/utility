@@ -172,7 +172,7 @@ public abstract class DataNode {
 	public Set<DataNode> getParents() {
 		return Collections.unmodifiableSet( parents );
 	}
-	
+
 	public Set<List<DataNode>> getNodePaths() {
 		return getNodePaths( null );
 	}
@@ -274,6 +274,18 @@ public abstract class DataNode {
 		return true;
 	}
 
+	public Transaction startTransaction() {
+		return Transaction.startTransaction();
+	}
+	
+	public Transaction getTransaction() {
+		return Transaction.getTransaction();
+	}
+
+	public boolean commitTransaction() {
+		return Transaction.commitTransaction();
+	}
+	
 	/**
 	 * Set the modified flag for this node.
 	 */
@@ -328,7 +340,7 @@ public abstract class DataNode {
 	void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
 		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
-	
+
 		// Set the attribute value.
 		if( newValue == null ) {
 			attributes.remove( name );
@@ -337,10 +349,10 @@ public abstract class DataNode {
 			attributes.put( name, newValue );
 			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
 		}
-	
+
 		// Remove the attribute map if necessary.
 		if( attributes.size() == 0 ) attributes = null;
-	
+
 		// Update the modified attribute value map.
 		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
 		if( preValue == null ) {
@@ -353,7 +365,7 @@ public abstract class DataNode {
 			modifiedAttributeCount--;
 			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
 		}
-	
+
 		updateModifiedFlag();
 	}
 

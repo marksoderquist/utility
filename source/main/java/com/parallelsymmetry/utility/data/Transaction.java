@@ -20,6 +20,8 @@ public class Transaction {
 
 	private static final ReentrantLock COMMIT_LOCK = new ReentrantLock();
 
+	private static final ThreadLocal<Transaction> threadLocalTransaction = new ThreadLocal<Transaction>();
+
 	private static Transaction activeTransaction;
 
 	private Queue<Operation> operations;
@@ -42,7 +44,7 @@ public class Transaction {
 		Object oldValue = node.getAttribute( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
-		submit( new SetAttributeOperation( node, name, node.getAttribute( name ), newValue ) );
+		submit( new SetAttributeOperation( node, name, oldValue, newValue ) );
 	}
 
 	public <T extends DataNode> boolean add( DataList<T> list, T child ) {
@@ -106,14 +108,15 @@ public class Transaction {
 
 	public void submit( Operation operation ) {
 		if( COMMIT_LOCK.isLocked() && inActiveTransaction( operation.getData() ) ) throw new RuntimeException( "Data should not be modified from data listeners." );
-	
+
 		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] adding operation: " + operation );
-	
+
 		addNode( operation.getData() );
 		operations.offer( operation );
 	}
 
 	public void commit() {
+	//public void commit() throws CommitException {
 		try {
 			Log.write( Log.DETAIL, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
 			COMMIT_LOCK.lock();
@@ -155,6 +158,10 @@ public class Transaction {
 		}
 	}
 
+	public void rollback() {
+		throw new RuntimeException( "Transaction.rollback() not implemented yet." );
+	}
+
 	public void reset() {
 		collectors.clear();
 		operations.clear();
@@ -165,6 +172,41 @@ public class Transaction {
 	@Override
 	public String toString() {
 		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
+	}
+
+	static final Transaction startTransaction() {
+		Transaction transaction = getTransaction();
+
+		if( transaction == null ) {
+			transaction = new Transaction();
+			threadLocalTransaction.set( transaction );
+		}
+
+		return transaction;
+	}
+
+	static final Transaction getTransaction() {
+		return threadLocalTransaction.get();
+	}
+
+	static final boolean commitTransaction() {
+		Transaction transaction = getTransaction();
+
+		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
+
+		threadLocalTransaction.set( null );
+		transaction.commit();
+		return true;
+
+//		try {
+//			transaction.commit();
+//			return true;
+//		} catch( CommitException exception ) {
+//			transaction.rollback();
+//			return false;
+//		} finally {
+//			threadLocalTransaction.set( null );
+//		}
 	}
 
 	void modify( DataNode node ) {
@@ -271,123 +313,6 @@ public class Transaction {
 		public DataChangedEvent changed;
 
 		public MetaAttributeEvent modified;
-
-	}
-
-	private static class ModifyOperation extends Operation {
-
-		public ModifyOperation( DataNode data ) {
-			super( data );
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			getData().doModify();
-
-			return result;
-		}
-
-	}
-
-	private static class UnmodifyOperation extends Operation {
-
-		public UnmodifyOperation( DataNode data ) {
-			super( data );
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			getData().doUnmodify();
-
-			return result;
-		}
-	}
-
-	private static class SetAttributeOperation extends Operation {
-
-		private String name;
-
-		private Object oldValue;
-
-		private Object newValue;
-
-		public SetAttributeOperation( DataNode data, String name, Object oldValue, Object newValue ) {
-			super( data );
-			this.name = name;
-			this.oldValue = oldValue;
-			this.newValue = newValue;
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			getData().doSetAttribute( name, oldValue, newValue );
-
-			DataEvent.Action type = DataEvent.Action.MODIFY;
-			type = oldValue == null ? DataEvent.Action.INSERT : type;
-			type = newValue == null ? DataEvent.Action.REMOVE : type;
-			result.addEvent( new DataAttributeEvent( type, data, data, name, oldValue, newValue ) );
-
-			return result;
-		}
-
-	}
-
-	private static class InsertChildOperation<T extends DataNode> extends Operation {
-
-		private DataList<T> list;
-
-		private int index;
-
-		private T child;
-
-		public InsertChildOperation( DataList<T> list, int index, T child ) {
-			super( list );
-			this.list = list;
-			this.index = index;
-			this.child = child;
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			if( index == Integer.MAX_VALUE ) index = list.size();
-			list.doAddChild( index, child );
-			result.addEvent( new DataChildEvent( DataEvent.Action.INSERT, list, list, index, child ) );
-
-			return result;
-		}
-
-	}
-
-	private static class RemoveChildOperation<T extends DataNode> extends Operation {
-
-		private DataList<T> list;
-
-		private T child;
-
-		public RemoveChildOperation( DataList<T> list, T child ) {
-			super( list );
-			this.list = list;
-			this.child = child;
-		}
-
-		@Override
-		protected OperationResult process() {
-			OperationResult result = new OperationResult( this );
-
-			int index = list.indexOf( child );
-			list.doRemoveChild( child );
-			result.addEvent( new DataChildEvent( DataEvent.Action.REMOVE, list, list, index, child ) );
-
-			return result;
-		}
 
 	}
 

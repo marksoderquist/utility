@@ -3,6 +3,8 @@ package com.parallelsymmetry.utility.data;
 import org.junit.Test;
 
 import com.parallelsymmetry.utility.ObjectUtil;
+import com.parallelsymmetry.utility.ThreadUtil;
+import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
@@ -352,6 +354,171 @@ public class TransactionTest extends DataTestCase {
 		// Check the event counts.
 		assertEventCounts( watcher1, 1, 1, 1 );
 		assertEventCounts( watcher2, 1, 1, 1 );
+	}
+
+	public void testThreadLocalTransaction() {
+		Log.setLevel( Log.TRACE );
+		ExecutorThread thread1 = new ExecutorThread( "Thread1" );
+		ExecutorThread thread2 = new ExecutorThread( "Thread2" );
+
+		thread1.start();
+		thread2.start();
+
+		try {
+			GetTransaction get = new GetTransaction();
+			StartTransaction start = new StartTransaction();
+			CommitTransaction commit = new CommitTransaction();
+
+			thread1.execute( get );
+			assertNull( get.getTransaction() );
+
+			thread1.execute( start );
+			Transaction transactionA = start.getTransaction();
+			assertNotNull( transactionA );
+
+			thread1.execute( get );
+			Transaction transactionB = get.getTransaction();
+			assertTrue( transactionA == transactionB );
+
+			thread2.execute( get );
+			assertNull( get.getTransaction() );
+
+			thread2.execute( start );
+			Transaction transactionC = start.getTransaction();
+			assertNotNull( transactionC );
+
+			thread2.execute( get );
+			Transaction transactionD = get.getTransaction();
+			assertTrue( transactionC == transactionD );
+			assertTrue( transactionA != transactionC );
+			
+			thread1.execute( commit );
+			assertTrue( commit.getResult() );
+			thread1.execute( get );
+			assertNull( get.getTransaction() );
+			
+			thread2.execute( commit );
+			assertTrue( commit.getResult() );
+			thread2.execute( get );
+			assertNull( get.getTransaction() );
+		} finally {
+			thread2.terminate();
+			thread1.terminate();
+
+			thread2.waitFor();
+			thread1.waitFor();
+		}
+	}
+
+	private class ExecutorThread extends Thread {
+
+		private boolean execute = true;
+
+		private Runnable runnable;
+
+		private boolean running;
+
+		public ExecutorThread( String name ) {
+			super( name );
+		}
+
+		public synchronized void execute( Runnable runnable ) {
+			Log.write( getName(), ".execute()" );
+			this.runnable = runnable;
+			notifyAll();
+			while( this.runnable != null ) {
+				try {
+					wait( 1000 );
+				} catch( InterruptedException exception ) {
+					break;
+				}
+			}
+		}
+
+		@Override
+		public synchronized void run() {
+			Log.write( getName(), ".run()" );
+			while( execute ) {
+				running = true;
+				while( runnable == null ) {
+					try {
+						wait( 1000 );
+					} catch( InterruptedException exception ) {
+						break;
+					}
+				}
+				if( runnable != null ) {
+					Log.write( getName(), ": Runnable.run()" );
+					runnable.run();
+				}
+				runnable = null;
+				notifyAll();
+			}
+			running = false;
+		}
+
+		public void terminate() {
+			this.execute = false;
+			interrupt();
+		}
+
+		public synchronized void waitFor() {
+			while( running ) {
+				try {
+					wait( 1000 );
+				} catch( InterruptedException exception ) {
+					break;
+				}
+			};
+		}
+
+	}
+
+	private class StartTransaction implements Runnable {
+
+		private Transaction transaction;
+
+		@Override
+		public void run() {
+			transaction = Transaction.startTransaction();
+			Log.write( Thread.currentThread().getName(), ": Srt Transaction: ", transaction == null ? "null" : transaction.hashCode() );
+		}
+
+		public Transaction getTransaction() {
+			return transaction;
+		}
+
+	}
+
+	private class GetTransaction implements Runnable {
+
+		private Transaction transaction;
+
+		@Override
+		public void run() {
+			transaction = Transaction.getTransaction();
+			Log.write( Thread.currentThread().getName(), ": Get Transaction: ", transaction == null ? "null" : transaction.hashCode() );
+		}
+
+		public Transaction getTransaction() {
+			return transaction;
+		}
+
+	}
+
+	private class CommitTransaction implements Runnable {
+		
+		private boolean result;
+
+		@Override
+		public void run() {
+			result = Transaction.commitTransaction();
+		}
+		
+		public boolean getResult() {
+			return result;
+		}
+
 	}
 
 	private class ModifyingDataHandler extends DataAdapter {

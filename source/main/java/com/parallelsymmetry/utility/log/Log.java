@@ -288,9 +288,13 @@ public class Log {
 
 		LogRecord record = new LogRecord( level == null ? DEFAULT_LOG_LEVEL : level, builder == null ? null : builder.toString() );
 		if( throwable != null ) record.setThrown( throwable );
+
 		StackTraceElement caller = getCaller();
-		record.setSourceClassName( caller.getClassName() );
-		record.setSourceMethodName( caller.getMethodName() );
+		if( caller != null ) {
+			record.setSourceClassName( caller.getClassName() );
+			record.setSourceMethodName( caller.getMethodName() );
+		}
+
 		writeTo( name, record );
 	}
 
