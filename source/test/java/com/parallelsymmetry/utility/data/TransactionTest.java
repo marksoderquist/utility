@@ -2,14 +2,20 @@ package com.parallelsymmetry.utility.data;
 
 import org.junit.Test;
 
+import com.parallelsymmetry.utility.Accessor;
 import com.parallelsymmetry.utility.ObjectUtil;
-import com.parallelsymmetry.utility.ThreadUtil;
 import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
 
 public class TransactionTest extends DataTestCase {
+
+	@Override
+	public void tearDown() {
+		super.tearDown();
+		Transaction.reset();
+	}
 
 	@Test
 	public void testTransaction() {
@@ -19,15 +25,14 @@ public class TransactionTest extends DataTestCase {
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		Transaction transaction = new Transaction();
-
-		transaction.setAttribute( data, "attribute0", "value0" );
-		transaction.setAttribute( data, "attribute1", "value1" );
-		transaction.setAttribute( data, "attribute2", "value2" );
+		Transaction.startTransaction();
+		data.setAttribute( "attribute0", "value0" );
+		data.setAttribute( "attribute1", "value1" );
+		data.setAttribute( "attribute2", "value2" );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 1, 1, 3 );
 
@@ -40,26 +45,26 @@ public class TransactionTest extends DataTestCase {
 		assertEquals( index++, handler.getEvents().size() );
 	}
 
-	@Test
-	public void testReuseTransaction() throws Exception {
-		MockDataNode node = new MockDataNode();
-		DataEventWatcher watcher = node.getDataEventWatcher();
-
-		Transaction transaction = new Transaction();
-
-		transaction.setAttribute( node, "key1", "value1" );
-		assertEventCounts( watcher, 0, 0, 0 );
-		transaction.commit();
-		assertEventCounts( watcher, 1, 1, 1 );
-		assertEquals( "value1", node.getAttribute( "key1" ) );
-		watcher.reset();
-
-		transaction.setAttribute( node, "key1", "value2" );
-		assertEventCounts( watcher, 0, 0, 0 );
-		transaction.commit();
-		assertEquals( "value2", node.getAttribute( "key1" ) );
-		assertEventCounts( watcher, 1, 0, 1 );
-	}
+	//	@Test
+	//	public void testReuseTransaction() throws Exception {
+	//		MockDataNode node = new MockDataNode();
+	//		DataEventWatcher watcher = node.getDataEventWatcher();
+	//
+	//		Transaction.startTransaction();
+	//
+	//		node.setAttribute( "key1", "value1" );
+	//		assertEventCounts( watcher, 0, 0, 0 );
+	//		Transaction.commitTransaction();
+	//		assertEventCounts( watcher, 1, 1, 1 );
+	//		assertEquals( "value1", node.getAttribute( "key1" ) );
+	//		watcher.reset();
+	//
+	//		node.setAttribute( "key1", "value2" );
+	//		assertEventCounts( watcher, 0, 0, 0 );
+	//		Transaction.commitTransaction();
+	//		assertEquals( "value2", node.getAttribute( "key1" ) );
+	//		assertEventCounts( watcher, 1, 0, 1 );
+	//	}
 
 	@Test
 	public void testOverlappingTransactions() throws Exception {
@@ -67,33 +72,33 @@ public class TransactionTest extends DataTestCase {
 		DataEventWatcher watcher = node.getDataEventWatcher();
 
 		// Initial transaction.
-		Transaction transaction0 = new Transaction();
-		transaction0.setAttribute( node, "key1", "value1" );
-		transaction0.setAttribute( node, "key2", "value2" );
+		Transaction.startTransaction();
+		node.setAttribute( "key1", "value1" );
+		node.setAttribute( "key2", "value2" );
 		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
 		assertNull( node.getAttribute( "key1" ) );
 		assertNull( node.getAttribute( "key2" ) );
 		assertNull( node.getAttribute( "key3" ) );
 
 		// Overlapping transaction.
-		Transaction transaction1 = new Transaction();
-		transaction1.setAttribute( node, "key3", "value3" );
+		Transaction.startTransaction();
+		node.setAttribute( "key3", "value3" );
 		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
 		assertNull( node.getAttribute( "key1" ) );
 		assertNull( node.getAttribute( "key2" ) );
 		assertNull( node.getAttribute( "key3" ) );
 
 		// Overlapping commit.
-		transaction1.commit();
-		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
+		Transaction.commitTransaction();
+		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
 		assertNull( node.getAttribute( "key1" ) );
 		assertNull( node.getAttribute( "key2" ) );
-		assertEquals( "value3", node.getAttribute( "key3" ) );
+		assertNull( node.getAttribute( "key3" ) );
 		watcher.reset();
 
 		// Final commit.
-		transaction0.commit();
-		assertEventCounts( watcher, 1, 0, 2, 0, 0 );
+		Transaction.commitTransaction();
+		assertEventCounts( watcher, 1, 1, 3, 0, 0 );
 		assertEquals( "value1", node.getAttribute( "key1" ) );
 		assertEquals( "value2", node.getAttribute( "key2" ) );
 		assertEquals( "value3", node.getAttribute( "key3" ) );
@@ -108,15 +113,15 @@ public class TransactionTest extends DataTestCase {
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		Transaction transaction = new Transaction();
+		Transaction.startTransaction();
 
-		transaction.setAttribute( data, "attribute0", "value0" );
-		transaction.setAttribute( data, "attribute1", "value1" );
-		transaction.setAttribute( data, "attribute2", "value2" );
+		data.setAttribute( "attribute0", "value0" );
+		data.setAttribute( "attribute1", "value1" );
+		data.setAttribute( "attribute2", "value2" );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 1, 1, 3 );
 
@@ -129,13 +134,14 @@ public class TransactionTest extends DataTestCase {
 		assertEquals( index++, handler.getEvents().size() );
 
 		handler.reset();
-		transaction.setAttribute( data, "attribute0", "value0" );
-		transaction.setAttribute( data, "attribute1", "value1" );
-		transaction.setAttribute( data, "attribute2", "value2" );
+		Transaction.startTransaction();
+		data.setAttribute( "attribute0", "value0" );
+		data.setAttribute( "attribute1", "value1" );
+		data.setAttribute( "attribute2", "value2" );
 		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertNodeState( data, true, 3 );
 		assertEventCounts( handler, 0, 0, 0 );
 	}
@@ -144,24 +150,25 @@ public class TransactionTest extends DataTestCase {
 	public void testTransactionWithEventModifingNode() {
 		MockDataNode node = new MockDataNode();
 		node.addDataListener( new ModifyingDataHandler( node, "time", System.nanoTime() ) );
-		Transaction transaction = new Transaction();
+		Transaction.startTransaction();
 		try {
-			transaction.setAttribute( node, "fire", "event" );
-			transaction.commit();
+			node.setAttribute( "fire", "event" );
+			Transaction.commitTransaction();
 			fail( "RuntimeException should be thrown due to modifying data listener." );
 		} catch( RuntimeException exception ) {
-
+			// Intentionally ignore exception.
 		}
 	}
 
 	@Test
 	public void testTransactionWithEventModifyingSeparateNode() {
+		Log.setLevel( Log.INFO );
 		MockDataNode node0 = new MockDataNode();
 		MockDataNode node1 = new MockDataNode();
 		node0.addDataListener( new ModifyingDataHandler( node1, "name", "node1" ) );
-		Transaction transaction = new Transaction();
-		transaction.setAttribute( node0, "fire", "event" );
-		transaction.commit();
+		Transaction.startTransaction();
+		node0.setAttribute( "fire", "event" );
+		Transaction.commitTransaction();
 		assertEquals( "node1", node1.getAttribute( "name" ) );
 	}
 
@@ -183,11 +190,11 @@ public class TransactionTest extends DataTestCase {
 		childWatcher.reset();
 
 		// Start a transaction
-		Transaction transaction = new Transaction();
+		Transaction.startTransaction();
 
 		// Set the child attribute but nothing should happen
 		// because the transaction has not been committed yet.
-		transaction.setAttribute( child, "key1", "value1" );
+		child.setAttribute( "key1", "value1" );
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
 		assertEventCounts( parentWatcher, 0, 0, 0, 0, 0 );
@@ -196,7 +203,7 @@ public class TransactionTest extends DataTestCase {
 		childWatcher.reset();
 
 		// Commit the transaction.
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertTrue( parent.isModified() );
 		assertTrue( child.isModified() );
 		assertEquals( "value1", child.getAttribute( "key1" ) );
@@ -213,15 +220,15 @@ public class TransactionTest extends DataTestCase {
 
 		// Unset the the child attribute but nothing should happen 
 		// because the transaction has not been committed yet.
-		transaction = new Transaction();
-		transaction.setAttribute( child, "key1", null );
+		Transaction.startTransaction();
+		child.setAttribute( "key1", null );
 		assertEventCounts( parentWatcher, 0, 0, 0, 0, 0 );
 		assertEventCounts( childWatcher, 0, 0, 0, 0, 0 );
 		parentWatcher.reset();
 		childWatcher.reset();
 
 		// Commit the transaction.
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
 		assertEquals( null, child.getAttribute( "key1" ) );
@@ -250,21 +257,21 @@ public class TransactionTest extends DataTestCase {
 		assertFalse( grandchild.isModified() );
 		watcher.reset();
 
-		Transaction transaction = new Transaction();
-		transaction.setAttribute( grandchild, "key1", "value1" );
+		Transaction.startTransaction();
+		grandchild.setAttribute( "key1", "value1" );
 		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
 		watcher.reset();
 
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
 		watcher.reset();
 
-		transaction = new Transaction();
-		transaction.setAttribute( grandchild, "key1", null );
+		Transaction.startTransaction();
+		grandchild.setAttribute( "key1", null );
 		assertEventCounts( watcher, 0, 0, 0, 0, 0 );
 		watcher.reset();
 
-		transaction.commit();
+		Transaction.commitTransaction();
 		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
 		watcher.reset();
 	}
@@ -292,10 +299,10 @@ public class TransactionTest extends DataTestCase {
 		assertEventCounts( watcher2, 0, 0, 0 );
 
 		// Use a transaction to change both nodes at the same time.
-		Transaction transaction = new Transaction();
-		transaction.setAttribute( node1, "name", "node1" );
-		transaction.setAttribute( node2, "name", "node2" );
-		transaction.commit();
+		Transaction.startTransaction();
+		node1.setAttribute( "name", "node1" );
+		node2.setAttribute( "name", "node2" );
+		Transaction.commitTransaction();
 
 		// Check the attributes.
 		assertEquals( "node1", node1.getAttribute( "name" ) );
@@ -339,10 +346,10 @@ public class TransactionTest extends DataTestCase {
 		watcher2.reset();
 
 		// Use a transaction to change both nodes at the same time.
-		Transaction transaction = new Transaction();
-		transaction.setAttribute( node1, "name", "node1" );
-		transaction.setAttribute( node2, "name", "node2" );
-		transaction.commit();
+		Transaction.startTransaction();
+		node1.setAttribute( "name", "node1" );
+		node2.setAttribute( "name", "node2" );
+		Transaction.commitTransaction();
 
 		// Check the attributes.
 		assertEquals( "node1", node1.getAttribute( "name" ) );
@@ -391,12 +398,12 @@ public class TransactionTest extends DataTestCase {
 			Transaction transactionD = get.getTransaction();
 			assertTrue( transactionC == transactionD );
 			assertTrue( transactionA != transactionC );
-			
+
 			thread1.execute( commit );
 			assertTrue( commit.getResult() );
 			thread1.execute( get );
 			assertNull( get.getTransaction() );
-			
+
 			thread2.execute( commit );
 			assertTrue( commit.getResult() );
 			thread2.execute( get );
@@ -423,7 +430,7 @@ public class TransactionTest extends DataTestCase {
 		}
 
 		public synchronized void execute( Runnable runnable ) {
-			Log.write( getName(), ".execute()" );
+			//Log.write( getName(), ".execute()" );
 			this.runnable = runnable;
 			notifyAll();
 			while( this.runnable != null ) {
@@ -437,7 +444,7 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public synchronized void run() {
-			Log.write( getName(), ".run()" );
+			//Log.write( getName(), ".run()" );
 			while( execute ) {
 				running = true;
 				while( runnable == null ) {
@@ -448,7 +455,7 @@ public class TransactionTest extends DataTestCase {
 					}
 				}
 				if( runnable != null ) {
-					Log.write( getName(), ": Runnable.run()" );
+					//Log.write( getName(), ": Runnable.run()" );
 					runnable.run();
 				}
 				runnable = null;
@@ -481,7 +488,7 @@ public class TransactionTest extends DataTestCase {
 		@Override
 		public void run() {
 			transaction = Transaction.startTransaction();
-			Log.write( Thread.currentThread().getName(), ": Srt Transaction: ", transaction == null ? "null" : transaction.hashCode() );
+			//Log.write( Thread.currentThread().getName(), ": Srt Transaction: ", transaction == null ? "null" : transaction.hashCode() );
 		}
 
 		public Transaction getTransaction() {
@@ -496,8 +503,17 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public void run() {
-			transaction = Transaction.getTransaction();
-			Log.write( Thread.currentThread().getName(), ": Get Transaction: ", transaction == null ? "null" : transaction.hashCode() );
+			ThreadLocal<Transaction> threadLocalTransaction;
+			try {
+				threadLocalTransaction = Accessor.getField( Transaction.class, "threadLocalTransaction" );
+				transaction = threadLocalTransaction.get();
+			} catch( NoSuchFieldException exception ) {
+				Log.write( exception );
+			} catch( IllegalAccessException exception ) {
+				Log.write( exception );
+			}
+
+			//Log.write( Thread.currentThread().getName(), ": Get Transaction: ", transaction == null ? "null" : transaction.hashCode() );
 		}
 
 		public Transaction getTransaction() {
@@ -507,14 +523,14 @@ public class TransactionTest extends DataTestCase {
 	}
 
 	private class CommitTransaction implements Runnable {
-		
+
 		private boolean result;
 
 		@Override
 		public void run() {
 			result = Transaction.commitTransaction();
 		}
-		
+
 		public boolean getResult() {
 			return result;
 		}

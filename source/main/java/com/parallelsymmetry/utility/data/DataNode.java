@@ -51,7 +51,7 @@ public abstract class DataNode {
 		if( modified ) {
 			modify();
 		} else {
-			unmodify( null );
+			unmodify();
 		}
 	}
 
@@ -109,9 +109,9 @@ public abstract class DataNode {
 
 		if( newValue instanceof DataNode ) checkForCircularReference( (DataNode)newValue );
 
-		Transaction transaction = new Transaction();
-		transaction.setAttribute( this, name, newValue );
-		transaction.commit();
+		Transaction.startTransaction();
+		Transaction.submitOperation( new SetAttributeOperation( this, name, oldValue, newValue ) );
+		Transaction.commitTransaction();
 	}
 
 	public int getModifiedAttributeCount() {
@@ -274,51 +274,38 @@ public abstract class DataNode {
 		return true;
 	}
 
-	public Transaction startTransaction() {
-		return Transaction.startTransaction();
-	}
-	
-	public Transaction getTransaction() {
-		return Transaction.getTransaction();
-	}
-
-	public boolean commitTransaction() {
-		return Transaction.commitTransaction();
-	}
-	
 	/**
 	 * Set the modified flag for this node.
 	 */
 	void modify() {
 		if( modified ) return;
 
-		Transaction transaction = new Transaction();
-		transaction.modify( this );
-		transaction.commit();
+		Transaction.startTransaction();
+		Transaction.submitOperation( new ModifyOperation( this ) );
+		Transaction.commitTransaction();
 	}
 
 	/**
 	 * Clear the modified flag for this node and all child nodes.
 	 */
-	void unmodify( Transaction transaction ) {
+	void unmodify() {
 		if( !modified ) return;
 
-		boolean commit = transaction == null;
-		if( transaction == null ) transaction = new Transaction();
+		Transaction.startTransaction();
 
-		transaction.unmodify( this );
+		Transaction.submitOperation( new UnmodifyOperation( this ) );
 
 		// Clear the modified flag of any attribute nodes.
 		if( attributes != null ) {
 			for( Object child : attributes.values() ) {
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) childNode.unmodify( transaction );
+					if( childNode.isModified() ) childNode.unmodify();
 				}
 			}
 		}
 
-		if( commit ) transaction.commit();
+		Transaction.commitTransaction();
 	}
 
 	void doModify() {

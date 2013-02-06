@@ -407,13 +407,14 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		Transaction transaction = new Transaction();
-		transaction.setAttribute( data, "a", "1" );
-		transaction.setAttribute( data, "a", "2" );
-		transaction.setAttribute( data, "a", "3" );
-		transaction.setAttribute( data, "a", "4" );
-		transaction.setAttribute( data, "a", "5" );
-		transaction.commit();
+		Transaction.startTransaction();
+		data.setAttribute( "a", "1" );
+		data.setAttribute( "a", "2" );
+		data.setAttribute( "a", "3" );
+		data.setAttribute( "a", "4" );
+		data.setAttribute( "a", "5" );
+		Transaction.commitTransaction();
+		
 		assertEquals( "5", data.getAttribute( "a" ) );
 		assertNodeState( data, true, 1 );
 		

@@ -1,7 +1,6 @@
 package com.parallelsymmetry.utility.data;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -11,7 +10,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.parallelsymmetry.utility.ObjectUtil;
 import com.parallelsymmetry.utility.log.Log;
 
 public class Transaction {
@@ -22,7 +20,9 @@ public class Transaction {
 
 	private static final ThreadLocal<Transaction> threadLocalTransaction = new ThreadLocal<Transaction>();
 
-	private static Transaction activeTransaction;
+	private static final ThreadLocal<Integer> transactionDepth = new ThreadLocal<Integer>();
+
+	private static Transaction committingTransaction;
 
 	private Queue<Operation> operations;
 
@@ -32,96 +32,93 @@ public class Transaction {
 
 	private Map<Integer, ResultCollector> collectors;
 
-	public Transaction() {
+	private Transaction() {
+		transactionDepth.set( 0 );
 		nodeKeys = new CopyOnWriteArraySet<Integer>();
 		operations = new ConcurrentLinkedQueue<Operation>();
 		nodes = new ConcurrentHashMap<Integer, DataNode>();
 		collectors = new ConcurrentHashMap<Integer, ResultCollector>();
 	}
 
-	public void setAttribute( DataNode node, String name, Object newValue ) {
-		// If the old value is equal to the new value no changes are necessary.
-		Object oldValue = node.getAttribute( name );
-		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
+	public static final Transaction startTransaction() {
+		Transaction transaction = threadLocalTransaction.get();
+		if( transaction == null ) threadLocalTransaction.set( transaction = new Transaction() );
 
-		submit( new SetAttributeOperation( node, name, oldValue, newValue ) );
+		int depth = transactionDepth.get() + 1;
+		transactionDepth.set( depth );
+
+		return transaction;
 	}
 
-	public <T extends DataNode> boolean add( DataList<T> list, T child ) {
-		return add( list, Integer.MAX_VALUE, child );
+	public static final void submitOperation( Operation operation ) {
+		Transaction transaction = threadLocalTransaction.get();
+		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
+
+		transaction.doSubmit( operation );
 	}
 
-	public <T extends DataNode> boolean add( DataList<T> list, int index, T child ) {
-		if( child == null ) return false;
+	public static final boolean commitTransaction() {
+		Transaction transaction = threadLocalTransaction.get();
+		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
 
-		submit( new InsertChildOperation<T>( list, index, child ) );
+		int depth = transactionDepth.get() - 1;
+		transactionDepth.set( depth );
 
-		return true;
-	}
-
-	public <T extends DataNode> boolean addAll( DataList<T> list, Collection<? extends T> collection ) {
-		return addAll( list, Integer.MAX_VALUE, collection );
-	}
-
-	public <T extends DataNode> boolean addAll( DataList<T> list, int index, Collection<? extends T> collection ) {
-		if( collection == null ) return false;
-
-		// Figure out if nodes need to be added.
-		List<T> children = new ArrayList<T>();
-		for( T node : collection ) {
-			if( !list.contains( node ) ) children.add( node );
-		}
-		if( children.size() == 0 ) return false;
-
-		// Add the nodes.
-		for( T node : children ) {
-			add( list, index, node );
-			if( index < Integer.MAX_VALUE ) index++;
+		if( depth == 0 ) {
+			threadLocalTransaction.set( null );
+			transaction.doCommit();
 		}
 
 		return true;
+
+		//		try {
+		//			transaction.commit();
+		//			return true;
+		//		} catch( CommitException exception ) {
+		//			transaction.rollback();
+		//			return false;
+		//		} finally {
+		//			threadLocalTransaction.set( null );
+		//		}
 	}
 
-	public <T extends DataNode> boolean remove( DataList<T> list, T child ) {
-		if( child == null || !( child instanceof DataNode ) || !list.contains( child ) ) return false;
-		return remove( list, list.indexOf( child ) );
+	public static final void rollbackTransaction() {
+		Transaction transaction = threadLocalTransaction.get();
+		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
+
+		threadLocalTransaction.set( null );
+		transaction.doRollback();
 	}
 
-	public <T extends DataNode> boolean remove( DataList<T> list, int index ) {
-		if( index < 0 || index >= list.size() ) throw new ArrayIndexOutOfBoundsException( index );
-		submit( new RemoveChildOperation<T>( list, list.get( index ) ) );
-		return true;
+	public static final void reset() {
+		Transaction transaction = threadLocalTransaction.get();
+
+		threadLocalTransaction.set( null );
+
+		if( transaction != null ) transaction.doReset();
 	}
 
-	@SuppressWarnings( "unchecked" )
-	public <T extends DataNode> boolean removeAll( DataList<T> list, Collection<?> collection ) {
-		if( collection == null ) return false;
-
-		int count = 0;
-		for( Object node : collection ) {
-			if( !( node instanceof DataNode ) ) continue;
-			if( remove( list, (T)node ) ) count++;
-		}
-
-		return count > 0;
+	@Override
+	public String toString() {
+		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
 	}
 
-	public void submit( Operation operation ) {
-		if( COMMIT_LOCK.isLocked() && inActiveTransaction( operation.getData() ) ) throw new RuntimeException( "Data should not be modified from data listeners." );
+	private void doSubmit( Operation operation ) {
+		if( COMMIT_LOCK.isLocked() && inCommittingTransaction( operation.getData() ) ) throw new TransactionException( "Data should not be modified from data listeners." );
 
-		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] adding operation: " + operation );
+		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] add operation: " + operation );
 
-		addNode( operation.getData() );
+		addOperationNode( operation.getData() );
 		operations.offer( operation );
 	}
 
-	public void commit() {
-	//public void commit() throws CommitException {
+	private void doCommit() {
+		//public void commit() throws CommitException {
 		try {
 			Log.write( Log.DETAIL, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
 			COMMIT_LOCK.lock();
 
-			activeTransaction = this;
+			committingTransaction = this;
 
 			// Store the current modified state of each data object.
 			for( DataNode node : nodes.values() ) {
@@ -151,73 +148,27 @@ public class Transaction {
 
 			dispatchTransactionEvents();
 		} finally {
-			reset();
-			activeTransaction = null;
+			doReset();
+			committingTransaction = null;
 			COMMIT_LOCK.unlock();
 			Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
 		}
 	}
 
-	public void rollback() {
-		throw new RuntimeException( "Transaction.rollback() not implemented yet." );
+	private void doRollback() {
+		//throw new UnsupportedOperationException( "Transaction.rollback() not implemented yet." );
+
+		doReset();
 	}
 
-	public void reset() {
+	private void doReset() {
 		collectors.clear();
 		operations.clear();
 		nodeKeys.clear();
 		nodes.clear();
 	}
 
-	@Override
-	public String toString() {
-		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
-	}
-
-	static final Transaction startTransaction() {
-		Transaction transaction = getTransaction();
-
-		if( transaction == null ) {
-			transaction = new Transaction();
-			threadLocalTransaction.set( transaction );
-		}
-
-		return transaction;
-	}
-
-	static final Transaction getTransaction() {
-		return threadLocalTransaction.get();
-	}
-
-	static final boolean commitTransaction() {
-		Transaction transaction = getTransaction();
-
-		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
-
-		threadLocalTransaction.set( null );
-		transaction.commit();
-		return true;
-
-//		try {
-//			transaction.commit();
-//			return true;
-//		} catch( CommitException exception ) {
-//			transaction.rollback();
-//			return false;
-//		} finally {
-//			threadLocalTransaction.set( null );
-//		}
-	}
-
-	void modify( DataNode node ) {
-		submit( new ModifyOperation( node ) );
-	}
-
-	void unmodify( DataNode node ) {
-		submit( new UnmodifyOperation( node ) );
-	}
-
-	private void addNode( DataNode node ) {
+	private void addOperationNode( DataNode node ) {
 		Integer key = System.identityHashCode( node );
 		synchronized( nodeKeys ) {
 			if( nodeKeys.contains( key ) ) return;
@@ -226,8 +177,8 @@ public class Transaction {
 		}
 	}
 
-	private boolean inActiveTransaction( DataNode node ) {
-		return activeTransaction != null && activeTransaction.nodeKeys.contains( System.identityHashCode( node ) );
+	private boolean inCommittingTransaction( DataNode node ) {
+		return committingTransaction != null && committingTransaction.nodeKeys.contains( System.identityHashCode( node ) );
 	}
 
 	private ResultCollector getResultCollector( DataNode node ) {

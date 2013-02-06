@@ -1,5 +1,6 @@
 package com.parallelsymmetry.utility.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -88,9 +89,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( element == null ) return;
 		if( element instanceof DataNode ) checkForCircularReference( (DataNode)element );
 
-		Transaction transaction = new Transaction();
-		transaction.add( this, index, element );
-		transaction.commit();
+		Transaction.startTransaction();
+		Transaction.submitOperation( new InsertChildOperation<T>( this, index, element ) );
+		Transaction.commitTransaction();
 	}
 
 	@Override
@@ -102,10 +103,22 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean addAll( int index, Collection<? extends T> collection ) {
 		if( collection == null ) return false;
 
-		Transaction transaction = new Transaction();
-		boolean result = transaction.addAll( this, index, collection );
-		transaction.commit();
-		return result;
+		// Figure out if nodes need to be added.
+		List<T> children = new ArrayList<T>();
+		for( T node : collection ) {
+			if( !contains( node ) ) children.add( node );
+		}
+		if( children.size() == 0 ) return false;
+
+		// Add the nodes.
+		Transaction.startTransaction();
+		for( T node : children ) {
+			add( index, node );
+			if( index < Integer.MAX_VALUE ) index++;
+		}
+		Transaction.commitTransaction();
+
+		return true;
 	}
 
 	@Override
@@ -116,10 +129,12 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 		T result = get( index );
 
-		Transaction transaction = new Transaction();
-		transaction.remove( this, index );
-		transaction.add( this, index, element );
-		transaction.commit();
+		Transaction.startTransaction();
+		
+		remove( index );
+		add( index, element );
+		
+		Transaction.commitTransaction();
 
 		return result;
 	}
@@ -129,11 +144,11 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean remove( Object object ) {
 		if( object == null || !( object instanceof DataNode ) || !contains( object ) ) return false;
 
-		Transaction transaction = new Transaction();
-		boolean result = transaction.remove( this, (T)object );
-		transaction.commit();
+		Transaction.startTransaction();
+		Transaction.submitOperation( new RemoveChildOperation<T>( this, (T)object ) );
+		Transaction.commitTransaction();
 
-		return result;
+		return true;
 	}
 
 	@Override
@@ -141,9 +156,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( index < 0 || index >= size() ) throw new ArrayIndexOutOfBoundsException( index );
 		T child = children.get( index );
 
-		Transaction transaction = new Transaction();
-		transaction.remove( this, index );
-		transaction.commit();
+		Transaction.startTransaction();
+		Transaction.submitOperation( new RemoveChildOperation<T>( this, child ) );
+		Transaction.commitTransaction();
 
 		return child;
 	}
@@ -152,11 +167,15 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean removeAll( Collection<?> collection ) {
 		if( collection == null ) return false;
 
-		Transaction transaction = new Transaction();
-		boolean result = transaction.removeAll( this, collection );
-		transaction.commit();
+		Transaction.startTransaction();
+		int count = 0;
+		for( Object node : collection ) {
+			if( !( node instanceof DataNode ) ) continue;
+			if( remove( node ) ) count++;
+		}
+		Transaction.commitTransaction();
 
-		return result;
+		return count > 0;
 	}
 
 	@Override
@@ -255,25 +274,24 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	}
 
 	@Override
-	protected void unmodify( Transaction transaction ) {
+	protected void unmodify() {
 		if( !modified ) return;
 
-		boolean commit = transaction == null;
-		if( transaction == null ) transaction = new Transaction();
+		Transaction.startTransaction();
 
-		super.unmodify( transaction );
+		super.unmodify();
 
 		// Clear the modified flag of any child nodes.
 		if( children != null ) {
 			for( Object child : children ) {
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
-					if( childNode.isModified() ) childNode.unmodify( transaction );
+					if( childNode.isModified() ) childNode.unmodify();
 				}
 			}
 		}
 
-		if( commit ) transaction.commit();
+		Transaction.commitTransaction();
 	}
 
 	@Override
