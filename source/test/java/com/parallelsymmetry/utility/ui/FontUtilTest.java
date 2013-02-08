@@ -19,6 +19,21 @@ public class FontUtilTest extends TestCase {
 	}
 
 	@Test
+	public void testEncodeNameAndStyle() {
+		assertEquals( "Dialog-PLAIN", FontUtil.encodeNameAndStyle( new Font( Font.DIALOG, Font.PLAIN, 8 ) ) );
+		assertEquals( "Serif-BOLD", FontUtil.encodeNameAndStyle( new Font( Font.SERIF, Font.BOLD, 8 ) ) );
+		assertEquals( "Consola Mono-ITALIC", FontUtil.encodeNameAndStyle( baseFont.deriveFont( Font.ITALIC ) ) );
+	}
+
+	@Test
+	public void testEncodeStyle() {
+		assertEquals( "PLAIN", FontUtil.encodeStyle( new Font( Font.DIALOG, Font.PLAIN, 8 ) ) );
+		assertEquals( "BOLD", FontUtil.encodeStyle( new Font( Font.DIALOG, Font.BOLD, 8 ) ) );
+		assertEquals( "ITALIC", FontUtil.encodeStyle( new Font( Font.DIALOG, Font.ITALIC, 8 ) ) );
+		assertEquals( "BOLDITALIC", FontUtil.encodeStyle( new Font( Font.DIALOG, Font.BOLD | Font.ITALIC, 8 ) ) );
+	}
+
+	@Test
 	public void testFindFontForWidth() {
 		Font font = FontUtil.findFontForWidth( baseFont, "M", 14 );
 		assertEquals( 31.852116f, font.getSize2D() );
