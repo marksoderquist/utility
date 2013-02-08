@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -307,6 +308,9 @@ public class IconLibrary {
 					input = uri.toURL().openStream();
 					output = new FileOutputStream( file );
 					IoUtil.copy( input, output );
+				} catch( FileNotFoundException exception ) {
+					Log.write( Log.WARN, "Icon not found: ", uri.toString() );
+					return null;
 				} catch( IOException exception ) {
 					Log.write( exception, uri.toString() );
 					return null;
