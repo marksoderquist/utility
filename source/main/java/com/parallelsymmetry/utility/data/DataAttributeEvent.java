@@ -8,7 +8,7 @@ public class DataAttributeEvent extends DataValueEvent {
 
 	private Object oldValue;
 
-	public DataAttributeEvent( DataEvent.Action action,DataNode sender, DataNode cause, String name, Object oldValue, Object newValue ) {
+	public DataAttributeEvent( DataEvent.Action action, DataNode sender, DataNode cause, String name, Object oldValue, Object newValue ) {
 		super( DataEvent.Type.DATA_ATTRIBUTE, action, sender, cause );
 		this.name = name;
 		this.oldValue = oldValue;

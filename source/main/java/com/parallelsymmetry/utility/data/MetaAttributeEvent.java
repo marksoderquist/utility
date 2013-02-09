@@ -26,7 +26,7 @@ public class MetaAttributeEvent extends DataEvent {
 	public Object getNewValue() {
 		return newValue;
 	}
-	
+
 	@Override
 	public DataEvent cloneWithNewSender( DataNode sender ) {
 		return new MetaAttributeEvent( getAction(), sender, name, oldValue, newValue ).setClone( true );

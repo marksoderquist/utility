@@ -77,7 +77,7 @@ public class XmlUtilTest extends TestCase {
 		if( current.compareTo( new Version( "1.7" ) ) >= 0 ) {
 			test = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tag>\n   <indent/>\n</tag>";
 		}
-		
+
 		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 

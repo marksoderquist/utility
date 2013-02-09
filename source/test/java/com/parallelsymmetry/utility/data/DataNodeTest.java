@@ -414,10 +414,10 @@ public class DataNodeTest extends DataTestCase {
 		data.setAttribute( "a", "4" );
 		data.setAttribute( "a", "5" );
 		Transaction.commitTransaction();
-		
+
 		assertEquals( "5", data.getAttribute( "a" ) );
 		assertNodeState( data, true, 1 );
-		
+
 		// FIXME The following event counts should be 1,1,1 not 1,5,1.
 		assertEventCounts( handler, 1, 1, 5 );
 	}

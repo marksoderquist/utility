@@ -1,7 +1,7 @@
 package com.parallelsymmetry.utility.data;
 
 public abstract class DataValueEvent extends DataEvent {
-	
+
 	private DataNode cause;
 
 	public DataValueEvent( Type type, Action action, DataNode sender, DataNode cause ) {
@@ -12,5 +12,5 @@ public abstract class DataValueEvent extends DataEvent {
 	public DataNode getCause() {
 		return cause;
 	}
-	
+
 }

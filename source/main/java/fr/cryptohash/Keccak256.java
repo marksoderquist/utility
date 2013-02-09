@@ -57,5 +57,5 @@ public class Keccak256 extends KeccakCore {
 	public int getDigestLength() {
 		return 32;
 	}
-	
+
 }

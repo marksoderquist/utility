@@ -119,7 +119,7 @@ public class XmlUtil {
 	public static final String toString( Node node ) {
 		StringWriter output = new StringWriter();
 		try {
-			XmlUtil.save( node, output );
+			save( node, output );
 		} catch( IOException exception ) {
 			Log.write( exception );
 		}

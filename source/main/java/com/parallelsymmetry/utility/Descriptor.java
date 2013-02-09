@@ -67,7 +67,7 @@ public class Descriptor {
 			throw new IOException( exception );
 		}
 	}
-	
+
 	public Descriptor( InputStream input ) throws IOException {
 		if( input == null ) return;
 		try {

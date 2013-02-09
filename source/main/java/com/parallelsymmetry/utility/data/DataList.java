@@ -130,10 +130,10 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		T result = get( index );
 
 		Transaction.startTransaction();
-		
+
 		remove( index );
 		add( index, element );
-		
+
 		Transaction.commitTransaction();
 
 		return result;

@@ -72,7 +72,7 @@ public abstract class BaseImage {
 	protected static final double DEGREES_PER_RADIAN = 180 / Math.PI;
 
 	protected static final Font DEFAULT_FONT = new Font( Font.SANS_SERIF, Font.PLAIN, 24 );
-	
+
 	private static ColorScheme defaultColorScheme = DEFAULT_COLOR_SCHEME.clone();
 
 	protected int size;
@@ -133,7 +133,7 @@ public abstract class BaseImage {
 	public void setOutlineSize( double size ) {
 		this.outlineSize = size;
 	}
-	
+
 	public Paint getGradientPaint( GradientType type ) {
 		return getGradientPaint( type, new Point( 0, 0 ) );
 	}

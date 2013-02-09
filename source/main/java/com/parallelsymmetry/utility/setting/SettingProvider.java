@@ -5,7 +5,7 @@ import java.util.Set;
 public interface SettingProvider {
 
 	String get( String path );
-	
+
 	Set<String> getKeys( String path );
 
 	Set<String> getChildNames( String path );

@@ -46,7 +46,7 @@ public class MapSettingProvider implements WritableSettingProvider {
 	public Set<String> getChildNames( String path ) {
 		Set<String> names = new HashSet<String>();
 		if( !nodeExists( path ) ) return names;
-		
+
 		if( !path.endsWith( "/" ) ) path += "/";
 
 		for( String key : store.keySet() ) {

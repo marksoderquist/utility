@@ -55,7 +55,7 @@ public final class FileUtil {
 	 */
 	public static String globToRE( String glob ) {
 		if( glob == null ) return null;
-		
+
 		boolean inside = false;
 		boolean escape = false;
 		StringBuffer buffer = new StringBuffer();

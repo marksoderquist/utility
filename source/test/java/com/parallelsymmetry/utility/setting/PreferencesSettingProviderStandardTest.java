@@ -7,7 +7,7 @@ public class PreferencesSettingProviderStandardTest extends SettingProviderStand
 	@Override
 	public void setUp() throws Exception {
 		Preferences preferences = Preferences.userNodeForPackage( getClass() );
-		
+
 		for( String name : preferences.childrenNames() ) {
 			preferences.node( name ).removeNode();
 		}
