@@ -131,6 +131,11 @@ public class Descriptor {
 	public String[] getValues( String path ) {
 		return getValues( this.node, path );
 	}
+	
+	@Override
+	public String toString() {
+		return XmlUtil.toString( node );
+	}
 
 	public static Node getNode( Node node, String path ) {
 		if( node == null || TextUtil.isEmpty( path ) ) return null;
