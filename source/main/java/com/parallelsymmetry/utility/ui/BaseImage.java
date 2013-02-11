@@ -154,6 +154,11 @@ public abstract class BaseImage {
 		return new GradientPaint( anchor, colora, new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), colorb );
 	}
 
+	public Paint getGradientPaint( Color color, Shape shape ) {
+		Point2D anchor = new Point2D.Double( shape.getBounds2D().getMinX(), shape.getBounds().getMinY() );
+		return new GradientPaint( anchor, Colors.getShade( color, 0.75 ), new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), Colors.getShade( color, -0.25 ) );
+	}
+
 	public Paint getGradientPaint( Color colora, Color colorb, Shape shape ) {
 		Point2D anchor = new Point2D.Double( shape.getBounds2D().getMinX(), shape.getBounds().getMinY() );
 		return new GradientPaint( anchor, colora, new Point2D.Double( anchor.getX() + 1, anchor.getY() + 1 ), colorb );
