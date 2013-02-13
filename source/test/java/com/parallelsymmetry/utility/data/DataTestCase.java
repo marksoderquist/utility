@@ -77,7 +77,7 @@ public abstract class DataTestCase extends TestCase {
 		// Check things common to all event types.
 		assertEquals( type, event.getType() );
 		assertEquals( action, event.getAction() );
-		assertEquals( data, event.getData() );
+		assertEquals( data, event.getSender() );
 
 		switch( event.getType() ) {
 			case DATA_CHANGED: {

@@ -18,13 +18,12 @@ public abstract class DataEvent {
 
 	private boolean isClone;
 
-	// TODO Rename data to sender once all modules are converted.
-	private DataNode data;
+	private DataNode sender;
 
 	public DataEvent( Type type, Action action, DataNode sender ) {
 		this.type = type;
 		this.action = action;
-		this.data = sender;
+		this.sender = sender;
 	}
 
 	public Type getType() {
@@ -35,8 +34,8 @@ public abstract class DataEvent {
 		return action;
 	}
 
-	public DataNode getData() {
-		return data;
+	public DataNode getSender() {
+		return sender;
 	}
 
 	public boolean isClone() {
@@ -60,7 +59,7 @@ public abstract class DataEvent {
 		builder.append( "  action: " );
 		builder.append( action.name() );
 		builder.append( "  sender: " );
-		builder.append( data.toString() );
+		builder.append( sender.toString() );
 
 		return builder.toString();
 	}

@@ -224,7 +224,7 @@ public class Transaction {
 
 	private void storeModifiedEvent( MetaAttributeEvent event ) {
 		// Remove any previously added modified events.
-		List<MetaAttributeEvent> events = getResultCollector( event.getData() ).modified;
+		List<MetaAttributeEvent> events = getResultCollector( event.getSender() ).modified;
 		Iterator<MetaAttributeEvent> iterator = events.iterator();
 		while( iterator.hasNext() ) {
 			MetaAttributeEvent metaValueEvent = iterator.next();
@@ -232,11 +232,11 @@ public class Transaction {
 		}
 		
 		// Add the new modified event.
-		getResultCollector( event.getData() ).modified.add( event );
+		getResultCollector( event.getSender() ).modified.add( event );
 	}
 
 	private void storeChangedEvent( DataChangedEvent event ) {
-		getResultCollector( event.getData() ).changed = event;
+		getResultCollector( event.getSender() ).changed = event;
 	}
 
 	private void dispatchTransactionEvents() {
@@ -264,7 +264,7 @@ public class Transaction {
 	}
 
 	private void dispatchValueEvent( DataEvent event ) {
-		DataNode sender = event.getData();
+		DataNode sender = event.getSender();
 
 		sender.dispatchEvent( event );
 
@@ -274,7 +274,7 @@ public class Transaction {
 	}
 
 	private void dispatchEvent( DataEvent event ) {
-		event.getData().dispatchEvent( event );
+		event.getSender().dispatchEvent( event );
 	}
 
 	private class ResultCollector {
