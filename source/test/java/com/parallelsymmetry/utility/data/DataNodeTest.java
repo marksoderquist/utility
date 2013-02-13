@@ -441,13 +441,13 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 0, 0, 0 );
 
-		Transaction.startTransaction();
+		Transaction.create();
 		data.setAttribute( "a", "1" );
 		data.setAttribute( "a", "2" );
 		data.setAttribute( "a", "3" );
 		data.setAttribute( "a", "4" );
 		data.setAttribute( "a", "5" );
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		assertEquals( "5", data.getAttribute( "a" ) );
 		assertNodeState( data, true, 1 );

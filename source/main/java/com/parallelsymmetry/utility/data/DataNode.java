@@ -115,9 +115,9 @@ public abstract class DataNode {
 
 		if( newValue instanceof DataNode ) checkForCircularReference( (DataNode)newValue );
 
-		Transaction.startTransaction();
-		Transaction.submitOperation( new SetAttributeOperation( this, name, oldValue, newValue ) );
-		Transaction.commitTransaction();
+		Transaction.create();
+		Transaction.submit( new SetAttributeOperation( this, name, oldValue, newValue ) );
+		Transaction.commit();
 	}
 
 	public int getModifiedAttributeCount() {
@@ -296,9 +296,9 @@ public abstract class DataNode {
 		Object oldValue = getMetaValue( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
-		Transaction.startTransaction();
-		Transaction.submitOperation( new SetMetaValueOperation( this, name, oldValue, newValue ) );
-		Transaction.commitTransaction();
+		Transaction.create();
+		Transaction.submit( new SetMetaValueOperation( this, name, oldValue, newValue ) );
+		Transaction.commit();
 	}
 
 	protected void applyMetaValue( String name, Object oldValue, Object newValue ) {
@@ -321,7 +321,7 @@ public abstract class DataNode {
 	void unmodify() {
 		if( !modified ) return;
 
-		Transaction.startTransaction();
+		Transaction.create();
 
 		// Clear the modified flag for this node.
 		setMetaValue( MODIFIED, false );
@@ -336,7 +336,7 @@ public abstract class DataNode {
 			}
 		}
 
-		Transaction.commitTransaction();
+		Transaction.commit();
 	}
 
 	void updateModifiedFlag() {

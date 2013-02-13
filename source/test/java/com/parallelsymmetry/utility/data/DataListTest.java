@@ -203,11 +203,11 @@ public class DataListTest extends DataTestCase {
 		MockDataNode child1 = new MockDataNode();
 		MockDataNode child2 = new MockDataNode();
 
-		Transaction.startTransaction();
+		Transaction.create();
 		node.add( child0 );
 		node.add( child1 );
 		node.add( child2 );
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		assertTrue( child0.getParents().contains( node ) );
 		assertSame( child0, node.get( 0 ) );
@@ -290,10 +290,10 @@ public class DataListTest extends DataTestCase {
 		nodes1.add( new MockDataNode( "node4" ) );
 		nodes1.add( new MockDataNode( "node5" ) );
 
-		Transaction.startTransaction();
+		Transaction.create();
 		assertTrue( list.addAll( nodes0 ) );
 		assertTrue( list.addAll( nodes1 ) );
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		assertEquals( nodes0.size() + nodes1.size(), list.size() );
 		assertSame( nodes0.get( 0 ), list.get( 0 ) );
@@ -830,20 +830,20 @@ public class DataListTest extends DataTestCase {
 		DataEventWatcher watcher = node.getDataEventWatcher();
 		node.addDataListener( watcher );
 
-		Transaction.startTransaction();
+		Transaction.create();
 		node.setAttribute( "key1", "value1" );
 		node.setAttribute( "key2", "value2" );
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
 		assertEquals( "key1", watcher.getDataAttributeEvents().get( 0 ).getAttributeName() );
 		assertEquals( "key2", watcher.getDataAttributeEvents().get( 1 ).getAttributeName() );
 		watcher.reset();
 
-		Transaction.startTransaction();
+		Transaction.create();
 		node.setAttribute( "key1", null );
 		node.setAttribute( "key2", null );
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		assertEventCounts( watcher, 1, 1, 2, 0, 0 );
 		assertEquals( "key1", watcher.getDataAttributeEvents().get( 0 ).getAttributeName() );

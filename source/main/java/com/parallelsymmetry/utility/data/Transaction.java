@@ -41,8 +41,7 @@ public class Transaction {
 		collectors = new ConcurrentHashMap<Integer, ResultCollector>();
 	}
 
-	// TODO Rename to start().
-	public static final Transaction startTransaction() {
+	public static final Transaction create() {
 		Transaction transaction = threadLocalTransaction.get();
 		if( transaction == null ) threadLocalTransaction.set( transaction = new Transaction() );
 
@@ -52,18 +51,16 @@ public class Transaction {
 		return transaction;
 	}
 
-	// TODO Rename to submit().
-	public static final void submitOperation( Operation operation ) {
+	public static final void submit( Operation operation ) {
 		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) throw new NullPointerException( "Transaction must be started first." );
-	
+		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
+
 		transaction.doSubmit( operation );
 	}
 
-	// TODO Rename to commit().
-	public static final boolean commitTransaction() {
+	public static final boolean commit() {
 		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) throw new NullPointerException( "Transaction must be started first." );
+		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
 
 		int depth = transactionDepth.get() - 1;
 		transactionDepth.set( depth );
@@ -86,11 +83,9 @@ public class Transaction {
 		//		}
 	}
 
-	
-	// TODO Rename to rollback().
-	public static final void rollbackTransaction() {
+	public static final void rollback() {
 		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) throw new NullPointerException( "Transaction must be started first." );
+		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
 
 		threadLocalTransaction.set( null );
 		transaction.doRollback();
@@ -230,7 +225,7 @@ public class Transaction {
 			MetaAttributeEvent metaValueEvent = iterator.next();
 			if( DataNode.MODIFIED.equals( metaValueEvent.getAttributeName() ) ) iterator.remove();
 		}
-		
+
 		// Add the new modified event.
 		getResultCollector( event.getSender() ).modified.add( event );
 	}

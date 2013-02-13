@@ -89,9 +89,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( element == null ) return;
 		if( element instanceof DataNode ) checkForCircularReference( (DataNode)element );
 
-		Transaction.startTransaction();
-		Transaction.submitOperation( new InsertChildOperation<T>( this, index, element ) );
-		Transaction.commitTransaction();
+		Transaction.create();
+		Transaction.submit( new InsertChildOperation<T>( this, index, element ) );
+		Transaction.commit();
 	}
 
 	@Override
@@ -111,12 +111,12 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( children.size() == 0 ) return false;
 
 		// Add the nodes.
-		Transaction.startTransaction();
+		Transaction.create();
 		for( T node : children ) {
 			add( index, node );
 			if( index < Integer.MAX_VALUE ) index++;
 		}
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		return true;
 	}
@@ -129,12 +129,12 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 		T result = get( index );
 
-		Transaction.startTransaction();
+		Transaction.create();
 
 		remove( index );
 		add( index, element );
 
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		return result;
 	}
@@ -144,9 +144,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean remove( Object object ) {
 		if( object == null || !( object instanceof DataNode ) || !contains( object ) ) return false;
 
-		Transaction.startTransaction();
-		Transaction.submitOperation( new RemoveChildOperation<T>( this, (T)object ) );
-		Transaction.commitTransaction();
+		Transaction.create();
+		Transaction.submit( new RemoveChildOperation<T>( this, (T)object ) );
+		Transaction.commit();
 
 		return true;
 	}
@@ -156,9 +156,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( index < 0 || index >= size() ) throw new ArrayIndexOutOfBoundsException( index );
 		T child = children.get( index );
 
-		Transaction.startTransaction();
-		Transaction.submitOperation( new RemoveChildOperation<T>( this, child ) );
-		Transaction.commitTransaction();
+		Transaction.create();
+		Transaction.submit( new RemoveChildOperation<T>( this, child ) );
+		Transaction.commit();
 
 		return child;
 	}
@@ -167,13 +167,13 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	public boolean removeAll( Collection<?> collection ) {
 		if( collection == null ) return false;
 
-		Transaction.startTransaction();
+		Transaction.create();
 		int count = 0;
 		for( Object node : collection ) {
 			if( !( node instanceof DataNode ) ) continue;
 			if( remove( node ) ) count++;
 		}
-		Transaction.commitTransaction();
+		Transaction.commit();
 
 		return count > 0;
 	}
@@ -289,7 +289,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	void unmodify() {
 		if( !modified ) return;
 
-		Transaction.startTransaction();
+		Transaction.create();
 
 		super.unmodify();
 
@@ -303,7 +303,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 			}
 		}
 
-		Transaction.commitTransaction();
+		Transaction.commit();
 	}
 
 	@Override
