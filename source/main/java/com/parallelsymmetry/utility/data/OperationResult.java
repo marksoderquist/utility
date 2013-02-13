@@ -9,9 +9,12 @@ public class OperationResult {
 
 	private List<DataValueEvent> events;
 
+	private List<MetaAttributeEvent> metaValueEvents;
+
 	public OperationResult( Operation action ) {
 		this.action = action;
 		this.events = new CopyOnWriteArrayList<DataValueEvent>();
+		this.metaValueEvents = new CopyOnWriteArrayList<MetaAttributeEvent>();
 	}
 
 	public Operation getOperation() {
@@ -24,6 +27,14 @@ public class OperationResult {
 
 	public void addEvent( DataValueEvent event ) {
 		events.add( event );
+	}
+
+	public List<MetaAttributeEvent> getMetaValueEvents() {
+		return metaValueEvents;
+	}
+
+	public void addMetaValueEvent( MetaAttributeEvent event ) {
+		metaValueEvents.add( event );
 	}
 
 }

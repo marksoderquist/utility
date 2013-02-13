@@ -274,7 +274,19 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	}
 
 	@Override
-	protected void unmodify() {
+	protected void applyMetaValue( String name, Object oldValue, Object newValue ) {
+		if( MODIFIED.equals( name ) ) {
+			boolean value = (Boolean)newValue;
+			if( value == false ) {
+				addRemoveChildren = null;
+				modifiedChildCount = 0;
+			}
+			super.applyMetaValue( name, oldValue, newValue );
+		}
+	}
+
+	@Override
+	void unmodify() {
 		if( !modified ) return;
 
 		Transaction.startTransaction();
@@ -295,14 +307,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	}
 
 	@Override
-	protected void doUnmodify() {
-		addRemoveChildren = null;
-		modifiedChildCount = 0;
-		super.doUnmodify();
-	}
-
-	@Override
-	protected void updateModifiedFlag() {
+	void updateModifiedFlag() {
 		super.updateModifiedFlag();
 
 		selfModified = modified;
@@ -312,7 +317,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	}
 
 	@Override
-	protected void dispatchEvent( DataEvent event ) {
+	void dispatchEvent( DataEvent event ) {
 		super.dispatchEvent( event );
 
 		if( event.getType() == DataEvent.Type.DATA_CHILD ) {
@@ -330,9 +335,9 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	}
 
 	/*
-	 * Similar logic is found in DataNode.attributeNodeModified().
+	 * Similar logic is found in DataNode.dataNodeChildModified().
 	 */
-	protected void childNodeModified( boolean modified ) {
+	void listNodeChildModified( boolean modified ) {
 		if( modified ) {
 			modifiedChildCount++;
 		} else {

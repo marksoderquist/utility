@@ -25,18 +25,22 @@ public abstract class DataNode {
 
 	private boolean selfModified;
 
-	private Map<String, Object> attributes;
+	private Map<String, Object> dataValues;
+
+	private Map<String, Object> metaValues;
 
 	private int modifiedAttributeCount;
 
-	private Map<String, Object> modifiedAttributes;
+	private Map<String, Object> modifiedDataValues;
+
+	private Map<String, Object> modifiedMetaValues;
 
 	private Map<String, Object> resources;
 
 	/**
-	 * Is the node modified. The node is modified if any attribute has been
+	 * Is the node modified. The node is modified if any data value has been
 	 * modified or any child node has been modified since the last time
-	 * {@link #unmodify()} was called.
+	 * setModified( false ) was called.
 	 * 
 	 * @return true if this node or any child nodes are modified, false otherwise.
 	 */
@@ -48,8 +52,10 @@ public abstract class DataNode {
 	 * Set the modified flag for this node.
 	 */
 	public void setModified( boolean modified ) {
+		if( this.modified == modified ) return;
+
 		if( modified ) {
-			modify();
+			setMetaValue( MODIFIED, true );
 		} else {
 			unmodify();
 		}
@@ -81,9 +87,9 @@ public abstract class DataNode {
 	@SuppressWarnings( "unchecked" )
 	public <T> T getAttribute( String name ) {
 		// Null attribute names are not allowed.
-		if( name == null ) throw new NullPointerException( "Attribute name cannot be null." );
+		if( name == null ) throw new NullPointerException( "Data value name cannot be null." );
 
-		return (T)( attributes == null ? null : attributes.get( name ) );
+		return (T)( dataValues == null ? null : dataValues.get( name ) );
 	}
 
 	/**
@@ -101,7 +107,7 @@ public abstract class DataNode {
 	 */
 	public void setAttribute( String name, Object newValue ) {
 		// Null attribute names are not allowed.
-		if( name == null ) throw new NullPointerException( "Attribute name cannot be null." );
+		if( name == null ) throw new NullPointerException( "Data value name cannot be null." );
 
 		// If the old value is equal to the new value no changes are necessary.
 		Object oldValue = getAttribute( name );
@@ -152,7 +158,7 @@ public abstract class DataNode {
 	 * @return The attribute key set.
 	 */
 	public Set<String> getAttributeKeys() {
-		return attributes == null ? new HashSet<String>() : attributes.keySet();
+		return dataValues == null ? new HashSet<String>() : dataValues.keySet();
 	}
 
 	/**
@@ -247,8 +253,8 @@ public abstract class DataNode {
 
 		DataNode that = (DataNode)object;
 
-		Map<String, Object> thisAttr = this.attributes;
-		Map<String, Object> thatAttr = that.attributes;
+		Map<String, Object> thisAttr = this.dataValues;
+		Map<String, Object> thatAttr = that.dataValues;
 
 		if( thisAttr == null && thatAttr == null ) return true;
 		if( thisAttr == null && thatAttr != null ) return false;
@@ -274,30 +280,55 @@ public abstract class DataNode {
 		return true;
 	}
 
-	/**
-	 * Set the modified flag for this node.
-	 */
-	void modify() {
-		if( modified ) return;
+	@SuppressWarnings( "unchecked" )
+	protected <T> T getMetaValue( String name ) {
+		// Null attribute names are not allowed.
+		if( name == null ) throw new NullPointerException( "Meta value name cannot be null." );
+
+		return (T)( dataValues == null ? null : dataValues.get( name ) );
+	}
+
+	protected void setMetaValue( String name, Object newValue ) {
+		// Null attribute names are not allowed.
+		if( name == null ) throw new NullPointerException( "Meta value name cannot be null." );
+
+		// If the old value is equal to the new value no changes are necessary.
+		Object oldValue = getMetaValue( name );
+		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
 
 		Transaction.startTransaction();
-		Transaction.submitOperation( new ModifyOperation( this ) );
+		Transaction.submitOperation( new SetMetaValueOperation( this, name, oldValue, newValue ) );
 		Transaction.commitTransaction();
 	}
 
+	protected void applyMetaValue( String name, Object oldValue, Object newValue ) {
+		if( MODIFIED.equals( name ) ) {
+			boolean value = (Boolean)newValue;
+			if( value == true ) {
+				selfModified = true;
+			} else {
+				selfModified = false;
+				modifiedDataValues = null;
+				modifiedAttributeCount = 0;
+			}
+			updateModifiedFlag();
+		}
+	}
+
 	/**
-	 * Clear the modified flag for this node and all child nodes.
+	 * Clear the modified flag for this node and all data value nodes.
 	 */
 	void unmodify() {
 		if( !modified ) return;
 
 		Transaction.startTransaction();
 
-		Transaction.submitOperation( new UnmodifyOperation( this ) );
+		// Clear the modified flag for this node.
+		setMetaValue( MODIFIED, false );
 
-		// Clear the modified flag of any attribute nodes.
-		if( attributes != null ) {
-			for( Object child : attributes.values() ) {
+		// Clear the modified flag of any data value nodes.
+		if( dataValues != null ) {
+			for( Object child : dataValues.values() ) {
 				if( child instanceof DataNode ) {
 					DataNode childNode = (DataNode)child;
 					if( childNode.isModified() ) childNode.unmodify();
@@ -308,58 +339,76 @@ public abstract class DataNode {
 		Transaction.commitTransaction();
 	}
 
-	void doModify() {
-		selfModified = true;
-		updateModifiedFlag();
-	}
-
-	void doUnmodify() {
-		selfModified = false;
-		modifiedAttributes = null;
-		modifiedAttributeCount = 0;
-		updateModifiedFlag();
-	}
-
 	void updateModifiedFlag() {
 		modified = selfModified || modifiedAttributeCount != 0;
 	}
 
 	void doSetAttribute( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
-		if( attributes == null ) attributes = new ConcurrentHashMap<String, Object>();
+		if( dataValues == null ) dataValues = new ConcurrentHashMap<String, Object>();
 
 		// Set the attribute value.
 		if( newValue == null ) {
-			attributes.remove( name );
+			dataValues.remove( name );
 			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
 		} else {
-			attributes.put( name, newValue );
+			dataValues.put( name, newValue );
 			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
 		}
 
 		// Remove the attribute map if necessary.
-		if( attributes.size() == 0 ) attributes = null;
+		if( dataValues.size() == 0 ) dataValues = null;
 
 		// Update the modified attribute value map.
-		Object preValue = modifiedAttributes == null ? null : modifiedAttributes.get( name );
+		Object preValue = modifiedDataValues == null ? null : modifiedDataValues.get( name );
 		if( preValue == null ) {
 			// Only add the value if there is not an existing previous value.
-			if( modifiedAttributes == null ) modifiedAttributes = new ConcurrentHashMap<String, Object>();
-			modifiedAttributes.put( name, oldValue == null ? NULL : oldValue );
+			if( modifiedDataValues == null ) modifiedDataValues = new ConcurrentHashMap<String, Object>();
+			modifiedDataValues.put( name, oldValue == null ? NULL : oldValue );
 			modifiedAttributeCount++;
 		} else if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
-			modifiedAttributes.remove( name );
+			modifiedDataValues.remove( name );
 			modifiedAttributeCount--;
-			if( modifiedAttributes.size() == 0 ) modifiedAttributes = null;
+			if( modifiedDataValues.size() == 0 ) modifiedDataValues = null;
 		}
 
 		updateModifiedFlag();
 	}
 
+	void doSetMetaValue( String name, Object oldValue, Object newValue ) {
+		// Create the meta value map if necessary.
+		if( metaValues == null ) metaValues = new ConcurrentHashMap<String, Object>();
+
+		// Set the value.
+		if( newValue == null ) {
+			metaValues.remove( name );
+			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
+		} else {
+			metaValues.put( name, newValue );
+			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
+		}
+
+		// Remove the meta value map if necessary.
+		if( metaValues.size() == 0 ) metaValues = null;
+
+		// Update the modified meta value map.
+		Object preValue = modifiedMetaValues == null ? null : modifiedMetaValues.get( name );
+		if( preValue == null ) {
+			// Only add the value if there is not an existing previous value.
+			if( modifiedMetaValues == null ) modifiedMetaValues = new ConcurrentHashMap<String, Object>();
+			modifiedMetaValues.put( name, oldValue == null ? NULL : oldValue );
+		} else if( ObjectUtil.areEqual( preValue == NULL ? null : preValue, newValue ) ) {
+			modifiedMetaValues.remove( name );
+			if( modifiedMetaValues.size() == 0 ) modifiedMetaValues = null;
+		}
+
+		applyMetaValue( name, oldValue, newValue );
+	}
+
 	/*
-	 * Similar logic is found in DataList.childNodeModified().
+	 * Similar logic is found in DataList.listNodeChildModified().
 	 */
-	void attributeNodeModified( boolean modified ) {
+	void dataNodeModified( boolean modified ) {
 		if( modified ) {
 			modifiedAttributeCount++;
 		} else {

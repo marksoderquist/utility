@@ -136,7 +136,7 @@ public class DataNodeTest extends DataTestCase {
 			data.setAttribute( null, "value" );
 			fail( "Null attribute names are not allowed." );
 		} catch( NullPointerException exception ) {
-			assertEquals( "Attribute name cannot be null.", exception.getMessage() );
+			assertEquals( "Data value name cannot be null.", exception.getMessage() );
 		}
 		assertEventCounts( handler, 0, 0, 0 );
 	}
@@ -149,7 +149,7 @@ public class DataNodeTest extends DataTestCase {
 			data.getAttribute( null );
 			fail( "Null attribute names are not allowed." );
 		} catch( NullPointerException exception ) {
-			assertEquals( "Attribute name cannot be null.", exception.getMessage() );
+			assertEquals( "Data value name cannot be null.", exception.getMessage() );
 		}
 	}
 
@@ -273,6 +273,40 @@ public class DataNodeTest extends DataTestCase {
 		data.setModified( false );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 4, 2, 3 );
+	}
+
+	@Test
+	public void testSetNullMetaValueToNull() {
+		MockDataNode data = new MockDataNode();
+		DataEventWatcher handler = data.getDataEventWatcher();
+		data.setMetaValue( "attribute", null );
+		assertEventCounts( handler, 0, 0, 0 );
+	}
+
+	@Test
+	public void testSetMetaValueWithNullName() {
+		MockDataNode data = new MockDataNode();
+		DataEventWatcher handler = data.getDataEventWatcher();
+
+		try {
+			data.setMetaValue( null, "value" );
+			fail( "Null attribute names are not allowed." );
+		} catch( NullPointerException exception ) {
+			assertEquals( "Meta value name cannot be null.", exception.getMessage() );
+		}
+		assertEventCounts( handler, 0, 0, 0 );
+	}
+
+	@Test
+	public void testGetMetaValueWithNullName() {
+		MockDataNode data = new MockDataNode();
+
+		try {
+			data.getMetaValue( null );
+			fail( "Null attribute names are not allowed." );
+		} catch( NullPointerException exception ) {
+			assertEquals( "Meta value name cannot be null.", exception.getMessage() );
+		}
 	}
 
 	public void testResources() {

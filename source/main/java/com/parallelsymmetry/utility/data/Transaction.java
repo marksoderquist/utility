@@ -1,6 +1,7 @@
 package com.parallelsymmetry.utility.data;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -40,6 +41,7 @@ public class Transaction {
 		collectors = new ConcurrentHashMap<Integer, ResultCollector>();
 	}
 
+	// TODO Rename to start().
 	public static final Transaction startTransaction() {
 		Transaction transaction = threadLocalTransaction.get();
 		if( transaction == null ) threadLocalTransaction.set( transaction = new Transaction() );
@@ -50,16 +52,18 @@ public class Transaction {
 		return transaction;
 	}
 
+	// TODO Rename to submit().
 	public static final void submitOperation( Operation operation ) {
 		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
-
+		if( transaction == null ) throw new NullPointerException( "Transaction must be started first." );
+	
 		transaction.doSubmit( operation );
 	}
 
+	// TODO Rename to commit().
 	public static final boolean commitTransaction() {
 		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
+		if( transaction == null ) throw new NullPointerException( "Transaction must be started first." );
 
 		int depth = transactionDepth.get() - 1;
 		transactionDepth.set( depth );
@@ -82,9 +86,11 @@ public class Transaction {
 		//		}
 	}
 
+	
+	// TODO Rename to rollback().
 	public static final void rollbackTransaction() {
 		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) throw new NullPointerException( "Transaction cannot be null." );
+		if( transaction == null ) throw new NullPointerException( "Transaction must be started first." );
 
 		threadLocalTransaction.set( null );
 		transaction.doRollback();
@@ -136,6 +142,7 @@ public class Transaction {
 			for( OperationResult operationResult : operationResults ) {
 				DataNode node = operationResult.getOperation().getData();
 				getResultCollector( node ).events.addAll( operationResult.getEvents() );
+				getResultCollector( node ).modified.addAll( operationResult.getMetaValueEvents() );
 			}
 
 			// Send the events for each data node.
@@ -192,30 +199,40 @@ public class Transaction {
 	}
 
 	private void collectFinalEvents( DataNode sender, DataNode cause, boolean oldModified, boolean newModified ) {
-		// Post the changed event.
-		storeChangedEvent( new DataChangedEvent( DataEvent.Action.MODIFY, sender ) );
-
 		// Post the modified event.
 		boolean modifiedChanged = oldModified != newModified;
 		if( modifiedChanged ) storeModifiedEvent( new MetaAttributeEvent( DataEvent.Action.MODIFY, sender, DataNode.MODIFIED, oldModified, newModified ) );
 
+		// Update the parent nodes.
 		for( DataNode parent : sender.getParents() ) {
 			boolean parentOldModified = parent.isModified();
 			if( modifiedChanged ) {
 				if( parent instanceof DataList ) {
-					( (DataList<?>)parent ).childNodeModified( newModified );
+					( (DataList<?>)parent ).listNodeChildModified( newModified );
 				} else {
-					parent.attributeNodeModified( newModified );
+					parent.dataNodeModified( newModified );
 				}
 			}
 			boolean parentNewModified = parent.isModified();
 
 			collectFinalEvents( parent, cause, parentOldModified, parentNewModified );
 		}
+
+		// Post the changed event.
+		storeChangedEvent( new DataChangedEvent( DataEvent.Action.MODIFY, sender ) );
 	}
 
 	private void storeModifiedEvent( MetaAttributeEvent event ) {
-		getResultCollector( event.getData() ).modified = event;
+		// Remove any previously added modified events.
+		List<MetaAttributeEvent> events = getResultCollector( event.getData() ).modified;
+		Iterator<MetaAttributeEvent> iterator = events.iterator();
+		while( iterator.hasNext() ) {
+			MetaAttributeEvent metaValueEvent = iterator.next();
+			if( DataNode.MODIFIED.equals( metaValueEvent.getAttributeName() ) ) iterator.remove();
+		}
+		
+		// Add the new modified event.
+		getResultCollector( event.getData() ).modified.add( event );
 	}
 
 	private void storeChangedEvent( DataChangedEvent event ) {
@@ -223,6 +240,7 @@ public class Transaction {
 	}
 
 	private void dispatchTransactionEvents() {
+		// Fire the data value events first
 		for( Integer key : collectors.keySet() ) {
 			ResultCollector collector = collectors.get( key );
 			for( DataValueEvent event : collector.events ) {
@@ -230,10 +248,12 @@ public class Transaction {
 			}
 		}
 
-		// Fire the modified events first.
+		// Fire the meta value events next.
 		for( Integer key : collectors.keySet() ) {
 			ResultCollector collector = collectors.get( key );
-			if( collector.modified != null ) dispatchEvent( collector.modified );
+			for( MetaAttributeEvent event : collector.modified ) {
+				dispatchEvent( event );
+			}
 		}
 
 		// Fire the data changed events last.
@@ -261,9 +281,9 @@ public class Transaction {
 
 		public List<DataValueEvent> events = new ArrayList<DataValueEvent>();
 
-		public DataChangedEvent changed;
+		public List<MetaAttributeEvent> modified = new ArrayList<MetaAttributeEvent>();
 
-		public MetaAttributeEvent modified;
+		public DataChangedEvent changed;
 
 	}
 
