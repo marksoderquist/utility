@@ -1,7 +1,12 @@
 package com.parallelsymmetry.utility.ui;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
+
+import com.parallelsymmetry.utility.TextUtil;
+import com.parallelsymmetry.utility.log.Log;
 
 public class SwingUtil {
 
@@ -13,7 +18,7 @@ public class SwingUtil {
 	 */
 	public static final void swingWait() {
 		try {
-			EventQueue.invokeAndWait( new Token() );
+			EventQueue.invokeAndWait( new WaitToken() );
 		} catch( InterruptedException event ) {
 			return;
 		} catch( InvocationTargetException event ) {
@@ -41,7 +46,19 @@ public class SwingUtil {
 		}
 	}
 
-	private static class Token implements Runnable {
+	public static final void printComponentHierarchy( Container container ) {
+		printComponentHierarchy( container, 0 );
+	}
+
+	public static final void printComponentHierarchy( Container container, int indent ) {
+		String indentString = TextUtil.pad( indent );
+		for( Component component : container.getComponents() ) {
+			Log.write( Log.DEBUG, indentString, component );
+			if( component instanceof Container ) printComponentHierarchy( (Container)component, indent + 1 );
+		}
+	}
+
+	private static class WaitToken implements Runnable {
 
 		@Override
 		public void run() {}
