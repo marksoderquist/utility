@@ -21,8 +21,6 @@ public class Transaction {
 
 	private static final ThreadLocal<Transaction> threadLocalTransaction = new ThreadLocal<Transaction>();
 
-	private static final ThreadLocal<Integer> transactionDepth = new ThreadLocal<Integer>();
-
 	private static Transaction committingTransaction;
 
 	private Queue<Operation> operations;
@@ -33,8 +31,9 @@ public class Transaction {
 
 	private Map<Integer, ResultCollector> collectors;
 
+	private int depth;
+
 	private Transaction() {
-		transactionDepth.set( 0 );
 		nodeKeys = new CopyOnWriteArraySet<Integer>();
 		operations = new ConcurrentLinkedQueue<Operation>();
 		nodes = new ConcurrentHashMap<Integer, DataNode>();
@@ -45,8 +44,7 @@ public class Transaction {
 		Transaction transaction = threadLocalTransaction.get();
 		if( transaction == null ) threadLocalTransaction.set( transaction = new Transaction() );
 
-		int depth = transactionDepth.get() + 1;
-		transactionDepth.set( depth );
+		++transaction.depth;
 
 		return transaction;
 	}
@@ -62,10 +60,9 @@ public class Transaction {
 		Transaction transaction = threadLocalTransaction.get();
 		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
 
-		int depth = transactionDepth.get() - 1;
-		transactionDepth.set( depth );
+		--transaction.depth;
 
-		if( depth == 0 ) {
+		if( transaction.depth == 0 ) {
 			threadLocalTransaction.set( null );
 			transaction.doCommit();
 		}
@@ -97,6 +94,11 @@ public class Transaction {
 		threadLocalTransaction.set( null );
 
 		if( transaction != null ) transaction.doReset();
+	}
+
+	public static final int depth() {
+		Transaction transaction = threadLocalTransaction.get();
+		return transaction == null ? 0 : transaction.depth;
 	}
 
 	@Override
