@@ -45,7 +45,7 @@ public class IconLibraryTest extends TestCase {
 	}
 
 	public void testGetIcon() throws Exception {
-		URI uri = URI.create( "http://www.parallelsymmetry.com/images/parasymm.png" );
+		URI uri = new File( "source/test/resources/com/parallelsymmetry/utility/ui/test.png" ).toURI();
 
 		// Get a direct version of the image to compare against.
 		Image source = ImageIO.read( uri.toURL() ).getScaledInstance( 16, 16, Image.SCALE_SMOOTH );
