@@ -1,10 +1,7 @@
 package com.parallelsymmetry.utility.data;
 
-import java.util.Deque;
-
 import org.junit.Test;
 
-import com.parallelsymmetry.utility.Accessor;
 import com.parallelsymmetry.utility.ObjectUtil;
 import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
@@ -46,32 +43,68 @@ public class TransactionTest extends DataTestCase {
 		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
 	}
-	
+
 	@Test
 	public void testNestedTransaction() {
-		fail();
+		MockDataNode data1 = new MockDataNode();
+		DataEventWatcher handler1 = new DataEventWatcher();
+		data1.addDataListener( handler1 );
+		assertNodeState( data1, false, 0 );
+		assertEventCounts( handler1, 0, 0, 0 );
+
+		MockDataNode data2 = new MockDataNode();
+		DataEventWatcher handler2 = new DataEventWatcher();
+		data2.addDataListener( handler2 );
+		assertNodeState( data2, false, 0 );
+		assertEventCounts( handler2, 0, 0, 0 );
+
+		Transaction.create();
+		data1.setAttribute( "key1", "value1" );
+
+		Transaction.create( true );
+		data2.setAttribute( "key2", "value2" );
+
+		assertNodeState( data1, false, 0 );
+		assertNodeState( data2, false, 0 );
+		Transaction.commit();
+
+		assertNodeState( data1, false, 0 );
+		assertNodeState( data2, true, 1 );
+
+		Transaction.commit();
+
+		assertNodeState( data1, true, 1 );
+		assertNodeState( data2, true, 1 );
 	}
 
-	//	@Test
-	//	public void testReuseTransaction() throws Exception {
-	//		MockDataNode node = new MockDataNode();
-	//		DataEventWatcher watcher = node.getDataEventWatcher();
-	//
-	//		Transaction.startTransaction();
-	//
-	//		node.setAttribute( "key1", "value1" );
-	//		assertEventCounts( watcher, 0, 0, 0 );
-	//		Transaction.commitTransaction();
-	//		assertEventCounts( watcher, 1, 1, 1 );
-	//		assertEquals( "value1", node.getAttribute( "key1" ) );
-	//		watcher.reset();
-	//
-	//		node.setAttribute( "key1", "value2" );
-	//		assertEventCounts( watcher, 0, 0, 0 );
-	//		Transaction.commitTransaction();
-	//		assertEquals( "value2", node.getAttribute( "key1" ) );
-	//		assertEventCounts( watcher, 1, 0, 1 );
-	//	}
+	@Test
+	public void testSubmitWithNoTransaction() throws Exception {
+		try {
+			Transaction.submit( null );
+			fail( "NullPointerException should be thrown." );
+		} catch( NullPointerException exception ) {
+			assertEquals( "Transaction must be created first.", exception.getMessage() );
+		}
+	}
+
+	@Test
+	public void testCommitWithNoTransaction() throws Exception {
+		try {
+			Transaction.commit();
+		} catch( NullPointerException exception ) {
+			assertEquals( "Transaction must be created first.", exception.getMessage() );
+		}
+	}
+
+	@Test
+	public void testRollbackWithNoTransaction() throws Exception {
+		try {
+			Transaction.rollback();
+			fail( "NullPointerException should be thrown." );
+		} catch( NullPointerException exception ) {
+			assertEquals( "Transaction must be created first.", exception.getMessage() );
+		}
+	}
 
 	@Test
 	public void testOverlappingTransactions() throws Exception {

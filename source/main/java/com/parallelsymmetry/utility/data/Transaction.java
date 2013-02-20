@@ -103,23 +103,24 @@ public class Transaction {
 	public static final void reset() {
 		Transaction transaction = peekTransaction();
 
-		pullTransaction();
-
-		if( transaction != null ) transaction.doReset();
+		while( transaction != null ) {
+			transaction.doReset();
+			transaction = pullTransaction();
+		}
 	}
 
 	public static final Transaction current() {
 		return peekTransaction();
 	}
 
-	public static final int count() {
-		Deque<Transaction> deque = threadLocalTransactions.get();
-		return deque == null ? 0 : deque.size();
-	}
-
 	public static final int depth() {
 		Transaction transaction = peekTransaction();
 		return transaction == null ? 0 : transaction.depth;
+	}
+
+	public static final int count() {
+		Deque<Transaction> deque = threadLocalTransactions.get();
+		return deque == null ? 0 : deque.size();
 	}
 
 	@Override
