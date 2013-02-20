@@ -1,6 +1,8 @@
 package com.parallelsymmetry.utility.data;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +21,9 @@ public class Transaction {
 
 	private static final ReentrantLock COMMIT_LOCK = new ReentrantLock();
 
-	private static final ThreadLocal<Transaction> threadLocalTransaction = new ThreadLocal<Transaction>();
+	//private static final ThreadLocal<Transaction> threadLocalTransaction = new ThreadLocal<Transaction>();
+
+	private static final ThreadLocal<Deque<Transaction>> threadLocalTransactions = new ThreadLocal<Deque<Transaction>>();
 
 	private static Transaction committingTransaction;
 
@@ -33,6 +37,10 @@ public class Transaction {
 
 	private int depth;
 
+	static {
+		threadLocalTransactions.set( new ArrayDeque<Transaction>() );
+	}
+
 	private Transaction() {
 		nodeKeys = new CopyOnWriteArraySet<Integer>();
 		operations = new ConcurrentLinkedQueue<Operation>();
@@ -41,8 +49,12 @@ public class Transaction {
 	}
 
 	public static final Transaction create() {
-		Transaction transaction = threadLocalTransaction.get();
-		if( transaction == null ) threadLocalTransaction.set( transaction = new Transaction() );
+		return create( false );
+	}
+
+	public static final Transaction create( boolean nest ) {
+		Transaction transaction = peekTransaction();
+		if( nest || transaction == null ) transaction = pushTransaction();
 
 		++transaction.depth;
 
@@ -50,20 +62,20 @@ public class Transaction {
 	}
 
 	public static final void submit( Operation operation ) {
-		Transaction transaction = threadLocalTransaction.get();
+		Transaction transaction = peekTransaction();
 		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
 
 		transaction.doSubmit( operation );
 	}
 
 	public static final boolean commit() {
-		Transaction transaction = threadLocalTransaction.get();
+		Transaction transaction = peekTransaction();
 		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
 
 		--transaction.depth;
 
 		if( transaction.depth == 0 ) {
-			threadLocalTransaction.set( null );
+			pullTransaction();
 			transaction.doCommit();
 		}
 
@@ -81,29 +93,59 @@ public class Transaction {
 	}
 
 	public static final void rollback() {
-		Transaction transaction = threadLocalTransaction.get();
+		Transaction transaction = peekTransaction();
 		if( transaction == null ) throw new NullPointerException( "Transaction must be created first." );
 
-		threadLocalTransaction.set( null );
+		pullTransaction();
 		transaction.doRollback();
 	}
 
 	public static final void reset() {
-		Transaction transaction = threadLocalTransaction.get();
+		Transaction transaction = peekTransaction();
 
-		threadLocalTransaction.set( null );
+		pullTransaction();
 
 		if( transaction != null ) transaction.doReset();
 	}
 
+	public static final Transaction current() {
+		return peekTransaction();
+	}
+
+	public static final int count() {
+		Deque<Transaction> deque = threadLocalTransactions.get();
+		return deque == null ? 0 : deque.size();
+	}
+
 	public static final int depth() {
-		Transaction transaction = threadLocalTransaction.get();
+		Transaction transaction = peekTransaction();
 		return transaction == null ? 0 : transaction.depth;
 	}
 
 	@Override
 	public String toString() {
 		return String.valueOf( "transaction[" + System.identityHashCode( this ) + "]" );
+	}
+
+	private static Transaction peekTransaction() {
+		Deque<Transaction> deque = threadLocalTransactions.get();
+		return deque == null ? null : deque.peekFirst();
+	}
+
+	private static Transaction pushTransaction() {
+		Deque<Transaction> deque = threadLocalTransactions.get();
+		if( deque == null ) threadLocalTransactions.set( deque = new ArrayDeque<Transaction>() );
+		Transaction transaction = new Transaction();
+		deque.offerFirst( transaction );
+		return transaction;
+	}
+
+	private static Transaction pullTransaction() {
+		Deque<Transaction> deque = threadLocalTransactions.get();
+		if( deque == null ) return null;
+		Transaction transaction = deque.pollFirst();
+		if( deque.size() == 0 ) threadLocalTransactions.set( null );
+		return transaction;
 	}
 
 	private void doSubmit( Operation operation ) {

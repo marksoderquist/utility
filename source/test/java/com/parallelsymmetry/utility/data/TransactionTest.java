@@ -1,5 +1,7 @@
 package com.parallelsymmetry.utility.data;
 
+import java.util.Deque;
+
 import org.junit.Test;
 
 import com.parallelsymmetry.utility.Accessor;
@@ -43,6 +45,11 @@ public class TransactionTest extends DataTestCase {
 		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
 		assertEquals( index++, handler.getEvents().size() );
+	}
+	
+	@Test
+	public void testNestedTransaction() {
+		fail();
 	}
 
 	//	@Test
@@ -503,15 +510,7 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public void run() {
-			ThreadLocal<Transaction> threadLocalTransaction;
-			try {
-				threadLocalTransaction = Accessor.getField( Transaction.class, "threadLocalTransaction" );
-				transaction = threadLocalTransaction.get();
-			} catch( NoSuchFieldException exception ) {
-				Log.write( exception );
-			} catch( IllegalAccessException exception ) {
-				Log.write( exception );
-			}
+			transaction = Transaction.current();
 
 			//Log.write( Thread.currentThread().getName(), ": Get Transaction: ", transaction == null ? "null" : transaction.hashCode() );
 		}
