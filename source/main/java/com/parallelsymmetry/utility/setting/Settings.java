@@ -225,14 +225,18 @@ public class Settings {
 
 		for( SettingProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
-			Set<String> providerKeys = provider.getKeys( full );
-			if( full != null && providerKeys != null ) keys.addAll( providerKeys );
+			if( full != null ) {
+				Set<String> providerKeys = provider.getKeys( full );
+				if( providerKeys != null ) keys.addAll( providerKeys );
+			}
 		}
 
 		if( root.defaultProvider != null ) {
 			String full = getProviderPath( root.defaultProvider, path );
-			Set<String> providerKeys = root.defaultProvider.getKeys( full );
-			if( full != null && providerKeys != null ) keys.addAll( providerKeys );
+			if( full != null ) {
+				Set<String> providerKeys = root.defaultProvider.getKeys( full );
+				if( providerKeys != null ) keys.addAll( providerKeys );
+			}
 		}
 
 		return keys;
@@ -255,14 +259,18 @@ public class Settings {
 
 		for( SettingProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
-			Set<String> providerNames = provider.getChildNames( full );
-			if( full != null && providerNames != null ) names.addAll( providerNames );
+			if( full != null ) {
+				Set<String> providerNames = provider.getChildNames( full );
+				if( providerNames != null ) names.addAll( providerNames );
+			}
 		}
 
 		if( root.defaultProvider != null ) {
 			String full = getProviderPath( root.defaultProvider, path );
-			Set<String> providerNames = root.defaultProvider.getChildNames( full );
-			if( full != null && providerNames != null ) names.addAll( providerNames );
+			if( full != null ) {
+				Set<String> providerNames = root.defaultProvider.getChildNames( full );
+				if( providerNames != null ) names.addAll( providerNames );
+			}
 		}
 
 		return names;
