@@ -108,16 +108,14 @@ public class Settings {
 	}
 
 	public Settings( SettingProvider defaultProvider ) {
-		this( defaultProvider, null );
-	}
+		root = this;
+		path = "/";
 
-	public Settings( SettingProvider defaultProvider, String mount ) {
 		providers = new CopyOnWriteArrayList<SettingProvider>();
 		mounts = new ConcurrentHashMap<SettingProvider, String>();
 		listeners = new ConcurrentHashMap<String, Set<SettingListener>>();
-		root = this;
-		path = "/";
-		if( defaultProvider != null ) setDefaultProvider( defaultProvider, mount );
+
+		if( defaultProvider != null ) setDefaultProvider( defaultProvider );
 	}
 
 	private Settings( Settings root, String path ) {
@@ -138,25 +136,21 @@ public class Settings {
 	}
 
 	public int getProviderCount() {
-		return providers.size();
+		return root.providers.size();
 	}
 
 	public SettingProvider getDefaultProvider() {
 		return defaultProvider;
 	}
 
+	/**
+	 * Set the default provider for the settings root. There is only on default
+	 * provider per settings root.
+	 * 
+	 * @param provider
+	 */
 	public void setDefaultProvider( SettingProvider provider ) {
-		setDefaultProvider( provider, null );
-	}
-
-	public void setDefaultProvider( SettingProvider provider, String mount ) {
 		this.defaultProvider = provider;
-		providers.remove( provider );
-		if( mount == null ) {
-			mounts.remove( provider );
-		} else {
-			mounts.put( provider, mount );
-		}
 	}
 
 	public SettingProvider getProvider( int index ) {

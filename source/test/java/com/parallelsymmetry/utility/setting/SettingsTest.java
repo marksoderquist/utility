@@ -121,31 +121,33 @@ public class SettingsTest extends TestCase {
 	}
 
 	public void testMounts() {
-		settings.addProvider( provider1, "/1" );
+		settings.setDefaultProvider( providerD );
+		
+		// Do not set a provider for path /1, just use the defaults.
 		settings.addProvider( provider2, "/2" );
 		settings.addProvider( provider3, "/3" );
-		settings.setDefaultProvider( providerD, "/D" );
+
+		providerD.set( "/1/value", "D" );
+		providerD.set( "/2/value", "D" );
+		providerD.set( "/3/value", "D" );
 
 		provider1.set( "/value", "1" );
 		provider2.set( "/value", "2" );
 		provider3.set( "/value", "3" );
-		providerD.set( "/value", "D" );
 
-		assertEquals( "1", settings.get( "/1/value", null ) );
+		assertEquals( "D", settings.get( "/1/value", null ) );
 		assertEquals( "2", settings.get( "/2/value", null ) );
 		assertEquals( "3", settings.get( "/3/value", null ) );
-		assertEquals( "D", settings.get( "/D/value", null ) );
 
+		// Remember that provider2 is the only one writable.
 		settings.put( "/1/value", "A" );
 		settings.put( "/2/value", "B" );
 		settings.put( "/3/value", "C" );
-		settings.put( "/D/value", "D" );
 
 		// Remember that provider2 is the only one writable.
-		assertEquals( "1", settings.get( "/1/value", null ) );
+		assertEquals( "D", settings.get( "/1/value", null ) );
 		assertEquals( "B", settings.get( "/2/value", null ) );
 		assertEquals( "3", settings.get( "/3/value", null ) );
-		assertEquals( "D", settings.get( "/D/value", null ) );
 	}
 
 	public void testNoProviders() {
