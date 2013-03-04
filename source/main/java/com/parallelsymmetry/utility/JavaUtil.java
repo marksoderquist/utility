@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import com.parallelsymmetry.utility.log.Log;
+
 public final class JavaUtil {
 
 	public static String getCallingClassName() {
@@ -152,6 +154,18 @@ public final class JavaUtil {
 		for( String key : keys ) {
 			System.out.println( key + " = " + properties.get( key ) );
 		}
+	}
+
+	public static void printClassLoader( Object object ) {
+		if( object instanceof Class ) {
+			Log.write( Log.TRACE, "Class loader for ", getClassName( (Class<?>)object ), ": ", ( (Class<?>)object ).getClassLoader() );
+		} else {
+			Log.write( Log.TRACE, "Class loader for ", getClassName( object.getClass() ), ": ", getClassLoader( object ) );
+		}
+	}
+
+	public static ClassLoader getClassLoader( Object object ) {
+		return object.getClass().getClassLoader();
 	}
 
 }
