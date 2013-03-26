@@ -243,12 +243,12 @@ public class OperatingSystem {
 
 	/**
 	 * Get the program data folder for the operating system. On Windows systems
-	 * this is the %APPDATA% location. On Linux systems this is $HOME.
+	 * this is the %APPDATA% location. On other systems this is $HOME.
 	 * <p>
 	 * Exapmles:
 	 * <p>
-	 * Windows 7: C:/ProgramData/<br/>
-	 * Linux: /usr/local/share/data/
+	 * Windows 7: C:\Users\&lt;username&gt;\AppData\Roaming<br/>
+	 * Linux: /home/&lt;username&gt;
 	 * 
 	 * @param vendor The vendor name to include in the path.
 	 * @param product The product name to include in the path.
