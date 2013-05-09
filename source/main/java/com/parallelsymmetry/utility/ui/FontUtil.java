@@ -42,6 +42,10 @@ public class FontUtil {
 		return font.deriveFont( findFontSizeForAscent( font, text, ascent ) );
 	}
 
+	public static Font findFontForFontHeight( Font font, double height ) {
+		return font.deriveFont( findFontSizeForFontHeight( font, height ) );
+	}
+
 	public static final Font findFontForBounds( Font font, String text, double width, double height ) {
 		float w = findFontSizeForWidth( font, text, width );
 		float h = findFontSizeForHeight( font, text, height );
@@ -76,6 +80,18 @@ public class FontUtil {
 		GlyphVector glyphsB = fontB.createGlyphVector( FONT_RENDER_CONTEXT, text );
 		Rectangle2D boundsB = glyphsB.getVisualBounds();
 		double b = -boundsB.getY();
+
+		double m = 100 / ( a - b );
+
+		return (float)( height * m );
+	}
+
+	private static final float findFontSizeForFontHeight( Font font, double height ) {
+		Font fontA = font.deriveFont( 200f );
+		double a = fontA.getMaxCharBounds( FONT_RENDER_CONTEXT ).getHeight();
+
+		Font fontB = font.deriveFont( 100f );
+		double b = fontB.getMaxCharBounds( FONT_RENDER_CONTEXT ).getHeight();
 
 		double m = 100 / ( a - b );
 

@@ -34,6 +34,18 @@ public class FontUtilTest extends TestCase {
 	}
 
 	@Test
+	public void testFindFontForAscent() {
+		Font font = FontUtil.findFontForAscent( baseFont, "M", 14 );
+		assertEquals( 19.116705f, font.getSize2D() );
+	}
+
+	@Test
+	public void testFindFontForFontHeight() {
+		Font font = FontUtil.findFontForFontHeight( baseFont, 14 );
+		assertEquals( 10.225392f, font.getSize2D() );
+	}
+
+	@Test
 	public void testFindFontForWidth() {
 		Font font = FontUtil.findFontForWidth( baseFont, "M", 14 );
 		assertEquals( 31.852116f, font.getSize2D() );
