@@ -34,27 +34,27 @@ public class FontUtilTest extends TestCase {
 	}
 
 	@Test
-	public void testFindFontForAscent() {
-		Font font = FontUtil.findFontForAscent( baseFont, "M", 14 );
-		assertEquals( 19.116705f, font.getSize2D() );
-	}
-
-	@Test
-	public void testFindFontForFontHeight() {
-		Font font = FontUtil.findFontForFontHeight( baseFont, 14 );
+	public void testFindFontByMaxHeight() {
+		Font font = FontUtil.findFontByMaxHeight( baseFont, 14 );
 		assertEquals( 10.225392f, font.getSize2D() );
 	}
 
 	@Test
-	public void testFindFontForWidth() {
-		Font font = FontUtil.findFontForWidth( baseFont, "M", 14 );
+	public void testFindFontByTextWidth() {
+		Font font = FontUtil.findFontByTextWidth( baseFont, "M", 14 );
 		assertEquals( 31.852116f, font.getSize2D() );
 	}
 
 	@Test
-	public void testFindFontForHeight() {
-		Font font = FontUtil.findFontForHeight( baseFont, "M", 14 );
+	public void testFindFontByTextHeight() {
+		Font font = FontUtil.findFontByTextHeight( baseFont, "M", 14 );
 		assertEquals( 19.116705f, font.getSize2D() );
+	}
+	
+	@Test
+	public void testFindFontByTextBounds() {
+		assertEquals( 19.116705f, FontUtil.findFontByTextBounds( baseFont, "M", 14, 14 ).getSize2D() );
+		assertEquals( 31.852116f, FontUtil.findFontByTextBounds( baseFont, "M", 14, 28 ).getSize2D() );
 	}
 
 }
