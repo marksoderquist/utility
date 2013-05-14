@@ -5,7 +5,33 @@ import java.lang.reflect.Array;
 public final class ArrayUtil {
 
 	@SuppressWarnings( "unchecked" )
-	public static <T> T[] combine( T[] a, T[] b ) {
+	public static final <T> T[] pop( T[] oldArray ) {
+		if( oldArray == null ) return null;
+
+		int size = oldArray.length - 1;
+		if( size < 0 ) return oldArray;
+
+		T[] newArray = (T[])Array.newInstance( oldArray.getClass().getComponentType(), size );
+		System.arraycopy( oldArray, 0, newArray, 0, oldArray.length - 1 );
+
+		return newArray;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public static final <T> T[] push( T[] oldArray, T element ) {
+		if( oldArray == null ) return null;
+		if( element == null ) return oldArray;
+	
+		int size = oldArray.length + 1;
+		T[] newArray = (T[])Array.newInstance( oldArray.getClass().getComponentType(), size );
+		System.arraycopy( oldArray, 0, newArray, 0, oldArray.length );
+		newArray[oldArray.length] = element;
+	
+		return newArray;
+	}
+
+	@SuppressWarnings( "unchecked" )
+	public static final <T> T[] combine( T[] a, T[] b ) {
 		if( a == null && b == null ) return null;
 		if( a == null ) return b;
 		if( b == null ) return a;

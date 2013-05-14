@@ -6,6 +6,24 @@ import org.junit.Test;
 
 public class ArrayUtilTest extends TestCase {
 
+	public void testPush() {
+		assertEquals( null, ArrayUtil.push( null, "a" ) );
+		assertEquals( new String[] { "a" }, ArrayUtil.push( new String[] { "a" }, null ) );
+
+		assertEquals( new String[] { "a" }, ArrayUtil.push( new String[] {}, "a" ) );
+		assertEquals( new String[] { "a", "b" }, ArrayUtil.push( new String[] { "a" }, "b" ) );
+		assertEquals( new String[] { "a", "b", "c" }, ArrayUtil.push( new String[] { "a", "b" }, "c" ) );
+	}
+
+	public void testPop() {
+		assertEquals( null, ArrayUtil.pop( null ) );
+		assertEquals( new String[] {}, ArrayUtil.pop( new String[] {} ) );
+
+		assertEquals( new String[] { "a", "b" }, ArrayUtil.pop( new String[] { "a", "b", "c" } ) );
+		assertEquals( new String[] { "a" }, ArrayUtil.pop( new String[] { "a", "b" } ) );
+		assertEquals( new String[] {}, ArrayUtil.pop( new String[] { "a" } ) );
+	}
+
 	public void testCombine() {
 		assertEquals( null, ArrayUtil.combine( null, null ) );
 
