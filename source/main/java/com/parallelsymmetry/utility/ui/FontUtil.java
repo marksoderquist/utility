@@ -34,12 +34,12 @@ public class FontUtil {
 		return "PLAIN";
 	}
 
-	public static final Font findFontByMaxHeight( Font font, double height ) {
-		return font.deriveFont( findFontSizeByMaxHeight( font, height ) );
-	}
-
 	public static final Rectangle2D getTextBounds( Font font, String text ) {
 		return font.createGlyphVector( FONT_RENDER_CONTEXT, text ).getVisualBounds();
+	}
+
+	public static final Font findFontByMaxHeight( Font font, double height ) {
+		return font.deriveFont( findFontSizeByMaxHeight( font, height ) );
 	}
 
 	/**
