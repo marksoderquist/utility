@@ -13,7 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -228,6 +228,11 @@ public class IconLibrary {
 	public void reset() {
 		proxies.clear();
 	}
+	
+	@Override
+	protected void finalize() {
+		reset();
+	}
 
 	private URL getIconUrl( String name ) {
 		URL url = null;
@@ -245,6 +250,7 @@ public class IconLibrary {
 	 */
 	private IconProxy getProxiedIcon( String name, int size, ImageFilter filter ) {
 		if( name == null ) name = BROKEN;
+		//name = BROKEN;
 
 		IconProxy proxy = null;
 		String key = name + ":" + size;
@@ -427,7 +433,7 @@ public class IconLibrary {
 		/**
 		 * The rendered icon.
 		 */
-		private SoftReference<ImageIcon> renderedIcon;
+		private WeakReference<ImageIcon> iconReference;
 
 		/**
 		 * Construct a <code>IconProxy</code>.
@@ -471,10 +477,10 @@ public class IconLibrary {
 		}
 
 		private Icon getRenderedIcon() {
-			ImageIcon icon = renderedIcon == null ? null : renderedIcon.get();
+			ImageIcon icon = iconReference == null ? null : iconReference.get();
 			if( icon == null ) {
 				icon = createRenderedIcon( this.icon, size, filter );
-				renderedIcon = new SoftReference<ImageIcon>( icon );
+				iconReference = new WeakReference<ImageIcon>( icon );
 			}
 			return icon;
 		}
