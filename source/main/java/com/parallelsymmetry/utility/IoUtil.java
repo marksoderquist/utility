@@ -33,13 +33,14 @@ public class IoUtil {
 	}
 
 	public static final void save( String data, OutputStream target ) throws IOException {
-		save( data, target, "UTF-8" );
+		save( data, target, TextUtil.DEFAULT_ENCODING );
 	}
 
 	public static final void save( String data, OutputStream target, String encoding ) throws IOException {
 		OutputStreamWriter writer = null;
+
 		try {
-			writer = new OutputStreamWriter( target, encoding );
+			writer = new OutputStreamWriter( target, encoding == null ? TextUtil.DEFAULT_ENCODING : encoding );
 			writer.write( data );
 		} finally {
 			if( writer != null ) writer.close();
@@ -47,7 +48,7 @@ public class IoUtil {
 	}
 
 	public static final String load( InputStream input ) throws IOException {
-		return load( input, "UTF-8" );
+		return load( input, TextUtil.DEFAULT_ENCODING );
 	}
 
 	public static final String load( InputStream input, String encoding ) throws IOException {
@@ -56,7 +57,7 @@ public class IoUtil {
 		StringWriter writer = new StringWriter();
 
 		try {
-			reader = new InputStreamReader( input, encoding );
+			reader = new InputStreamReader( input, encoding == null ? TextUtil.DEFAULT_ENCODING : encoding );
 			int read = reader.read( buffer );
 			while( read > -1 ) {
 				writer.write( buffer, 0, read );
