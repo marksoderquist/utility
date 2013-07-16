@@ -110,4 +110,33 @@ public final class Colors {
 		return Color.getHSBColor( h > 0.5 ? h - 0.5f : h + 0.5f, components[1], components[2] );
 	}
 
+	public static final Color deriveColor( Color src, float hOffset, float sOffset, float bOffset, int aOffset ) {
+		float[] tmp = Color.RGBtoHSB( src.getRed(), src.getGreen(), src.getBlue(), null );
+
+		tmp[0] = clamp( tmp[0] + hOffset );
+		tmp[1] = clamp( tmp[1] + sOffset );
+		tmp[2] = clamp( tmp[2] + bOffset );
+		int alpha = clamp( src.getAlpha() + aOffset );
+		
+		return new Color( ( Color.HSBtoRGB( tmp[0], tmp[1], tmp[2] ) & 0xFFFFFF ) | ( alpha << 24 ) );
+	}
+
+	private static float clamp( float value ) {
+		if( value < 0 ) {
+			value = 0;
+		} else if( value > 1 ) {
+			value = 1;
+		}
+		return value;
+	}
+
+	private static int clamp( int value ) {
+		if( value < 0 ) {
+			value = 0;
+		} else if( value > 255 ) {
+			value = 255;
+		}
+		return value;
+	}
+
 }
