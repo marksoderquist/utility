@@ -28,7 +28,7 @@ public final class Colors {
 		return new Color( color, true );
 	}
 
-	public static Color mix( Color color, Color mixer, double factor ) {
+	public static final Color mix( Color color, Color mixer, double factor ) {
 		if( color == null || mixer == null ) return null;
 
 		int colorR = color.getRed();
@@ -54,7 +54,20 @@ public final class Colors {
 		return new Color( r, g, b, a );
 	}
 
-	public static float getIntensity( Color color ) {
+	public static final Color derive( Color color, float hOffset, float sOffset, float bOffset, int aOffset ) {
+		if( color == null ) return null;
+		
+		float[] temp = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
+	
+		temp[0] = clamp( temp[0] + hOffset );
+		temp[1] = clamp( temp[1] + sOffset );
+		temp[2] = clamp( temp[2] + bOffset );
+		int alpha = clamp( color.getAlpha() + aOffset );
+		
+		return new Color( ( Color.HSBtoRGB( temp[0], temp[1], temp[2] ) & 0xFFFFFF ) | ( alpha << 24 ) );
+	}
+
+	public static final float getIntensity( Color color ) {
 		float[] rgb = color.getRGBColorComponents( null );
 		return ( ( ( rgb[0] + rgb[1] + rgb[2] ) / 3f ) - 0.5f ) * 2;
 	}
@@ -67,23 +80,23 @@ public final class Colors {
 	 * @param factor The shading factor.
 	 * @return
 	 */
-	public static Color getShade( Color color, double factor ) {
+	public static final Color getShade( Color color, double factor ) {
 		if( factor == 0 ) return color;
 		if( factor < -1 ) factor = -1;
 		if( factor > 1 ) factor = 1;
 		return factor < 0 ? Colors.mix( color, Color.BLACK, -factor ) : Colors.mix( color, Color.WHITE, factor );
 	}
 
-	public static Color makeOpaque( Color color ) {
+	public static final Color makeOpaque( Color color ) {
 		return new Color( color.getRGB() | 0xff000000 );
 	}
 
-	public static Color makeTransparent( Color color, double transparency ) {
+	public static final Color makeTransparent( Color color, double factor ) {
 		float[] components = color.getColorComponents( new float[4] );
-		return new Color( components[0], components[1], components[2], (float)transparency );
+		return new Color( components[0], components[1], components[2], (float)factor );
 	}
 
-	public static Color getHue( Color color ) {
+	public static final Color getHue( Color color ) {
 		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
 		return new Color( Color.HSBtoRGB( components[0], 1, 1 ) );
 	}
@@ -93,7 +106,7 @@ public final class Colors {
 	 * @param angle The color wheel angle in degrees.
 	 * @return
 	 */
-	public static Color getSecondary( Color color, double angle ) {
+	public static final Color getSecondary( Color color, double angle ) {
 		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
 
 		double factor = ( angle / 360 );
@@ -102,23 +115,12 @@ public final class Colors {
 		return Color.getHSBColor( (float)h, components[1], components[2] );
 	}
 
-	public static Color getComplement( Color color ) {
+	public static final Color getComplement( Color color ) {
 		float[] components = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
 
 		float h = components[0];
 
 		return Color.getHSBColor( h > 0.5 ? h - 0.5f : h + 0.5f, components[1], components[2] );
-	}
-
-	public static final Color deriveColor( Color src, float hOffset, float sOffset, float bOffset, int aOffset ) {
-		float[] tmp = Color.RGBtoHSB( src.getRed(), src.getGreen(), src.getBlue(), null );
-
-		tmp[0] = clamp( tmp[0] + hOffset );
-		tmp[1] = clamp( tmp[1] + sOffset );
-		tmp[2] = clamp( tmp[2] + bOffset );
-		int alpha = clamp( src.getAlpha() + aOffset );
-		
-		return new Color( ( Color.HSBtoRGB( tmp[0], tmp[1], tmp[2] ) & 0xFFFFFF ) | ( alpha << 24 ) );
 	}
 
 	private static float clamp( float value ) {
