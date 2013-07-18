@@ -2,6 +2,8 @@ package com.parallelsymmetry.utility.ui;
 
 import java.awt.Color;
 
+import javax.swing.UIManager;
+
 import com.parallelsymmetry.utility.TextUtil;
 
 public final class Colors {
@@ -54,16 +56,20 @@ public final class Colors {
 		return new Color( r, g, b, a );
 	}
 
+	public static final Color derive( String key, float hOffset, float sOffset, float bOffset, int aOffset ) {
+		return derive( UIManager.getColor( key ), hOffset, sOffset, bOffset, aOffset );
+	}
+
 	public static final Color derive( Color color, float hOffset, float sOffset, float bOffset, int aOffset ) {
 		if( color == null ) return null;
-		
+
 		float[] temp = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
-	
+
 		temp[0] = clamp( temp[0] + hOffset );
 		temp[1] = clamp( temp[1] + sOffset );
 		temp[2] = clamp( temp[2] + bOffset );
 		int alpha = clamp( color.getAlpha() + aOffset );
-		
+
 		return new Color( ( Color.HSBtoRGB( temp[0], temp[1], temp[2] ) & 0xFFFFFF ) | ( alpha << 24 ) );
 	}
 
