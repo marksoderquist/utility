@@ -2,8 +2,6 @@ package com.parallelsymmetry.utility.ui;
 
 import java.awt.Color;
 
-import com.parallelsymmetry.utility.ui.Colors;
-
 import junit.framework.TestCase;
 
 public class ColorsTest extends TestCase {
@@ -39,6 +37,10 @@ public class ColorsTest extends TestCase {
 		assertEquals( new Color( 0, 0, 0, 127 ), Colors.mix( Color.BLACK, Colors.CLEAR, 0.5 ) );
 		assertEquals( new Color( 127, 127, 127, 255 ), Colors.mix( Color.BLACK, Color.WHITE, 0.5 ) );
 		assertEquals( new Color( 63, 63, 63, 255 ), Colors.mix( Color.BLACK, Color.WHITE, 0.25 ) );
+	}
+
+	public void testDeriveWithColor() {
+		assertEquals( new Color( 116, 165, 209 ), Colors.derive( new Color( 51, 98, 140 ), 0f, -0.19f, 0.27f, 0 ) );
 	}
 
 	public void testGetIntensity() {

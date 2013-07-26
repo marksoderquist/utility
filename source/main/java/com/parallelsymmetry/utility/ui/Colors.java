@@ -75,7 +75,7 @@ public final class Colors {
 
 	public static final float getIntensity( Color color ) {
 		float[] rgb = color.getRGBColorComponents( null );
-		return ( ( ( rgb[0] + rgb[1] + rgb[2] ) / 3f ) - 0.5f ) * 2;
+		return ( ( ( rgb[0] + rgb[1] + rgb[2] ) / 3f ) - 0.5f ) * 2f;
 	}
 
 	/**
