@@ -129,6 +129,12 @@ public final class Colors {
 		return Color.getHSBColor( h > 0.5 ? h - 0.5f : h + 0.5f, components[1], components[2] );
 	}
 
+	public static final float[] getHsvOffsets( Color base, Color color ) {
+		float[] basehsv = Color.RGBtoHSB( base.getRed(), base.getGreen(), base.getBlue(), null );
+		float[] colorhsv = Color.RGBtoHSB( color.getRed(), color.getGreen(), color.getBlue(), null );
+		return new float[] { colorhsv[0] - basehsv[0], colorhsv[1] - basehsv[1], colorhsv[2] - basehsv[2] };
+	}
+
 	private static float clamp( float value ) {
 		if( value < 0 ) {
 			value = 0;

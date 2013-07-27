@@ -119,4 +119,12 @@ public class ColorsTest extends TestCase {
 		assertEquals( Color.decode( "#ff00ff" ), Colors.getComplement( Color.decode( "#00ff00" ) ) );
 		assertEquals( Color.decode( "#ffff00" ), Colors.getComplement( Color.decode( "#0000ff" ) ) );
 	}
+
+	public void testGetHsvOffsets() {
+		float[] offsets = Colors.getHsvOffsets( new Color( 51, 98, 140 ), new Color( 116, 165, 209 ) );
+		assertEquals( 2.014041E-4f, offsets[0] );
+		assertEquals( -0.1907382f, offsets[1] );
+		assertEquals( 0.27058822f, offsets[2] );
+	}
+	
 }
