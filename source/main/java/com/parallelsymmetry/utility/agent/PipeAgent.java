@@ -160,6 +160,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 			try {
 				if( connected ) internalDisconnect();
 				internalConnect();
+				Log.write( Log.TRACE, getName(), " reconnected." );
 				break;
 			} catch( Exception exception ) {
 				if( start && ( connectOnce || stopOnConnectException ) ) {
@@ -172,7 +173,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 				}
 			}
 		}
-		Log.write( Log.TRACE, getName(), " reconnected." );
+		if( attempts > 0 && attempt >= attempts ) Log.write( Log.WARN, "Max reconnect attempts exhausted: ", attempt );
 	}
 
 	private final void internalConnect() throws Exception {
