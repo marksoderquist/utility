@@ -15,13 +15,13 @@ public class ExceptionCountingAgent extends CountingAgent {
 	@Override
 	protected void startAgent() throws Exception {
 		super.startAgent();
-		if( failStart ) throw new Exception( "Test exception during startAgent()." );
+		if( failStart ) throw new RuntimeException( "Test exception during startAgent()." );
 	}
 
 	@Override
 	protected void stopAgent() throws Exception {
 		super.stopAgent();
-		if( failStop ) throw new Exception( "Test exception during stopAgent()." );
+		if( failStop ) throw new RuntimeException( "Test exception during stopAgent()." );
 	}
 
 }

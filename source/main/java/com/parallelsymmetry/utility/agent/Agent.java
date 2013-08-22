@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.parallelsymmetry.utility.Controllable;
 import com.parallelsymmetry.utility.log.Log;
@@ -16,29 +18,28 @@ public abstract class Agent implements Controllable {
 
 	private String name;
 
-	private Thread thread;
-
+	// Values locks and conditions for managing the state.
 	private State state = State.STOPPED;
 
+	private ReentrantLock stateLock = new ReentrantLock();
+
+	private Condition stateChanging = stateLock.newCondition();
+
+	// Values locks and conditions for managing transitions.
+	private boolean transitionFlag;
+
+	private ReentrantLock transitionLock = new ReentrantLock();
+
+	private Condition transitionRunning = transitionLock.newCondition();
+
+	// The agent listener collection.
 	private Set<AgentListener> listeners = new HashSet<AgentListener>();
-
-	private Object statelock = new Object();
-
-	private Object operationLock = new Object();
-
-	private boolean startingFlag;
-
-	private boolean stoppingFlag;
 
 	protected Agent() {
 		this( null );
 	}
 
 	protected Agent( String name ) {
-		thread = new Thread( new AgentRunner() );
-		thread.setPriority( Thread.NORM_PRIORITY );
-		thread.setDaemon( true );
-		thread.start();
 		setName( name );
 	}
 
@@ -48,7 +49,6 @@ public abstract class Agent implements Controllable {
 
 	public void setName( String name ) {
 		this.name = name == null ? getClass().getSimpleName() : name;
-		thread.setName( "Agent - " + this.name );
 	}
 
 	/**
@@ -68,15 +68,23 @@ public abstract class Agent implements Controllable {
 	 */
 	@Override
 	public final void start() {
-		synchronized( operationLock ) {
+		transitionLock.lock();
+		try {
 			if( state != State.STOPPED ) return;
 
 			// Set the starting flag to synchronize with external callers.
-			startingFlag = true;
-			operationLock.notifyAll();
+			transitionFlag = true;
+			transitionRunning.signalAll();
 
-			// Change the state so the agent thread can start the agent.
+			// Change the state to starting before running the start task.
 			changeState( State.STARTING );
+
+			// Run the start task on a separate thread.
+			Thread thread = new Thread( new StartTransition() );
+			thread.setPriority( Thread.NORM_PRIORITY + 2 );
+			thread.start();
+		} finally {
+			transitionLock.unlock();
 		}
 	}
 
@@ -104,9 +112,12 @@ public abstract class Agent implements Controllable {
 	 */
 	@Override
 	public final void startAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
-		synchronized( operationLock ) {
+		transitionLock.lock();
+		try {
 			start();
 			waitForStartup( timeout, unit );
+		} finally {
+			transitionLock.unlock();
 		}
 	}
 
@@ -116,15 +127,23 @@ public abstract class Agent implements Controllable {
 	 */
 	@Override
 	public final void stop() {
-		synchronized( operationLock ) {
+		transitionLock.lock();
+		try {
 			if( state != State.STARTED ) return;
 
 			// Set the stopping flag to synchronize with external callers.
-			stoppingFlag = true;
-			operationLock.notifyAll();
+			transitionFlag = true;
+			transitionRunning.signalAll();
 
-			// Change the state so the agent thread can stop the agent.
+			// Change the state to stopping before running the stop task.
 			changeState( State.STOPPING );
+
+			// Run the stop task on a separate thread.
+			Thread thread = new Thread( new StopTransition() );
+			thread.setPriority( Thread.NORM_PRIORITY + 2 );
+			thread.start();
+		} finally {
+			transitionLock.unlock();
 		}
 	}
 
@@ -151,9 +170,12 @@ public abstract class Agent implements Controllable {
 	 */
 	@Override
 	public final void stopAndWait( long timeout, TimeUnit unit ) throws InterruptedException {
-		synchronized( operationLock ) {
+		transitionLock.lock();
+		try {
 			stop();
 			waitForShutdown( timeout, unit );
+		} finally {
+			transitionLock.unlock();
 		}
 	}
 
@@ -175,19 +197,17 @@ public abstract class Agent implements Controllable {
 	 */
 	@Override
 	public final void restart( long timeout, TimeUnit unit ) throws InterruptedException {
-		synchronized( operationLock ) {
-			startingFlag = true;
-			stoppingFlag = true;
-			operationLock.notifyAll();
+		transitionLock.lock();
+		try {
+			transitionFlag = true;
+			transitionRunning.signalAll();
 
 			// Don't use start() and stop() because they are asynchronous.
 			stopAndWait( timeout / 2, unit );
 			startAndWait( timeout / 2, unit );
+		} finally {
+			transitionLock.unlock();
 		}
-	}
-
-	public final boolean isAgentThread() {
-		return Thread.currentThread() == thread;
 	}
 
 	public final boolean shouldExecute() {
@@ -221,10 +241,13 @@ public abstract class Agent implements Controllable {
 	 * @throws InterruptedException
 	 */
 	public final void waitForStartup( long timeout, TimeUnit unit ) throws InterruptedException {
-		synchronized( operationLock ) {
-			while( startingFlag ) {
-				operationLock.wait( unit.convert( timeout, unit ) );
+		transitionLock.lock();
+		try {
+			while( transitionFlag ) {
+				transitionRunning.await( timeout, unit );
 			}
+		} finally {
+			transitionLock.unlock();
 		}
 	}
 
@@ -246,10 +269,13 @@ public abstract class Agent implements Controllable {
 	 * @throws InterruptedException
 	 */
 	public final void waitForShutdown( long timeout, TimeUnit unit ) throws InterruptedException {
-		synchronized( operationLock ) {
-			while( stoppingFlag ) {
-				operationLock.wait( unit.convert( timeout, unit ) );
+		transitionLock.lock();
+		try {
+			while( transitionFlag ) {
+				transitionRunning.await( timeout, unit );
 			}
+		} finally {
+			transitionLock.unlock();
 		}
 	}
 
@@ -310,11 +336,16 @@ public abstract class Agent implements Controllable {
 				shutdown();
 			} catch( Throwable stopThrowable ) {
 				Log.write( stopThrowable );
+			} finally {
+				changeState( State.STOPPED );
 			}
 		} finally {
-			synchronized( operationLock ) {
-				startingFlag = false;
-				operationLock.notifyAll();
+			transitionLock.lock();
+			try {
+				transitionFlag = false;
+				transitionRunning.signalAll();
+			} finally {
+				transitionLock.unlock();
 			}
 		}
 	}
@@ -331,9 +362,12 @@ public abstract class Agent implements Controllable {
 			changeState( State.STARTED );
 			Log.write( throwable );
 		} finally {
-			synchronized( operationLock ) {
-				stoppingFlag = false;
-				operationLock.notifyAll();
+			transitionLock.lock();
+			try {
+				transitionFlag = false;
+				transitionRunning.signalAll();
+			} finally {
+				transitionLock.unlock();
 			}
 		}
 	}
@@ -341,72 +375,29 @@ public abstract class Agent implements Controllable {
 	private final void changeState( State state ) {
 		if( this.state == state ) return;
 
-		synchronized( statelock ) {
+		stateLock.lock();
+		try {
 			this.state = state;
-			statelock.notifyAll();
+			stateChanging.signalAll();
+		} finally {
+			stateLock.unlock();
 		}
 
 		fireEvent( state );
 	}
 
-	private final void waitForState( State state ) throws InterruptedException {
-		waitForState( state, 0 );
-	}
+	private final class StartTransition implements Runnable {
 
-	private final void waitForState( State state, int timeout ) throws InterruptedException {
-		synchronized( statelock ) {
-			//Log.write( Log.TRACE, "Waiting for " + state + "..." );
-			long mark = System.currentTimeMillis();
-			while( this.state != state ) {
-				statelock.wait( timeout );
-				if( timeout > 0 && System.currentTimeMillis() - mark > timeout ) return;
-			}
-		}
-	}
-
-	private final void waitForStateChange( State state ) throws InterruptedException {
-		waitForStateChange( state, 0 );
-	}
-
-	private final void waitForStateChange( State state, int timeout ) throws InterruptedException {
-		synchronized( statelock ) {
-			long mark = System.currentTimeMillis();
-			while( this.state == state ) {
-				statelock.wait( timeout );
-				if( timeout > 0 && System.currentTimeMillis() - mark > timeout ) return;
-			}
-		}
-	}
-
-	private final class AgentRunner implements Runnable {
-
-		/**
-		 * The implementation of the Runnable interface.
-		 */
-		@Override
 		public void run() {
-			try {
-				while( true ) {
-					switch( getState() ) {
-						case STOPPED:
-						case STARTING: {
-							waitForState( State.STARTING );
-							startup();
-							waitForStateChange( State.STARTING );
-							break;
-						}
-						case STARTED:
-						case STOPPING: {
-							waitForState( State.STOPPING );
-							shutdown();
-							waitForStateChange( State.STOPPING );
-							break;
-						}
-					}
-				}
-			} catch( InterruptedException exception ) {
-				Log.write( Log.ERROR, exception, "AgentRunner terminated." );
-			}
+			startup();
+		}
+
+	}
+
+	private final class StopTransition implements Runnable {
+
+		public void run() {
+			shutdown();
 		}
 
 	}

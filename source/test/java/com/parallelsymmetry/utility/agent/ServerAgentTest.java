@@ -4,27 +4,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
-
-import com.parallelsymmetry.utility.agent.ServerAgent;
-import com.parallelsymmetry.utility.agent.SocketAgent;
+import com.parallelsymmetry.utility.BaseTestCase;
 import com.parallelsymmetry.utility.log.Log;
 
-public class ServerAgentTest extends TestCase {
+public class ServerAgentTest extends BaseTestCase {
 
 	private static final int PORT = 51427;
 	
 	private static final int TIMEOUT = 1000;
-
-	@Override
-	public void setUp() {
-		Log.setLevel( Log.INFO );
-	}
-
-	@Override
-	public void tearDown() {
-		Log.setLevel( null );
-	}
 
 	public void testStartStop() throws Exception {
 		ServerAgent server = new ServerAgent();

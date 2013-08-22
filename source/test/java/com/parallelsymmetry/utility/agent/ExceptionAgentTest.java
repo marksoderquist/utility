@@ -1,10 +1,8 @@
 package com.parallelsymmetry.utility.agent;
 
-import com.parallelsymmetry.utility.agent.Agent;
+import com.parallelsymmetry.utility.BaseTestCase;
 
-import junit.framework.TestCase;
-
-public class ExceptionAgentTest extends TestCase {
+public class ExceptionAgentTest extends BaseTestCase {
 
 	public void testStartFailure() throws Exception {
 		//Log.write( "testStartFailure()..." );

@@ -16,7 +16,7 @@ public abstract class AgentTestCase extends TestCase {
 
 	@Override
 	public void tearDown() {
-		Log.setLevel( null );
+		Log.setLevel( Log.NONE );
 	}
 
 	public void testStartAndStop() throws Exception {
