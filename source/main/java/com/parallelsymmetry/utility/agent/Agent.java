@@ -223,7 +223,7 @@ public abstract class Agent implements Controllable {
 	public final void waitForStartup( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			while( startingFlag ) {
-				operationLock.wait( timeout );
+				operationLock.wait( unit.convert( timeout, unit ) );
 			}
 		}
 	}
@@ -248,7 +248,7 @@ public abstract class Agent implements Controllable {
 	public final void waitForShutdown( long timeout, TimeUnit unit ) throws InterruptedException {
 		synchronized( operationLock ) {
 			while( stoppingFlag ) {
-				operationLock.wait( timeout );
+				operationLock.wait( unit.convert( timeout, unit ) );
 			}
 		}
 	}

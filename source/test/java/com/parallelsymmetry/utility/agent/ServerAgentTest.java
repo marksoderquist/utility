@@ -2,6 +2,7 @@ package com.parallelsymmetry.utility.agent;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -11,11 +12,13 @@ import com.parallelsymmetry.utility.log.Log;
 
 public class ServerAgentTest extends TestCase {
 
-	private static final int PORT = 23423;
+	private static final int PORT = 51427;
+	
+	private static final int TIMEOUT = 1000;
 
 	@Override
 	public void setUp() {
-		Log.setLevel( Log.NONE );
+		Log.setLevel( Log.INFO );
 	}
 
 	@Override
@@ -25,50 +28,50 @@ public class ServerAgentTest extends TestCase {
 
 	public void testStartStop() throws Exception {
 		ServerAgent server = new ServerAgent();
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", server.isRunning() );
 		int localPort = server.getLocalPort();
 		assertTrue( "Server port should be greater than zero: " + localPort, localPort > 0 );
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", server.isRunning() );
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", server.isRunning() );
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", server.isRunning() );
 	}
 
 	public void testStartStopWithPort() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", server.isRunning() );
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", server.isRunning() );
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", server.isRunning() );
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", server.isRunning() );
 	}
 
 	public void testConnect() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 
 		SocketAgent agent = new SocketAgent( server.getLocalPort() );
 		assertFalse( "Server should not be running.", agent.isRunning() );
-		agent.startAndWait();
+		agent.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", agent.isRunning() );
 
-		agent.stopAndWait();
+		agent.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", agent.isRunning() );
 
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", server.isRunning() );
 	}
 
 	public void testRestart() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
 		assertFalse( "Server should not be running.", server.isRunning() );
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", server.isRunning() );
 
 		server.restart();
@@ -83,27 +86,27 @@ public class ServerAgentTest extends TestCase {
 		server.restart();
 		assertTrue( "Server is not running.", server.isRunning() );
 
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", server.isRunning() );
 	}
 
 	public void testWrite() throws Exception {
 		MockServer server = new MockServer( PORT );
-		server.startAndWait();
+		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 
 		SocketAgent agent = new SocketAgent( server.getLocalPort() );
 		assertFalse( "Server should not be running.", agent.isRunning() );
-		agent.startAndWait();
+		agent.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertTrue( "Server is not running.", agent.isRunning() );
 
 		String message = "Test message.";
 		agent.getOutputStream().write( message.getBytes( Charset.forName( "US-ASCII" ) ) );
 		assertEquals( "Incorrect message.", message, server.getMessage( message.length() ) );
 
-		agent.stopAndWait();
+		agent.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 		assertFalse( "Server is not stopped.", agent.isRunning() );
 
-		server.stopAndWait();
+		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 	}
 
 	private static final class MockServer extends ServerAgent {
