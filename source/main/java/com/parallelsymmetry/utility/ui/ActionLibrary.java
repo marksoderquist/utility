@@ -33,6 +33,7 @@ public class ActionLibrary {
 		actionsByAccelerator = new ConcurrentHashMap<String, XAction>();
 
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		// FIXME The following line is causing a memory leak.
 		manager.addKeyEventPostProcessor( new ActionAcceleratorWatcher( this ) );
 	}
 
