@@ -4,7 +4,7 @@ import com.parallelsymmetry.utility.log.Log;
 
 import junit.framework.TestCase;
 
-public class BaseTestCase extends TestCase {
+public abstract class BaseTestCase extends TestCase {
 
 	public BaseTestCase() {}
 
