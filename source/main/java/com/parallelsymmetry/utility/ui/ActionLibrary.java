@@ -1,6 +1,5 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.KeyboardFocusManager;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -31,10 +30,6 @@ public class ActionLibrary {
 		this.bundlePath = bundlePath;
 		actions = new ConcurrentHashMap<String, XAction>();
 		actionsByAccelerator = new ConcurrentHashMap<String, XAction>();
-
-		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		// FIXME The following line is causing a memory leak.
-		manager.addKeyEventPostProcessor( new ActionAcceleratorWatcher( this ) );
 	}
 
 	public XAction getAction( String key ) {
