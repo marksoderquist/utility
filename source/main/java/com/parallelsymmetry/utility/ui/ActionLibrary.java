@@ -43,12 +43,12 @@ public class ActionLibrary {
 		return action;
 	}
 
-	public XAction getActionByAccelerator( String accelerator ) {
-		return actionsByAccelerator.get( accelerator );
-	}
-
 	public Set<String> getAccelerators() {
 		return Collections.unmodifiableSet( actionsByAccelerator.keySet() );
+	}
+
+	public XAction getActionByAccelerator( String accelerator ) {
+		return actionsByAccelerator.get( accelerator );
 	}
 
 	/**
@@ -62,8 +62,9 @@ public class ActionLibrary {
 		XAction action = actions.get( key );
 		if( action != null ) return action;
 
+		// The following six lines should match refresh().
 		String name = Bundles.getString( bundlePath, key );
-		String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", "-1", false );
+		String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", String.valueOf( XAction.NONE ), false );
 		String accelerator = Bundles.getString( bundlePath, key + ".accelerator", false );
 		String display = Bundles.getString( bundlePath, key + ".display", false );
 		String icon = Bundles.getString( bundlePath, key + ".icon", false );
@@ -104,11 +105,13 @@ public class ActionLibrary {
 	public void refresh() {
 		// Go through the actions and change the names, accelerators, etc.
 		for( String key : actions.keySet() ) {
+			// The following six lines should match addAction().
 			String name = Bundles.getString( bundlePath, key );
-			String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", "-1", false );
+			String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", String.valueOf( XAction.NONE ), false );
 			String accelerator = Bundles.getString( bundlePath, key + ".accelerator", false );
 			String display = Bundles.getString( bundlePath, key + ".display", false );
 			String icon = Bundles.getString( bundlePath, key + ".icon", false );
+			if( name == null ) name = key;
 
 			actions.get( key ).setValues( name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), accelerator, display );
 		}

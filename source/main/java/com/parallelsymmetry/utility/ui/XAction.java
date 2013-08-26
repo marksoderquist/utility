@@ -79,15 +79,15 @@ public class XAction extends AbstractAction {
 		putValue( Action.SHORT_DESCRIPTION, name );
 
 		int mnemonicKey = -1;
-		if( mnemonic > -1 && mnemonic < name.length() ) {
+		if( mnemonic > NONE && mnemonic < name.length() ) {
 			char mnemonicChar = name.charAt( mnemonic );
 			mnemonicKey = getMnemonicKey( mnemonicChar );
 		}
 
 		// Set the mnemonic value.
 		if( mnemonic != NONE ) {
-			putValue( MNEMONIC_KEY, mnemonicKey );
-			putValue( DISPLAYED_MNEMONIC_INDEX_KEY, mnemonic );
+			putValue( Action.MNEMONIC_KEY, mnemonicKey );
+			putValue( Action.DISPLAYED_MNEMONIC_INDEX_KEY, mnemonic );
 		}
 
 		// Set the accelerator sequence value.
