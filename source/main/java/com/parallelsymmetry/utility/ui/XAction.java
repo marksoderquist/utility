@@ -78,7 +78,7 @@ public class XAction extends AbstractAction {
 		putValue( Action.SMALL_ICON, icon );
 		putValue( Action.SHORT_DESCRIPTION, name );
 
-		int mnemonicKey = -1;
+		Integer mnemonicKey = null;
 		if( mnemonic > NONE && mnemonic < name.length() ) {
 			char mnemonicChar = name.charAt( mnemonic );
 			mnemonicKey = getMnemonicKey( mnemonicChar );
