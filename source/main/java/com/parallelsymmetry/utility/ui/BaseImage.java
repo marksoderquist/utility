@@ -497,6 +497,16 @@ public abstract class BaseImage {
 			super( type );
 		}
 
+		/**
+		 * @param x The X coordinate of the arc's bounding rectangle.
+		 * @param y The Y coordinate of the arc's bounding rectangle.
+		 * @param w The width of the arc's bounding rectangle.
+		 * @param h The height of the arc's bounding rectangle.
+		 * @param start The starting angle of the arc in degrees.
+		 * @param extent The angular extent of the arc in degrees.
+		 * @param type The closure type for the arc: {@link #OPEN}, {@link #CHORD},
+		 *          or {@link #PIE}.
+		 */
 		public Arc( double x, double y, double w, double h, double start, double extent, int type ) {
 			super( x, y, w, h, start, extent, type );
 		}
