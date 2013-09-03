@@ -336,11 +336,9 @@ public abstract class BaseImage {
 		this.colorMode = mode;
 	}
 
-	protected Path getDot( double x, double y ) {
-		double offset = 0.5 * DEFAULT_OUTLINE_SIZE;
-		Path path = new Path();
-		path.append( new Ellipse( x - offset, y - offset, offset * 2, offset * 2 ), false );
-		return path;
+	protected Shape getDot( double x, double y ) {
+		double offset = DEFAULT_OUTLINE_SIZE;
+		return new Ellipse( x - offset, y - offset, offset * 2, offset * 2 );
 	}
 
 	protected Ellipse getCenteredCircle( double cx, double cy, double r ) {
@@ -370,10 +368,10 @@ public abstract class BaseImage {
 		double w = rx * 2;
 		double h = ry * 2;
 
-		double extents = end - start;
-		if( extents < 0 ) extents += 360;
+		double extent = end - start;
+		if( extent < 0 ) extent += 360;
 
-		return new Arc( x, y, w, h, start, extents, type );
+		return new Arc( x, y, w, h, start, extent, type );
 	}
 
 	protected Arc getDirectedArc( double cx, double cy, double radius, double start, double extents, int type ) {
