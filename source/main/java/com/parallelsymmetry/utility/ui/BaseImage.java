@@ -336,8 +336,12 @@ public abstract class BaseImage {
 		this.colorMode = mode;
 	}
 
+	protected Shape getDot( Point point ) {
+		return getDot( point.getX(), point.getY() );
+	}
+
 	protected Shape getDot( double x, double y ) {
-		double offset = DEFAULT_OUTLINE_SIZE;
+		double offset = 0.5 * DEFAULT_OUTLINE_SIZE;
 		return new Ellipse( x - offset, y - offset, offset * 2, offset * 2 );
 	}
 
