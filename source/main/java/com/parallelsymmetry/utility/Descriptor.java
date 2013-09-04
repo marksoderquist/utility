@@ -69,7 +69,7 @@ public class Descriptor {
 	}
 
 	public Descriptor( InputStream input ) throws IOException {
-		if( input == null ) return;
+		if( input == null ) throw new NullPointerException( "Input stream cannot be null.");
 		try {
 			node = XmlUtil.loadXmlDocument( input );
 		} catch( SAXException exception ) {
