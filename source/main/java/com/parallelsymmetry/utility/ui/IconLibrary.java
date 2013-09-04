@@ -254,8 +254,6 @@ public class IconLibrary {
 		IconProxy proxy = null;
 		String key = name + ":" + size;
 
-		// NEXT A - Icon cache not working. Icon renderer is always called.
-
 		// Get a proxy from the cache.
 		proxy = proxies.get( key );
 		if( proxy != null ) return proxy;
