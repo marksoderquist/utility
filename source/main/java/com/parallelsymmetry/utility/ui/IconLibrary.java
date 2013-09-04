@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -228,7 +227,7 @@ public class IconLibrary {
 	public void reset() {
 		proxies.clear();
 	}
-	
+
 	@Override
 	protected void finalize() {
 		reset();
@@ -256,7 +255,7 @@ public class IconLibrary {
 		String key = name + ":" + size;
 
 		// NEXT A - Icon cache not working. Icon renderer is always called.
-		
+
 		// Get a proxy from the cache.
 		proxy = proxies.get( key );
 		if( proxy != null ) return proxy;
@@ -435,7 +434,8 @@ public class IconLibrary {
 		/**
 		 * The rendered icon.
 		 */
-		private WeakReference<ImageIcon> iconReference;
+
+		private ImageIcon renderedIcon;
 
 		/**
 		 * Construct a <code>IconProxy</code>.
@@ -479,10 +479,10 @@ public class IconLibrary {
 		}
 
 		private Icon getRenderedIcon() {
-			ImageIcon icon = iconReference == null ? null : iconReference.get();
+			ImageIcon icon = renderedIcon;
 			if( icon == null ) {
 				icon = createRenderedIcon( this.icon, size, filter );
-				iconReference = new WeakReference<ImageIcon>( icon );
+				renderedIcon = icon;
 			}
 			return icon;
 		}

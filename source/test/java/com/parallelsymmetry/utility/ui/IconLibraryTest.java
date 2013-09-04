@@ -1,6 +1,8 @@
 package com.parallelsymmetry.utility.ui;
 
+import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.net.URI;
@@ -75,6 +77,38 @@ public class IconLibraryTest extends TestCase {
 		Image target = Icons.getImage( icon );
 
 		assertEquals( "964e85e8361583ce5b2f6bf2b334a479085b38d6", HashUtil.hash( Images.getArrayFromImage( target ) ) );
+	}
+
+	public void testIconCache() throws Exception {
+		TestIcon renderer = new TestIcon();
+		library.putIcon( "test", renderer );
+		assertEquals( 0, renderer.getRenderCalledCount() );
+
+		BufferedImage image = new BufferedImage( 16, 16, BufferedImage.TYPE_4BYTE_ABGR );
+		Graphics graphics = image.getGraphics();
+		assertNotNull( graphics );
+
+		Icon icon = library.getIcon( "test" );
+		icon.paintIcon( null, graphics, 0, 0 );
+		assertEquals( 1, renderer.getRenderCalledCount() );
+		
+		icon.paintIcon( null, graphics, 0, 0 );
+		assertEquals( 1, renderer.getRenderCalledCount() );
+	}
+
+	private static class TestIcon extends BaseIcon {
+
+		private int renderCalledCount;
+
+		@Override
+		public void render() {
+			renderCalledCount++;
+		}
+
+		public int getRenderCalledCount() {
+			return renderCalledCount;
+		}
+
 	}
 
 }
