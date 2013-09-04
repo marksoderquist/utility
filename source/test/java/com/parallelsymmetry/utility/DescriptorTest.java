@@ -28,10 +28,14 @@ public class DescriptorTest extends TestCase {
 	}
 
 	public void testConstructorWithNullStream() throws Exception {
-		Descriptor descriptor = new Descriptor( (InputStream)null );
-		assertNotNull( descriptor );
-		assertNotNull( descriptor.getPaths() );
-		assertEquals( 0, descriptor.getPaths().size() );
+		Descriptor descriptor = null;
+		try {
+			descriptor = new Descriptor( (InputStream)null );
+			fail( "Descriptor constructor should not allow null streams." );
+		} catch( NullPointerException exception ) {
+			// Intentionally ignore exception.
+		}
+		assertNull( descriptor );
 	}
 
 	public void testConstructorWithNode() throws Exception {
