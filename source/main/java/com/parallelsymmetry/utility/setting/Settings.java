@@ -1,10 +1,12 @@
 package com.parallelsymmetry.utility.setting;
 
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -792,15 +794,53 @@ public class Settings {
 		}
 	}
 
-	public void print( PrintStream stream ) {
-		print( this, stream );
+	public String toStringPaths() {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( buffer );
+		printAsPaths( this, stream );
+		return buffer.toString();
 	}
 
-	public static void print( Settings settings, PrintStream stream ) {
-		print( settings, stream, 0 );
+	public String toStringXml() {
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( buffer );
+		printAsXml( this, stream );
+		return buffer.toString();
 	}
 
-	private static void print( Settings settings, PrintStream stream, int level ) {
+	public void printAsPaths( PrintStream stream ) {
+		printAsPaths( this, stream );
+	}
+
+	public void printAsXml( PrintStream stream ) {
+		printAsXml( this, stream );
+	}
+
+	public static void printAsPaths( Settings settings, PrintStream stream ) {
+		String path = settings.getPath();
+		List<String> keys = new ArrayList<String>( settings.getKeys() );
+		Set<Settings> children = settings.getChildNodes();
+
+		Collections.sort( keys );
+
+		for( String key : keys ) {
+			if( !"/".equals( path ) ) stream.append( path );
+			stream.append( "/" );
+			stream.append( key );
+			stream.append( "=" );
+			stream.append( settings.get( key, null ) );
+			stream.append( "\n" );
+		}
+		for( Settings child : children ) {
+			printAsPaths( child, stream );
+		}
+	}
+
+	public static void printAsXml( Settings settings, PrintStream stream ) {
+		printAsXml( settings, stream, 0 );
+	}
+
+	private static void printAsXml( Settings settings, PrintStream stream, int level ) {
 		String name = settings.getName();
 		Set<String> keys = settings.getKeys();
 		Set<Settings> children = settings.getChildNodes();
@@ -820,15 +860,15 @@ public class Settings {
 				stream.append( valueIndent );
 				stream.append( "<" );
 				stream.append( key );
-				stream.append( ">");
-				stream.append(settings.get( key, null ));
+				stream.append( ">" );
+				stream.append( settings.get( key, null ) );
 				stream.append( "</" );
 				stream.append( key );
 				stream.append( ">\n" );
 			}
 
 			for( Settings child : children ) {
-				print( child, stream, level + 1 );
+				printAsXml( child, stream, level + 1 );
 			}
 
 			stream.append( indent );

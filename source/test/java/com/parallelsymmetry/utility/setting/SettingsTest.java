@@ -688,30 +688,111 @@ public class SettingsTest extends TestCase {
 		assertEquals( "setting", Settings.getSettingKey( "/path/to/setting" ) );
 	}
 
-	public void testPrint() {
+	public void testToStringPaths() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
 		providerD.set( "/z/b", "B" );
-		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
+		providerD.set( "/y/a", "A" );
+		providerD.set( "/y/b", "B" );
+		String expected = "/a=A\n/b=B\n/y/a=A\n/y/b=B\n/z/a=A\n/z/b=B\n";
+
+		assertEquals( expected, settings.toStringPaths() );
+	}
+
+	public void testToStringXml() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		providerD.set( "/y/a", "A" );
+		providerD.set( "/y/b", "B" );
+		String expected = "<settings>\n"
+			+ "  <b>B</b>\n"
+			+ "  <a>A</a>\n"
+			+ "  <y>\n"
+			+ "    <b>B</b>\n"
+			+ "    <a>A</a>\n"
+			+ "  </y>\n"
+			+ "  <z>\n"
+			+ "    <b>B</b>\n"
+			+ "    <a>A</a>\n"
+			+ "  </z>\n"
+			+ "</settings>\n";
+
+		assertEquals( expected, settings.toStringXml() );
+	}
+
+	public void testPrintAsPaths() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		providerD.set( "/y/a", "A" );
+		providerD.set( "/y/b", "B" );
+		String expected = "/a=A\n/b=B\n/y/a=A\n/y/b=B\n/z/a=A\n/z/b=B\n";
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
-		settings.print( stream );
+		settings.printAsPaths( stream );
 
 		assertEquals( expected, buffer.toString() );
 	}
 
-	public void testPrintUsingStaticPrint() {
+	public void testPrintAsPathsStatc() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
 		providerD.set( "/z/b", "B" );
-		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
+		providerD.set( "/y/a", "A" );
+		providerD.set( "/y/b", "B" );
+		String expected = "/a=A\n/b=B\n/y/a=A\n/y/b=B\n/z/a=A\n/z/b=B\n";
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
-		Settings.print( settings, stream );
+		Settings.printAsPaths( settings, stream );
+
+		assertEquals( expected, buffer.toString() );
+	}
+
+	public void testPrintAsXml() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		String expected = "<settings>\n"
+			+ "  <b>B</b>\n"
+			+ "  <a>A</a>\n"
+			+ "  <z>\n"
+			+ "    <b>B</b>\n"
+			+ "    <a>A</a>\n"
+			+ "  </z>\n"
+			+ "</settings>\n";
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( buffer );
+		settings.printAsXml( stream );
+
+		assertEquals( expected, buffer.toString() );
+	}
+
+	public void testPrintAsXmlStatic() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		String expected = "<settings>\n"
+			+ "  <b>B</b>\n"
+			+ "  <a>A</a>\n"
+			+ "  <z>\n"
+			+ "    <b>B</b>\n"
+			+ "    <a>A</a>\n"
+			+ "  </z>\n"
+			+ "</settings>\n";
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( buffer );
+		Settings.printAsXml( settings, stream );
 
 		assertEquals( expected, buffer.toString() );
 	}
