@@ -2,6 +2,7 @@ package com.parallelsymmetry.utility.setting;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -103,11 +104,15 @@ public class MapSettingProvider implements WritableSettingProvider {
 		return store.toString();
 	}
 
+	public Map<String, String> getStore() {
+		return new HashMap<String, String>( store );
+	}
+
 	public void show() {
 		List<String> keys = new ArrayList<String>( store.keySet() );
 		Collections.sort( keys );
 		for( String key : keys ) {
-			System.out.println( "Key: " + key + "  Value: " + store.get( key ) );
+			System.out.println( key + "=" + store.get( key ) );
 		}
 	}
 
