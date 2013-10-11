@@ -1,6 +1,8 @@
 package com.parallelsymmetry.utility.setting;
 
 import java.awt.Color;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -122,7 +124,7 @@ public class SettingsTest extends TestCase {
 
 	public void testMounts() {
 		settings.setDefaultProvider( providerD );
-		
+
 		// Do not set a provider for path /1, just use the defaults.
 		settings.addProvider( provider2, "/2" );
 		settings.addProvider( provider3, "/3" );
@@ -684,6 +686,34 @@ public class SettingsTest extends TestCase {
 	public void testGetSettingKey() {
 		assertEquals( null, Settings.getSettingKey( "/" ) );
 		assertEquals( "setting", Settings.getSettingKey( "/path/to/setting" ) );
+	}
+
+	public void testPrint() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( buffer );
+		settings.print( stream );
+
+		assertEquals( expected, buffer.toString() );
+	}
+
+	public void testPrintUsingStaticPrint() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream stream = new PrintStream( buffer );
+		Settings.print( settings, stream );
+
+		assertEquals( expected, buffer.toString() );
 	}
 
 	protected void showProviderData( Settings settings ) {

@@ -1,6 +1,7 @@
 package com.parallelsymmetry.utility.setting;
 
 import java.awt.Color;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -586,6 +587,8 @@ public class Settings {
 		}
 	}
 
+	// FIXME Clean up deprecated methods.
+
 	@Deprecated
 	@SuppressWarnings( "unchecked" )
 	public <T extends Persistent> List<T> getList( String path, List<T> defaultList ) {
@@ -786,6 +789,52 @@ public class Settings {
 			Set<SettingListener> listeners = root.listeners.get( full );
 			listeners.remove( listener );
 			if( listeners.size() == 0 ) root.listeners.remove( full );
+		}
+	}
+
+	public void print( PrintStream stream ) {
+		print( this, stream );
+	}
+
+	public static void print( Settings settings, PrintStream stream ) {
+		print( settings, stream, 0 );
+	}
+
+	private static void print( Settings settings, PrintStream stream, int level ) {
+		String name = settings.getName();
+		Set<String> keys = settings.getKeys();
+		Set<Settings> children = settings.getChildNodes();
+		String indent = TextUtil.pad( 2 * level );
+		String valueIndent = TextUtil.pad( 2 * ( level + 1 ) );
+		int valueCount = keys.size() + children.size();
+
+		stream.append( indent );
+		stream.append( "<" );
+		stream.append( "".equals( name ) ? "settings" : name );
+		if( valueCount == 0 ) {
+			stream.append( "/>\n" );
+		} else {
+			stream.append( ">\n" );
+
+			for( String key : keys ) {
+				stream.append( valueIndent );
+				stream.append( "<" );
+				stream.append( key );
+				stream.append( ">");
+				stream.append(settings.get( key, null ));
+				stream.append( "</" );
+				stream.append( key );
+				stream.append( ">\n" );
+			}
+
+			for( Settings child : children ) {
+				print( child, stream, level + 1 );
+			}
+
+			stream.append( indent );
+			stream.append( "</" );
+			stream.append( "".equals( name ) ? "settings" : name );
+			stream.append( ">\n" );
 		}
 	}
 
