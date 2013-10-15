@@ -121,6 +121,36 @@ public class SettingsTest extends TestCase {
 		assertEquals( "#80494a63", settings.get( "color", null ) );
 		assertEquals( new Color( 73, 74, 99, 128 ), settings.getColor( "color", null ) );
 	}
+	
+	public void testCopy() {
+		settings.put( "/a", "A" );
+		settings.put( "/b", "B" );
+		settings.put( "/p/a", "A" );
+		settings.put( "/p/b", "B" );
+
+		Settings newSettings = new Settings();
+		newSettings.addProvider( new MapSettingProvider() );
+		
+		settings.copy( newSettings );
+		
+		assertEquals( 2, newSettings.getKeys().size() );
+		assertEquals( 0, newSettings.getChildCount() );
+	}
+	
+	public void testDeepCopy() {
+		settings.put( "/a", "A" );
+		settings.put( "/b", "B" );
+		settings.put( "/p/a", "A" );
+		settings.put( "/p/b", "B" );
+
+		Settings newSettings = new Settings();
+		newSettings.addProvider( new MapSettingProvider() );
+		
+		settings.deepCopy( newSettings );
+		
+		assertEquals( 2, newSettings.getKeys().size() );
+		assertEquals( 1, newSettings.getChildCount() );
+	}
 
 	public void testMounts() {
 		settings.setDefaultProvider( providerD );

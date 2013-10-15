@@ -357,6 +357,31 @@ public class Settings {
 	}
 
 	/**
+	 * Copy the values from this settings object to the specified settings object.
+	 * 
+	 * @param settings
+	 */
+	public void copy( Settings settings ) {
+		for( String key : getKeys() ) {
+			settings.put( key, get( key, null ) );
+		}
+	}
+
+	/**
+	 * Deep copy the values from this settings object to the specified settings
+	 * object.
+	 * 
+	 * @param settings
+	 */
+	public void deepCopy( Settings settings ) {
+		copy( settings );
+
+		for( Settings child : getChildNodes() ) {
+			child.deepCopy( settings.getNode( child.getName() ) );
+		}
+	}
+
+	/**
 	 * Get a value. If the value is not defined in the settings return the
 	 * specified default value.
 	 * 
