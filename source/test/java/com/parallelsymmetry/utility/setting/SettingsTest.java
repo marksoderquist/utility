@@ -36,6 +36,8 @@ public class SettingsTest extends TestCase {
 		settings.addProvider( provider3 );
 		settings.setDefaultProvider( providerD );
 	}
+	
+	// TODO Test if a MapSettingProvider is faster than DescriptorSettingProvider to provide better startup performance.
 
 	public void testGetName() {
 		assertEquals( "", settings.getName() );
