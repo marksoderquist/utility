@@ -614,7 +614,7 @@ public class Settings {
 		}
 	}
 
-	// FIXME Clean up deprecated methods.
+	// TODO Clean up deprecated methods.
 
 	@Deprecated
 	@SuppressWarnings( "unchecked" )
