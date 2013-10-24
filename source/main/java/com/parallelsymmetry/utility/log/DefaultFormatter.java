@@ -15,6 +15,8 @@ public class DefaultFormatter extends Formatter {
 
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat( Log.DEFAULT_DATE_FORMAT );
 
+	private boolean showDate;
+
 	@Override
 	public String format( LogRecord record ) {
 		if( record == null ) return null;
@@ -30,7 +32,8 @@ public class DefaultFormatter extends Formatter {
 		if( Log.isShowTag() ) {
 			prefix.append( getTag( record.getLevel() ) );
 		}
-		if( record.getLevel().intValue() < Log.HELP.intValue() && Log.isShowDate() ) {
+		if( ( showDate || Log.isShowDate() ) && record.getLevel().intValue() < Log.HELP.intValue() ) {
+			// FIXME Log date is local but does not show time zone.
 			prefix.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
 			prefix.append( " " );
 		}
@@ -65,6 +68,10 @@ public class DefaultFormatter extends Formatter {
 		}
 
 		return buffer.toString();
+	}
+	
+	public void setShowDate( boolean showDate ) {
+		this.showDate = showDate;
 	}
 
 	protected static final String getTag( Level level ) {
