@@ -442,7 +442,7 @@ public class Settings {
 
 		if( changed ) {
 			fireSettingChangedEvent( new SettingEvent( absolute, oldValue, value ) );
-			Log.write( Log.DEBUG, "Write setting: ", absolute, " = ", value );
+			Log.write( Log.DETAIL, "Write setting: ", absolute, " = ", value );
 		}
 	}
 
