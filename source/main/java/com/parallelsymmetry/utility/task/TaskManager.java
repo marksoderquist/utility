@@ -46,6 +46,8 @@ public class TaskManager implements Persistent, Controllable {
 
 	private List<Task<?>> tasks;
 
+	private boolean eventDispatchThreadCheck;
+
 	public TaskManager() {
 		tasks = new CopyOnWriteArrayList<Task<?>>();
 		queue = new LinkedBlockingQueue<Runnable>();
@@ -171,7 +173,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> Future<T> invoke( Task<T> task ) throws InterruptedException {
-		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+		if( eventDispatchThreadCheck && EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
 
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( task );
@@ -195,7 +197,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> Future<T> invoke( Task<T> task, long timeout, TimeUnit unit ) throws InterruptedException {
-		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+		if( eventDispatchThreadCheck && EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
 
 		if( Thread.currentThread() instanceof TaskThread ) {
 			synchronousExecute( task, timeout, unit );
@@ -216,7 +218,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks ) throws InterruptedException {
-		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+		if( eventDispatchThreadCheck && EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
 
 		checkRunning();
 		if( Thread.currentThread() instanceof TaskThread ) {
@@ -241,7 +243,7 @@ public class TaskManager implements Persistent, Controllable {
 	 * @throws InterruptedException
 	 */
 	public <T> List<Future<T>> invokeAll( Collection<? extends Task<T>> tasks, long timeout, TimeUnit unit ) throws InterruptedException {
-		if( EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
+		if( eventDispatchThreadCheck && EventQueue.isDispatchThread() ) throw new RuntimeException( "The event dispatch thread should not be blocked." );
 
 		checkRunning();
 		if( Thread.currentThread() instanceof TaskThread ) {
@@ -253,6 +255,15 @@ public class TaskManager implements Persistent, Controllable {
 			executor.invokeAll( tasks, timeout, unit );
 		}
 		return new ArrayList<Future<T>>( tasks );
+	}
+
+	/**
+	 * Enable event dispatch thread checking after the program GUI is initialized
+	 * to protect long running tasks from "freezing" the GUI by throwing a
+	 * RuntimeException.
+	 */
+	public void enableEventDispatchThreadCheck() {
+		eventDispatchThreadCheck = true;
 	}
 
 	public void addTaskListener( TaskListener listener ) {
