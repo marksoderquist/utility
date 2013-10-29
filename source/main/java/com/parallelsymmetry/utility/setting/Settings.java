@@ -287,6 +287,11 @@ public class Settings {
 		return nodes;
 	}
 
+	public List<Settings> getIndexedNodes() {
+		// Get the indexed nodes from this node.
+		return getIndexedNodes( "." );
+	}
+
 	public List<Settings> getIndexedNodes( String path ) {
 		int count = getChildCount( path );
 		List<Settings> settings = new ArrayList<Settings>();
