@@ -36,7 +36,7 @@ public class SettingsTest extends TestCase {
 		settings.addProvider( provider3 );
 		settings.setDefaultProvider( providerD );
 	}
-	
+
 	// TODO Test if a MapSettingProvider is faster than DescriptorSettingProvider to provide better startup performance.
 
 	public void testGetName() {
@@ -123,7 +123,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "#80494a63", settings.get( "color", null ) );
 		assertEquals( new Color( 73, 74, 99, 128 ), settings.getColor( "color", null ) );
 	}
-	
+
 	public void testCopy() {
 		settings.put( "/a", "A" );
 		settings.put( "/b", "B" );
@@ -132,13 +132,13 @@ public class SettingsTest extends TestCase {
 
 		Settings newSettings = new Settings();
 		newSettings.addProvider( new MapSettingProvider() );
-		
+
 		settings.copy( newSettings );
-		
+
 		assertEquals( 2, newSettings.getKeys().size() );
 		assertEquals( 0, newSettings.getChildCount() );
 	}
-	
+
 	public void testDeepCopy() {
 		settings.put( "/a", "A" );
 		settings.put( "/b", "B" );
@@ -147,9 +147,9 @@ public class SettingsTest extends TestCase {
 
 		Settings newSettings = new Settings();
 		newSettings.addProvider( new MapSettingProvider() );
-		
+
 		settings.deepCopy( newSettings );
-		
+
 		assertEquals( 2, newSettings.getKeys().size() );
 		assertEquals( 1, newSettings.getChildCount() );
 	}
@@ -351,7 +351,45 @@ public class SettingsTest extends TestCase {
 		settings.putNodeList( path, sourceList );
 
 		int index = 0;
+		for( Settings itemSettings : settings.getIndexedNodes() ) {
+			assertEquals( "item-" + index, itemSettings.getName() );
+			assertEquals( "/item-" + index, itemSettings.getPath() );
+			index++;
+		}
+	}
+
+	public void testGetIndexedNodesAtRootWithPath() {
+		int count = 5;
+		String path = "/";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceList.add( new MockPersistent( index ) );
+		}
+
+		settings.putNodeList( path, sourceList );
+
+		int index = 0;
 		for( Settings itemSettings : settings.getIndexedNodes( "/" ) ) {
+			assertEquals( "item-" + index, itemSettings.getName() );
+			assertEquals( "/item-" + index, itemSettings.getPath() );
+			index++;
+		}
+	}
+
+	public void testGetIndexedNodesAtRootWithEmptyPath() {
+		int count = 5;
+		String path = "/";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceList.add( new MockPersistent( index ) );
+		}
+
+		settings.putNodeList( path, sourceList );
+
+		int index = 0;
+		for( Settings itemSettings : settings.getIndexedNodes( "" ) ) {
 			assertEquals( "item-" + index, itemSettings.getName() );
 			assertEquals( "/item-" + index, itemSettings.getPath() );
 			index++;

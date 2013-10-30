@@ -1028,6 +1028,7 @@ public class Settings {
 	}
 
 	private String getItemPath( String path, int index ) {
+		path = getAbsolutePath( path );
 		if( path.endsWith( SEPARATOR ) ) path = path.substring( 0, path.length() - 1 );
 		return path + SEPARATOR + ITEM_PREFIX + index;
 	}
