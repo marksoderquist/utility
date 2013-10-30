@@ -296,7 +296,8 @@ public class Settings {
 		int count = getChildCount( path );
 		List<Settings> settings = new ArrayList<Settings>();
 		for( int index = 0; index < count; index++ ) {
-			settings.add( getIndexedNode( path, index ) );
+			Settings node = getIndexedNode( path, index );
+			settings.add( node );
 		}
 		return settings;
 	}
@@ -1027,6 +1028,7 @@ public class Settings {
 	}
 
 	private String getItemPath( String path, int index ) {
+		if( path.endsWith( SEPARATOR ) ) path = path.substring( 0, path.length() - 1 );
 		return path + SEPARATOR + ITEM_PREFIX + index;
 	}
 

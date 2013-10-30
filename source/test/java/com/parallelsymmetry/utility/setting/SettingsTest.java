@@ -212,6 +212,13 @@ public class SettingsTest extends TestCase {
 	public void testGetKeys() {
 		Set<String> keys = settings.getKeys();
 		assertEquals( 0, keys.size() );
+
+		provider1.set( "/value1", "1" );
+		provider2.set( "/value2", "2" );
+		provider3.set( "/value3", "3" );
+		providerD.set( "/valueD", "D" );
+
+		assertEquals( 4, settings.getKeys().size() );
 	}
 
 	public void testGetChildCount() {
@@ -326,7 +333,28 @@ public class SettingsTest extends TestCase {
 
 		int index = 0;
 		for( Settings itemSettings : settings.getIndexedNodes( "/test/lists/list1" ) ) {
-			assertEquals( "item-" + index++, itemSettings.getName() );
+			assertEquals( "item-" + index, itemSettings.getName() );
+			assertEquals( "/test/lists/list1/item-" + index, itemSettings.getPath() );
+			index++;
+		}
+	}
+
+	public void testGetIndexedNodesAtRoot() {
+		int count = 5;
+		String path = "/";
+		List<MockPersistent> sourceList = new ArrayList<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceList.add( new MockPersistent( index ) );
+		}
+
+		settings.putNodeList( path, sourceList );
+
+		int index = 0;
+		for( Settings itemSettings : settings.getIndexedNodes( "/" ) ) {
+			assertEquals( "item-" + index, itemSettings.getName() );
+			assertEquals( "/item-" + index, itemSettings.getPath() );
+			index++;
 		}
 	}
 
