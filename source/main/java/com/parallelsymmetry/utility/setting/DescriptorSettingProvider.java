@@ -11,7 +11,7 @@ public class DescriptorSettingProvider implements SettingProvider {
 
 	private Descriptor descriptor;
 
-	private String root = "";
+	private String root = "/";
 
 	public DescriptorSettingProvider( Descriptor descriptor ) {
 		this( descriptor, true );
@@ -45,6 +45,10 @@ public class DescriptorSettingProvider implements SettingProvider {
 
 		// Incoming paths should always be absolute.
 		if( path.endsWith( "/" ) ) path = path.substring( 0, path.length() - 1 );
+
+		for( String name : descriptor.getAttributeNames( root + path ) ) {
+			keys.add( name );
+		}
 
 		for( String name : descriptor.getNames( root + path ) ) {
 			Node node = descriptor.getNode( root + path + "/" + name );

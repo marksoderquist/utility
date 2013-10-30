@@ -24,7 +24,6 @@ public class DescriptorSettingProviderTest extends TestCase {
 
 	public void testGet() {
 		assertEquals( "test.path.value", provider.get( "/path/value" ) );
-		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
 
 	public void testGetWithAttributes() {
@@ -47,8 +46,30 @@ public class DescriptorSettingProviderTest extends TestCase {
 
 	public void testNodeExists() {
 		assertFalse( provider.nodeExists( "/path/invalid" ) );
-		assertFalse( rootedProvider.nodeExists( "/test/path/invalid" ) );
 		assertTrue( provider.nodeExists( "/path" ) );
+	}
+
+	public void testRootedProviderGet() {
+		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
+	}
+	
+	public void testRootedProviderGetWithAttributes() {
+		assertNull( provider.get( "/test/invalid/path" ) );
+		assertEquals( "5", rootedProvider.get( "/test/bounds/x" ) );
+		assertEquals( "10", rootedProvider.get( "/test/bounds/y" ) );
+		assertEquals( "20", rootedProvider.get( "/test/bounds/w" ) );
+		assertEquals( "15", rootedProvider.get( "/test/bounds/h" ) );
+	}
+
+	public void testRootedProviderGetChildNames() {
+		Set<String> names = rootedProvider.getChildNames( "" );
+
+		assertEquals( 1, names.size() );
+		assertTrue( names.contains( "test" ) );
+	}
+
+	public void testRootedProviderNodeExists() {
+		assertFalse( rootedProvider.nodeExists( "/test/path/invalid" ) );
 		assertTrue( rootedProvider.nodeExists( "/test/path" ) );
 	}
 
