@@ -356,6 +356,7 @@ public class SettingsTest extends TestCase {
 			assertEquals( "/item-" + index, itemSettings.getPath() );
 			index++;
 		}
+		assertEquals( count, index );
 	}
 
 	public void testGetIndexedNodesAtRootWithPath() {
@@ -375,6 +376,7 @@ public class SettingsTest extends TestCase {
 			assertEquals( "/item-" + index, itemSettings.getPath() );
 			index++;
 		}
+		assertEquals( count, index );
 	}
 
 	public void testGetIndexedNodesAtRootWithEmptyPath() {
@@ -394,6 +396,7 @@ public class SettingsTest extends TestCase {
 			assertEquals( "/item-" + index, itemSettings.getPath() );
 			index++;
 		}
+		assertEquals( count, index );
 	}
 
 	public void testGetNode() {

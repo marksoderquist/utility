@@ -293,7 +293,11 @@ public class Settings {
 	}
 
 	public List<Settings> getIndexedNodes( String path ) {
-		int count = getChildCount( path );
+		int count = 0;
+		for( String childName : getChildNames() ) {
+			if( childName.startsWith( ITEM_PREFIX ) ) count++;
+		}
+
 		List<Settings> settings = new ArrayList<Settings>();
 		for( int index = 0; index < count; index++ ) {
 			Settings node = getIndexedNode( path, index );

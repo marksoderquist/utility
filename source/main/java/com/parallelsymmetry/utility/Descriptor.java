@@ -253,6 +253,8 @@ public class Descriptor {
 
 		Node node = null;
 		NamedNodeMap map = parent.getAttributes();
+		if( map == null ) return names;
+		
 		int count = map.getLength();
 		for( int index = 0; index < count; index++ ) {
 			node = map.item( index );
