@@ -79,6 +79,17 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
 	}
 
+	public void testGetAttributeNames() throws Exception {
+		Descriptor descriptor = loadTestDescriptor();
+
+		List<String> names = descriptor.getAttributeNames( "/test/bounds" );
+		assertEquals( 4, names.size() );
+		assertTrue( names.contains( "x" ) );
+		assertTrue( names.contains( "y" ) );
+		assertTrue( names.contains( "w" ) );
+		assertTrue( names.contains( "h" ) );
+	}
+
 	public void testGetNames() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 

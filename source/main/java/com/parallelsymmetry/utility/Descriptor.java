@@ -16,8 +16,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -28,6 +30,8 @@ import com.parallelsymmetry.utility.log.Log;
 public class Descriptor {
 
 	private Node node;
+
+	private Map<String, List<String>> attrNames = new ConcurrentHashMap<String, List<String>>();
 
 	private Map<String, List<String>> names = new ConcurrentHashMap<String, List<String>>();
 
@@ -69,7 +73,7 @@ public class Descriptor {
 	}
 
 	public Descriptor( InputStream input ) throws IOException {
-		if( input == null ) throw new NullPointerException( "Input stream cannot be null.");
+		if( input == null ) throw new NullPointerException( "Input stream cannot be null." );
 		try {
 			node = XmlUtil.loadXmlDocument( input );
 		} catch( SAXException exception ) {
@@ -90,6 +94,15 @@ public class Descriptor {
 
 	public Node getNode() {
 		return node;
+	}
+
+	public List<String> getAttributeNames( String path ) {
+		List<String> names = this.attrNames.get( path );
+		if( names == null ) {
+			names = listAttributeNames( getNode( path ) );
+			this.attrNames.put( path, names );
+		}
+		return names;
 	}
 
 	public List<String> getNames( String path ) {
@@ -131,7 +144,7 @@ public class Descriptor {
 	public String[] getValues( String path ) {
 		return getValues( this.node, path );
 	}
-	
+
 	@Override
 	public String toString() {
 		return XmlUtil.toString( node );
@@ -232,6 +245,21 @@ public class Descriptor {
 	public static String getAttribute( Node node, String name ) {
 		Node attribute = node.getAttributes().getNamedItem( name );
 		return attribute == null ? null : attribute.getNodeValue();
+	}
+
+	private List<String> listAttributeNames( Node parent ) {
+		List<String> names = new ArrayList<String>();
+		if( parent == null ) return names;
+
+		Node node = null;
+		NamedNodeMap map = parent.getAttributes();
+		int count = map.getLength();
+		for( int index = 0; index < count; index++ ) {
+			node = map.item( index );
+			if( node instanceof Attr ) names.add( node.getNodeName() );
+		}
+
+		return names;
 	}
 
 	private List<String> listNames( Node parent ) {
