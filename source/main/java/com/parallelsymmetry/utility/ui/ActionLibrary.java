@@ -38,7 +38,7 @@ public class ActionLibrary {
 		XAction action = actions.get( key );
 		if( action != null ) return action;
 
-		action = addAction( key );
+		action = addAction( getClass().getClassLoader(), key );
 
 		return action;
 	}
@@ -58,19 +58,19 @@ public class ActionLibrary {
 	 * @param key
 	 * @return
 	 */
-	public XAction addAction( String key ) {
+	public XAction addAction( ClassLoader loader, String key ) {
 		XAction action = actions.get( key );
 		if( action != null ) return action;
 
 		// The following six lines should match refresh().
-		String name = Bundles.getString( bundlePath, key );
-		String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", String.valueOf( XAction.NONE ), false );
-		String accelerator = Bundles.getString( bundlePath, key + ".accelerator", false );
-		String display = Bundles.getString( bundlePath, key + ".display", false );
-		String icon = Bundles.getString( bundlePath, key + ".icon", false );
+		String name = Bundles.getString( loader, bundlePath, key );
+		String mnemonic = Bundles.getString( loader, bundlePath, key + ".mnemonic", String.valueOf( XAction.NONE ), false );
+		String accelerator = Bundles.getString( loader, bundlePath, key + ".accelerator", false );
+		String display = Bundles.getString( loader, bundlePath, key + ".display", false );
+		String icon = Bundles.getString( loader, bundlePath, key + ".icon", false );
 		if( name == null ) name = key;
 
-		return addAction( key, name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), accelerator, display );
+		return addAction( loader, key, name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), accelerator, display );
 	}
 
 	/**
@@ -85,12 +85,13 @@ public class ActionLibrary {
 	 * @param accelerator
 	 * @return
 	 */
-	public XAction addAction( String key, String name, Icon icon, int mnemonic, String accelerator, String display ) {
+	public XAction addAction( ClassLoader loader, String key, String name, Icon icon, int mnemonic, String accelerator, String display ) {
 		XAction action = actions.get( key );
 		if( action != null ) return action;
 
 		action = new XAction( key, name, icon, mnemonic, accelerator, display );
 		if( accelerator != null ) actionsByAccelerator.put( accelerator, action );
+		action.putValue( "class.loader", loader );
 		actions.put( key, action );
 
 		return action;
@@ -105,15 +106,18 @@ public class ActionLibrary {
 	public void refresh() {
 		// Go through the actions and change the names, accelerators, etc.
 		for( String key : actions.keySet() ) {
+			XAction action = actions.get( key );
+			ClassLoader loader = (ClassLoader)action.getValue( "class.loader" );
+
 			// The following six lines should match addAction().
-			String name = Bundles.getString( bundlePath, key );
-			String mnemonic = Bundles.getString( bundlePath, key + ".mnemonic", String.valueOf( XAction.NONE ), false );
-			String accelerator = Bundles.getString( bundlePath, key + ".accelerator", false );
-			String display = Bundles.getString( bundlePath, key + ".display", false );
-			String icon = Bundles.getString( bundlePath, key + ".icon", false );
+			String name = Bundles.getString( loader, bundlePath, key );
+			String mnemonic = Bundles.getString( loader, bundlePath, key + ".mnemonic", String.valueOf( XAction.NONE ), false );
+			String accelerator = Bundles.getString( loader, bundlePath, key + ".accelerator", false );
+			String display = Bundles.getString( loader, bundlePath, key + ".display", false );
+			String icon = Bundles.getString( loader, bundlePath, key + ".icon", false );
 			if( name == null ) name = key;
 
-			actions.get( key ).setValues( name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), accelerator, display );
+			action.setValues( name, icons.getIcon( icon == null ? key : icon ), Integer.parseInt( mnemonic ), accelerator, display );
 		}
 	}
 
