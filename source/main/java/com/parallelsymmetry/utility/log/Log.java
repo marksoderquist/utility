@@ -57,7 +57,7 @@ public class Log {
 
 	public static final String DEFAULT_LOGGER_NAME = Logger.GLOBAL_LOGGER_NAME;
 
-	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
+	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 	public static final String DEFAULT_LOG_FILE_NAME = "program.log";
 
