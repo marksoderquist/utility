@@ -200,6 +200,10 @@ public class IconLibrary {
 			icons.put( name, renderer );
 		}
 	}
+	
+	public void removeIcon( String name ) {
+		putIcon( name, null );
+	}
 
 	/**
 	 * Add path to the search paths.
