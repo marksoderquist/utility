@@ -2,18 +2,15 @@ package com.parallelsymmetry.utility.log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import com.parallelsymmetry.utility.DateUtil;
 import com.parallelsymmetry.utility.TextUtil;
 
 public class DefaultFormatter extends Formatter {
-
-	private static final DateFormat DATE_FORMAT = new SimpleDateFormat( Log.DEFAULT_DATE_FORMAT );
 
 	private boolean showDate;
 
@@ -33,8 +30,7 @@ public class DefaultFormatter extends Formatter {
 			prefix.append( getTag( record.getLevel() ) );
 		}
 		if( ( showDate || Log.isShowDate() ) && record.getLevel().intValue() < Log.HELP.intValue() ) {
-			// FIXME Log date is local but does not show time zone.
-			prefix.append( DATE_FORMAT.format( new Date( record.getMillis() ) ) );
+			prefix.append( DateUtil.format( new Date( record.getMillis() ), Log.DEFAULT_DATE_FORMAT ) );
 			prefix.append( " " );
 		}
 		if( Log.isShowPrefix() ) {
