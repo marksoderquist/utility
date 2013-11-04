@@ -1,8 +1,9 @@
 package com.parallelsymmetry.utility.ui;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.EventQueue;
-
-import com.parallelsymmetry.utility.ui.SwingUtil;
+import java.awt.Panel;
 
 import junit.framework.TestCase;
 
@@ -27,6 +28,22 @@ public class SwingUtilTest extends TestCase {
 		SwingUtil.executeSafely( tester );
 		tester.waitFor();
 		assertTrue( tester.isSafe() );
+	}
+
+	public void testGetNamedComponent() {
+		Container container = new Container();
+
+		Component one = new Panel();
+		one.setName( "one" );
+		Component two = new Panel();
+		two.setName( "two" );
+
+		container.add( one );
+		container.add( two );
+
+		assertNull( SwingUtil.getNamedComponent( container, "zero" ) );
+		assertEquals( one, SwingUtil.getNamedComponent( container, "one" ) );
+		assertEquals( two, SwingUtil.getNamedComponent( container, "two" ) );
 	}
 
 	private static final class ExecuteTester implements Runnable {

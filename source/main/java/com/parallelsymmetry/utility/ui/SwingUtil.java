@@ -46,6 +46,22 @@ public class SwingUtil {
 		}
 	}
 
+	/**
+	 * Convenience method to get a child component by name.
+	 * 
+	 * @param container
+	 * @param name
+	 * @return
+	 */
+	public static final Component getNamedComponent( Container container, String name ) {
+		if( container == null ) throw new NullPointerException( "Container cannot be null." );
+		if( name == null ) throw new NullPointerException( "Name cannot be null." );
+		for( Component component : container.getComponents() ) {
+			if( name.equals( component.getName() ) ) return component;
+		}
+		return null;
+	}
+
 	public static final void printComponentHierarchy( Container container ) {
 		printComponentHierarchy( container, 0 );
 	}
