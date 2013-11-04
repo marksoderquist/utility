@@ -103,8 +103,11 @@ public class Log {
 				FileHandler handler = new FileHandler( pattern, parameters.isTrue( LogFlag.LOG_FILE_APPEND ) );
 				handler.setLevel( Log.INFO );
 				if( parameters.isSet( LogFlag.LOG_FILE_LEVEL ) ) handler.setLevel( Log.parseLevel( parameters.get( LogFlag.LOG_FILE_LEVEL ) ) );
-				handler.setFormatter( new DefaultFormatter() );
-				addHandler( handler );
+
+				DefaultFormatter formatter = new DefaultFormatter();
+				formatter.setShowDate( true );
+				handler.setFormatter( formatter );
+				Log.addHandler( handler );
 			} catch( IOException exception ) {
 				Log.write( exception );
 			}
