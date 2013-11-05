@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 public final class TextUtil {
 
@@ -416,6 +417,66 @@ public final class TextUtil {
 		}
 
 		return count;
+	}
+
+	public static final int countLines( List<String> lines, String pattern ) {
+		int result = 0;
+		Pattern p = Pattern.compile( pattern );
+
+		for( String line : lines ) {
+			if( p.matcher( line ).matches() ) result++;
+		}
+
+		return result;
+	}
+
+	public static final String findLine( List<String> lines, String pattern ) {
+		return findLine( lines, pattern, 0 );
+	}
+
+	public static final String findLine( List<String> lines, String pattern, int start ) {
+		Pattern p = Pattern.compile( pattern );
+
+		int count = lines.size();
+		for( int index = start; index < count; index++ ) {
+			String line = lines.get( index );
+			if( p.matcher( line ).matches() ) return line;
+		}
+
+		return null;
+	}
+
+	public static final List<String> findLines( List<String> lines, String pattern ) {
+		return findLines( lines, pattern, 0 );
+	}
+
+	public static final List<String> findLines( List<String> lines, String pattern, int start ) {
+		List<String> result = new ArrayList<String>();
+
+		Pattern p = Pattern.compile( pattern );
+
+		int count = lines.size();
+		for( int index = start; index < count; index++ ) {
+			String line = lines.get( index );
+			if( p.matcher( line ).matches() ) result.add( line );
+		}
+
+		return result;
+	}
+
+	public static final int findLineIndex( List<String> lines, String pattern ) {
+		return findLineIndex( lines, pattern, 0 );
+	}
+
+	public static final int findLineIndex( List<String> lines, String pattern, int start ) {
+		Pattern p = Pattern.compile( pattern );
+
+		int count = lines.size();
+		for( int index = start; index < count; index++ ) {
+			if( p.matcher( lines.get( index ) ).matches() ) return index;
+		}
+
+		return -1;
 	}
 
 	public static final String prepend( String content, String text ) {

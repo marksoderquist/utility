@@ -224,6 +224,71 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
 	}
 
+	public void testCountLines() {
+		List<String> lines = new ArrayList<String>();
+		for( int index = 0; index < 5; index++ ) {
+			lines.add( "Test line " + index );
+		}
+
+		assertEquals( 0, TextUtil.countLines( lines, "Test line" ) );
+		assertEquals( 1, TextUtil.countLines( lines, "Test line 1" ) );
+		assertEquals( 5, TextUtil.countLines( lines, "Test line ." ) );
+		assertEquals( 2, TextUtil.countLines( lines, "Test .* [3,4]" ) );
+		assertEquals( 1, TextUtil.countLines( lines, ".*4" ) );
+	}
+
+	public void testFindLine() {
+		List<String> lines = new ArrayList<String>();
+		for( int index = 0; index < 5; index++ ) {
+			lines.add( "Test line " + index );
+		}
+
+		assertEquals( null, TextUtil.findLine( lines, "Test line" ) );
+		assertEquals( "Test line 1", TextUtil.findLine( lines, "Test line 1" ) );
+		assertEquals( "Test line 2", TextUtil.findLine( lines, "Test line .*", 2 ) );
+		assertEquals( "Test line 3", TextUtil.findLine( lines, "Test .* 3" ) );
+		assertEquals( "Test line 2", TextUtil.findLine( lines, "Test line .*", 2 ) );
+		assertEquals( "Test line 4", TextUtil.findLine( lines, ".*4" ) );
+	}
+
+	public void testFindLines() {
+		List<String> lines = new ArrayList<String>();
+		for( int index = 0; index < 5; index++ ) {
+			lines.add( "Test line " + index );
+		}
+
+		List<String> result = null;
+
+		result = TextUtil.findLines( lines, "Test line" );
+		assertEquals( 0, result.size() );
+		
+		result = TextUtil.findLines( lines, "Test line ." );
+		assertEquals( 5, result.size() );
+		
+		result = TextUtil.findLines( lines, "Test line 1" );
+		assertEquals( 1, result.size() );
+		
+		result = TextUtil.findLines( lines, "Test line [2,3]" );
+		assertEquals( 2, result.size() );
+		
+		result = TextUtil.findLines( lines, ".*4" );
+		assertEquals( 1, result.size() );
+	}
+
+	public void testFindLineIndex() {
+		List<String> lines = new ArrayList<String>();
+		for( int index = 0; index < 5; index++ ) {
+			lines.add( "Test line " + index );
+		}
+
+		assertEquals( -1, TextUtil.findLineIndex( lines, "Test line" ) );
+		assertEquals( 1, TextUtil.findLineIndex( lines, "Test line 1" ) );
+		assertEquals( 2, TextUtil.findLineIndex( lines, "Test line .*", 2 ) );
+		assertEquals( 3, TextUtil.findLineIndex( lines, "Test .* 3" ) );
+		assertEquals( 2, TextUtil.findLineIndex( lines, "Test line .*", 2 ) );
+		assertEquals( 4, TextUtil.findLineIndex( lines, ".*4" ) );
+	}
+
 	public void testPrepend() {
 		assertEquals( null, TextUtil.prepend( null, "X" ) );
 		assertEquals( "A", TextUtil.prepend( "A", null ) );
