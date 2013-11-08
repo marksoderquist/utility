@@ -49,18 +49,18 @@ public final class Images {
 		show( image, Color.WHITE );
 	}
 
-	public static void show( Image image, int size ) {
-		show( image, Color.WHITE, size );
+	public static void show( Image image, int borderSize ) {
+		show( image, Color.WHITE, borderSize );
 	}
 
-	public static void show( Image image, Color color ) {
-		show( image, color, 5 );
+	public static void show( Image image, Color borderColor ) {
+		show( image, borderColor, 5 );
 	}
 
-	public static void show( Image image, Color color, int size ) {
+	public static void show( Image image, Color borderColor, int borderSize ) {
 		JPanel border = new JPanel();
-		border.setBackground( color );
-		border.setBorder( new LineBorder( color, size ) );
+		border.setBackground( borderColor );
+		border.setBorder( new LineBorder( borderColor, borderSize ) );
 		border.setLayout( new BorderLayout() );
 
 		ImagePanel panel = new ImagePanel( image );
