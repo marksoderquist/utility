@@ -134,19 +134,31 @@ public class Icons {
 	}
 
 	public static void proof( Icon icon ) {
-		proof( icon, null );
+		proof( icon, null, null );
+	}
+
+	public static void proof( Icon icon, Color background ) {
+		proof( icon, background, null );
 	}
 
 	public static void proof( Icon icon, int animationDelay ) {
 		proof( icon, null, animationDelay );
 	}
 
-	public static void proof( Icon icon, ImageFilter filter ) {
-		proof( icon, filter, 0 );
+	public static void proof( Icon icon, Color background, int animationDelay ) {
+		proof( icon, background, null, animationDelay );
 	}
 
-	public static void proof( Icon icon, ImageFilter filter, int animationDelay ) {
-		SamplePanel panel = new SamplePanel( icon, filter, animationDelay );
+	public static void proof( Icon icon, ImageFilter filter ) {
+		proof( icon, null, filter, 0 );
+	}
+
+	public static void proof( Icon icon, Color background, ImageFilter filter ) {
+		proof( icon, background, filter, 0 );
+	}
+
+	public static void proof( Icon icon, Color background, ImageFilter filter, int animationDelay ) {
+		SamplePanel panel = new SamplePanel( icon, background, filter, animationDelay );
 		JOptionPane.showMessageDialog( null, panel, null, JOptionPane.PLAIN_MESSAGE );
 		if( icon instanceof AnimatedIcon ) ( (AnimatedIcon)icon ).stopAnimation();
 	}
@@ -165,7 +177,7 @@ public class Icons {
 
 		private Color border = new Color( 255, 0, 0, 64 );
 
-		public SamplePanel( Icon icon, ImageFilter filter, int animateDelay ) {
+		public SamplePanel( Icon icon, Color background, ImageFilter filter, int animateDelay ) {
 			this.icon = icon;
 
 			iconImage = new BufferedImage( icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB );
@@ -177,8 +189,7 @@ public class Icons {
 			iconImage = Images.filter( iconImage, filter );
 
 			gridImage = createBackgroundImage();
-			setBackground( new Color( 220, 220, 220 ) );
-			setBackground( Color.WHITE );
+			setBackground( background == null ? Color.WHITE : background );
 
 			if( icon instanceof AnimatedIcon ) ( (AnimatedIcon)icon ).startAnimation( this, animateDelay );
 		}
