@@ -234,7 +234,7 @@ public abstract class BaseImage {
 		render();
 
 		for( Instruction instruction : instructions ) {
-			instruction.paint( graphics );
+			instruction.render( graphics );
 		}
 		instructions.clear();
 
@@ -674,13 +674,13 @@ public abstract class BaseImage {
 	}
 
 	private interface Instruction {
-		void paint( Graphics2D graphics );
+		void render( Graphics2D graphics );
 	}
 
 	private class ResetInstruction implements Instruction {
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.setTransform( baseTransform );
 		}
 
@@ -698,7 +698,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.translate( this.x, this.y );
 		}
 	}
@@ -718,7 +718,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.rotate( theta, this.x, this.y );
 		}
 
@@ -733,7 +733,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.setClip( clip );
 		}
 
@@ -748,7 +748,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.setComposite( composite );
 		}
 
@@ -766,7 +766,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.setPaint( paint );
 			//graphics.translate( x, y );
 			graphics.fill( shape );
@@ -790,7 +790,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			graphics.setPaint( paint );
 			graphics.setStroke( stroke );
 			//graphics.translate( x, y );
@@ -815,7 +815,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			if( TextUtil.isEmpty( text.getText() ) ) return;
 			graphics.setPaint( paint );
 			graphics.setStroke( stroke );
@@ -836,7 +836,7 @@ public abstract class BaseImage {
 		}
 
 		@Override
-		public void paint( Graphics2D graphics ) {
+		public void render( Graphics2D graphics ) {
 			AffineTransform transform = graphics.getTransform();
 			//graphics.translate( x, y );
 			graphics.setTransform( originalTransform );
