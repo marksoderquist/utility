@@ -21,15 +21,20 @@ public class IoUtil {
 			target.write( buffer, 0, read );
 			count += read;
 		}
+		target.flush();
 		return count;
 	}
 
-	public static final void copy( Reader source, Writer target ) throws IOException {
+	public static final long copy( Reader source, Writer target ) throws IOException {
 		int length;
-		char[] buffer = new char[1024];
+		long count = 0;
+		char[] buffer = new char[DEFAULT_BUFFER_SIZE];
 		while( ( length = source.read( buffer ) ) > 0 ) {
 			target.write( buffer, 0, length );
+			count += length;
 		}
+		target.flush();
+		return count;
 	}
 
 	public static final void save( String data, OutputStream target ) throws IOException {
@@ -52,17 +57,12 @@ public class IoUtil {
 	}
 
 	public static final String load( InputStream input, String encoding ) throws IOException {
-		char[] buffer = new char[4096];
 		InputStreamReader reader = null;
 		StringWriter writer = new StringWriter();
 
 		try {
 			reader = new InputStreamReader( input, encoding == null ? TextUtil.DEFAULT_ENCODING : encoding );
-			int read = reader.read( buffer );
-			while( read > -1 ) {
-				writer.write( buffer, 0, read );
-				read = reader.read( buffer );
-			}
+			copy( reader, writer );
 			writer.close();
 		} finally {
 			if( reader != null ) reader.close();
