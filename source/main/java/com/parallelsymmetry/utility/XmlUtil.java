@@ -40,31 +40,52 @@ public class XmlUtil {
 
 	private static final int DEFAULT_INDENT = 2;
 
-	public static final Document loadXmlDocument( File file ) throws SAXException, IOException, ParserConfigurationException {
+	public static final Document loadXmlDocument( File file ) throws SAXException, IOException {
 		return loadXmlDocument( new InputStreamReader( new FileInputStream( file ), TextUtil.DEFAULT_ENCODING ) );
 	}
 
-	public static final Document loadXmlDocument( String uri ) throws SAXException, IOException, ParserConfigurationException {
+	public static final Document loadXmlDocument( String uri ) throws SAXException, IOException {
 		if( uri == null ) return null;
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		Document document = factory.newDocumentBuilder().parse( uri );
-		document.getDocumentElement().normalize();
+
+		Document document = null;
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			document = factory.newDocumentBuilder().parse( uri );
+			document.getDocumentElement().normalize();
+		} catch( ParserConfigurationException exception ) {
+			// Intentionally ignore exception.
+		}
+
 		return document;
 	}
 
-	public static final Document loadXmlDocument( Reader reader ) throws SAXException, IOException, ParserConfigurationException {
+	public static final Document loadXmlDocument( Reader reader ) throws SAXException, IOException {
 		if( reader == null ) return null;
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		Document document = factory.newDocumentBuilder().parse( new InputSource( reader ) );
-		document.getDocumentElement().normalize();
+
+		Document document = null;
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			document = factory.newDocumentBuilder().parse( new InputSource( reader ) );
+			document.getDocumentElement().normalize();
+		} catch( ParserConfigurationException exception ) {
+			// Intentionally ignore exception.
+		}
+
 		return document;
 	}
 
-	public static final Document loadXmlDocument( InputStream stream ) throws SAXException, IOException, ParserConfigurationException {
+	public static final Document loadXmlDocument( InputStream stream ) throws SAXException, IOException {
 		if( stream == null ) return null;
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		Document document = factory.newDocumentBuilder().parse( new InputSource( stream ) );
-		document.getDocumentElement().normalize();
+
+		Document document = null;
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			document = factory.newDocumentBuilder().parse( new InputSource( stream ) );
+			document.getDocumentElement().normalize();
+		} catch( ParserConfigurationException exception ) {
+			// Intentionally ignore exception.
+		}
+
 		return document;
 	}
 

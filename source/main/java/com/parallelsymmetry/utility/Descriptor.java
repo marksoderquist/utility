@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -45,8 +44,6 @@ public class Descriptor {
 			node = XmlUtil.loadXmlDocument( uri.toString() );
 		} catch( SAXException exception ) {
 			throw new IOException( exception );
-		} catch( ParserConfigurationException exception ) {
-			throw new IOException( exception );
 		}
 	}
 
@@ -55,8 +52,6 @@ public class Descriptor {
 		try {
 			node = XmlUtil.loadXmlDocument( url.toString() );
 		} catch( SAXException exception ) {
-			throw new IOException( exception );
-		} catch( ParserConfigurationException exception ) {
 			throw new IOException( exception );
 		}
 	}
@@ -67,8 +62,6 @@ public class Descriptor {
 			node = XmlUtil.loadXmlDocument( reader );
 		} catch( SAXException exception ) {
 			throw new IOException( exception );
-		} catch( ParserConfigurationException exception ) {
-			throw new IOException( exception );
 		}
 	}
 
@@ -77,8 +70,6 @@ public class Descriptor {
 		try {
 			node = XmlUtil.loadXmlDocument( input );
 		} catch( SAXException exception ) {
-			throw new IOException( exception );
-		} catch( ParserConfigurationException exception ) {
 			throw new IOException( exception );
 		}
 	}
@@ -254,7 +245,7 @@ public class Descriptor {
 		Node node = null;
 		NamedNodeMap map = parent.getAttributes();
 		if( map == null ) return names;
-		
+
 		int count = map.getLength();
 		for( int index = 0; index < count; index++ ) {
 			node = map.item( index );
