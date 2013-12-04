@@ -15,14 +15,13 @@ import com.parallelsymmetry.utility.task.TaskEvent.Type;
 /**
  * An executable task.
  * <p>
- * The correct way to wait for the result is to obtain the Future object from
- * the call to submit( Task ) and then call future.get().
+ * WARNING! Do not create a waitFor() method to wait for the task to complete.
+ * The correct way to wait for the result is to obtain the Future object when
+ * calling the submit( Task ) method and then call future.get().
  * 
  * @author Mark Soderquist
  * @param <V> The return type of the task.
  */
-
-// WARNING! Do not create a waitFor() method. See JavaDoc above. 
 
 public abstract class Task<V> implements Callable<V>, Future<V> {
 
@@ -32,6 +31,10 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	public enum Result {
 		UNKNOWN, CANCELLED, SUCCESS, FAILED;
+	}
+
+	public enum Priority {
+		LOW, MEDIUM, HIGH, UI
 	}
 
 	private Object stateLock = new Object();
@@ -48,6 +51,8 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	private Set<TaskListener> listeners;
 
+	private Priority priority;
+
 	private long minimum = 0;
 
 	private long maximum = 1;
@@ -59,7 +64,12 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 	}
 
 	public Task( String name ) {
+		this( name, Priority.MEDIUM );
+	}
+
+	public Task( String name, Priority priority ) {
 		this.name = name;
+		this.priority = priority;
 		future = new TaskFuture<V>( this, new TaskExecute<V>( this ) );
 		listeners = new CopyOnWriteArraySet<TaskListener>();
 	}
@@ -102,8 +112,12 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 		return name == null ? getClass().getName() : name;
 	}
 
-	public void setName( String name ) {
-		this.name = name;
+	public Priority getPriority() {
+		return priority;
+	}
+
+	public void setPriority( Priority priority ) {
+		this.priority = priority;
 	}
 
 	public State getState() {

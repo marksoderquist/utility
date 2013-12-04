@@ -23,6 +23,17 @@ public class TaskTest extends TestCase {
 	public void setUp() throws Exception {
 		manager.startAndWait();
 	}
+	
+	public void testPriority() throws Exception {
+		Task<?> task = new MockTask(manager);
+		
+		// Check default priority.
+		assertEquals( Task.Priority.MEDIUM, task.getPriority() );
+		
+		// Check changing priority.
+		task.setPriority( Task.Priority.LOW );
+		assertEquals( Task.Priority.LOW, task.getPriority() );
+	}
 
 	public void testSuccess() throws Exception {
 		Task<?> task = new MockTask( manager, 4 * delay );
