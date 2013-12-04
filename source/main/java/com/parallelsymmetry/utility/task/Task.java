@@ -249,7 +249,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 			super.done();
 		}
 
-		// The following methods work in Java 7 but not in Java 6.
+		// TODO The following methods work in Java 7 but not in Java 6.
 		//		@Override
 		//		protected void done() {
 		//			task.setState( State.DONE );
@@ -281,6 +281,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 		@Override
 		public W call() throws Exception {
+			// TODO This may not be the right place, but implement preemptive priority execution.
 			return task.execute();
 		}
 
