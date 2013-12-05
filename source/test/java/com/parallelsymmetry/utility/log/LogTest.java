@@ -107,7 +107,7 @@ public class LogTest extends TestCase {
 			LogRecord record = handler.getLogRecord();
 			assertNotNull( "Log record is null.", record );
 			assertEquals( "Incorrect log level.", Log.INFO, record.getLevel() );
-			assertEquals( "Incorrect log message.", "\u001b[0m[I] " + message + "\u001b[0m\n", output.toString() );
+			assertEquals( "Incorrect log message.", "\u001b[37m[I] " + message + "\u001b[0m\n", output.toString() );
 		} finally {
 			Log.setShowColor( false );
 			Log.setDefaultHandler( oldHandler );
@@ -214,7 +214,7 @@ public class LogTest extends TestCase {
 
 	public void testGetLevels() {
 		SortedSet<? extends Level> levels = Log.getLevels();
-		assertEquals( 9, levels.size() );
+		assertEquals( 10, levels.size() );
 
 		Iterator<? extends Level> iterator = levels.iterator();
 		assertEquals( Log.ALL, iterator.next() );
@@ -224,6 +224,7 @@ public class LogTest extends TestCase {
 		assertEquals( Log.INFO, iterator.next() );
 		assertEquals( Log.WARN, iterator.next() );
 		assertEquals( Log.ERROR, iterator.next() );
+		assertEquals( Log.DEVEL, iterator.next() );
 		assertEquals( Log.HELP, iterator.next() );
 		assertEquals( Log.NONE, iterator.next() );
 	}

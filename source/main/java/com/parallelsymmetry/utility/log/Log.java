@@ -29,25 +29,27 @@ import com.parallelsymmetry.utility.agent.Worker;
  */
 public class Log {
 
-	private static SortedSet<CustomLevel> known = new ConcurrentSkipListSet<CustomLevel>();
+	static SortedSet<CustomLevel> known = new ConcurrentSkipListSet<CustomLevel>();
 
-	public static final Level NONE = new CustomLevel( "NONE", Integer.MAX_VALUE );
+	public static final Level NONE = new CustomLevel( "NONE", Level.OFF.intValue(), "", "", "" );
 
-	public static final Level HELP = new CustomLevel( "HELP", Integer.MAX_VALUE - 1 );
+	public static final Level HELP = new CustomLevel( "HELP", 20000, "", "", "" );
 
-	public static final Level ERROR = new CustomLevel( "ERROR", 1000 );
+	public static final Level DEVEL = new CustomLevel( "DEVEL", 10000, "[V]", "\u001b[1m\u001b[35m", "=" );
 
-	public static final Level WARN = new CustomLevel( "WARN", 900 );
+	public static final Level ERROR = new CustomLevel( "ERROR", Level.SEVERE.intValue(), "[E]", "\u001b[1m\u001b[31m", "*" );
 
-	public static final Level INFO = new CustomLevel( "INFO", 800 );
+	public static final Level WARN = new CustomLevel( "WARN", Level.WARNING.intValue(), "[W]", "\u001b[1m\u001b[33m", "-" );
 
-	public static final Level TRACE = new CustomLevel( "TRACE", 700 );
+	public static final Level INFO = new CustomLevel( "INFO", Level.INFO.intValue(), "[I]", "\u001b[37m", " " );
 
-	public static final Level DEBUG = new CustomLevel( "DEBUG", 600 );
+	public static final Level TRACE = new CustomLevel( "TRACE", Level.CONFIG.intValue(), "[T]", "\u001b[36m", "  " );
 
-	public static final Level DETAIL = new CustomLevel( "DETAIL", 500 );
+	public static final Level DEBUG = new CustomLevel( "DEBUG", Level.FINE.intValue(), "[D]", "\u001b[32m", "   " );
 
-	public static final Level ALL = new CustomLevel( "ALL", Integer.MIN_VALUE );
+	public static final Level DETAIL = new CustomLevel( "DETAIL", Level.FINER.intValue(), "[L]", "\u001b[1m\u001b[30m", "    " );
+
+	public static final Level ALL = new CustomLevel( "ALL", Level.ALL.intValue(), "", "", "" );
 
 	public static final Level DEFAULT_LOG_LEVEL = INFO;
 
@@ -470,26 +472,6 @@ public class Log {
 				return record;
 			}
 
-		}
-
-	}
-
-	private static class CustomLevel extends Level implements Comparable<CustomLevel> {
-
-		private static final long serialVersionUID = -7853455775674488102L;
-
-		protected CustomLevel( String name, int value ) {
-			super( name, value );
-			synchronized( CustomLevel.class ) {
-				known.add( this );
-			}
-		}
-
-		@Override
-		public int compareTo( CustomLevel that ) {
-			int thisValue = this.intValue();
-			int thatValue = that.intValue();
-			return ( thisValue < thatValue ? -1 : ( thisValue == thatValue ? 0 : 1 ) );
 		}
 
 	}

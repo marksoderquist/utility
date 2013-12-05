@@ -139,8 +139,8 @@ public abstract class Agent implements Controllable {
 			changeState( State.STOPPING );
 
 			// Run the stop task on a separate thread.
-			Thread thread = new Thread( new StopTransition() );
-			thread.setPriority( Thread.NORM_PRIORITY + 2 );
+			Thread thread = new Thread( new StopTransition(), "Agent stop thread" );
+			thread.setPriority( Thread.MAX_PRIORITY );
 			thread.start();
 		} finally {
 			transitionLock.unlock();
