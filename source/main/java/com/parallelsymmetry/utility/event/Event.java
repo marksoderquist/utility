@@ -6,7 +6,7 @@ import java.awt.EventQueue;
  * <p>
  * The Event class is the superclass of all application events.
  * <p>
- * Event priorities range from 0 to 9 with 5 being the default.
+ * Event priorities range from 1 to 9 with 5 being the default.
  * 
  * @author Mark Soderquist
  */
