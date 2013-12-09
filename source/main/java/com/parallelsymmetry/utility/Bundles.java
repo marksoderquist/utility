@@ -98,23 +98,33 @@ public class Bundles {
 	}
 
 	private static final String getKeyOrString( ClassLoader loader, String path, String name, String defaultValue, boolean showKey ) {
-		if( loader == null ) loader = ClassLoader.getSystemClassLoader();
-		ResourceBundle bundle = getBundle( loader, path, name, Locale.getDefault() );
-
 		// Define the string.
 		String string = null;
 
-		// If the string is null try and get the string from the bundle.
-		try {
-			if( bundle != null ) string = bundle.getString( name );
-		} catch( MissingResourceException exception ) {
-			// Intentionally ignore exception.
+		// Try the specified loader first.
+		if( string == null && loader != null ) {
+			try {
+				ResourceBundle bundle = getBundle( loader, path, name, Locale.getDefault() );
+				if( bundle != null ) string = bundle.getString( name );
+			} catch( MissingResourceException exception ) {
+				// Intentionally ignore exception.
+			}
 		}
 
-		// If the string is null try and use the default value.
+		// Try the system loader next.
+		if( string == null ) {
+			try {
+				ResourceBundle bundle = getBundle( ClassLoader.getSystemClassLoader(), path, name, Locale.getDefault() );
+				if( bundle != null ) string = bundle.getString( name );
+			} catch( MissingResourceException exception ) {
+				// Intentionally ignore exception.
+			}
+		}
+
+		// If the string is still null use the default value.
 		if( string == null ) string = defaultValue;
 
-		// If the string is null use the path and name to create a string
+		// If the string is still null use the key
 		if( string == null && showKey ) string = "[" + path + ":" + name + "]";
 
 		return string;
