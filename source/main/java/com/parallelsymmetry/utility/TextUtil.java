@@ -52,6 +52,16 @@ public final class TextUtil {
 		if( string1 != null && string2 == null ) return 1;
 		return string1.compareTo( string2 );
 	}
+	
+	public static final String cleanNull( String string ) {
+		if( string == null ) return null;
+		string = string.trim();
+		return "".equals( string ) ? null : string;
+	}
+
+	public static final String cleanEmpty( String string ) {
+		return string == null ? "" : string.trim();
+	}
 
 	/**
 	 * Concatenate multiple objects together using a fast string building object.
@@ -59,7 +69,7 @@ public final class TextUtil {
 	 * @param objects
 	 * @return
 	 */
-	public static String concatenate( Object... objects ) {
+	public static final String concatenate( Object... objects ) {
 		StringBuilder builder = new StringBuilder();
 
 		for( Object object : objects ) {
@@ -77,7 +87,7 @@ public final class TextUtil {
 	 * @param string
 	 * @return
 	 */
-	public static byte[] getMD5Sum( String string ) {
+	public static final byte[] getMD5Sum( String string ) {
 		if( string == null ) return null;
 
 		int width = 512;
@@ -101,43 +111,43 @@ public final class TextUtil {
 		}
 	}
 
-	public static String toString( Object[] array ) {
+	public static final String toString( Object[] array ) {
 		return toString( Arrays.asList( array ) );
 	}
 
-	public static String toString( Object[] array, int offset ) {
+	public static final String toString( Object[] array, int offset ) {
 		return toString( array, offset, array.length - offset );
 	}
 
-	public static String toString( Object[] array, int offset, int length ) {
+	public static final String toString( Object[] array, int offset, int length ) {
 		Object[] items = new Object[length];
 		System.arraycopy( array, offset, items, 0, length );
 		return toString( Arrays.asList( items ) );
 	}
 
-	public static String toString( Object[] array, String delimiter ) {
+	public static final String toString( Object[] array, String delimiter ) {
 		return toString( Arrays.asList( array ), delimiter );
 	}
 
-	public static String toString( Object[] array, String delimiter, int offset ) {
+	public static final String toString( Object[] array, String delimiter, int offset ) {
 		return toString( array, delimiter, offset, array.length - offset );
 	}
 
-	public static String toString( Object[] array, String delimiter, int offset, int length ) {
+	public static final String toString( Object[] array, String delimiter, int offset, int length ) {
 		Object[] items = new Object[length];
 		System.arraycopy( array, offset, items, 0, length );
 		return toString( Arrays.asList( items ), delimiter );
 	}
 
-	public static String toString( List<? extends Object> list ) {
+	public static final String toString( List<? extends Object> list ) {
 		return toString( list, "[", "]" );
 	}
 
-	public static String toString( List<? extends Object> list, String delimiter ) {
+	public static final String toString( List<? extends Object> list, String delimiter ) {
 		return toString( list, delimiter, null );
 	}
 
-	public static String toString( List<? extends Object> list, String prefix, String suffix ) {
+	public static final String toString( List<? extends Object> list, String prefix, String suffix ) {
 		if( list == null ) return null;
 
 		boolean delimiter = suffix == null;
@@ -166,7 +176,7 @@ public final class TextUtil {
 	 * @param data The character to convert.
 	 * @return A printable string representation of the character.
 	 */
-	public static String toPrintableString( char data ) {
+	public static final String toPrintableString( char data ) {
 
 		if( data >= 32 && data <= 126 ) {
 			return String.valueOf( data );
@@ -176,7 +186,7 @@ public final class TextUtil {
 		}
 	}
 
-	public static String toPrintableString( byte[] data ) {
+	public static final String toPrintableString( byte[] data ) {
 		if( data == null ) return null;
 		StringBuilder builder = new StringBuilder();
 		int count = data.length;
@@ -187,7 +197,7 @@ public final class TextUtil {
 		return builder.toString();
 	}
 
-	public static String toPrintableString( char[] data ) {
+	public static final String toPrintableString( char[] data ) {
 		if( data == null ) return null;
 		StringBuilder builder = new StringBuilder();
 		int count = data.length;
@@ -197,7 +207,7 @@ public final class TextUtil {
 		return builder.toString();
 	}
 
-	public static String toPrintableString( String data ) {
+	public static final String toPrintableString( String data ) {
 		return toPrintableString( data.toCharArray() );
 	}
 

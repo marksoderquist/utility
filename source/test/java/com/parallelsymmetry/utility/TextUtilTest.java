@@ -55,6 +55,20 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, TextUtil.compare( "b", "a" ) );
 	}
 
+	public void testCleanNull() {
+		assertEquals( null, TextUtil.cleanNull( null ) );
+		assertEquals( null, TextUtil.cleanNull( "" ) );
+		assertEquals( null, TextUtil.cleanNull( " " ) );
+		assertEquals( "a", TextUtil.cleanNull( " a " ) );
+	}
+
+	public void testCleanEmpty() {
+		assertEquals( "", TextUtil.cleanEmpty( null ) );
+		assertEquals( "", TextUtil.cleanEmpty( "" ) );
+		assertEquals( "", TextUtil.cleanEmpty( " " ) );
+		assertEquals( "a", TextUtil.cleanEmpty( " a " ) );
+	}
+
 	public void testConcatenate() {
 		assertEquals( "Count: 10", TextUtil.concatenate( "Count: ", 10 ) );
 		assertEquals( "Flag: false", TextUtil.concatenate( "Flag: ", false ) );
@@ -261,16 +275,16 @@ public class TextUtilTest extends TestCase {
 
 		result = TextUtil.findLines( lines, "Test line" );
 		assertEquals( 0, result.size() );
-		
+
 		result = TextUtil.findLines( lines, "Test line ." );
 		assertEquals( 5, result.size() );
-		
+
 		result = TextUtil.findLines( lines, "Test line 1" );
 		assertEquals( 1, result.size() );
-		
+
 		result = TextUtil.findLines( lines, "Test line [2,3]" );
 		assertEquals( 2, result.size() );
-		
+
 		result = TextUtil.findLines( lines, ".*4" );
 		assertEquals( 1, result.size() );
 	}
