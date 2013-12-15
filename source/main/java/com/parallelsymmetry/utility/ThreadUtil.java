@@ -12,11 +12,7 @@ public class ThreadUtil {
 	 * @param duration
 	 */
 	public static final void pause( long duration ) {
-		try {
-			Thread.sleep( duration );
-		} catch( InterruptedException exception ) {
-			// Intentionally ignore exception.
-		}
+		pause( duration, TimeUnit.MILLISECONDS );
 	}
 
 	/**
@@ -27,7 +23,7 @@ public class ThreadUtil {
 	 */
 	public static final void pause( long duration, TimeUnit unit ) {
 		try {
-			unit.sleep( duration );
+			unit.sleep( unit.convert( duration, TimeUnit.MILLISECONDS ) );
 		} catch( InterruptedException exception ) {
 			// Intentionally ignore exception.
 		}
