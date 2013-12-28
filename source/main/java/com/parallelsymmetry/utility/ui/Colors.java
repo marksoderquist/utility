@@ -10,6 +10,32 @@ public final class Colors {
 
 	public static final Color CLEAR = new Color( 0, 0, 0, 0 );
 
+	public final static Color WHITE = Color.WHITE;
+
+	public final static Color LIGHT_GRAY = Color.LIGHT_GRAY;
+
+	public final static Color GRAY = Color.GRAY;
+
+	public final static Color BLACK = Color.BLACK;
+
+	public final static Color RED = Color.RED;
+
+	public final static Color PINK = Color.PINK;
+
+	public final static Color ORANGE = Color.ORANGE;
+
+	public final static Color YELLOW = Color.YELLOW;
+
+	public final static Color GREEN = Color.GREEN;
+
+	public final static Color MAGENTA = Color.MAGENTA;
+
+	public final static Color CYAN = Color.CYAN;
+
+	public final static Color BLUE = Color.BLUE;
+
+	public final static Color PURPLE = new Color( 128, 0, 128 );
+
 	public static final String encode( Color color ) {
 		if( color == null ) return null;
 		String string = Integer.toHexString( color.getRGB() );
