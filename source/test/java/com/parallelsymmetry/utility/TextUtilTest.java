@@ -106,12 +106,40 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test".getBytes( ascii ) ) );
 	}
 
-	public void testToHexEncodedStringWithString() {
-		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "" ) );
-		assertEquals( "Bad conversion.", "0", TextUtil.toHexEncodedString( "\u0000" ) );
-		assertEquals( "Bad conversion.", "01", TextUtil.toHexEncodedString( "\u0000\u0001" ) );
-		assertEquals( "Bad conversion.", "01f", TextUtil.toHexEncodedString( "\u0000\u0001\u000f" ) );
-		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test" ) );
+	public void testHexEncodeWithString() {
+		assertEquals( "Bad conversion.", "", TextUtil.hexEncode( "" ) );
+		assertEquals( "Bad conversion.", "0000", TextUtil.hexEncode( "\u0000" ) );
+		assertEquals( "Bad conversion.", "00000001", TextUtil.hexEncode( "\u0000\u0001" ) );
+		assertEquals( "Bad conversion.", "00000001000f", TextUtil.hexEncode( "\u0000\u0001\u000f" ) );
+		assertEquals( "Bad conversion.", "0074006500730074", TextUtil.hexEncode( "test" ) );
+	}
+
+	public void testHexDecodeWithString() {
+		assertEquals( "Bad conversion.", null, TextUtil.hexDecode( null ) );
+		assertEquals( "Bad conversion.", "", TextUtil.hexDecode( "" ) );
+		assertEquals( "Bad conversion.", "\u0000", TextUtil.hexDecode( "0000" ) );
+		assertEquals( "Bad conversion.", "\u0000\u0001", TextUtil.hexDecode( "00000001" ) );
+		assertEquals( "Bad conversion.", "\u0000\u0001\u000f", TextUtil.hexDecode( "00000001000f" ) );
+		assertEquals( "Bad conversion.", "test", TextUtil.hexDecode( "0074006500730074" ) );
+
+	}
+
+	public void testHexEncode() {
+		assertEquals( "Bad conversion.", null, TextUtil.secureHexEncode( null ) );
+		assertEquals( "Bad conversion.", "", TextUtil.secureHexEncode( "".toCharArray() ) );
+		assertEquals( "Bad conversion.", "0000", TextUtil.secureHexEncode( "\u0000".toCharArray() ) );
+		assertEquals( "Bad conversion.", "00000001", TextUtil.secureHexEncode( "\u0000\u0001".toCharArray() ) );
+		assertEquals( "Bad conversion.", "00000001000f", TextUtil.secureHexEncode( "\u0000\u0001\u000f".toCharArray() ) );
+		assertEquals( "Bad conversion.", "0074006500730074", TextUtil.secureHexEncode( "test".toCharArray() ) );
+	}
+
+	public void testHexDecode() {
+		assertEquals( "Bad conversion.", null, TextUtil.secureHexDecode( null ) );
+		assertEquals( "Bad conversion.", "", new String( TextUtil.secureHexDecode( "" ) ) );
+		assertEquals( "Bad conversion.", "\u0000", new String( TextUtil.secureHexDecode( "0000" ) ) );
+		assertEquals( "Bad conversion.", "\u0000\u0001", new String( TextUtil.secureHexDecode( "00000001" ) ) );
+		assertEquals( "Bad conversion.", "\u0000\u0001\u000f", new String( TextUtil.secureHexDecode( "00000001000f" ) ) );
+		assertEquals( "Bad conversion.", "test", new String( TextUtil.secureHexDecode( "0074006500730074" ) ) );
 	}
 
 	public void testIsInteger() throws Exception {

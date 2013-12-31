@@ -52,7 +52,7 @@ public final class TextUtil {
 		if( string1 != null && string2 == null ) return 1;
 		return string1.compareTo( string2 );
 	}
-	
+
 	public static final String cleanNull( String string ) {
 		if( string == null ) return null;
 		string = string.trim();
@@ -232,16 +232,88 @@ public final class TextUtil {
 	}
 
 	/**
+	 * Encode a string to a hex string.
+	 * 
 	 * @param string
 	 * @return
 	 */
-	public static final String toHexEncodedString( String string ) {
-		int count = string.length();
+	public static final String hexEncode( String string ) {
+		return secureHexEncode( string.toCharArray() );
+	}
+
+	/**
+	 * Decode a hex string to a string.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static final String hexDecode( String string ) {
+		char[] value = secureHexDecode( string );
+		return value == null ? null : new String( value );
+	}
+
+	/**
+	 * <p>
+	 * Encode the char[] into a hex string. Secure means that at no time is the
+	 * char[] converted, in its entirety, to or from a String. See the security
+	 * note below.
+	 * <p>
+	 * Security note: Objects of type String are immutable, meaning there are no
+	 * methods defined that allow you to change (overwrite) or zero out the
+	 * contents of a String after usage. This feature makes String objects
+	 * unsuitable for storing security sensitive information, such as passwords.
+	 * The String objects can easily be discovered using standard debugging tools
+	 * or other methods that can inspect the JVM memory. Security sensitive
+	 * information should always be collected and stored in a char array instead.
+	 * 
+	 * @param chars
+	 * @return
+	 */
+	public static final String secureHexEncode( char[] chars ) {
+		if( chars == null ) return null;
+
+		int count = chars.length;
+		String string = null;
 		StringBuilder builder = new StringBuilder();
 		for( int index = 0; index < count; index++ ) {
-			builder.append( Integer.toHexString( string.charAt( index ) ) );
+			string = Integer.toHexString( chars[index] );
+			builder.append( rightJustify( string, 4, '0' ) );
 		}
+
 		return builder.toString();
+	}
+
+	/**
+	 * Decode a hex string into a char[]. Secure means that at no time is the
+	 * char[] converted, in its entirety, to or from a String. See the security
+	 * note below.
+	 * <p>
+	 * Security note: Objects of type String are immutable, meaning there are no
+	 * methods defined that allow you to change (overwrite) or zero out the
+	 * contents of a String after usage. This feature makes String objects
+	 * unsuitable for storing security sensitive information, such as passwords.
+	 * The String objects can easily be discovered using standard debugging tools
+	 * or other methods that can inspect the JVM memory. Security sensitive
+	 * information should always be collected and stored in a char array instead.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	public static final char[] secureHexDecode( String string ) {
+		if( string == null ) return null;
+
+		int count = string.length();
+		if( count % 4 != 0 ) throw new IllegalArgumentException( "Invalid string length: " + count );
+
+		// Divide the count by four.
+		count /= 4;
+
+		char[] chars = new char[count];
+		for( int index = 0; index < count; index += 1 ) {
+			chars[index] = (char)Integer.parseInt( string.substring( index * 4, index * 4 + 4 ), 16 );
+		}
+
+		return chars;
 	}
 
 	public static final boolean isInteger( String text ) {

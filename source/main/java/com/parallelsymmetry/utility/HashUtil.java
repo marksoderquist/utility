@@ -11,11 +11,16 @@ import java.security.NoSuchAlgorithmException;
 
 import com.parallelsymmetry.utility.log.Log;
 
+import fr.cryptohash.DigestEngine;
+import fr.cryptohash.Keccak256;
+
 public class HashUtil {
 
-	public static final HashStrategy SHA1 = new NamedStrategy( "SHA-1" );
+	public static final HashStrategy SHA1 = new DigestStrategy( new MessageDigestWrapper( "SHA-1" ) );
 
-	public static final HashStrategy MD5 = new NamedStrategy( "MD5" );
+	public static final HashStrategy MD5 = new DigestStrategy( new MessageDigestWrapper( "MD5" ) );
+
+	public static final HashStrategy KECCAK = new DigestStrategy( new KeccakDigestWrapper( new Keccak256() ) );
 
 	public static final HashStrategy DEFAULT_STRATEGY = SHA1;
 
@@ -71,25 +76,31 @@ public class HashUtil {
 		return strategy.hash( input );
 	}
 
-	private static class NamedStrategy implements HashStrategy {
+	private static interface DigestWrapper {
+	
+		void reset();
+	
+		void update( byte[] input, int offset, int len );
+	
+		byte[] digest();
+	
+	}
 
-		private String algorithm = "SHA-1";
+	private static final class DigestStrategy implements HashStrategy {
 
-		public NamedStrategy( String algorithm ) {
-			this.algorithm = algorithm;
+		private DigestWrapper digest;
+
+		public DigestStrategy( DigestWrapper digest ) {
+			setDigest( digest );
+		}
+
+		protected void setDigest( DigestWrapper digest ) {
+			this.digest = digest;
 		}
 
 		@Override
 		public String hash( InputStream input ) {
 			if( input == null ) return null;
-
-			MessageDigest digest = null;
-			try {
-				digest = MessageDigest.getInstance( algorithm );
-			} catch( NoSuchAlgorithmException exception ) {
-				Log.write( exception );
-				return null;
-			}
 
 			byte[] buffer = new byte[4096];
 			digest.reset();
@@ -105,6 +116,62 @@ public class HashUtil {
 			}
 
 			return TextUtil.toHexEncodedString( digest.digest() );
+		}
+
+	}
+
+	private static final class MessageDigestWrapper implements DigestWrapper {
+
+		private MessageDigest digest;
+
+		public MessageDigestWrapper( String algorithm ) {
+			MessageDigest digest = null;
+			try {
+				digest = MessageDigest.getInstance( algorithm );
+			} catch( NoSuchAlgorithmException exception ) {
+				Log.write( exception );
+			}
+			this.digest = digest;
+		}
+
+		@Override
+		public void reset() {
+			digest.reset();
+		}
+
+		@Override
+		public void update( byte[] input, int offset, int length ) {
+			digest.update( input, offset, length );
+		}
+
+		@Override
+		public byte[] digest() {
+			return digest.digest();
+		}
+
+	}
+
+	private static final class KeccakDigestWrapper implements DigestWrapper {
+
+		private DigestEngine digest;
+
+		public KeccakDigestWrapper( DigestEngine digest ) {
+			this.digest = digest;
+		}
+
+		@Override
+		public void reset() {
+			digest.reset();
+		}
+
+		@Override
+		public void update( byte[] input, int offset, int length ) {
+			digest.update( input, offset, length );
+		}
+
+		@Override
+		public byte[] digest() {
+			return digest.digest();
 		}
 
 	}
