@@ -98,12 +98,13 @@ public class TextUtilTest extends TestCase {
 	}
 
 	public void testToHexEncodedStringWithBytes() {
-		Charset ascii = Charset.forName( "ASCII" );
-		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "".getBytes( ascii ) ) );
-		assertEquals( "Bad conversion.", "00", TextUtil.toHexEncodedString( "\u0000".getBytes( ascii ) ) );
-		assertEquals( "Bad conversion.", "0001", TextUtil.toHexEncodedString( "\u0000\u0001".getBytes( ascii ) ) );
-		assertEquals( "Bad conversion.", "00010f", TextUtil.toHexEncodedString( "\u0000\u0001\u000f".getBytes( ascii ) ) );
-		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test".getBytes( ascii ) ) );
+		Charset encoding = Charset.forName( "ISO-8859-1" );
+		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "00", TextUtil.toHexEncodedString( "\u0000".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "0001", TextUtil.toHexEncodedString( "\u0000\u0001".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "ff01", TextUtil.toHexEncodedString( "\u00ff\u0001".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "00010f", TextUtil.toHexEncodedString( "\u0000\u0001\u000f".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test".getBytes( encoding ) ) );
 	}
 
 	public void testHexEncodeWithString() {
@@ -124,7 +125,28 @@ public class TextUtilTest extends TestCase {
 
 	}
 
-	public void testHexEncode() {
+	public void testHexByteEncode() {
+		Charset encoding = Charset.forName( "ISO-8859-1" );
+		assertEquals( "Bad conversion.", "", TextUtil.secureHexByteEncode( "".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "00", TextUtil.secureHexByteEncode( "\u0000".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "0001", TextUtil.secureHexByteEncode( "\u0000\u0001".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "ff01", TextUtil.secureHexByteEncode( "\u00ff\u0001".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "00010f", TextUtil.secureHexByteEncode( "\u0000\u0001\u000f".getBytes( encoding ) ) );
+		assertEquals( "Bad conversion.", "74657374", TextUtil.secureHexByteEncode( "test".getBytes( encoding ) ) );
+	}
+
+	public void testHexByteDecode() {
+		Charset encoding = Charset.forName( "ISO-8859-1" );
+		assertEquals( "Bad conversion.", null, TextUtil.secureHexByteDecode( null ) );
+		assertEquals( "Bad conversion.", "", new String( TextUtil.secureHexByteDecode( "" ), encoding ) );
+		assertEquals( "Bad conversion.", "\u0000", new String( TextUtil.secureHexByteDecode( "00" ), encoding ) );
+		assertEquals( "Bad conversion.", "\u0000\u0001", new String( TextUtil.secureHexByteDecode( "0001" ), encoding ) );
+		assertEquals( "Bad conversion.", "\u00ff\u0001", new String( TextUtil.secureHexByteDecode( "ff01" ), encoding ) );
+		assertEquals( "Bad conversion.", "\u0000\u0001\u000f", new String( TextUtil.secureHexByteDecode( "00010f" ), encoding ) );
+		assertEquals( "Bad conversion.", "test", new String( TextUtil.secureHexByteDecode( "74657374" ), encoding ) );
+	}
+
+	public void testHexCharEncode() {
 		assertEquals( "Bad conversion.", null, TextUtil.secureHexEncode( null ) );
 		assertEquals( "Bad conversion.", "", TextUtil.secureHexEncode( "".toCharArray() ) );
 		assertEquals( "Bad conversion.", "0000", TextUtil.secureHexEncode( "\u0000".toCharArray() ) );
@@ -133,7 +155,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Bad conversion.", "0074006500730074", TextUtil.secureHexEncode( "test".toCharArray() ) );
 	}
 
-	public void testHexDecode() {
+	public void testHexCharDecode() {
 		assertEquals( "Bad conversion.", null, TextUtil.secureHexDecode( null ) );
 		assertEquals( "Bad conversion.", "", new String( TextUtil.secureHexDecode( "" ) ) );
 		assertEquals( "Bad conversion.", "\u0000", new String( TextUtil.secureHexDecode( "0000" ) ) );

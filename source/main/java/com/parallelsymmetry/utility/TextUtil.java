@@ -252,6 +252,40 @@ public final class TextUtil {
 		return value == null ? null : new String( value );
 	}
 
+	public static final String secureHexByteEncode( byte[] bytes ) {
+		if( bytes == null ) return null;
+
+		int value = 0;
+		int count = bytes.length;
+		String string = null;
+		StringBuilder builder = new StringBuilder();
+		for( int index = 0; index < count; index++ ) {
+			value = bytes[index];
+			string = Integer.toHexString( value < 0 ? value + 256 : value );
+			if( string.length() == 1 ) builder.append( "0" );
+			builder.append( string );
+		}
+
+		return builder.toString();
+	}
+
+	public static final byte[] secureHexByteDecode( String string ) {
+		if( string == null ) return null;
+
+		int count = string.length();
+		if( count % 2 != 0 ) throw new IllegalArgumentException( "Invalid string length: " + count );
+
+		// Divide the count by two.
+		count /= 2;
+
+		byte[] bytes = new byte[count];
+		for( int index = 0; index < count; index += 1 ) {
+			bytes[index] = (byte)Integer.parseInt( string.substring( index * 2, index * 2 + 2 ), 16 );
+		}
+
+		return bytes;
+	}
+
 	/**
 	 * <p>
 	 * Encode the char[] into a hex string. Secure means that at no time is the
