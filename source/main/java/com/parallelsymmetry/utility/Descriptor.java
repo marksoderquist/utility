@@ -187,7 +187,7 @@ public class Descriptor {
 		try {
 			value = (String)xpath.evaluate( "normalize-space(" + path + ")", node, XPathConstants.STRING );
 		} catch( XPathExpressionException exception ) {
-			Log.write( new Exception( path, exception ) );
+			throw new RuntimeException( path, exception );
 		}
 
 		if( TextUtil.isEmpty( value ) ) return null;
