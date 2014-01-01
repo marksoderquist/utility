@@ -209,6 +209,11 @@ public class ProductCard {
 		return this;
 	}
 
+	/**
+	 * Get the product key which is defined as: group.artifact
+	 * 
+	 * @return
+	 */
 	public String getProductKey() {
 		return productKey;
 	}
