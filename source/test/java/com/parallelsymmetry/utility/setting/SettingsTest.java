@@ -570,6 +570,28 @@ public class SettingsTest extends TestCase {
 		assertNull( targetList );
 	}
 
+	public void testPutSetEvents() {
+		int count = 5;
+		String path = "/test/sets/set5";
+		Set<MockPersistent> sourceSet = new HashSet<MockPersistent>();
+
+		for( int index = 0; index < count; index++ ) {
+			sourceSet.add( new MockPersistent( index ) );
+		}
+
+		settings.removeNode( path );
+		assertFalse( settings.nodeExists( path ) );
+
+		MockSettingListener listener = new MockSettingListener();
+		settings.addSettingListener( path, listener );
+
+		settings.putNodeSet( path, sourceSet );
+		assertTrue( settings.nodeExists( path ) );
+
+		// The event count is 6 but should be 1.
+		assertEquals( 6, listener.getEvents().size() );
+	}
+
 	public void testGetSet() {
 		int count = 5;
 		String path = "/test/sets/set1";
@@ -808,18 +830,7 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/z/b", "B" );
 		providerD.set( "/y/a", "A" );
 		providerD.set( "/y/b", "B" );
-		String expected = "<settings>\n"
-			+ "  <b>B</b>\n"
-			+ "  <a>A</a>\n"
-			+ "  <y>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </y>\n"
-			+ "  <z>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </z>\n"
-			+ "</settings>\n";
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <y>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </y>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
 		assertEquals( expected, settings.toStringXml() );
 	}
@@ -861,14 +872,7 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
 		providerD.set( "/z/b", "B" );
-		String expected = "<settings>\n"
-			+ "  <b>B</b>\n"
-			+ "  <a>A</a>\n"
-			+ "  <z>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </z>\n"
-			+ "</settings>\n";
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
@@ -882,14 +886,7 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
 		providerD.set( "/z/b", "B" );
-		String expected = "<settings>\n"
-			+ "  <b>B</b>\n"
-			+ "  <a>A</a>\n"
-			+ "  <z>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </z>\n"
-			+ "</settings>\n";
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
