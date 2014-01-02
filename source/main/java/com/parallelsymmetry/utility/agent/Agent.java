@@ -7,10 +7,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.parallelsymmetry.utility.Controllable;
+import com.parallelsymmetry.utility.ExtendedControllable;
 import com.parallelsymmetry.utility.log.Log;
 
-public abstract class Agent implements Controllable {
+public abstract class Agent implements ExtendedControllable {
 
 	public enum State {
 		STARTING, STARTED, STOPPING, STOPPED, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED

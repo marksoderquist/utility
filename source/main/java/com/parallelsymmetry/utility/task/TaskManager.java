@@ -15,12 +15,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.parallelsymmetry.utility.Controllable;
+import com.parallelsymmetry.utility.ExtendedControllable;
 import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.setting.Persistent;
 import com.parallelsymmetry.utility.setting.Settings;
 
-public class TaskManager implements Persistent, Controllable {
+public class TaskManager implements Persistent, ExtendedControllable {
 
 	private static final int MIN_THREAD_COUNT = 4;
 
