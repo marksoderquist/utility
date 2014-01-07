@@ -46,6 +46,7 @@ public class TaskManager implements Persistent, ExtendedControllable {
 
 	private List<Task<?>> tasks;
 
+	// NEXT Remove the event dispatch thread check. It was a workaround anyway.
 	private boolean eventDispatchThreadCheck;
 
 	public TaskManager() {
