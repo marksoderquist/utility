@@ -35,6 +35,8 @@ public class OperatingSystem {
 	private static String arch;
 
 	private static Boolean elevated;
+	
+	private static boolean fileSystemCaseSensitive;
 
 	/**
 	 * Initialize the class.
@@ -87,6 +89,11 @@ public class OperatingSystem {
 
 		// Store the version.
 		OperatingSystem.version = version;
+		
+		// Case sensitive file system.
+		File fileOne = new File( "TeStFiLe" );
+		File fileTwo = new File( "tEsTfIlE" );
+		fileSystemCaseSensitive = !fileOne.equals( fileTwo );
 	}
 
 	public static final String getName() {
@@ -150,6 +157,13 @@ public class OperatingSystem {
 
 	public static final boolean isReduceProcessSupported() {
 		return OperatingSystem.isMac() || OperatingSystem.isUnix() || OperatingSystem.isWindows();
+	}
+
+	/**
+	Test the file system for case sensitivity.
+	*/
+	public static final boolean isFileSystemCaseSensitive() {
+		return fileSystemCaseSensitive;
 	}
 
 	public static final Process startProcessElevated( ProcessBuilder builder ) throws IOException {
