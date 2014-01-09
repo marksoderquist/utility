@@ -2,6 +2,8 @@ package com.parallelsymmetry.utility.data;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -239,6 +241,38 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 	//	public boolean equals( Object object ) {
 	//		return equalsUsingAttributesAndChildren( object );
 	//	}
+
+	/**
+	 * Sort the child nodes according to the specified {@link Comparator}.
+	 */
+	public void sort( Comparator<T> comparator ) {
+		if( children == null ) return;
+
+		// This long implementation is because CopyOnWriteArrayList does not support Collections.sort().
+		// In Java 8 there is a CopyOnWriteArrayList.sort() method.
+		ArrayList<T> buffer = new ArrayList<T>( children );
+		Collections.sort( buffer, comparator );
+		children.clear();
+		children.addAll( buffer );
+	}
+
+	/**
+	 * <p>
+	 * Filter the child nodes according to the specified <code>NodeFilter</code>.
+	 * </p>
+	 * <p>
+	 * Warning: This method will remove child nodes that do not pass the filter.
+	 * </p>
+	 */
+	public void filter( DataFilter<T> filter ) {
+		// If the filter is null the return.
+		if( filter == null ) return;
+
+		// Filter the child resources.
+		for( T node : children ) {
+			if( !filter.accept( node ) ) children.remove( node );
+		}
+	}
 
 	public boolean equalsUsingChildren( Object object ) {
 		if( !( object instanceof DataList<?> ) ) return false;

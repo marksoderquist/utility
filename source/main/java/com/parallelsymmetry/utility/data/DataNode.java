@@ -171,6 +171,27 @@ public abstract class DataNode {
 	}
 
 	/**
+	 * Convenience method to get the parent when there is only one.
+	 * 
+	 * @return The parent node or null if there is not a parent.
+	 * @throws RuntimeException if there is more than one parent.
+	 */
+	public DataNode getParent() {
+		int count = parents.size();
+
+		switch( count ) {
+			case 0: {
+				return null;
+			}
+			case 1: {
+				return parents.iterator().next();
+			}
+		}
+
+		throw new RuntimeException( "The node has more than one parent: " + count );
+	}
+
+	/**
 	 * Get the parent node.
 	 * 
 	 * @return The parent node or null if there is no parent.
