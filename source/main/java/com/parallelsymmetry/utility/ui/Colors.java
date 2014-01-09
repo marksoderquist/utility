@@ -56,6 +56,10 @@ public final class Colors {
 		return new Color( color, true );
 	}
 
+	public static final Color mix( Color color, Color mixer ) {
+		return mix( color, mixer, 0.5 );
+	}
+
 	public static final Color mix( Color color, Color mixer, double factor ) {
 		if( color == null || mixer == null ) return null;
 
