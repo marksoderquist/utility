@@ -138,7 +138,9 @@ public class OperatingSystemTest extends TestCase {
 			assertEquals( gksudo.toString(), builder.command().get( 0 ) );
 			assertEquals( program, builder.command().get( 1 ) );
 		} else if( kdesudo.exists() ) {
-			// commands.add("/usr/bin/kdesudo");
+			assertEquals( 2, builder.command().size() );
+			assertEquals( kdesudo.toString(), builder.command().get( 0 ) );
+			assertEquals( program, builder.command().get( 1 ) );
 		} else {
 			assertEquals( 6, builder.command().size() );
 			assertEquals( "xterm", builder.command().get( 0 ) );
