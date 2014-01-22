@@ -174,10 +174,11 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
-		assertEquals( 4, builder.command().size() );
+		assertEquals( 5, builder.command().size() );
 		assertEquals( "su", builder.command().get( index++ ) );
 		assertEquals( "-", builder.command().get( index++ ) );
 		assertEquals( System.getenv( "SUDO_USER" ), builder.command().get( index++ ) );
+		assertEquals( "--", builder.command().get( index++ ) );
 		assertEquals( "textmate", builder.command().get( index++ ) );
 	}
 
@@ -190,10 +191,11 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
-		assertEquals( 4, builder.command().size() );
+		assertEquals( 5, builder.command().size() );
 		assertEquals( "su", builder.command().get( index++ ) );
 		assertEquals( "-", builder.command().get( index++ ) );
 		assertEquals( System.getenv( "SUDO_USER" ), builder.command().get( index++ ) );
+		assertEquals( "--", builder.command().get( index++ ) );
 		assertEquals( "vi", builder.command().get( index++ ) );
 	}
 

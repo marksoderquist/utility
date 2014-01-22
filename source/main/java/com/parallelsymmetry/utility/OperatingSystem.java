@@ -467,6 +467,7 @@ public class OperatingSystem {
 			commands.add( "su" );
 			commands.add( "-" );
 			commands.add( System.getenv( "SUDO_USER" ) );
+			commands.add( "--" );
 		}
 
 		return commands;
