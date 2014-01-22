@@ -118,7 +118,7 @@ public class OperatingSystemTest extends TestCase {
 		ProcessBuilder builder = new ProcessBuilder( "textmate" );
 		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate" );
 
-		OperatingSystem.elevateProcessBuilder( builder );
+		OperatingSystem.elevateProcessBuilder( "textmate", builder );
 		assertEquals( 2, builder.command().size() );
 		assertEquals( elevate.getCanonicalPath(), builder.command().get( 0 ) );
 		assertEquals( "textmate", builder.command().get( 1 ) );
@@ -129,23 +129,23 @@ public class OperatingSystemTest extends TestCase {
 		String program = "vi";
 		OperatingSystemTest.init( "Linux", "x86_64", "2.6.32_45" );
 		ProcessBuilder builder = new ProcessBuilder( program );
-		OperatingSystem.elevateProcessBuilder( builder );
+		OperatingSystem.elevateProcessBuilder( program, builder );
 
 		File gksudo = new File( "/usr/bin/gksudo" );
 		File kdesudo = new File( "/usr/bin/kdesudo" );
 		if( gksudo.exists() ) {
-			assertEquals( 2, builder.command().size() );
+			assertEquals( 5, builder.command().size() );
 			assertEquals( gksudo.toString(), builder.command().get( 0 ) );
-			assertEquals( program, builder.command().get( 1 ) );
+			assertEquals( program, builder.command().get( 4 ) );
 		} else if( kdesudo.exists() ) {
-			assertEquals( 2, builder.command().size() );
+			assertEquals( 3, builder.command().size() );
 			assertEquals( kdesudo.toString(), builder.command().get( 0 ) );
-			assertEquals( program, builder.command().get( 1 ) );
+			assertEquals( program, builder.command().get( 2 ) );
 		} else {
 			assertEquals( 6, builder.command().size() );
 			assertEquals( "xterm", builder.command().get( 0 ) );
 			assertEquals( "-title", builder.command().get( 1 ) );
-			assertEquals( "elevate", builder.command().get( 2 ) );
+			assertEquals( program, builder.command().get( 2 ) );
 			assertEquals( "-e", builder.command().get( 3 ) );
 			assertEquals( "sudo", builder.command().get( 4 ) );
 			assertEquals( program, builder.command().get( 5 ) );
@@ -158,7 +158,7 @@ public class OperatingSystemTest extends TestCase {
 		ProcessBuilder builder = new ProcessBuilder( "notepad.exe" );
 		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" );
 
-		OperatingSystem.elevateProcessBuilder( builder );
+		OperatingSystem.elevateProcessBuilder( "Notepad", builder );
 		assertEquals( 3, builder.command().size() );
 		assertEquals( "wscript", builder.command().get( 0 ) );
 		assertEquals( elevate.getCanonicalPath(), builder.command().get( 1 ) );

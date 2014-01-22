@@ -35,7 +35,7 @@ public class OperatingSystem {
 	private static String arch;
 
 	private static Boolean elevated;
-	
+
 	private static boolean fileSystemCaseSensitive;
 
 	/**
@@ -64,7 +64,11 @@ public class OperatingSystem {
 			family = Family.WINDOWS;
 		} else if( name.contains( "OS/2" ) ) {
 			family = Family.OS2;
-		} else if( name.contains( "SunOS" ) | name.contains( "Solaris" ) | name.contains( "HP-UX" ) | name.contains( "AIX" ) | name.contains( "FreeBSD" ) ) {
+		} else if( name.contains( "SunOS" )
+			| name.contains( "Solaris" )
+			| name.contains( "HP-UX" )
+			| name.contains( "AIX" )
+			| name.contains( "FreeBSD" ) ) {
 			family = Family.UNIX;
 		} else if( name.contains( "Mac OS" ) ) {
 			if( name.contains( "Mac OS X" ) ) {
@@ -89,7 +93,7 @@ public class OperatingSystem {
 
 		// Store the version.
 		OperatingSystem.version = version;
-		
+
 		// Case sensitive file system.
 		File fileOne = new File( "TeStFiLe" );
 		File fileTwo = new File( "tEsTfIlE" );
@@ -160,14 +164,14 @@ public class OperatingSystem {
 	}
 
 	/**
-	Test the file system for case sensitivity.
-	*/
+	 * Test the file system for case sensitivity.
+	 */
 	public static final boolean isFileSystemCaseSensitive() {
 		return fileSystemCaseSensitive;
 	}
 
-	public static final Process startProcessElevated( ProcessBuilder builder ) throws IOException {
-		if( !OperatingSystem.isProcessElevated() ) elevateProcessBuilder( builder );
+	public static final Process startProcessElevated( String programName, ProcessBuilder builder ) throws IOException {
+		if( !OperatingSystem.isProcessElevated() ) elevateProcessBuilder( programName, builder );
 		return builder.start();
 	}
 
@@ -182,12 +186,13 @@ public class OperatingSystem {
 	 * modified after this call to avoid problems even though this cannot be
 	 * enforced.
 	 * 
+	 * @param programName The name of the program requesting elevated privileges
 	 * @param builder
 	 * @return
 	 * @throws IOException
 	 */
-	public static final ProcessBuilder elevateProcessBuilder( ProcessBuilder builder ) throws IOException {
-		List<String> command = getElevateCommands();
+	public static final ProcessBuilder elevateProcessBuilder( String programName, ProcessBuilder builder ) throws IOException {
+		List<String> command = getElevateCommands( programName );
 		command.addAll( builder.command() );
 		builder.command( command );
 		return builder;
@@ -401,7 +406,8 @@ public class OperatingSystem {
 	}
 
 	static final boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) )
+			|| ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 	static final void clearProcessElevatedCache() {
@@ -420,7 +426,7 @@ public class OperatingSystem {
 		}
 	}
 
-	private static final List<String> getElevateCommands() throws IOException {
+	private static final List<String> getElevateCommands( String programName ) throws IOException {
 		List<String> commands = new ArrayList<String>();
 
 		if( isMac() ) {
@@ -430,12 +436,16 @@ public class OperatingSystem {
 			File kdesudo = new File( "/usr/bin/kdesudo" );
 			if( gksudo.exists() ) {
 				commands.add( "/usr/bin/gksudo" );
+				commands.add( "-D" );
+				commands.add( programName );
+				commands.add( "--" );
 			} else if( kdesudo.exists() ) {
 				commands.add( "/usr/bin/kdesudo" );
+				commands.add( "--" );
 			} else {
 				commands.add( "xterm" );
 				commands.add( "-title" );
-				commands.add( "elevate" );
+				commands.add( programName );
 				commands.add( "-e" );
 				commands.add( "sudo" );
 			}
