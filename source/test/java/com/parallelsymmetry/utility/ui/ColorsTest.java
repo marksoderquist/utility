@@ -39,6 +39,19 @@ public class ColorsTest extends TestCase {
 		assertEquals( new Color( 63, 63, 63, 255 ), Colors.mix( Color.BLACK, Color.WHITE, 0.25 ) );
 	}
 
+	public void testMixSrcOverDst() {
+		assertEquals( null, Colors.mixSrcOverDst( null, Colors.CLEAR, 0.5 ) );
+		assertEquals( null, Colors.mixSrcOverDst( Colors.CLEAR, null, 0.5 ) );
+		assertEquals( new Color( 0, 0, 0, 255 ), Colors.mixSrcOverDst( Color.BLACK, Colors.CLEAR, 0.5 ) );
+		assertEquals( new Color( 128, 128, 128, 255 ), Colors.mixSrcOverDst( Color.BLACK, Color.WHITE, 0.5 ) );
+		assertEquals( new Color( 64, 64, 64, 255 ), Colors.mixSrcOverDst( Color.BLACK, Color.WHITE, 0.25 ) );
+
+		Color a = new Color( 0, 0, 0, 128 );
+		Color b = new Color( 255, 255, 255, 128 );
+		assertEquals( new Color( 102, 102, 102, 160 ), Colors.mixSrcOverDst( a, b, 0.5 ) );
+		assertEquals( new Color( 153, 153, 153, 160 ), Colors.mixSrcOverDst( b, a, 0.5 ) );
+	}
+
 	public void testDeriveWithColor() {
 		assertEquals( new Color( 116, 165, 209 ), Colors.derive( new Color( 51, 98, 140 ), 0f, -0.19f, 0.27f, 0 ) );
 	}
@@ -126,5 +139,5 @@ public class ColorsTest extends TestCase {
 		assertEquals( -0.1907382f, offsets[1] );
 		assertEquals( 0.27058822f, offsets[2] );
 	}
-	
+
 }

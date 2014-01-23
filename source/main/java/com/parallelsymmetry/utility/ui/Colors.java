@@ -86,6 +86,37 @@ public final class Colors {
 		return new Color( r, g, b, a );
 	}
 
+	public static final Color mixSrcOverDst( Color dst, Color src ) {
+		return mixSrcOverDst( dst, src, 1 );
+	}
+
+	public static final Color mixSrcOverDst( Color dst, Color src, double factor ) {
+		if( dst == null || src == null ) return null;
+
+		// The color pre-multiplied.
+		float[] dstRgba = dst.getRGBComponents( null );
+		float dstA = dstRgba[3];
+		float dstR = dstRgba[0] * dstA;
+		float dstG = dstRgba[1] * dstA;
+		float dstB = dstRgba[2] * dstA;
+
+		// The mixer pre-multiplied.
+		float[] srcRgba = src.getRGBComponents( null );
+		float srcA = srcRgba[3] * (float)factor;
+		float srcR = srcRgba[0] * srcA;
+		float srcG = srcRgba[1] * srcA;
+		float srcB = srcRgba[2] * srcA;
+
+		float isrcA = 1 - srcA;
+
+		float a = srcA + dstA * isrcA;
+		float r = ( srcR + dstR * isrcA ) / a;
+		float g = ( srcG + dstG * isrcA ) / a;
+		float b = ( srcB + dstB * isrcA ) / a;
+
+		return new Color( r, g, b, a );
+	}
+
 	public static final Color derive( String key, float hOffset, float sOffset, float bOffset, int aOffset ) {
 		return derive( UIManager.getColor( key ), hOffset, sOffset, bOffset, aOffset );
 	}
