@@ -53,6 +53,13 @@ public final class TextUtil {
 		return string1.compareTo( string2 );
 	}
 
+	public static final int compareIgnoreCase( String string1, String string2 ) {
+		if( string1 == null && string2 == null ) return 0;
+		if( string1 == null && string2 != null ) return -1;
+		if( string1 != null && string2 == null ) return 1;
+		return string1.compareToIgnoreCase( string2 );
+	}
+
 	public static final String cleanNull( String string ) {
 		if( string == null ) return null;
 		string = string.trim();

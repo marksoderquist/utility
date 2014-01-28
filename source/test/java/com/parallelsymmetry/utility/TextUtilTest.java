@@ -55,6 +55,20 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, TextUtil.compare( "b", "a" ) );
 	}
 
+	public void testCompareIgnoreCase() {
+		assertEquals( 0, TextUtil.compareIgnoreCase( null, null ) );
+		assertEquals( -1, TextUtil.compareIgnoreCase( null, "" ) );
+		assertEquals( 1, TextUtil.compareIgnoreCase( "", null ) );
+		assertEquals( 0, TextUtil.compareIgnoreCase( "", "" ) );
+
+		assertEquals( 0, TextUtil.compareIgnoreCase( "A", "a" ) );
+		assertEquals( 0, TextUtil.compareIgnoreCase( "a", "A" ) );
+		assertEquals( -1, TextUtil.compareIgnoreCase( "a", "B" ) );
+		assertEquals( -1, TextUtil.compareIgnoreCase( "A", "b" ) );
+		assertEquals( 1, TextUtil.compareIgnoreCase( "B", "a" ) );
+		assertEquals( 1, TextUtil.compareIgnoreCase( "b", "A" ) );
+	}
+
 	public void testCleanNull() {
 		assertEquals( null, TextUtil.cleanNull( null ) );
 		assertEquals( null, TextUtil.cleanNull( "" ) );
