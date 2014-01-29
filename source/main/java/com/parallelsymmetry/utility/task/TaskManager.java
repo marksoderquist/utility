@@ -60,7 +60,7 @@ public class TaskManager implements Persistent, ExtendedControllable {
 	}
 
 	public int getThreadCount() {
-		return executor.getPoolSize();
+		return executor == null ? 0 : executor.getPoolSize();
 	}
 
 	public void setThreadCount( int count ) {
