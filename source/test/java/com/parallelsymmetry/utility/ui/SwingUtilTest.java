@@ -25,7 +25,7 @@ public class SwingUtilTest extends TestCase {
 		assertFalse( tester.isSafe() );
 
 		tester.reset();
-		SwingUtil.executeSafely( tester );
+		SwingUtil.invokeNowOrLater( tester );
 		tester.waitFor();
 		assertTrue( tester.isSafe() );
 	}

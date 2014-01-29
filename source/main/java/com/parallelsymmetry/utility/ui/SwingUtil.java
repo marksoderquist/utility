@@ -26,6 +26,14 @@ public class SwingUtil {
 		}
 	}
 
+	public static final void invokeLater( Runnable runnable ) {
+		EventQueue.invokeLater( runnable );
+	}
+
+	public static final void invokeAndWait( Runnable runnable ) throws InterruptedException, InvocationTargetException {
+		EventQueue.invokeAndWait( runnable );
+	}
+
 	/**
 	 * Choose how to execute a runnable by checking if the current thread is the
 	 * event dispatch thread. If so it is safe to execute the runnable directly on
@@ -36,7 +44,7 @@ public class SwingUtil {
 	 * @return True if executed on the event dispatch thread. False if queued to
 	 *         execute on the event dispatch thread.
 	 */
-	public static final boolean executeSafely( Runnable runnable ) {
+	public static final boolean invokeNowOrLater( Runnable runnable ) {
 		if( EventQueue.isDispatchThread() ) {
 			runnable.run();
 			return true;
