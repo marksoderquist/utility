@@ -54,6 +54,16 @@ public class SwingUtil {
 		}
 	}
 
+	public static final boolean safeInvokeAndWait( Runnable runnable ) throws InterruptedException, InvocationTargetException {
+		if( EventQueue.isDispatchThread() ) {
+			runnable.run();
+			return true;
+		} else {
+			EventQueue.invokeAndWait( runnable );
+			return false;
+		}
+	}
+
 	/**
 	 * Convenience method to get a child component by name.
 	 * 
