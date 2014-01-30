@@ -126,6 +126,12 @@ public final class FileUtil {
 		return name.substring( index + 1 );
 	}
 
+	/**
+	 * Get a human readable string using orders of magnitude in base-10.
+	 * 
+	 * @param size
+	 * @return
+	 */
 	public static String getHumanSize( long size ) {
 		int exponent = 0;
 		long coefficient = size;
@@ -174,6 +180,12 @@ public final class FileUtil {
 		return String.valueOf( coefficient ) + unit;
 	}
 
+	/**
+	 * Get a human readable string using orders of magnitude in base-2.
+	 * 
+	 * @param size
+	 * @return
+	 */
 	public static String getHumanBinSize( long size ) {
 		int exponent = 0;
 		long coefficient = size;
