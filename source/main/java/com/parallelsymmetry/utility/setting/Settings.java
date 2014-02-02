@@ -784,7 +784,7 @@ public class Settings {
 	 * settings.addSettingListener( settings.getPath() + "/", listener ).
 	 */
 	public void addSettingListener( SettingListener listener ) {
-		addSettingListener( path + "/", listener );
+		addSettingListener( path, listener );
 	}
 
 	/**
@@ -793,7 +793,7 @@ public class Settings {
 	 * ).
 	 */
 	public void removeSettingListener( SettingListener listener ) {
-		removeSettingListener( path + "/", listener );
+		removeSettingListener( path, listener );
 	}
 
 	/**
@@ -991,8 +991,6 @@ public class Settings {
 	}
 
 	private void fireSettingChangedEvent( SettingEvent event ) {
-		// Dispatch the event to any listeners matching a parent node path.
-
 		String eventPath = event.getFullPath();
 
 		while( eventPath != null ) {
@@ -1002,6 +1000,8 @@ public class Settings {
 					listener.settingChanged( event );
 				}
 			}
+
+			// Dispatch the event to any listeners matching a parent node path.
 			eventPath = getParentPath( eventPath );
 		}
 	}
@@ -1017,13 +1017,17 @@ public class Settings {
 	}
 
 	private String getAbsolutePath( String path ) {
+		// If the path is empty, return this node's path.
+		if( TextUtil.isEmpty( path ) ) return this.path;
+
+		// Trim trailing separator.
+		if( path.endsWith( SEPARATOR ) ) path = path.substring( 0, path.length() - 1 );
+
+		// Handle references to self.
 		if( path.startsWith( "." ) ) return this.path + path.substring( 1 );
 
 		// If the path is already absolute, return the specified path.
 		if( path.startsWith( SEPARATOR ) ) return path;
-
-		// If the path is empty, return this node's path.
-		if( TextUtil.isEmpty( path ) ) return this.path;
 
 		// If this node's path is the root.
 		if( SEPARATOR.equals( this.path ) ) return this.path + path;
