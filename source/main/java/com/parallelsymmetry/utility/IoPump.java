@@ -42,6 +42,8 @@ public class IoPump implements Runnable {
 
 	private boolean execute;
 
+	private boolean stopAtEndOfStream = true;
+
 	private boolean interruptOnStop;
 
 	private boolean logEnabled;
@@ -162,6 +164,14 @@ public class IoPump implements Runnable {
 		this.reader = new BufferedReader( reader );
 		this.writer = new BufferedWriter( writer );
 		this.bufferSize = bufferSize;
+	}
+
+	public boolean getStopAtEndOfStream() {
+		return stopAtEndOfStream;
+	}
+
+	public void setStopAtEndOfStream( boolean stopAtEndOfStream ) {
+		this.stopAtEndOfStream = stopAtEndOfStream;
 	}
 
 	public boolean isInterruptOnStop() {
@@ -318,11 +328,8 @@ public class IoPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( logEnabled && logContent ) {
-						if( builder.length() > 0 ) Log.write( Log.TRACE, name, ": ", builder.toString() );
-						Log.write( Log.TRACE, name, " stream ended." );
-					}
-					execute = false;
+					if( logEnabled && logContent && builder.length() > 0 ) Log.write( Log.TRACE, name, ": ", builder.toString() );
+					if( stopAtEndOfStream ) execute = false;
 					continue;
 				}
 

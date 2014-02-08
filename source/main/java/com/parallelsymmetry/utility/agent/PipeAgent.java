@@ -157,7 +157,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 		int attempt = 0;
 		while( shouldExecute() ) {
 			if( attempts > 0 ) attempt++;
-			
+
 			try {
 				if( connected ) internalDisconnect();
 				internalConnect();
@@ -173,7 +173,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 					ThreadUtil.pause( reconnectDelay );
 				}
 			}
-			
+
 			if( attempts > 0 && attempt == attempts ) {
 				Log.write( Log.WARN, "Max reconnect attempts exhausted: ", attempt );
 				break;
@@ -215,6 +215,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 			try {
 				int bite = realInput.read();
 				if( bite < 0 ) {
+					realInput = null;
 					if( !isRunning() || isConnectOnce() ) return -1;
 					reconnect();
 					return read();
@@ -238,6 +239,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 			try {
 				int read = realInput.read( data );
 				if( read < 0 ) {
+					realInput = null;
 					if( !isRunning() || isConnectOnce() ) return -1;
 					reconnect();
 					return read( data );
@@ -261,6 +263,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 			try {
 				int read = realInput.read( data, offset, length );
 				if( read < 0 ) {
+					realInput = null;
 					if( !isRunning() || isConnectOnce() ) return -1;
 					reconnect();
 					return read( data, offset, length );
