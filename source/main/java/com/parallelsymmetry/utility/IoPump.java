@@ -318,7 +318,10 @@ public class IoPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( logEnabled && logContent && builder.length() > 0 ) Log.write( Log.TRACE, name, ": ", builder.toString() );
+					if( logEnabled && logContent ) {
+						if( builder.length() > 0 ) Log.write( Log.TRACE, name, ": ", builder.toString() );
+						Log.write( Log.TRACE, name, " stream ended." );
+					}
 					execute = false;
 					continue;
 				}
@@ -358,7 +361,7 @@ public class IoPump implements Runnable {
 				}
 			}
 		} catch( InterruptedIOException exception ) {
-			// Intentionally ignore exception.
+			Log.write( Log.TRACE, name, " interrupted." );
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception, name, " ", exception.getMessage() );
 		} finally {

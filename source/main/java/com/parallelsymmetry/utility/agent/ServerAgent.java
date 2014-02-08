@@ -94,7 +94,7 @@ public class ServerAgent extends PipeAgent {
 		runner.start();
 		startlock.hold();
 		startServer();
-		Log.write( Log.TRACE, getName() + ": Started on " + server.getInetAddress().getHostAddress() + ":" + server.getLocalPort() + "." );
+		Log.write( Log.TRACE, getName(), ": Started on ", server.getInetAddress().getHostAddress(), ":", server.getLocalPort(), "." );
 	}
 
 	@Override
