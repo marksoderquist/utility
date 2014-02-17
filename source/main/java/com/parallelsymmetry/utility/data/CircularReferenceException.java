@@ -20,8 +20,4 @@ public class CircularReferenceException extends RuntimeException {
 		super( message, cause );
 	}
 
-	public CircularReferenceException( String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace ) {
-		super( message, cause, enableSuppression, writableStackTrace );
-	}
-
 }
