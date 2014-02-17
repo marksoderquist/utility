@@ -391,7 +391,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 		if( index > children.size() ) index = children.size();
 
 		children.add( index, child );
-		child.addParent( this );
+		child.setParent( this );
 
 		if( addRemoveChildren == null ) {
 			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Action>();
@@ -410,7 +410,7 @@ public class DataList<T extends DataNode> extends DataNode implements List<T> {
 
 	void doRemoveChild( T child ) {
 		children.remove( child );
-		child.removeParent( this );
+		child.setParent( null );
 
 		if( addRemoveChildren == null ) {
 			addRemoveChildren = new ConcurrentHashMap<DataNode, DataEvent.Action>();

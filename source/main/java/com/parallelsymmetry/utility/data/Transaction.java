@@ -243,8 +243,9 @@ public class Transaction {
 		boolean modifiedChanged = oldModified != newModified;
 		if( modifiedChanged ) storeModifiedEvent( new MetaAttributeEvent( DataEvent.Action.MODIFY, sender, DataNode.MODIFIED, oldModified, newModified ) );
 
-		// Update the parent nodes.
-		for( DataNode parent : sender.getParents() ) {
+		// Update the parent node.
+		DataNode parent = sender.getParent();
+		if( parent != null ) {
 			boolean parentOldModified = parent.isModified();
 			if( modifiedChanged ) {
 				if( parent instanceof DataList ) {
@@ -308,9 +309,8 @@ public class Transaction {
 
 		sender.dispatchEvent( event );
 
-		for( DataNode parent : sender.getParents() ) {
-			dispatchValueEvent( event.cloneWithNewSender( parent ) );
-		}
+		DataNode parent = sender.getParent();
+		if( parent != null ) dispatchValueEvent( event.cloneWithNewSender( parent ) );
 	}
 
 	private void dispatchEvent( DataEvent event ) {

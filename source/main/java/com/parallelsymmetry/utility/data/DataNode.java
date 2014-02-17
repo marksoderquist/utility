@@ -1,7 +1,6 @@
 package com.parallelsymmetry.utility.data;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public abstract class DataNode {
 
 	protected boolean modified;
 
-	protected Set<DataNode> parents = new CopyOnWriteArraySet<DataNode>();
+	protected DataNode parent;
 
 	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
@@ -177,50 +176,21 @@ public abstract class DataNode {
 	 * @throws RuntimeException if there is more than one parent.
 	 */
 	public DataNode getParent() {
-		int count = parents.size();
-
-		switch( count ) {
-			case 0: {
-				return null;
-			}
-			case 1: {
-				return parents.iterator().next();
-			}
-		}
-
-		throw new RuntimeException( "The node has more than one parent: " + count );
+		return parent;
 	}
 
-	/**
-	 * Get the parent node.
-	 * 
-	 * @return The parent node or null if there is no parent.
-	 */
-	public Set<DataNode> getParents() {
-		return Collections.unmodifiableSet( parents );
+	public List<DataNode> getNodePath() {
+		return getNodePath( null );
 	}
 
-	public Set<List<DataNode>> getNodePaths() {
-		return getNodePaths( null );
-	}
+	public List<DataNode> getNodePath( DataNode stop ) {
+		List<DataNode> path = new ArrayList<DataNode>();
 
-	public Set<List<DataNode>> getNodePaths( DataNode stop ) {
-		Set<List<DataNode>> paths = new HashSet<List<DataNode>>();
+		if( this != stop && parent != null ) path = parent.getNodePath();
 
-		if( this == stop || parents.size() == 0 ) {
-			List<DataNode> path = new ArrayList<DataNode>();
-			path.add( this );
-			paths.add( path );
-		} else {
-			for( DataNode parent : parents ) {
-				for( List<DataNode> path : parent.getNodePaths( stop ) ) {
-					path.add( this );
-					paths.add( path );
-				}
-			}
-		}
+		path.add( this );
 
-		return paths;
+		return path;
 	}
 
 	/**
@@ -371,10 +341,10 @@ public abstract class DataNode {
 		// Set the attribute value.
 		if( newValue == null ) {
 			dataValues.remove( name );
-			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
+			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
 		} else {
 			dataValues.put( name, newValue );
-			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
+			if( newValue instanceof DataNode ) ( (DataNode)newValue ).setParent( this );
 		}
 
 		// Remove the attribute map if necessary.
@@ -403,10 +373,10 @@ public abstract class DataNode {
 		// Set the value.
 		if( newValue == null ) {
 			metaValues.remove( name );
-			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).removeParent( this );
+			if( oldValue instanceof DataNode ) ( (DataNode)oldValue ).setParent( null );
 		} else {
 			metaValues.put( name, newValue );
-			if( newValue instanceof DataNode ) ( (DataNode)newValue ).addParent( this );
+			if( newValue instanceof DataNode ) ( (DataNode)newValue ).setParent( this );
 		}
 
 		// Remove the meta value map if necessary.
@@ -443,12 +413,9 @@ public abstract class DataNode {
 		updateModifiedFlag();
 	}
 
-	void addParent( DataNode parent ) {
-		this.parents.add( parent );
-	}
-
-	void removeParent( DataNode parent ) {
-		this.parents.remove( parent );
+	void setParent( DataNode parent ) {
+		checkForCircularReference( parent );
+		this.parent = parent;
 	}
 
 	void dispatchEvent( DataEvent event ) {
@@ -469,8 +436,10 @@ public abstract class DataNode {
 	}
 
 	void checkForCircularReference( DataNode node ) {
-		for( DataNode parent : parents ) {
-			if( parent == node ) throw new RuntimeException( "Circular reference detected: " + node );
+		DataNode parent = this;
+		while( parent != null ) {
+			if( node == parent ) throw new CircularReferenceException( "Circular reference detected: " + node );
+			parent = parent.getParent();
 		}
 	}
 

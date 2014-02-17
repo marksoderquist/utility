@@ -2,9 +2,7 @@ package com.parallelsymmetry.utility.data;
 
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -457,80 +455,35 @@ public class DataNodeTest extends DataTestCase {
 	}
 
 	@Test
-	public void testGetParents() {
+	public void testGetParent() {
 		MockDataNode parent = new MockDataNode();
 		MockDataNode child = new MockDataNode();
-		assertEquals( 0, child.getParents().size() );
+		//assertEquals( 0, child.getParents().size() );
+		assertNull( child.getParent() );
 
 		String key = "key";
 
 		parent.setAttribute( key, child );
-		assertTrue( child.getParents().contains( parent ) );
+		assertEquals( child.getParent(), parent );
 
 		parent.setAttribute( key, null );
-		assertEquals( 0, child.getParents().size() );
+		assertNull( child.getParent() );
 	}
 
 	@Test
-	public void testGetNodePathsSingleParent() {
+	public void testGetNodePath() {
 		MockDataList list = new MockDataList();
 		MockDataNode child = new MockDataNode();
 
 		list.add( child );
 
-		Set<List<DataNode>> paths = list.getNodePaths();
-		assertEquals( 1, paths.size() );
-		List<DataNode> path = paths.iterator().next();
+		List<DataNode> path = list.getNodePath();
 		assertEquals( 1, path.size() );
 		assertEquals( list, path.get( 0 ) );
 
-		paths = child.getNodePaths();
-		assertEquals( 1, paths.size() );
-		path = paths.iterator().next();
+		path = child.getNodePath();
 		assertEquals( 2, path.size() );
 		assertEquals( list, path.get( 0 ) );
-		assertEquals( child, path.get( 1 ) );
-	}
-
-	@Test
-	public void testGetNodePathsMultipleParents() {
-		MockDataList list0 = new MockDataList( "List 0" );
-		MockDataList list1 = new MockDataList( "List 1" );
-		MockDataNode child = new MockDataNode();
-
-		list0.add( child );
-		list1.add( child );
-
-		// Check the list0 paths
-		Set<List<DataNode>> paths = list0.getNodePaths();
-		assertEquals( 1, paths.size() );
-		List<DataNode> path = paths.iterator().next();
-		assertEquals( 1, path.size() );
-		assertEquals( list0, path.get( 0 ) );
-
-		// Check the list1 paths
-		paths = list1.getNodePaths();
-		assertEquals( 1, paths.size() );
-		path = paths.iterator().next();
-		assertEquals( 1, path.size() );
-		assertEquals( list1, path.get( 0 ) );
-
-		// Get the child paths
-		paths = child.getNodePaths();
-		assertEquals( 2, paths.size() );
-
-		Iterator<List<DataNode>> iterator = paths.iterator();
-
-		// Check the first path.
-		path = iterator.next();
-		assertEquals( 2, path.size() );
-		assertTrue( list1 == path.get( 0 ) || list0 == path.get( 0 ) );
-		assertEquals( child, path.get( 1 ) );
-
-		// Check the second path.
-		path = iterator.next();
-		assertEquals( 2, path.size() );
-		assertTrue( list1 == path.get( 0 ) || list0 == path.get( 0 ) );
 		assertEquals( child, path.get( 1 ) );
 	}
 
@@ -552,7 +505,7 @@ public class DataNodeTest extends DataTestCase {
 
 		// Test setting an attribute on the child node modifies the parent.
 		child.setAttribute( "attribute", "value" );
-		assertTrue( child.getParents().contains( parent ) );
+		assertEquals( child.getParent(), parent );
 
 		assertNodeState( child, true, 1 );
 		assertNodeState( parent, true, 1 );
@@ -575,7 +528,7 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( parent, false, 0 );
 
 		parent.setAttribute( "child", child );
-		assertTrue( child.getParents().contains( parent ) );
+		assertEquals( child.getParent(), parent );
 		assertNodeState( parent, true, 1 );
 		assertEventCounts( parentHandler, 1, 1, 1 );
 		assertEventCounts( childHandler, 0, 0, 0 );
@@ -671,7 +624,7 @@ public class DataNodeTest extends DataTestCase {
 
 		// Test setting an attribute on the attribute node modifies the parent.
 		attribute.setAttribute( "attribute", "value" );
-		assertTrue( attribute.getParents().contains( node ) );
+		assertEquals( attribute.getParent(), node );
 
 		assertNodeState( attribute, true, 1 );
 		assertNodeState( node, true, 1 );
@@ -743,7 +696,6 @@ public class DataNodeTest extends DataTestCase {
 		parent1.setAttribute( "child", child );
 		assertEquals( child, parent0.getAttribute( "child" ) );
 		assertEquals( child, parent1.getAttribute( "child" ) );
-		assertEquals( 2, child.getParents().size() );
 		assertNodeState( parent0, false, 0 );
 		assertNodeState( parent1, true, 1 );
 		assertEventCounts( childHandler, 0, 0, 0 );
@@ -783,6 +735,17 @@ public class DataNodeTest extends DataTestCase {
 		node.removeDataListener( handler );
 		assertEquals( 0, listeners.size() );
 		assertFalse( listeners.contains( handler ) );
+	}
+
+	@Test
+	public void testCircularReferenceCheck() {
+		MockDataNode node = new MockDataNode();
+		try {
+			node.setAttribute( "node", node );
+			fail( "CircularReferenceException should be throw." );
+		} catch( CircularReferenceException exception ) {
+			// Intentionally ignore exception.
+		}
 	}
 
 }
