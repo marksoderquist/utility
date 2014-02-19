@@ -42,19 +42,19 @@ public class FontUtilTest extends TestCase {
 	@Test
 	public void testFindFontByTextWidth() {
 		Font font = FontUtil.findFontByTextWidth( baseFont, "M", 14 );
-		assertEquals( 31.852116f, font.getSize2D() );
+		assertEquals( 31.886122f, font.getSize2D() );
 	}
 
 	@Test
 	public void testFindFontByTextHeight() {
 		Font font = FontUtil.findFontByTextHeight( baseFont, "M", 14 );
-		assertEquals( 19.116705f, font.getSize2D() );
+		assertEquals( 19.104477f, font.getSize2D() );
 	}
 	
 	@Test
 	public void testFindFontByTextBounds() {
-		assertEquals( 19.116705f, FontUtil.findFontByTextBounds( baseFont, "M", 14, 14 ).getSize2D() );
-		assertEquals( 31.852116f, FontUtil.findFontByTextBounds( baseFont, "M", 14, 28 ).getSize2D() );
+		assertEquals( 19.104477f, FontUtil.findFontByTextBounds( baseFont, "M", 14, 14 ).getSize2D() );
+		assertEquals( 31.886122f, FontUtil.findFontByTextBounds( baseFont, "M", 14, 28 ).getSize2D() );
 	}
 
 }
