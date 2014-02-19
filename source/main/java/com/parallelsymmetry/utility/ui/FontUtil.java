@@ -12,6 +12,10 @@ public class FontUtil {
 
 	private static final String SEPARATOR = "-";
 
+	private static final float LARGE = 20f;
+	
+	private static final float SMALL = 10f;
+
 	public static final String encodeNameAndStyle( Font font ) {
 		StringBuilder builder = new StringBuilder( font.getFamily() );
 		builder.append( SEPARATOR );
@@ -77,35 +81,35 @@ public class FontUtil {
 
 		return (float)( height * m );
 	}
-
+	
 	private static final float findFontSizeByTextWidth( Font font, String text, double width ) {
-		Font fontA = font.deriveFont( 200f );
+		Font fontA = font.deriveFont( LARGE );
 		GlyphVector glyphsA = fontA.createGlyphVector( FONT_RENDER_CONTEXT, text );
 		Rectangle2D boundsA = glyphsA.getVisualBounds();
 		double a = boundsA.getWidth();
 
-		Font fontB = font.deriveFont( 100f );
+		Font fontB = font.deriveFont( SMALL );
 		GlyphVector glyphsB = fontB.createGlyphVector( FONT_RENDER_CONTEXT, text );
 		Rectangle2D boundsB = glyphsB.getVisualBounds();
 		double b = boundsB.getWidth();
 
-		double m = 100 / ( a - b );
+		double m = (LARGE - SMALL) / ( a - b );
 
 		return (float)( width * m );
 	}
 
 	private static final float findFontSizeByTextHeight( Font font, String text, double height ) {
-		Font fontA = font.deriveFont( 200f );
+		Font fontA = font.deriveFont( LARGE );
 		GlyphVector glyphsA = fontA.createGlyphVector( FONT_RENDER_CONTEXT, text );
 		Rectangle2D boundsA = glyphsA.getVisualBounds();
 		double a = boundsA.getHeight();
 
-		Font fontB = font.deriveFont( 100f );
+		Font fontB = font.deriveFont( SMALL );
 		GlyphVector glyphsB = fontB.createGlyphVector( FONT_RENDER_CONTEXT, text );
 		Rectangle2D boundsB = glyphsB.getVisualBounds();
 		double b = boundsB.getHeight();
 
-		double m = 100 / ( a - b );
+		double m = (LARGE - SMALL) / ( a - b );
 
 		return (float)( height * m );
 	}
