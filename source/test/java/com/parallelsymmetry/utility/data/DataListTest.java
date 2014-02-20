@@ -1,12 +1,10 @@
 package com.parallelsymmetry.utility.data;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.utility.TextUtil;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
@@ -940,39 +938,6 @@ public class DataListTest extends DataTestCase {
 	}
 
 	@Test
-	public void testSort() {
-		MockDataList list = new MockDataList();
-		list.add( new MockDataNode( "2" ) );
-		list.add( new MockDataNode( "1" ) );
-		list.add( new MockDataNode( "3" ) );
-		list.add( new MockDataNode( "0" ) );
-		list.add( new MockDataNode( "4" ) );
-
-		list.sort( new MockComparator() );
-		
-		assertEquals( "0", list.get(0).getAttribute( "name" ).toString() );
-		assertEquals( "1", list.get(1).getAttribute( "name" ).toString() );
-		assertEquals( "2", list.get(2).getAttribute( "name" ).toString() );
-		assertEquals( "3", list.get(3).getAttribute( "name" ).toString() );
-		assertEquals( "4", list.get(4).getAttribute( "name" ).toString() );
-	}
-
-	@Test
-	public void testFilter() {
-		MockDataList list = new MockDataList();
-		list.add( new MockDataNode( "0" ) );
-		list.add( new MockDataNode( "1" ) );
-		list.add( new MockDataNode( "2" ) );
-		list.add( new MockDataNode( "3" ) );
-		list.add( new MockDataNode( "4" ) );
-		assertEquals( 5, list.size() );
-
-		list.filter( new MockFilter( "3" ) );
-
-		assertEquals( 4, list.size() );
-	}
-
-	@Test
 	public void testEquals() {
 		MockDataList node1 = null;
 		MockDataList node2 = null;
@@ -1078,30 +1043,6 @@ public class DataListTest extends DataTestCase {
 		child2.setAttribute( "key", "b" );
 		assertFalse( node1.equalsUsingAttributesAndChildren( node2 ) );
 		assertFalse( node2.equalsUsingAttributesAndChildren( node1 ) );
-	}
-
-	private class MockComparator implements Comparator<DataNode> {
-
-		@Override
-		public int compare( DataNode node1, DataNode node2 ) {
-			return node1.getAttribute( "name" ).toString().compareTo( node2.getAttribute( "name" ).toString() );
-		}
-
-	}
-
-	private class MockFilter implements DataFilter<DataNode> {
-
-		private String name;
-
-		public MockFilter( String name ) {
-			this.name = name;
-		}
-
-		@Override
-		public boolean accept( DataNode node ) {
-			return !TextUtil.areEqual( name, node.getAttribute( "name" ).toString() );
-		}
-
 	}
 
 }
