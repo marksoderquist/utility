@@ -318,16 +318,15 @@ public abstract class BaseImage {
 	}
 
 	protected void fill( Shape shape ) {
-		fill( shape, getGradientPaint( GradientType.LIGHT ) );
+		fill( shape, (Paint)null );
 	}
 
 	protected void fill( Shape shape, GradientType type ) {
-		fill( shape, getGradientPaint( type, new Point( shape.getBounds2D().getMinX(), shape.getBounds().getMinY() ) ) );
+		fill( shape, getGradientPaint( type ) );
 	}
 
 	protected void fill( Shape shape, Paint paint ) {
-		if( paint == null ) paint = getGradientPaint( GradientType.LIGHT );
-		instructions.add( new FillInstruction( shape, paint ) );
+		instructions.add( new FillInstruction( shape, paint == null ? getGradientPaint( GradientType.LIGHT ) : paint ) );
 	}
 
 	protected ColorMode getColorMode() {
