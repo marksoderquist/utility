@@ -39,6 +39,13 @@ public final class TextUtil {
 		return string1.equals( string2 );
 	}
 
+	public static final boolean areEqualIgnoreCase( String string1, String string2 ) {
+		if( string1 == null && string2 == null ) return true;
+		if( string1 == null && string2 != null ) return false;
+		if( string1 != null && string2 == null ) return false;
+		return string1.equalsIgnoreCase( string2 );
+	}
+
 	public static final boolean areSame( String string1, String string2 ) {
 		if( isEmpty( string1 ) && isEmpty( string2 ) ) return true;
 		if( string1 == null && string2 != null ) return false;

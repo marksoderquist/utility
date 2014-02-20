@@ -27,6 +27,21 @@ public class TextUtilTest extends TestCase {
 
 		assertFalse( TextUtil.areEqual( null, "" ) );
 		assertFalse( TextUtil.areEqual( "", null ) );
+		assertFalse( TextUtil.areEqual( "a", "b" ) );
+		assertFalse( TextUtil.areEqual( "b", "a" ) );
+	}
+
+	public void testAreEqualIgnoreCase() {
+		assertTrue( TextUtil.areEqualIgnoreCase( null, null ) );
+		assertTrue( TextUtil.areEqualIgnoreCase( "", "" ) );
+		assertTrue( TextUtil.areEqualIgnoreCase( " ", " " ) );
+		assertTrue( TextUtil.areEqualIgnoreCase( "A", "a" ) );
+		assertTrue( TextUtil.areEqualIgnoreCase( "a", "A" ) );
+
+		assertFalse( TextUtil.areEqualIgnoreCase( null, "" ) );
+		assertFalse( TextUtil.areEqualIgnoreCase( "", null ) );
+		assertFalse( TextUtil.areEqual( "A", "b" ) );
+		assertFalse( TextUtil.areEqual( "B", "a" ) );
 	}
 
 	public void testAreSame() {
