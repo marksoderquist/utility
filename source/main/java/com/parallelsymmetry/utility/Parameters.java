@@ -1,6 +1,5 @@
 package com.parallelsymmetry.utility;
 
-import java.io.File;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,12 +97,12 @@ public class Parameters {
 
 	private Map<String, List<String>> values;
 
-	private List<File> files;
+	private List<String> resources; 
 
-	private Parameters( String[] commands, Map<String, List<String>> values, List<File> files ) {
+	private Parameters( String[] commands, Map<String, List<String>> values, List<String> resources ) {
 		this.commands = Arrays.copyOf( commands, commands.length );
 		this.values = values;
-		this.files = files;
+		this.resources = resources;
 	}
 
 	public static final Parameters create() {
@@ -120,7 +119,8 @@ public class Parameters {
 
 	public static final Parameters parse( String[] commands, Set<String> validParameters ) {
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
-		List<File> files = new ArrayList<File>();
+		//List<File> files = new ArrayList<File>();
+		List<String> resources = new ArrayList<String>();
 
 		boolean terminated = false;
 
@@ -161,12 +161,12 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				files.add( new File( command ) );
+				resources.add(  command );
 			}
 
 		}
 
-		return new Parameters( Arrays.copyOf( commands, commands.length ), values, files );
+		return new Parameters( Arrays.copyOf( commands, commands.length ), values, resources );
 	}
 
 	public int size() {
@@ -225,16 +225,16 @@ public class Parameters {
 		return !( get( name ) == null );
 	}
 
-	public List<File> getFiles() {
-		return files;
-	}
-
 	public Set<String> getNames() {
 		return values.keySet();
 	}
 
 	public String[] getCommands() {
 		return commands;
+	}
+
+	public List<String> getResources() {
+		return resources;
 	}
 
 	private String cleanup( String name ) {

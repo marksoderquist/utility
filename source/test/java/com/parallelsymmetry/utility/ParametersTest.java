@@ -1,14 +1,11 @@
 package com.parallelsymmetry.utility;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
-
-import com.parallelsymmetry.utility.Parameters;
 
 public class ParametersTest extends TestCase {
 
@@ -44,17 +41,17 @@ public class ParametersTest extends TestCase {
 	public void testParseWithValueAndFile() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
-		assertEquals( 1, parameters.getFiles().size() );
-		assertEquals( "test.txt", parameters.getFiles().get( 0 ).toString() );
+		assertEquals( 1, parameters.getResources().size() );
+		assertEquals( "test.txt", parameters.getResources().get( 0 ).toString() );
 	}
 
 	@Test
 	public void testParseWithValueAndFiles() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test1.txt", "test2.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
-		assertEquals( 2, parameters.getFiles().size() );
-		assertEquals( "test1.txt", parameters.getFiles().get( 0 ).toString() );
-		assertEquals( "test2.txt", parameters.getFiles().get( 1 ).toString() );
+		assertEquals( 2, parameters.getResources().size() );
+		assertEquals( "test1.txt", parameters.getResources().get( 0 ).toString() );
+		assertEquals( "test2.txt", parameters.getResources().get( 1 ).toString() );
 	}
 
 	@Test
@@ -69,8 +66,8 @@ public class ParametersTest extends TestCase {
 	public void testParseWithFlagAndFile() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" }, "help" );
 		assertEquals( "topic", parameters.get( "help" ) );
-		assertEquals( 1, parameters.getFiles().size() );
-		assertEquals( "test.txt", parameters.getFiles().get( 0 ).toString() );
+		assertEquals( 1, parameters.getResources().size() );
+		assertEquals( "test.txt", parameters.getResources().get( 0 ).toString() );
 	}
 
 	@Test
@@ -185,9 +182,9 @@ public class ParametersTest extends TestCase {
 		String filename = "test.file";
 		String[] args = new String[] { filename };
 		Parameters parameters = Parameters.parse( args );
-		List<File> files = parameters.getFiles();
-		assertEquals( "Number of files incorrect.", 1, files.size() );
-		assertEquals( "File name incorrect.", new File( filename ), files.get( 0 ) );
+		List<String> resources = parameters.getResources();
+		assertEquals( "Number of files incorrect.", 1, resources.size() );
+		assertEquals( "File name incorrect.", filename, resources.get( 0 ) );
 	}
 
 	@Test
@@ -202,10 +199,10 @@ public class ParametersTest extends TestCase {
 		list.toArray( args );
 		Parameters parameters = Parameters.parse( args );
 
-		List<File> files = parameters.getFiles();
-		assertEquals( "Number of files incorrect.", count, files.size() );
+		List<String> resources = parameters.getResources();
+		assertEquals( "Number of files incorrect.", count, resources.size() );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( "File name incorrect.", new File( "test" + index + ".file" ), files.get( index ) );
+			assertEquals( "File name incorrect.", "test" + index + ".file", resources.get( index ) );
 		}
 	}
 
@@ -214,11 +211,11 @@ public class ParametersTest extends TestCase {
 		String filename = "file";
 		String[] args = new String[] { "-flag", "--", filename };
 		Parameters parameters = Parameters.parse( args );
-		List<File> files = parameters.getFiles();
+		List<String> resources = parameters.getResources();
 
 		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
-		assertEquals( "Number of files incorrect.", 1, files.size() );
-		assertEquals( "File name incorrect.", new File( filename ), files.get( 0 ) );
+		assertEquals( "Number of files incorrect.", 1, resources.size() );
+		assertEquals( "File name incorrect.", filename, resources.get( 0 ) );
 	}
 
 	@Test
@@ -299,7 +296,7 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
-		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
+		assertEquals( "file1.txt", parameters.getResources().get( 0 ) );
 	}
 
 	@Test
@@ -314,7 +311,7 @@ public class ParametersTest extends TestCase {
 		assertTrue( parameters.isSet( "other" ) );
 		assertFalse( parameters.isTrue( "other" ) );
 
-		assertEquals( new File( "file1.txt" ), parameters.getFiles().get( 0 ) );
+		assertEquals( "file1.txt", parameters.getResources().get( 0 ) );
 	}
 
 	@Test
