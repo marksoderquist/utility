@@ -106,7 +106,7 @@ public class ActionAcceleratorWatcher implements KeyEventPostProcessor {
 	private Match match( List<String> accelerators, String sequence ) {
 		if( sequence == null ) return Match.NONE;
 
-		Log.write( Log.DEBUG, "Match key sequence: " + sequence );
+		Log.write( Log.DETAIL, "Match key sequence: " + sequence );
 
 		int index = Collections.binarySearch( accelerators, sequence );
 		if( index >= 0 ) return Match.EXACT;
