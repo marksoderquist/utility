@@ -16,10 +16,14 @@ public class FontUtil {
 	
 	private static final float SMALL = 10f;
 
-	public static final String encodeNameAndStyle( Font font ) {
-		StringBuilder builder = new StringBuilder( font.getFamily() );
+	public static final Font decode( String string ) {
+		return Font.decode( string );
+	}
+
+	public static final String encode( Font font ) {
+		StringBuilder builder = new StringBuilder( encodeNameAndStyle( font ) );
 		builder.append( SEPARATOR );
-		builder.append( encodeStyle( font ) );
+		builder.append( font.getSize() );
 		return builder.toString();
 	}
 
@@ -36,6 +40,13 @@ public class FontUtil {
 			}
 		}
 		return "PLAIN";
+	}
+
+	public static final String encodeNameAndStyle( Font font ) {
+		StringBuilder builder = new StringBuilder( font.getFamily() );
+		builder.append( SEPARATOR );
+		builder.append( encodeStyle( font ) );
+		return builder.toString();
 	}
 
 	public static final Rectangle2D getTextBounds( Font font, String text ) {
