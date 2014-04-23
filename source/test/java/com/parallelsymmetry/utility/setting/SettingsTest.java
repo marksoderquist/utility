@@ -843,6 +843,20 @@ public class SettingsTest extends TestCase {
 			+ "  </z>\n"
 			+ "</settings>\n";
 
+		if( System.getProperty( "java.version" ).startsWith( "1.8" )) {
+			expected = "<settings>\n"
+					+ "  <a>A</a>\n"
+					+ "  <b>B</b>\n"
+					+ "  <y>\n"
+					+ "    <a>A</a>\n"
+					+ "    <b>B</b>\n"
+					+ "  </y>\n"
+					+ "  <z>\n"
+					+ "    <a>A</a>\n"
+					+ "    <b>B</b>\n"
+					+ "  </z>\n"
+					+ "</settings>\n";
+		}
 		assertEquals( expected, settings.toStringXml() );
 	}
 
@@ -891,6 +905,17 @@ public class SettingsTest extends TestCase {
 			+ "    <a>A</a>\n"
 			+ "  </z>\n"
 			+ "</settings>\n";
+		
+		if( System.getProperty( "java.version" ).startsWith( "1.8" )) {
+			expected = "<settings>\n"
+					+ "  <a>A</a>\n"
+					+ "  <b>B</b>\n"
+					+ "  <z>\n"
+					+ "    <a>A</a>\n"
+					+ "    <b>B</b>\n"
+					+ "  </z>\n"
+					+ "</settings>\n";
+		}
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
@@ -913,6 +938,17 @@ public class SettingsTest extends TestCase {
 			+ "  </z>\n"
 			+ "</settings>\n";
 
+		if( System.getProperty( "java.version" ).startsWith( "1.8" )) {
+			expected = "<settings>\n"
+					+ "  <a>A</a>\n"
+					+ "  <b>B</b>\n"
+					+ "  <z>\n"
+					+ "    <a>A</a>\n"
+					+ "    <b>B</b>\n"
+					+ "  </z>\n"
+					+ "</settings>\n";
+		}
+		
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
 		Settings.printAsXml( settings, stream );
