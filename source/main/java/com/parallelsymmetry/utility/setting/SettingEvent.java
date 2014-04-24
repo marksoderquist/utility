@@ -73,4 +73,17 @@ public class SettingEvent {
 		return newValue;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( getClass().getName() );
+		builder.append( "@" );
+		builder.append( getFullPath() );
+		builder.append( "=" );
+		builder.append( getNewValue() );
+		builder.append( "|" );
+		builder.append( getOldValue() );
+		return builder.toString();
+	}
+
 }
