@@ -1,11 +1,14 @@
 package com.parallelsymmetry.utility.setting;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.w3c.dom.Node;
 
 import com.parallelsymmetry.utility.Descriptor;
+import com.parallelsymmetry.utility.log.Log;
 
 public class DescriptorSettingProvider implements SettingProvider {
 
@@ -18,6 +21,24 @@ public class DescriptorSettingProvider implements SettingProvider {
 	}
 
 	public DescriptorSettingProvider( Descriptor descriptor, boolean skipRoot ) {
+		init( descriptor, skipRoot );
+	}
+
+	public DescriptorSettingProvider( InputStream input ) {
+		this( input, true );
+	}
+
+	public DescriptorSettingProvider( InputStream input, boolean skipRoot ) {
+		Descriptor descriptor = null;
+		try {
+			descriptor = new Descriptor( input );
+		} catch( IOException exception ) {
+			throw new RuntimeException( exception );
+		}
+		init( descriptor, skipRoot );
+	}
+
+	private void init( Descriptor descriptor, boolean skipRoot ) {
 		this.descriptor = descriptor;
 		if( skipRoot ) root = "/" + descriptor.getDocument().getDocumentElement().getNodeName();
 	}
