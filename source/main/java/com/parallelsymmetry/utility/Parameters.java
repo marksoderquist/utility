@@ -113,11 +113,11 @@ public class Parameters {
 		return parse( commands, (Set<String>)null );
 	}
 
-	public static final Parameters parse( String[] commands, String... validParameters ) {
-		return parse( commands, new HashSet<String>( Arrays.asList( validParameters ) ) );
+	public static final Parameters parse( String[] commands, String... validCommands ) {
+		return parse( commands, new HashSet<String>( Arrays.asList( validCommands ) ) );
 	}
 
-	public static final Parameters parse( String[] commands, Set<String> validParameters ) {
+	public static final Parameters parse( String[] commands, Set<String> validCommands ) {
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
 		//List<File> files = new ArrayList<File>();
 		List<String> resources = new ArrayList<String>();
@@ -134,7 +134,7 @@ public class Parameters {
 			} else if( !terminated && command.startsWith( MULTIPLE ) ) {
 				String parameter = command.substring( 2 );
 
-				if( validParameters != null && !validParameters.contains( parameter ) ) throw new InvalidParameterException( "Unknown parameter: " + MULTIPLE + parameter );
+				if( validCommands != null && !validCommands.contains( command ) ) throw new InvalidParameterException( "Unknown parameter: " + command );
 
 				List<String> valueList = new ArrayList<String>();
 				while( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( SINGLE ) ) ) {
@@ -149,7 +149,7 @@ public class Parameters {
 			} else if( !terminated && command.startsWith( SINGLE ) ) {
 				String parameter = command.substring( 1 );
 
-				if( validParameters != null && !validParameters.contains( parameter ) ) throw new InvalidParameterException( "Unknown parameter: " + SINGLE + parameter );
+				if( validCommands != null && !validCommands.contains( command ) ) throw new InvalidParameterException( "Unknown command: " + command );
 
 				List<String> valueList = new ArrayList<String>();
 				if( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( SINGLE ) ) ) {
