@@ -1,15 +1,23 @@
 package com.parallelsymmetry.utility;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Map;
-
-import com.parallelsymmetry.utility.UriUtil;
 
 import junit.framework.TestCase;
 
 public class UriUtilTest extends TestCase {
 
-	public void testResolve() {
+	public void testResolveWithString() throws Exception {
+		assertEquals( new File( "" ).getCanonicalFile().toURI(), UriUtil.resolve( "" ) );
+		assertEquals( new File( "." ).getCanonicalFile().toURI(), UriUtil.resolve( "." ) );
+		assertEquals( new File( "test" ).getCanonicalFile().toURI(), UriUtil.resolve( "test" ) );
+		assertEquals( new File( "/test" ).getCanonicalFile().toURI(), UriUtil.resolve( "/test" ) );
+	
+		assertEquals( URI.create( "ssh://localhost" ), UriUtil.resolve( "ssh://localhost" ) );
+	}
+
+	public void testResolveWithRelativeUri() {
 		URI base = URI.create( "file:/test/folder/" );
 		URI absolute = URI.create( "file:/test/folder/absolute" );
 		URI relative = URI.create( "relative" );
