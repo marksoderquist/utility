@@ -42,7 +42,7 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 1, parameters.getResources().size() );
-		assertEquals( "test.txt", parameters.getResources().get( 0 ).toString() );
+		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
 	}
 
 	@Test
@@ -50,8 +50,8 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test1.txt", "test2.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 2, parameters.getResources().size() );
-		assertEquals( "test1.txt", parameters.getResources().get( 0 ).toString() );
-		assertEquals( "test2.txt", parameters.getResources().get( 1 ).toString() );
+		assertEquals( UriUtil.resolve( "test1.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
+		assertEquals( UriUtil.resolve( "test2.txt" ).toString(), parameters.getResources().get( 1 ).toString() );
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" }, "help" );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 1, parameters.getResources().size() );
-		assertEquals( "test.txt", parameters.getResources().get( 0 ).toString() );
+		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( args );
 		List<String> resources = parameters.getResources();
 		assertEquals( "Number of files incorrect.", 1, resources.size() );
-		assertEquals( "File name incorrect.", filename, resources.get( 0 ) );
+		assertEquals( "File name incorrect.", UriUtil.resolve( filename ).toString(), resources.get( 0 ) );
 	}
 
 	@Test
@@ -202,7 +202,7 @@ public class ParametersTest extends TestCase {
 		List<String> resources = parameters.getResources();
 		assertEquals( "Number of files incorrect.", count, resources.size() );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( "File name incorrect.", "test" + index + ".file", resources.get( index ) );
+			assertEquals( "File name incorrect.", UriUtil.resolve( "test" + index + ".file" ).toString(), resources.get( index ) );
 		}
 	}
 
@@ -215,7 +215,7 @@ public class ParametersTest extends TestCase {
 
 		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
 		assertEquals( "Number of files incorrect.", 1, resources.size() );
-		assertEquals( "File name incorrect.", filename, resources.get( 0 ) );
+		assertEquals( "File name incorrect.", UriUtil.resolve( filename ).toString(), resources.get( 0 ) );
 	}
 
 	@Test
@@ -296,7 +296,7 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
-		assertEquals( "file1.txt", parameters.getResources().get( 0 ) );
+		assertEquals( UriUtil.resolve( "file1.txt" ).toString(), parameters.getResources().get( 0 ) );
 	}
 
 	@Test
@@ -311,7 +311,7 @@ public class ParametersTest extends TestCase {
 		assertTrue( parameters.isSet( "other" ) );
 		assertFalse( parameters.isTrue( "other" ) );
 
-		assertEquals( "file1.txt", parameters.getResources().get( 0 ) );
+		assertEquals( UriUtil.resolve( "file1.txt" ).toString(), parameters.getResources().get( 0 ) );
 	}
 
 	@Test
@@ -361,6 +361,37 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( args );
 		assertNotSame( "Commands are same object.", args, parameters.getCommands() );
 		assertEquals( "Commands not identical values.", sumHashCode( args ), sumHashCode( parameters.getCommands() ) );
+	}
+
+	@Test
+	public void testIdempotentParse() throws Exception {
+		String[] commands = new String[] { "-flag", "-key", "value", "file" };
+		Parameters parameters1 = Parameters.parse( commands );
+		Parameters parameters2 = Parameters.parse( parameters1.getCommands() );
+
+		assertEquals( parameters1, parameters2 );
+	}
+
+	@Test
+	public void testHashCode() {
+		String[] commands = new String[] { "-flag", "-key", "value", "file" };
+		Parameters parameters1 = Parameters.parse( commands );
+		Parameters parameters2 = Parameters.parse( commands );
+
+		assertEquals( parameters1.hashCode(), parameters2.hashCode() );
+	}
+
+	@Test
+	public void testEquals() {
+		String[] commands = new String[] { "-flag", "-key", "value", "file" };
+		Parameters parameters1 = Parameters.parse( commands );
+		Parameters parameters2 = Parameters.parse( commands );
+		Parameters parameters3 = Parameters.parse( new String[] { "-flag", "-key", "value", "otherfile" } );
+
+		assertTrue( parameters1.equals( parameters2 ) );
+		assertTrue( parameters2.equals( parameters1 ) );
+		assertFalse( parameters1.equals( parameters3 ) );
+		assertFalse( parameters3.equals( parameters1 ) );
 	}
 
 	private long sumHashCode( Object[] objects ) {

@@ -97,7 +97,7 @@ public class Parameters {
 
 	private Map<String, List<String>> values;
 
-	private List<String> resources; 
+	private List<String> resources;
 
 	private Parameters( String[] commands, Map<String, List<String>> values, List<String> resources ) {
 		this.commands = Arrays.copyOf( commands, commands.length );
@@ -161,7 +161,7 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				resources.add(  command );
+				resources.add( UriUtil.resolve( command ).toString() );
 			}
 
 		}
@@ -256,5 +256,31 @@ public class Parameters {
 		}
 
 		return builder.toString().trim();
+	}
+
+	@Override
+	public int hashCode() {
+		int code = 0;
+
+		for( String command : commands ) {
+			code &= command.hashCode();
+		}
+
+		return code;
+	}
+
+	@Override
+	public boolean equals( Object object ) {
+		if( !( object instanceof Parameters ) ) return false;
+
+		Parameters that = (Parameters)object;
+		if( this.commands.length != that.commands.length ) return false;
+
+		int count = this.commands.length;
+		for( int index = 0; index < count; index++ ) {
+			if( this.commands[index] != that.commands[index] ) return false;
+		}
+
+		return true;
 	}
 }
