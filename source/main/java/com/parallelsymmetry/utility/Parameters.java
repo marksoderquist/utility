@@ -118,7 +118,6 @@ public class Parameters {
 	}
 
 	public static final Parameters parse( String[] commands, Set<String> validCommands ) {
-		String[] resolved = Arrays.copyOf( commands, commands.length );
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
 		List<String> resources = new ArrayList<String>();
 
@@ -161,12 +160,12 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				resources.add( resolved[index] = UriUtil.resolve( command ).toString() );
+				resources.add( commands[index] = UriUtil.resolve( command ).toString() );
 			}
 
 		}
 
-		return new Parameters( resolved, values, resources );
+		return new Parameters( commands, values, resources );
 	}
 
 	public int size() {
