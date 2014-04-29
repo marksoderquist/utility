@@ -161,9 +161,7 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				String uri = UriUtil.resolve( command ).toString();
-				resources.add( uri );
-				resolved[index] = uri;
+				resources.add( resolved[index] = UriUtil.resolve( command ).toString() );
 			}
 
 		}
