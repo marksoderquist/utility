@@ -1,5 +1,6 @@
 package com.parallelsymmetry.utility;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -359,8 +360,15 @@ public class ParametersTest extends TestCase {
 	public void testGetCommands() throws Exception {
 		String[] args = new String[] { "-flag", "-key", "value", "file" };
 		Parameters parameters = Parameters.parse( args );
+		String[] commands = parameters.getCommands();
+
 		assertNotSame( "Commands are same object.", args, parameters.getCommands() );
-		assertEquals( "Commands not identical values.", sumHashCode( args ), sumHashCode( parameters.getCommands() ) );
+
+		int index = 0;
+		assertEquals( "-flag", commands[index++] );
+		assertEquals( "-key", commands[index++] );
+		assertEquals( "value", commands[index++] );
+		assertEquals( new File( "file" ).toURI().toString(), commands[index++] );
 	}
 
 	@Test
@@ -392,16 +400,6 @@ public class ParametersTest extends TestCase {
 		assertTrue( parameters2.equals( parameters1 ) );
 		assertFalse( parameters1.equals( parameters3 ) );
 		assertFalse( parameters3.equals( parameters1 ) );
-	}
-
-	private long sumHashCode( Object[] objects ) {
-		long value = 0;
-
-		for( Object object : objects ) {
-			value += object.hashCode();
-		}
-
-		return value;
 	}
 
 }

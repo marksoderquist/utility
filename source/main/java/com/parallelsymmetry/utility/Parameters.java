@@ -118,8 +118,8 @@ public class Parameters {
 	}
 
 	public static final Parameters parse( String[] commands, Set<String> validCommands ) {
+		String[] resolved = Arrays.copyOf( commands, commands.length );
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
-		//List<File> files = new ArrayList<File>();
 		List<String> resources = new ArrayList<String>();
 
 		boolean terminated = false;
@@ -161,12 +161,14 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				resources.add( UriUtil.resolve( command ).toString() );
+				String uri = UriUtil.resolve( command ).toString();
+				resources.add( uri );
+				resolved[index] = uri;
 			}
 
 		}
 
-		return new Parameters( Arrays.copyOf( commands, commands.length ), values, resources );
+		return new Parameters( resolved, values, resources );
 	}
 
 	public int size() {
@@ -274,11 +276,12 @@ public class Parameters {
 		if( !( object instanceof Parameters ) ) return false;
 
 		Parameters that = (Parameters)object;
+
 		if( this.commands.length != that.commands.length ) return false;
 
 		int count = this.commands.length;
 		for( int index = 0; index < count; index++ ) {
-			if( this.commands[index] != that.commands[index] ) return false;
+			if( !TextUtil.areEqual( this.commands[index], that.commands[index] ) ) return false;
 		}
 
 		return true;
