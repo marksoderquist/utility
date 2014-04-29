@@ -64,7 +64,7 @@ public class ParametersTest extends TestCase {
 
 	@Test
 	public void testParseWithFlagAndFile() throws Exception {
-		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" }, "help" );
+		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" }, "-help" );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 1, parameters.getResources().size() );
 		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
@@ -73,10 +73,10 @@ public class ParametersTest extends TestCase {
 	@Test
 	public void testParseWithUnknownFlagAndFile() throws Exception {
 		try {
-			Parameters.parse( new String[] { "-help", "topic", "-test", "test", "test.txt" }, "help" );
+			Parameters.parse( new String[] { "-help", "topic", "-test", "test", "test.txt" }, "-help" );
 			fail( "Unknown flags should cause an exception" );
 		} catch( IllegalArgumentException exception ) {
-			assertEquals( "Unknown parameter: -test", exception.getMessage() );
+			assertEquals( "Unknown command: -test", exception.getMessage() );
 		}
 	}
 
