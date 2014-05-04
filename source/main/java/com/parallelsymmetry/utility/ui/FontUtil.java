@@ -9,6 +9,12 @@ import java.awt.geom.Rectangle2D;
 public class FontUtil {
 
 	public static final FontRenderContext FONT_RENDER_CONTEXT = new FontRenderContext( new AffineTransform(), true, true );
+	
+	public static final String DEFAULT_SANSSERIF_FONT_CODE = "SansSerif-PLAIN-10";
+
+	public static final String DEFAULT_MONOSPACED_FONT_CODE = "Monospaced-PLAIN-8";
+
+	public static final String DEFAULT_FONT_CODE = DEFAULT_SANSSERIF_FONT_CODE;
 
 	private static final String SEPARATOR = "-";
 
