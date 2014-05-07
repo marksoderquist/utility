@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MockSettingListener implements SettingListener {
-	
+
 	private List<SettingEvent> events;
 
 	public MockSettingListener() {
@@ -16,11 +16,11 @@ public class MockSettingListener implements SettingListener {
 	public void settingChanged( SettingEvent event ) {
 		events.add( event );
 	}
-	
+
 	public List<SettingEvent> getEvents() {
 		return new ArrayList<SettingEvent>( events );
 	}
-	
+
 	public void reset() {
 		events = new CopyOnWriteArrayList<SettingEvent>();
 	}

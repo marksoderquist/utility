@@ -10,7 +10,7 @@ import com.parallelsymmetry.utility.log.Log;
 public class ServerAgentTest extends BaseTestCase {
 
 	private static final int PORT = 51427;
-	
+
 	private static final int TIMEOUT = 1000;
 
 	public void testStartStop() throws Exception {

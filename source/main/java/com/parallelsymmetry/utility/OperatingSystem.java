@@ -64,11 +64,7 @@ public class OperatingSystem {
 			family = Family.WINDOWS;
 		} else if( name.contains( "OS/2" ) ) {
 			family = Family.OS2;
-		} else if( name.contains( "SunOS" )
-			| name.contains( "Solaris" )
-			| name.contains( "HP-UX" )
-			| name.contains( "AIX" )
-			| name.contains( "FreeBSD" ) ) {
+		} else if( name.contains( "SunOS" ) | name.contains( "Solaris" ) | name.contains( "HP-UX" ) | name.contains( "AIX" ) | name.contains( "FreeBSD" ) ) {
 			family = Family.UNIX;
 		} else if( name.contains( "Mac OS" ) ) {
 			if( name.contains( "Mac OS X" ) ) {
@@ -406,8 +402,7 @@ public class OperatingSystem {
 	}
 
 	static final boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) )
-			|| ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 	static final void clearProcessElevatedCache() {

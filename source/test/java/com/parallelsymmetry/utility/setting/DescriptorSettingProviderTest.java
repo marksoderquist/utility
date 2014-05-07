@@ -52,7 +52,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 	public void testRootedProviderGet() {
 		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
-	
+
 	public void testRootedProviderGetWithAttributes() {
 		assertNull( provider.get( "/test/invalid/path" ) );
 		assertEquals( "5", rootedProvider.get( "/test/bounds/x" ) );

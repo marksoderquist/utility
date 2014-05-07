@@ -1,6 +1,5 @@
 package com.parallelsymmetry.utility.setting;
 
-
 public class PersistentString implements Persistent {
 
 	private String string;

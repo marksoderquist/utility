@@ -77,13 +77,13 @@ public class HashUtil {
 	}
 
 	private static interface DigestWrapper {
-	
+
 		void reset();
-	
+
 		void update( byte[] input, int offset, int len );
-	
+
 		byte[] digest();
-	
+
 	}
 
 	private static final class DigestStrategy implements HashStrategy {

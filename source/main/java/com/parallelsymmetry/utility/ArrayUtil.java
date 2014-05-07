@@ -21,12 +21,12 @@ public final class ArrayUtil {
 	public static final <T> T[] push( T[] oldArray, T element ) {
 		if( oldArray == null ) return null;
 		if( element == null ) return oldArray;
-	
+
 		int size = oldArray.length + 1;
 		T[] newArray = (T[])Array.newInstance( oldArray.getClass().getComponentType(), size );
 		System.arraycopy( oldArray, 0, newArray, 0, oldArray.length );
 		newArray[oldArray.length] = element;
-	
+
 		return newArray;
 	}
 

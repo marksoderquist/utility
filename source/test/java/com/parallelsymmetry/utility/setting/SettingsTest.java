@@ -830,32 +830,10 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/z/b", "B" );
 		providerD.set( "/y/a", "A" );
 		providerD.set( "/y/b", "B" );
-		String expected = "<settings>\n"
-			+ "  <b>B</b>\n"
-			+ "  <a>A</a>\n"
-			+ "  <y>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </y>\n"
-			+ "  <z>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </z>\n"
-			+ "</settings>\n";
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <y>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </y>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
-		if( System.getProperty( "java.version" ).startsWith( "1.8" )) {
-			expected = "<settings>\n"
-					+ "  <a>A</a>\n"
-					+ "  <b>B</b>\n"
-					+ "  <y>\n"
-					+ "    <a>A</a>\n"
-					+ "    <b>B</b>\n"
-					+ "  </y>\n"
-					+ "  <z>\n"
-					+ "    <a>A</a>\n"
-					+ "    <b>B</b>\n"
-					+ "  </z>\n"
-					+ "</settings>\n";
+		if( System.getProperty( "java.version" ).startsWith( "1.8" ) ) {
+			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <y>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </y>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
 		}
 		assertEquals( expected, settings.toStringXml() );
 	}
@@ -897,24 +875,10 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
 		providerD.set( "/z/b", "B" );
-		String expected = "<settings>\n"
-			+ "  <b>B</b>\n"
-			+ "  <a>A</a>\n"
-			+ "  <z>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </z>\n"
-			+ "</settings>\n";
-		
-		if( System.getProperty( "java.version" ).startsWith( "1.8" )) {
-			expected = "<settings>\n"
-					+ "  <a>A</a>\n"
-					+ "  <b>B</b>\n"
-					+ "  <z>\n"
-					+ "    <a>A</a>\n"
-					+ "    <b>B</b>\n"
-					+ "  </z>\n"
-					+ "</settings>\n";
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
+
+		if( System.getProperty( "java.version" ).startsWith( "1.8" ) ) {
+			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
 		}
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -929,26 +893,12 @@ public class SettingsTest extends TestCase {
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
 		providerD.set( "/z/b", "B" );
-		String expected = "<settings>\n"
-			+ "  <b>B</b>\n"
-			+ "  <a>A</a>\n"
-			+ "  <z>\n"
-			+ "    <b>B</b>\n"
-			+ "    <a>A</a>\n"
-			+ "  </z>\n"
-			+ "</settings>\n";
+		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
-		if( System.getProperty( "java.version" ).startsWith( "1.8" )) {
-			expected = "<settings>\n"
-					+ "  <a>A</a>\n"
-					+ "  <b>B</b>\n"
-					+ "  <z>\n"
-					+ "    <a>A</a>\n"
-					+ "    <b>B</b>\n"
-					+ "  </z>\n"
-					+ "</settings>\n";
+		if( System.getProperty( "java.version" ).startsWith( "1.8" ) ) {
+			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
 		}
-		
+
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
 		Settings.printAsXml( settings, stream );
@@ -962,13 +912,13 @@ public class SettingsTest extends TestCase {
 		MockSettingListener listener3 = new MockSettingListener();
 		MockSettingListener listener4 = new MockSettingListener();
 
-		settings.getNode( "/watched/node/" ).addSettingListener( listener1);
-		settings.getNode( "/watched/node" ).addSettingListener( listener2);
+		settings.getNode( "/watched/node/" ).addSettingListener( listener1 );
+		settings.getNode( "/watched/node" ).addSettingListener( listener2 );
 		settings.addSettingListener( "/watched/node", listener3 );
 		settings.addSettingListener( "/watched", listener4 );
-		
+
 		settings.put( "/watched/node/a", "a" );
-		
+
 		assertEquals( 1, listener1.getEvents().size() );
 		assertEquals( 1, listener2.getEvents().size() );
 		assertEquals( 1, listener3.getEvents().size() );

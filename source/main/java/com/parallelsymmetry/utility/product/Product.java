@@ -5,7 +5,7 @@ import java.io.File;
 public interface Product {
 
 	ProductCard getCard();
-	
+
 	/**
 	 * Get the product data folder. This is the location where the product should
 	 * be able to store files that are specific to the product. This path is
@@ -23,5 +23,5 @@ public interface Product {
 	 * @return The program data folder.
 	 */
 	File getDataFolder();
-	
+
 }

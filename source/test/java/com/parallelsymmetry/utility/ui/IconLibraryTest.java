@@ -91,7 +91,7 @@ public class IconLibraryTest extends TestCase {
 		Icon icon = library.getIcon( "test" );
 		icon.paintIcon( null, graphics, 0, 0 );
 		assertEquals( 1, renderer.getRenderCalledCount() );
-		
+
 		icon.paintIcon( null, graphics, 0, 0 );
 		assertEquals( 1, renderer.getRenderCalledCount() );
 	}

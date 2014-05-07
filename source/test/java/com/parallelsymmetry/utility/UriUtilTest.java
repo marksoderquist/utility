@@ -13,7 +13,7 @@ public class UriUtilTest extends TestCase {
 		assertEquals( new File( "." ).getCanonicalFile().toURI(), UriUtil.resolve( "." ) );
 		assertEquals( new File( "test" ).getCanonicalFile().toURI(), UriUtil.resolve( "test" ) );
 		assertEquals( new File( "/test" ).getCanonicalFile().toURI(), UriUtil.resolve( "/test" ) );
-	
+
 		assertEquals( URI.create( "ssh://localhost" ), UriUtil.resolve( "ssh://localhost" ) );
 	}
 

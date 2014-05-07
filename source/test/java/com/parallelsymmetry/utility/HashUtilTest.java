@@ -24,7 +24,7 @@ public class HashUtilTest extends TestCase {
 		FileUtil.save( "test", test );
 		assertEquals( "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3", HashUtil.hash( test ) );
 	}
-	
+
 	public void testHashUsingKeccak() {
 		assertNull( HashUtil.hash( (String)null ) );
 		assertEquals( "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470", HashUtil.hash( "", HashUtil.KECCAK ) );

@@ -200,7 +200,7 @@ public class IconLibrary {
 			icons.put( name, renderer );
 		}
 	}
-	
+
 	public void removeIcon( String name ) {
 		putIcon( name, null );
 	}
