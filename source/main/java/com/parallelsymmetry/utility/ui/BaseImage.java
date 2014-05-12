@@ -174,8 +174,22 @@ public abstract class BaseImage {
 		return image;
 	}
 
+	public BufferedImage getOpaqueImage() {
+		BufferedImage image = new BufferedImage( width, height, BufferedImage.TYPE_INT_RGB );
+
+		Graphics2D graphics = image.createGraphics();
+		render( graphics, 0, 0 );
+		graphics.dispose();
+
+		return image;
+	}
+
 	public void save( File target, String name ) {
 		save( target, name, width, height );
+	}
+
+	public void save( File target, String name, String type ) {
+		save( target, name, width, height, null, type );
 	}
 
 	public void save( File target, String name, ImageFilter filter ) {
@@ -191,6 +205,10 @@ public abstract class BaseImage {
 	}
 
 	public void save( File target, String name, int width, int height, ImageFilter filter ) {
+		save( target, name, width, height, null, "png" );
+	}
+
+	public void save( File target, String name, int width, int height, ImageFilter filter, String type ) {
 		if( target.exists() && target.isFile() ) {
 			System.err.println( "Target not a folder: " + target );
 			return;
@@ -201,7 +219,12 @@ public abstract class BaseImage {
 		}
 
 		// Generate the image.
-		BufferedImage image = getImage();
+		BufferedImage image = null;
+		if( "png".equals( type.toLowerCase() ) ) {
+			image = getImage();
+		} else {
+			image = getOpaqueImage();
+		}
 
 		// Scale the icon.
 		if( this.width != width || this.height != height ) image = Images.scale( image, width, height );
@@ -210,8 +233,8 @@ public abstract class BaseImage {
 		image = Images.filter( image, filter );
 
 		try {
-			File file = new File( target, name + ".png" );
-			ImageIO.write( image, "png", file );
+			File file = new File( target, name + "." + type.toLowerCase() );
+			ImageIO.write( image, type.toUpperCase(), file );
 			System.out.println( "Image created: " + file.toString() );
 		} catch( IOException exception ) {
 			exception.printStackTrace();
