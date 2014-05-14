@@ -93,14 +93,14 @@ public class Parameters {
 
 	public static final String MULTIPLE = "--";
 
-	private String[] commands;
+	private String[] originalCommands;
 
 	private Map<String, List<String>> values;
 
 	private List<String> uris;
 
 	private Parameters( String[] commands, Map<String, List<String>> values, List<String> uris ) {
-		this.commands = Arrays.copyOf( commands, commands.length );
+		this.originalCommands = Arrays.copyOf( commands, commands.length );
 		this.values = values;
 		this.uris = uris;
 	}
@@ -210,10 +210,6 @@ public class Parameters {
 		return value == null ? defaultValue : Boolean.parseBoolean( value );
 	}
 
-	public List<String> getValues( String name ) {
-		return values.get( cleanup( name ) );
-	}
-
 	/**
 	 * Returns whether the parameter was specified on the command line.
 	 * 
@@ -228,8 +224,12 @@ public class Parameters {
 		return values.keySet();
 	}
 
-	public String[] getCommands() {
-		return commands;
+	public List<String> getValues( String name ) {
+		return values.get( cleanup( name ) );
+	}
+
+	public String[] getOriginalCommands() {
+		return originalCommands;
 	}
 
 	public List<String> getUris() {
@@ -240,7 +240,7 @@ public class Parameters {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 
-		for( String command : commands ) {
+		for( String command : originalCommands ) {
 			builder.append( command );
 			builder.append( " " );
 		}
@@ -252,7 +252,7 @@ public class Parameters {
 	public int hashCode() {
 		int code = 0;
 
-		for( String command : commands ) {
+		for( String command : originalCommands ) {
 			code &= command.hashCode();
 		}
 
@@ -265,11 +265,11 @@ public class Parameters {
 
 		Parameters that = (Parameters)object;
 
-		if( this.commands.length != that.commands.length ) return false;
+		if( this.originalCommands.length != that.originalCommands.length ) return false;
 
-		int count = this.commands.length;
+		int count = this.originalCommands.length;
 		for( int index = 0; index < count; index++ ) {
-			if( !TextUtil.areEqual( this.commands[index], that.commands[index] ) ) return false;
+			if( !TextUtil.areEqual( this.originalCommands[index], that.originalCommands[index] ) ) return false;
 		}
 
 		return true;

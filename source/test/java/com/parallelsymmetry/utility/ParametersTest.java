@@ -357,12 +357,12 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetCommands() throws Exception {
+	public void testGetOriginalCommands() throws Exception {
 		String[] args = new String[] { "-flag", "-key", "value", "file" };
 		Parameters parameters = Parameters.parse( args );
-		String[] commands = parameters.getCommands();
+		String[] commands = parameters.getOriginalCommands();
 
-		assertNotSame( "Commands are same object.", args, parameters.getCommands() );
+		assertNotSame( "Commands are same object.", args, parameters.getOriginalCommands() );
 
 		int index = 0;
 		assertEquals( "-flag", commands[index++] );
@@ -375,7 +375,7 @@ public class ParametersTest extends TestCase {
 	public void testIdempotentParse() throws Exception {
 		String[] commands = new String[] { "-flag", "-key", "value", "file" };
 		Parameters parameters1 = Parameters.parse( commands );
-		Parameters parameters2 = Parameters.parse( parameters1.getCommands() );
+		Parameters parameters2 = Parameters.parse( parameters1.getOriginalCommands() );
 
 		assertEquals( parameters1, parameters2 );
 	}
