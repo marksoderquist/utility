@@ -91,19 +91,22 @@ public class Parameters {
 
 	public static final String SINGLE = "-";
 
-	public static final String MULTIPLE = "--";
+	public static final String DOUBLE = "--";
 
 	private String[] originalCommands;
-	
+
 	private String[] resolvedCommands;
+
+	private Set<String> flags;
 
 	private Map<String, List<String>> values;
 
 	private List<String> uris;
 
-	private Parameters( String[] originalCommands, String[] resolvedCommands, Map<String, List<String>> values, List<String> uris ) {
+	private Parameters( String[] originalCommands, String[] resolvedCommands, Set<String> flags, Map<String, List<String>> values, List<String> uris ) {
 		this.originalCommands = Arrays.copyOf( originalCommands, originalCommands.length );
 		this.resolvedCommands = resolvedCommands;
+		this.flags = flags;
 		this.values = values;
 		this.uris = uris;
 	}
@@ -121,8 +124,10 @@ public class Parameters {
 	}
 
 	public static final Parameters parse( String[] commands, Set<String> validCommands ) {
+		Set<String> flags = new HashSet<String>();
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
 		List<String> uris = new ArrayList<String>();
+
 		String[] resolved = new String[commands.length];
 		System.arraycopy( commands, 0, resolved, 0, commands.length );
 
@@ -133,11 +138,9 @@ public class Parameters {
 
 			if( command == null ) throw new IllegalArgumentException( "Null command at index: " + index );
 
-			if( MULTIPLE.equals( command ) ) {
+			if( DOUBLE.equals( command ) ) {
 				terminated = true;
-			} else if( !terminated && command.startsWith( MULTIPLE ) ) {
-				String parameter = command.substring( 2 );
-
+			} else if( !terminated && command.startsWith( DOUBLE ) ) {
 				if( validCommands != null && !validCommands.contains( command ) ) throw new InvalidParameterException( "Unknown parameter: " + command );
 
 				List<String> valueList = new ArrayList<String>();
@@ -149,10 +152,9 @@ public class Parameters {
 				}
 				if( valueList.size() == 0 ) valueList.add( "true" );
 
-				values.put( parameter, valueList );
+				flags.add( command );
+				values.put( removePrefix( command ), valueList );
 			} else if( !terminated && command.startsWith( SINGLE ) ) {
-				String parameter = command.substring( 1 );
-
 				if( validCommands != null && !validCommands.contains( command ) ) throw new InvalidParameterException( "Unknown command: " + command );
 
 				List<String> valueList = new ArrayList<String>();
@@ -162,7 +164,8 @@ public class Parameters {
 				}
 				if( valueList.size() == 0 ) valueList.add( "true" );
 
-				values.put( parameter, valueList );
+				flags.add( command );
+				values.put( removePrefix( command ), valueList );
 			} else {
 				terminated = true;
 				uris.add( resolved[index] = UriUtil.resolve( command ).toString() );
@@ -170,20 +173,20 @@ public class Parameters {
 
 		}
 
-		return new Parameters( commands, resolved, values, uris );
+		return new Parameters( commands, resolved, flags, values, uris );
 	}
 
 	public int size() {
 		return values.size();
 	}
 
-	public String get( String name ) {
-		List<String> values = this.values.get( removePrefix( name ) );
+	public String get( String flag ) {
+		List<String> values = this.values.get( removePrefix( flag ) );
 		return values == null ? null : values.get( 0 );
 	}
 
-	public String get( String name, String defaultValue ) {
-		String value = get( name );
+	public String get( String flag, String defaultValue ) {
+		String value = get( flag );
 		return value != null ? value : defaultValue;
 	}
 
@@ -192,11 +195,11 @@ public class Parameters {
 	 * the value true if the parameter value is not null and is equal, ignoring
 	 * case, to the string "true".
 	 * 
-	 * @param name
+	 * @param flag
 	 * @return
 	 */
-	public boolean isTrue( String name ) {
-		return Boolean.parseBoolean( get( name ) );
+	public boolean isTrue( String flag ) {
+		return Boolean.parseBoolean( get( flag ) );
 	}
 
 	/**
@@ -206,37 +209,37 @@ public class Parameters {
 	 * parameter was not specified on the command line then the default value is
 	 * returned.
 	 * 
-	 * @param name
+	 * @param flag
 	 * @param defaultValue
 	 * @return
 	 */
-	public boolean isSet( String name, boolean defaultValue ) {
-		String value = get( name );
+	public boolean isSet( String flag, boolean defaultValue ) {
+		String value = get( flag );
 		return value == null ? defaultValue : Boolean.parseBoolean( value );
 	}
 
 	/**
 	 * Returns whether the parameter was specified on the command line.
 	 * 
-	 * @param name
+	 * @param flag
 	 * @return
 	 */
-	public boolean isSet( String name ) {
-		return !( get( name ) == null );
+	public boolean isSet( String flag ) {
+		return !( get( flag ) == null );
 	}
 
-	public Set<String> getNames() {
-		return values.keySet();
+	public Set<String> getFlags() {
+		return flags;
 	}
 
-	public List<String> getValues( String name ) {
-		return values.get( removePrefix( name ) );
+	public List<String> getValues( String flag ) {
+		return values.get( removePrefix( flag ) );
 	}
 
 	public List<String> getUris() {
 		return uris;
 	}
-	
+
 	public String[] getResolvedCommands() {
 		return resolvedCommands;
 	}
@@ -284,13 +287,13 @@ public class Parameters {
 		return true;
 	}
 
-	private String removePrefix( String name ) {
-		if( name.startsWith( MULTIPLE ) ) {
-			return name.substring( MULTIPLE.length() );
-		} else if( name.startsWith( SINGLE ) ) {
-			return name.substring( SINGLE.length() );
+	private static String removePrefix( String flag ) {
+		if( flag.startsWith( DOUBLE ) ) {
+			return flag.substring( DOUBLE.length() );
+		} else if( flag.startsWith( SINGLE ) ) {
+			return flag.substring( SINGLE.length() );
 		}
-		return name;
+		return flag;
 	}
 
 }

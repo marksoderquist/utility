@@ -2,6 +2,7 @@ package com.parallelsymmetry.utility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -254,6 +255,20 @@ public class ParametersTest extends TestCase {
 		assertEquals( "true", parameters.get( "none", "true" ) );
 		assertEquals( "true", parameters.get( "flag", "false" ) );
 		assertEquals( "value", parameters.get( "key", null ) );
+	}
+
+	@Test
+	public void testGetFlags() throws Exception {
+		String[] args = new String[] { "-flag", "-key", "value", "--flag", "value0", "value1", "value2", "--", "file0", "file1" };
+		Parameters parameters = Parameters.parse( args );
+
+		Set<String> flags = parameters.getFlags();
+		assertEquals( 3, flags.size() );
+		assertTrue( flags.contains( "--flag" ) );
+		assertTrue( flags.contains( "-flag" ) );
+		assertTrue( flags.contains( "-key" ) );
+
+		assertEquals( 3, parameters.getValues( "flag" ).size() );
 	}
 
 	@Test

@@ -31,7 +31,7 @@ public class ParametersSettingProvider implements SettingProvider {
 
 		String node = getName( path );
 
-		for( String name : parameters.getNames() ) {
+		for( String name : parameters.getFlags() ) {
 			if( name.startsWith( node ) && name.indexOf( ".", node.length() ) < 0 ) {
 				keys.add( name.substring( node.length() ) );
 			}
@@ -52,7 +52,7 @@ public class ParametersSettingProvider implements SettingProvider {
 
 		String node = getName( path );
 
-		for( String name : parameters.getNames() ) {
+		for( String name : parameters.getFlags() ) {
 			if( name.startsWith( node ) ) {
 				int index = name.indexOf( ".", node.length() );
 				//				if( index < 0 ) {
@@ -75,7 +75,7 @@ public class ParametersSettingProvider implements SettingProvider {
 
 		String node = getName( path );
 
-		Set<String> names = parameters.getNames();
+		Set<String> names = parameters.getFlags();
 		for( String name : names ) {
 			if( name.startsWith( node ) ) return true;
 		}
