@@ -236,15 +236,6 @@ public class Parameters {
 		return resources;
 	}
 
-	private String cleanup( String name ) {
-		if( name.startsWith( MULTIPLE ) ) {
-			return name.substring( MULTIPLE.length() );
-		} else if( name.startsWith( SINGLE ) ) {
-			return name.substring( SINGLE.length() );
-		}
-		return name;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -283,4 +274,14 @@ public class Parameters {
 
 		return true;
 	}
+
+	private String cleanup( String name ) {
+		if( name.startsWith( MULTIPLE ) ) {
+			return name.substring( MULTIPLE.length() );
+		} else if( name.startsWith( SINGLE ) ) {
+			return name.substring( SINGLE.length() );
+		}
+		return name;
+	}
+
 }
