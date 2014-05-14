@@ -42,17 +42,17 @@ public class ParametersTest extends TestCase {
 	public void testParseWithValueAndFile() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
-		assertEquals( 1, parameters.getResources().size() );
-		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
+		assertEquals( 1, parameters.getUris().size() );
+		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getUris().get( 0 ).toString() );
 	}
 
 	@Test
 	public void testParseWithValueAndFiles() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test1.txt", "test2.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
-		assertEquals( 2, parameters.getResources().size() );
-		assertEquals( UriUtil.resolve( "test1.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
-		assertEquals( UriUtil.resolve( "test2.txt" ).toString(), parameters.getResources().get( 1 ).toString() );
+		assertEquals( 2, parameters.getUris().size() );
+		assertEquals( UriUtil.resolve( "test1.txt" ).toString(), parameters.getUris().get( 0 ).toString() );
+		assertEquals( UriUtil.resolve( "test2.txt" ).toString(), parameters.getUris().get( 1 ).toString() );
 	}
 
 	@Test
@@ -67,8 +67,8 @@ public class ParametersTest extends TestCase {
 	public void testParseWithFlagAndFile() throws Exception {
 		Parameters parameters = Parameters.parse( new String[] { "-help", "topic", "test.txt" }, "-help" );
 		assertEquals( "topic", parameters.get( "help" ) );
-		assertEquals( 1, parameters.getResources().size() );
-		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getResources().get( 0 ).toString() );
+		assertEquals( 1, parameters.getUris().size() );
+		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getUris().get( 0 ).toString() );
 	}
 
 	@Test
@@ -183,9 +183,9 @@ public class ParametersTest extends TestCase {
 		String filename = "test.file";
 		String[] args = new String[] { filename };
 		Parameters parameters = Parameters.parse( args );
-		List<String> resources = parameters.getResources();
-		assertEquals( "Number of files incorrect.", 1, resources.size() );
-		assertEquals( "File name incorrect.", UriUtil.resolve( filename ).toString(), resources.get( 0 ) );
+		List<String> uris = parameters.getUris();
+		assertEquals( "Number of URIs incorrect.", 1, uris.size() );
+		assertEquals( "URI incorrect.", UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
 	}
 
 	@Test
@@ -200,10 +200,10 @@ public class ParametersTest extends TestCase {
 		list.toArray( args );
 		Parameters parameters = Parameters.parse( args );
 
-		List<String> resources = parameters.getResources();
-		assertEquals( "Number of files incorrect.", count, resources.size() );
+		List<String> uris = parameters.getUris();
+		assertEquals( "Number of URIs incorrect.", count, uris.size() );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( "File name incorrect.", UriUtil.resolve( "test" + index + ".file" ).toString(), resources.get( index ) );
+			assertEquals( "URI incorrect.", UriUtil.resolve( "test" + index + ".file" ).toString(), uris.get( index ) );
 		}
 	}
 
@@ -212,11 +212,11 @@ public class ParametersTest extends TestCase {
 		String filename = "file";
 		String[] args = new String[] { "-flag", "--", filename };
 		Parameters parameters = Parameters.parse( args );
-		List<String> resources = parameters.getResources();
+		List<String> uris = parameters.getUris();
 
 		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
-		assertEquals( "Number of files incorrect.", 1, resources.size() );
-		assertEquals( "File name incorrect.", UriUtil.resolve( filename ).toString(), resources.get( 0 ) );
+		assertEquals( "URIs incorrect.", 1, uris.size() );
+		assertEquals( "URI incorrect.", UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
 	}
 
 	@Test
@@ -297,7 +297,7 @@ public class ParametersTest extends TestCase {
 		assertEquals( "value1", parameters.getValues( "flag" ).get( 1 ) );
 		assertEquals( "value2", parameters.getValues( "flag" ).get( 2 ) );
 
-		assertEquals( UriUtil.resolve( "file1.txt" ).toString(), parameters.getResources().get( 0 ) );
+		assertEquals( UriUtil.resolve( "file1.txt" ).toString(), parameters.getUris().get( 0 ) );
 	}
 
 	@Test
@@ -312,7 +312,7 @@ public class ParametersTest extends TestCase {
 		assertTrue( parameters.isSet( "other" ) );
 		assertFalse( parameters.isTrue( "other" ) );
 
-		assertEquals( UriUtil.resolve( "file1.txt" ).toString(), parameters.getResources().get( 0 ) );
+		assertEquals( UriUtil.resolve( "file1.txt" ).toString(), parameters.getUris().get( 0 ) );
 	}
 
 	@Test

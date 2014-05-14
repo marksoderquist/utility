@@ -97,12 +97,12 @@ public class Parameters {
 
 	private Map<String, List<String>> values;
 
-	private List<String> resources;
+	private List<String> uris;
 
-	private Parameters( String[] commands, Map<String, List<String>> values, List<String> resources ) {
+	private Parameters( String[] commands, Map<String, List<String>> values, List<String> uris ) {
 		this.commands = Arrays.copyOf( commands, commands.length );
 		this.values = values;
-		this.resources = resources;
+		this.uris = uris;
 	}
 
 	public static final Parameters create() {
@@ -119,7 +119,7 @@ public class Parameters {
 
 	public static final Parameters parse( String[] commands, Set<String> validCommands ) {
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
-		List<String> resources = new ArrayList<String>();
+		List<String> uris = new ArrayList<String>();
 
 		boolean terminated = false;
 
@@ -160,12 +160,12 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				resources.add( commands[index] = UriUtil.resolve( command ).toString() );
+				uris.add( commands[index] = UriUtil.resolve( command ).toString() );
 			}
 
 		}
 
-		return new Parameters( commands, values, resources );
+		return new Parameters( commands, values, uris );
 	}
 
 	public int size() {
@@ -232,8 +232,8 @@ public class Parameters {
 		return commands;
 	}
 
-	public List<String> getResources() {
-		return resources;
+	public List<String> getUris() {
+		return uris;
 	}
 
 	@Override
