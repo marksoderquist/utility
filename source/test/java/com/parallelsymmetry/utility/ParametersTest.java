@@ -1,6 +1,5 @@
 package com.parallelsymmetry.utility;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -368,7 +367,7 @@ public class ParametersTest extends TestCase {
 		assertEquals( "-flag", commands[index++] );
 		assertEquals( "-key", commands[index++] );
 		assertEquals( "value", commands[index++] );
-		assertEquals( new File( "file" ).toURI().toString(), commands[index++] );
+		assertEquals( "file", commands[index++] );
 	}
 
 	@Test

@@ -94,13 +94,16 @@ public class Parameters {
 	public static final String MULTIPLE = "--";
 
 	private String[] originalCommands;
+	
+	private String[] resolvedCommands;
 
 	private Map<String, List<String>> values;
 
 	private List<String> uris;
 
-	private Parameters( String[] commands, Map<String, List<String>> values, List<String> uris ) {
-		this.originalCommands = Arrays.copyOf( commands, commands.length );
+	private Parameters( String[] originalCommands, String[] resolvedCommands, Map<String, List<String>> values, List<String> uris ) {
+		this.originalCommands = Arrays.copyOf( originalCommands, originalCommands.length );
+		this.resolvedCommands = resolvedCommands;
 		this.values = values;
 		this.uris = uris;
 	}
@@ -120,6 +123,8 @@ public class Parameters {
 	public static final Parameters parse( String[] commands, Set<String> validCommands ) {
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
 		List<String> uris = new ArrayList<String>();
+		String[] resolved = new String[commands.length];
+		System.arraycopy( commands, 0, resolved, 0, commands.length );
 
 		boolean terminated = false;
 
@@ -160,12 +165,12 @@ public class Parameters {
 				values.put( parameter, valueList );
 			} else {
 				terminated = true;
-				uris.add( commands[index] = UriUtil.resolve( command ).toString() );
+				uris.add( resolved[index] = UriUtil.resolve( command ).toString() );
 			}
 
 		}
 
-		return new Parameters( commands, values, uris );
+		return new Parameters( commands, resolved, values, uris );
 	}
 
 	public int size() {
@@ -173,7 +178,7 @@ public class Parameters {
 	}
 
 	public String get( String name ) {
-		List<String> values = this.values.get( cleanup( name ) );
+		List<String> values = this.values.get( removePrefix( name ) );
 		return values == null ? null : values.get( 0 );
 	}
 
@@ -225,15 +230,19 @@ public class Parameters {
 	}
 
 	public List<String> getValues( String name ) {
-		return values.get( cleanup( name ) );
-	}
-
-	public String[] getOriginalCommands() {
-		return originalCommands;
+		return values.get( removePrefix( name ) );
 	}
 
 	public List<String> getUris() {
 		return uris;
+	}
+	
+	public String[] getResolvedCommands() {
+		return resolvedCommands;
+	}
+
+	public String[] getOriginalCommands() {
+		return originalCommands;
 	}
 
 	@Override
@@ -252,7 +261,7 @@ public class Parameters {
 	public int hashCode() {
 		int code = 0;
 
-		for( String command : originalCommands ) {
+		for( String command : resolvedCommands ) {
 			code &= command.hashCode();
 		}
 
@@ -265,17 +274,17 @@ public class Parameters {
 
 		Parameters that = (Parameters)object;
 
-		if( this.originalCommands.length != that.originalCommands.length ) return false;
+		if( this.resolvedCommands.length != that.resolvedCommands.length ) return false;
 
-		int count = this.originalCommands.length;
+		int count = this.resolvedCommands.length;
 		for( int index = 0; index < count; index++ ) {
-			if( !TextUtil.areEqual( this.originalCommands[index], that.originalCommands[index] ) ) return false;
+			if( !TextUtil.areEqual( this.resolvedCommands[index], that.resolvedCommands[index] ) ) return false;
 		}
 
 		return true;
 	}
 
-	private String cleanup( String name ) {
+	private String removePrefix( String name ) {
 		if( name.startsWith( MULTIPLE ) ) {
 			return name.substring( MULTIPLE.length() );
 		} else if( name.startsWith( SINGLE ) ) {
