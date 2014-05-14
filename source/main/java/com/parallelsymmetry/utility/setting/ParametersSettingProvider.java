@@ -32,10 +32,10 @@ public class ParametersSettingProvider implements SettingProvider {
 		String node = getName( path );
 
 		for( String name : parameters.getFlags() ) {
+			name = removePrefix( name );
 			if( name.startsWith( node ) && name.indexOf( ".", node.length() ) < 0 ) {
 				keys.add( name.substring( node.length() ) );
 			}
-
 		}
 
 		return keys;
@@ -53,13 +53,9 @@ public class ParametersSettingProvider implements SettingProvider {
 		String node = getName( path );
 
 		for( String name : parameters.getFlags() ) {
+			name = removePrefix( name );
 			if( name.startsWith( node ) ) {
 				int index = name.indexOf( ".", node.length() );
-				//				if( index < 0 ) {
-				//					names.add( name.substring( node.length() ) );
-				//				} else {
-				//					names.add( name.substring( node.length(), index ) );
-				//				}
 				if( index > 0 ) names.add( name.substring( node.length(), index ) );
 			}
 		}
@@ -77,6 +73,7 @@ public class ParametersSettingProvider implements SettingProvider {
 
 		Set<String> names = parameters.getFlags();
 		for( String name : names ) {
+			name = removePrefix( name );
 			if( name.startsWith( node ) ) return true;
 		}
 
@@ -85,6 +82,15 @@ public class ParametersSettingProvider implements SettingProvider {
 
 	private String getName( String path ) {
 		return path.replace( '/', '.' ).substring( 1 );
+	}
+
+	private static String removePrefix( String flag ) {
+		if( flag.startsWith( "--" ) ) {
+			return flag.substring( "--".length() );
+		} else if( flag.startsWith( "-" ) ) {
+			return flag.substring( "-".length() );
+		}
+		return flag;
 	}
 
 }
