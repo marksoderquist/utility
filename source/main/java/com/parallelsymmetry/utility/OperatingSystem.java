@@ -204,36 +204,11 @@ public class OperatingSystem {
 	 * @throws IOException
 	 */
 	public static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
-		List<String> commands = getReduceCommands();
-
-		if( isWindows() ) {
-			StringBuilder inner = new StringBuilder();
-
-			for( String command : builder.command() ) {
-				if( command.contains( " " ) ) {
-					inner.append( "\\\"" );
-					inner.append( command );
-					inner.append( "\\\"" );
-				} else {
-					inner.append( command );
-				}
-				inner.append( " " );
-			}
-
-			StringBuilder outer = new StringBuilder();
-			outer.append( "\"" );
-			outer.append( inner.toString().trim() );
-			outer.append( "\"" );
-
-			commands.add( outer.toString() );
-		} else {
-			commands.addAll( builder.command() );
-			builder.command( commands );
-		}
-
-		builder.command( commands );
-
+		List<String> command = getReduceCommands();
+		command.addAll( builder.command() );
+		builder.command( command );
 		return builder;
+
 	}
 
 	public static final String getJavaExecutableName() {
