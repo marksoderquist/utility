@@ -204,18 +204,18 @@ public class OperatingSystem {
 	 * @throws IOException
 	 */
 	public static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
-		List<String> command = getReduceCommands();
+		List<String> commands = getReduceCommands();
 
 		if( isWindows() ) {
 			StringBuilder inner = new StringBuilder();
 
-			for( String c : builder.command() ) {
-				if( c.contains( " " ) ) {
+			for( String command : builder.command() ) {
+				if( command.contains( " " ) ) {
 					inner.append( "\\\"" );
-					inner.append( c );
+					inner.append( command );
 					inner.append( "\\\"" );
 				} else {
-					inner.append( c );
+					inner.append( command );
 				}
 				inner.append( " " );
 			}
@@ -225,13 +225,13 @@ public class OperatingSystem {
 			outer.append( inner.toString().trim() );
 			outer.append( "\"" );
 
-			command.add( outer.toString() );
+			commands.add( outer.toString() );
 		} else {
-			command.addAll( builder.command() );
-			builder.command( command );
+			commands.addAll( builder.command() );
+			builder.command( commands );
 		}
 
-		builder.command( command );
+		builder.command( commands );
 
 		return builder;
 	}
@@ -456,6 +456,7 @@ public class OperatingSystem {
 		List<String> commands = new ArrayList<String>();
 
 		if( isWindows() ) {
+			// FIXME This reduced the privileges too much.
 			commands.add( "runas" );
 			commands.add( "/trustlevel:0x20000" );
 		} else {
