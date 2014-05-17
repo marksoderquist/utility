@@ -1,7 +1,7 @@
 /*
- * This script can be used to elevate rights through the UAC on Windows Vista and higher.
+ * This script can be used to elevate privileges through the UAC on Windows Vista and higher.
  * Run it as follows:
- *    wscript elevate.js program.exe "argument1" "argument2" "argument3"
+ *    wscript win-elevate.js program.exe "argument1" "argument2" "argument3"
  *
  * Adapted from Aaron Margosis 'elevate.js' script, see
  * http://blogs.msdn.com/aaron_margosis/archive/2007/07/01/scripting-elevation-on-vista.aspx

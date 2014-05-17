@@ -159,10 +159,12 @@ public class OperatingSystemTest extends TestCase {
 		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" );
 
 		OperatingSystem.elevateProcessBuilder( "Notepad", builder );
+		
+		int index = 0;
 		assertEquals( 3, builder.command().size() );
-		assertEquals( "wscript", builder.command().get( 0 ) );
-		assertEquals( elevate.getCanonicalPath(), builder.command().get( 1 ) );
-		assertEquals( "notepad.exe", builder.command().get( 2 ) );
+		assertEquals( "wscript", builder.command().get( index++ ) );
+		assertEquals( elevate.getCanonicalPath(), builder.command().get( index++ ) );
+		assertEquals( "notepad.exe", builder.command().get( index++ ) );
 	}
 
 	@Test
@@ -204,15 +206,15 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		ProcessBuilder builder = new ProcessBuilder( "javaw", "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
+		File reduce = new File( System.getProperty( "java.io.tmpdir" ), "reduce.js" );
 
 		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
 		assertEquals( 3, builder.command().size() );
-		assertEquals( "runas", builder.command().get( index++ ) );
-		assertEquals( "/trustlevel:0x20000", builder.command().get( index++ ) );
+		assertEquals( "wscript", builder.command().get( index++ ) );
+		assertEquals( reduce.getCanonicalPath(), builder.command().get( index++ ) );
 		assertEquals( "\"javaw -jar \\\"C:\\Program Files\\Escape\\program.jar\\\" -update false\"", builder.command().get( index++ ) );
-
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {

@@ -456,9 +456,8 @@ public class OperatingSystem {
 		List<String> commands = new ArrayList<String>();
 
 		if( isWindows() ) {
-			// FIXME This reduced the privileges too much.
-			commands.add( "runas" );
-			commands.add( "/trustlevel:0x20000" );
+			commands.add( "wscript" );
+			commands.add( extractWinReduce().getPath() );
 		} else {
 			commands.add( "su" );
 			commands.add( "-" );
@@ -471,7 +470,7 @@ public class OperatingSystem {
 
 	private static final File extractWinElevate() throws IOException {
 		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" ).getCanonicalFile();
-		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/win-elevate.js" );
+		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/win/elevate.js" );
 		FileOutputStream target = new FileOutputStream( elevator );
 		try {
 			IoUtil.copy( source, target );
@@ -485,9 +484,25 @@ public class OperatingSystem {
 		return elevator;
 	}
 
+	private static final File extractWinReduce() throws IOException {
+		File reducer = new File( System.getProperty( "java.io.tmpdir" ), "reduce.js" ).getCanonicalFile();
+		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/win/reduce.js" );
+		FileOutputStream target = new FileOutputStream( reducer );
+		try {
+			IoUtil.copy( source, target );
+		} finally {
+			source.close();
+			target.close();
+		}
+
+		reducer.setExecutable( true );
+
+		return reducer;
+	}
+
 	private static final File extractMacElevate() throws IOException {
 		File elevator = new File( System.getProperty( "java.io.tmpdir" ), "elevate" ).getCanonicalFile();
-		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/mac-elevate" );
+		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/mac/elevate" );
 		FileOutputStream target = new FileOutputStream( elevator );
 		try {
 			IoUtil.copy( source, target );
