@@ -159,7 +159,7 @@ public class OperatingSystemTest extends TestCase {
 		File elevate = new File( System.getProperty( "java.io.tmpdir" ), "elevate.js" );
 
 		OperatingSystem.elevateProcessBuilder( "Notepad", builder );
-		
+
 		int index = 0;
 		assertEquals( 3, builder.command().size() );
 		assertEquals( "wscript", builder.command().get( index++ ) );
@@ -211,14 +211,18 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
-		assertEquals( 7, builder.command().size() );
-		assertEquals( "wscript", builder.command().get( index++ ) );
-		assertEquals( reduce.getCanonicalPath(), builder.command().get( index++ ) );
-		assertEquals( "javaw", builder.command().get( index++ ) );
-		assertEquals( "-jar", builder.command().get( index++ ) );
-		assertEquals( "C:\\Program Files\\Escape\\program.jar", builder.command().get( index++ ) );
-		assertEquals( "-update", builder.command().get( index++ ) );
-		assertEquals( "false", builder.command().get( index++ ) );
+		assertEquals( 2, builder.command().size() );
+		assertEquals( "runas", builder.command().get( index++ ) );
+		assertEquals( "\"javaw -jar \\\"C:\\Program Files\\Escape\\program.jar\\\" -update false\"", builder.command().get( index++ ) );
+
+		//		assertEquals( 7, builder.command().size() );
+		//		assertEquals( "wscript", builder.command().get( index++ ) );
+		//		assertEquals( reduce.getCanonicalPath(), builder.command().get( index++ ) );
+		//		assertEquals( "javaw", builder.command().get( index++ ) );
+		//		assertEquals( "-jar", builder.command().get( index++ ) );
+		//		assertEquals( "C:\\Program Files\\Escape\\program.jar", builder.command().get( index++ ) );
+		//		assertEquals( "-update", builder.command().get( index++ ) );
+		//		assertEquals( "false", builder.command().get( index++ ) );
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {

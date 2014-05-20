@@ -205,11 +205,35 @@ public class OperatingSystem {
 	 */
 	public static final ProcessBuilder reduceProcessBuilder( ProcessBuilder builder ) throws IOException {
 		List<String> command = getReduceCommands();
-		command.addAll( builder.command() );
-		builder.command( command );
-		return builder;
 
-	}
+		if( isWindows() ) {
+			StringBuilder inner = new StringBuilder();
+
+			for( String c : builder.command() ) {
+				if( c.contains( " " ) ) {
+					inner.append( "\\\"" );
+					inner.append( c );
+					inner.append( "\\\"" );
+				} else {
+					inner.append( c );
+				}
+				inner.append( " " );
+			}
+
+			StringBuilder outer = new StringBuilder();
+			outer.append( "\"" );
+			outer.append( inner.toString().trim() );
+			outer.append( "\"" );
+
+			command.add( outer.toString() );
+		} else {
+			command.addAll( builder.command() );
+			builder.command( command );
+		}
+
+		builder.command( command );
+
+		return builder;	}
 
 	public static final String getJavaExecutableName() {
 		return isWindows() ? "javaw" : "java";
@@ -431,8 +455,8 @@ public class OperatingSystem {
 		List<String> commands = new ArrayList<String>();
 
 		if( isWindows() ) {
-			commands.add( "wscript" );
-			commands.add( extractWinReduce().getPath() );
+			commands.add( "runas" );
+			//commands.add( "/trustlevel:0x20000" );
 		} else {
 			commands.add( "su" );
 			commands.add( "-" );
