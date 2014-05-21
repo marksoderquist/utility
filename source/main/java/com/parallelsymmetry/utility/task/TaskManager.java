@@ -46,8 +46,7 @@ public class TaskManager implements Persistent, ExtendedControllable {
 
 	private List<Task<?>> tasks;
 
-	// NEXT Remove the event dispatch thread check. It was a workaround anyway.
-	private boolean eventDispatchThreadCheck;
+	private boolean eventDispatchThreadCheck = true;
 
 	public TaskManager() {
 		tasks = new CopyOnWriteArrayList<Task<?>>();
@@ -259,12 +258,11 @@ public class TaskManager implements Persistent, ExtendedControllable {
 	}
 
 	/**
-	 * Enable event dispatch thread checking after the program GUI is initialized
-	 * to protect long running tasks from "freezing" the GUI by throwing a
-	 * RuntimeException.
+	 * Enable event dispatch thread checking to protect long running tasks from
+	 * "freezing" the UI by throwing a RuntimeException.
 	 */
-	public void enableEventDispatchThreadCheck() {
-		eventDispatchThreadCheck = true;
+	public void setEventDispatchThreadCheck( boolean enabled ) {
+		eventDispatchThreadCheck = enabled;
 	}
 
 	public void addTaskListener( TaskListener listener ) {
