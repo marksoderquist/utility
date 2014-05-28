@@ -456,7 +456,7 @@ public class OperatingSystem {
 
 		if( isWindows() ) {
 			commands.add( "runas" );
-			//commands.add( "/trustlevel:0x20000" );
+			commands.add( "/trustlevel:0x20000" );
 		} else {
 			commands.add( "su" );
 			commands.add( "-" );
