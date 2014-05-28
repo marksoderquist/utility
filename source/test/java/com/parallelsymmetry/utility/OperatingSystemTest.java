@@ -211,8 +211,9 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
-		assertEquals( 2, builder.command().size() );
+		assertEquals( 3, builder.command().size() );
 		assertEquals( "runas", builder.command().get( index++ ) );
+		assertEquals( "/trustlevel:0x20000", builder.command().get( index++ ) );
 		assertEquals( "\"javaw -jar \\\"C:\\Program Files\\Escape\\program.jar\\\" -update false\"", builder.command().get( index++ ) );
 
 		//		assertEquals( 7, builder.command().size() );
