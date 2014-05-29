@@ -45,7 +45,6 @@ public final class UriUtil {
 				uri = new URI( string );
 			} catch( URISyntaxException exception ) {
 				// Intentionally ignore exception.
-				Log.write( Log.DEVEL, exception );
 			}
 		}
 
