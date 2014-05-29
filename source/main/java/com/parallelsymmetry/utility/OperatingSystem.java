@@ -207,6 +207,9 @@ public class OperatingSystem {
 		List<String> command = getReduceCommands();
 
 		if( isWindows() ) {
+			// FIXME Launching normal processes from elevated processes is impossible in Windows.
+			// See the following link for reasonable workaround (comment 2 in answer):
+			// http://stackoverflow.com/questions/2414991/how-to-launch-a-program-as-as-a-normal-user-from-a-uac-elevated-installer
 			StringBuilder inner = new StringBuilder();
 
 			for( String c : builder.command() ) {
