@@ -10,6 +10,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.task.TaskEvent.Type;
 
 /**
@@ -78,7 +79,12 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 
 	@Override
 	public V call() throws Exception {
+		try {
 		return invoke();
+		} catch( Exception exception ) {
+			Log.write( exception );
+			throw exception;
+		}
 	}
 
 	@Override
