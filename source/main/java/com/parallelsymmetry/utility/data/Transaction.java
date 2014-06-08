@@ -151,17 +151,12 @@ public class Transaction {
 
 	private void doSubmit( Operation operation ) {
 		if( COMMIT_LOCK.isLocked() && inCommittingTransaction( operation.getData() ) ) throw new TransactionException( "Data should not be modified from data listeners." );
-
-		Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] add operation: " + operation );
-
 		addOperationNode( operation.getData() );
 		operations.offer( operation );
 	}
 
 	private void doCommit() {
-		//public void commit() throws CommitException {
 		try {
-			Log.write( Log.DETAIL, "Committing transaction[" + System.identityHashCode( this ) + "]..." );
 			COMMIT_LOCK.lock();
 
 			committingTransaction = this;
@@ -174,7 +169,6 @@ public class Transaction {
 			// Process the operations.
 			List<OperationResult> operationResults = new ArrayList<OperationResult>();
 			for( Operation operation : operations ) {
-				Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] processing operation: " + operation );
 				operationResults.add( operation.process() );
 			}
 
@@ -198,7 +192,7 @@ public class Transaction {
 			doReset();
 			committingTransaction = null;
 			COMMIT_LOCK.unlock();
-			Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
+			//Log.write( Log.DETAIL, "Transaction[" + System.identityHashCode( this ) + "] committed!" );
 		}
 	}
 
