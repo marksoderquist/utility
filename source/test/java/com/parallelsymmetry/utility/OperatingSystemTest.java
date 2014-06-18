@@ -7,8 +7,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.parallelsymmetry.utility.OperatingSystem;
-
 public class OperatingSystemTest extends TestCase {
 
 	@Override
@@ -20,6 +18,7 @@ public class OperatingSystemTest extends TestCase {
 		init( "Linux", "x86_64", "2.6.32_45" );
 		assertTrue( OperatingSystem.isLinux() );
 		assertFalse( OperatingSystem.isMac() );
+		assertTrue( OperatingSystem.isUnix() );
 		assertFalse( OperatingSystem.isWindows() );
 		assertEquals( "2.6.32_45", OperatingSystem.getVersion() );
 		assertEquals( "x86_64", OperatingSystem.getSystemArchitecture() );
@@ -41,6 +40,7 @@ public class OperatingSystemTest extends TestCase {
 		init( "Mac OS X", "ppc", "10" );
 		assertFalse( OperatingSystem.isLinux() );
 		assertTrue( OperatingSystem.isMac() );
+		assertTrue( OperatingSystem.isUnix() );
 		assertFalse( OperatingSystem.isWindows() );
 		assertEquals( "10", OperatingSystem.getVersion() );
 		assertEquals( "ppc", OperatingSystem.getSystemArchitecture() );
@@ -62,6 +62,7 @@ public class OperatingSystemTest extends TestCase {
 		init( "Windows 7", "x86", "6.1" );
 		assertFalse( OperatingSystem.isLinux() );
 		assertFalse( OperatingSystem.isMac() );
+		assertFalse( OperatingSystem.isUnix() );
 		assertTrue( OperatingSystem.isWindows() );
 		assertEquals( "6.1", OperatingSystem.getVersion() );
 		assertEquals( "x86", OperatingSystem.getSystemArchitecture() );

@@ -125,7 +125,7 @@ public class OperatingSystem {
 	}
 
 	public static final boolean isUnix() {
-		return isLinux() || family == Family.UNIX;
+		return family == Family.LINUX || family == Family.MAC || family == Family.UNIX;
 	}
 
 	public static final boolean isWindows() {
