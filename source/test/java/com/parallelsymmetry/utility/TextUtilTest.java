@@ -115,6 +115,21 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "aea6ce04bb28d644a8d4e0bc6a319b54", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( new String( data ) ) ) );
 	}
 
+	public void testToPrintableStringUsingByte() {
+		assertEquals( "Bad conversion", "[0]", TextUtil.toPrintableString( (byte)0 ) );
+		assertEquals( "Bad conversion", "[27]", TextUtil.toPrintableString( (byte)27 ) );
+		assertEquals( "Bad conversion", "[31]", TextUtil.toPrintableString( (byte)31 ) );
+		assertEquals( "Bad conversion", " ", TextUtil.toPrintableString( (byte)32 ) );
+		assertEquals( "Bad conversion", "A", TextUtil.toPrintableString( (byte)65 ) );
+		assertEquals( "Bad conversion", "~", TextUtil.toPrintableString( (byte)126 ) );
+		assertEquals( "Bad conversion", "[127]", TextUtil.toPrintableString( (byte)127 ) );
+		assertEquals( "Bad conversion", "[128]", TextUtil.toPrintableString( (byte)128 ) );
+		assertEquals( "Bad conversion", "[255]", TextUtil.toPrintableString( (byte)255 ) );
+		
+		assertEquals( "Bad conversion", "[255]", TextUtil.toPrintableString( (byte)-1 ) );
+		assertEquals( "Bad conversion", "[0]", TextUtil.toPrintableString( (byte)256 ) );
+	}
+
 	public void testToPrintableString() {
 		assertEquals( "Bad conversion.", "[0]", TextUtil.toPrintableString( (char)0 ) );
 		assertEquals( "Bad conversion.", "[27]", TextUtil.toPrintableString( (char)27 ) );

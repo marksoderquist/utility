@@ -190,6 +190,32 @@ public final class TextUtil {
 	 * @param data The character to convert.
 	 * @return A printable string representation of the character.
 	 */
+	public static final String toPrintableString( byte bite ) {
+		String result = null;
+		int data = bite;
+		if( data >= 32 && data <= 126 ) {
+			result = String.valueOf( (char)data );
+		} else {
+			short value = (short)data;
+			result = "[" + String.valueOf( (int)( value < 0 ? value + 256 : value ) ) + "]";
+			if( value == 13 ) result += "\n";
+		}
+
+		return result;
+	}
+
+	/**
+	 * Returns a printable string representation of a character by converting char
+	 * values less than or equal to 32 or greater than or equal to 126 to the
+	 * integer value surrounded by brackets.
+	 * <p>
+	 * Example: An escape char (27) would be returned as: [27]
+	 * <p>
+	 * Example: The letter A would be returned as: A
+	 * 
+	 * @param data The character to convert.
+	 * @return A printable string representation of the character.
+	 */
 	public static final String toPrintableString( char data ) {
 
 		if( data >= 32 && data <= 126 ) {
@@ -201,10 +227,14 @@ public final class TextUtil {
 	}
 
 	public static final String toPrintableString( byte[] data ) {
+		return toPrintableString( data, 0, data.length );
+	}
+
+	public static final String toPrintableString( byte[] data, int offset, int length ) {
 		if( data == null ) return null;
 		StringBuilder builder = new StringBuilder();
-		int count = data.length;
-		for( int index = 0; index < count; index++ ) {
+		int count = offset + length;
+		for( int index = offset; index < count; index++ ) {
 			byte value = data[index];
 			builder.append( toPrintableString( (char)( value < 0 ? value + 256 : value ) ) );
 		}
