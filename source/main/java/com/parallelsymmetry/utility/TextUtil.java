@@ -179,24 +179,24 @@ public final class TextUtil {
 	}
 
 	/**
-	 * Returns a printable string representation of a character by converting char
-	 * values less than or equal to 32 or greater than or equal to 126 to the
-	 * integer value surrounded by brackets.
+	 * Returns a printable string representation of a byte by converting byte
+	 * values less than 32 or greater than 126 to the integer value surrounded by
+	 * brackets.
 	 * <p>
 	 * Example: An escape char (27) would be returned as: [27]
 	 * <p>
 	 * Example: The letter A would be returned as: A
 	 * 
-	 * @param data The character to convert.
-	 * @return A printable string representation of the character.
+	 * @param data The byte to convert.
+	 * @return A printable string representation of the byte.
 	 */
-	public static final String toPrintableString( byte bite ) {
+	public static final String toPrintableString( byte data ) {
 		String result = null;
-		int data = bite;
-		if( data >= 32 && data <= 126 ) {
-			result = String.valueOf( (char)data );
+		int dataAsInt = data;
+		if( dataAsInt >= 32 && dataAsInt <= 126 ) {
+			result = String.valueOf( (char)dataAsInt );
 		} else {
-			short value = (short)data;
+			short value = (short)dataAsInt;
 			result = "[" + String.valueOf( (int)( value < 0 ? value + 256 : value ) ) + "]";
 			if( value == 13 ) result += "\n";
 		}
