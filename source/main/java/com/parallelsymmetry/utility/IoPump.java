@@ -31,7 +31,7 @@ public class IoPump implements Runnable {
 
 	public static final int DEFAULT_LINE_LENGTH = 160;
 
-	public static final int DEFAULT_LINE_TIMEOUT = 100;
+	public static final int DEFAULT_LINE_TIMEOUT = -1;
 
 	private static Timer timer;
 
@@ -74,7 +74,7 @@ public class IoPump implements Runnable {
 	private LineTimeoutTask lineTimeoutTask;
 
 	static {
-		timer = new Timer( "IOPump Timer", false );
+		timer = new Timer( "IOPump Timer", true );
 	}
 
 	public IoPump( InputStream input, OutputStream output ) {
@@ -347,7 +347,7 @@ public class IoPump implements Runnable {
 
 			if( logEnabled ) {
 				Log.write( Log.TRACE, name, " IOPump started." );
-				if( logContent ) {
+				if( logContent && lineTimeout > -1 ) {
 					lineReadTime.set( System.currentTimeMillis() );
 					timer.schedule( ( lineTimeoutTask = new LineTimeoutTask() ), lineTimeout );
 				}
@@ -440,7 +440,7 @@ public class IoPump implements Runnable {
 				newLine = false;
 			}
 		}
-		lineTimerReset();
+		if( lineTimeout > -1 ) lineTimerReset();
 	}
 
 	private void flushLogLine() {
