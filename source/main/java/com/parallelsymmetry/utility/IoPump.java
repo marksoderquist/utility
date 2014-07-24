@@ -13,6 +13,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.parallelsymmetry.utility.log.Log;
 
@@ -27,6 +30,10 @@ public class IoPump implements Runnable {
 	public static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	public static final int DEFAULT_LINE_LENGTH = 160;
+
+	public static final int DEFAULT_LINE_TIMEOUT = 100;
+
+	private static Timer timer;
 
 	private String name;
 
@@ -57,6 +64,18 @@ public class IoPump implements Runnable {
 	private boolean started;
 
 	private Object startLock = new Object();
+
+	private int lineTimeout = DEFAULT_LINE_TIMEOUT;
+
+	private AtomicLong lineReadTime = new AtomicLong();
+
+	private StringBuilder builder = new StringBuilder();
+
+	private LineTimeoutTask lineTimeoutTask;
+
+	static {
+		timer = new Timer( "IOPump Timer", false );
+	}
 
 	public IoPump( InputStream input, OutputStream output ) {
 		this( null, input, output, DEFAULT_BUFFER_SIZE );
@@ -161,7 +180,7 @@ public class IoPump implements Runnable {
 
 	public IoPump( String name, Reader reader, Writer writer, int bufferSize ) {
 		this.name = name;
-		this.reader = new BufferedReader( reader );
+		this.reader = reader;
 		this.writer = new BufferedWriter( writer );
 		this.bufferSize = bufferSize;
 	}
@@ -188,6 +207,21 @@ public class IoPump implements Runnable {
 
 	public void setLineLength( int length ) {
 		this.lineLength = length;
+	}
+
+	public int getLineTimeout() {
+		return lineTimeout;
+	}
+
+	/**
+	 * Set the amount of time to wait for more input before flushing the current
+	 * buffer as a line. This is useful when the input comes in timed bursts
+	 * without line termination characters.
+	 * 
+	 * @param timeout
+	 */
+	public void setLineTimeout( int timeout ) {
+		this.lineTimeout = timeout;
 	}
 
 	public boolean isLogEnabled() {
@@ -311,14 +345,17 @@ public class IoPump implements Runnable {
 				chararray = new char[bufferSize];
 			}
 
-			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump started." );
+			if( logEnabled ) {
+				Log.write( Log.TRACE, name, " IOPump started." );
+				if( logContent ) {
+					lineReadTime.set( System.currentTimeMillis() );
+					timer.schedule( ( lineTimeoutTask = new LineTimeoutTask() ), lineTimeout );
+				}
+			}
+
 			startNotify();
 
 			int read = 0;
-			boolean binary = false;
-			boolean lineTerminator = false;
-			StringBuilder builder = new StringBuilder();
-
 			while( execute ) {
 				// Read data.
 				if( reader == null ) {
@@ -328,7 +365,9 @@ public class IoPump implements Runnable {
 				}
 
 				if( read == -1 ) {
-					if( logEnabled && logContent && builder.length() > 0 ) Log.write( Log.TRACE, name, ": ", builder.toString() );
+					synchronized( builder ) {
+						if( logEnabled && logContent && builder.length() > 0 ) flushLogLine();
+					}
 					if( stopAtEndOfStream ) execute = false;
 					continue;
 				}
@@ -343,20 +382,7 @@ public class IoPump implements Runnable {
 							datum = chararray[index];
 							if( datum < 0 ) datum += 65536;
 						}
-
-						if( datum < 32 || datum > 127 ) binary = true;
-
-						if( datum == 10 || datum == 13 || builder.length() > lineLength || ( binary && builder.length() > 80 ) ) {
-							if( !lineTerminator ) {
-								Log.write( Log.TRACE, name, ": ", builder.toString() );
-								builder.delete( 0, builder.length() );
-								binary = false;
-							}
-							lineTerminator = true;
-						} else {
-							builder.append( TextUtil.toPrintableString( (char)datum ) );
-							lineTerminator = false;
-						}
+						sendToLog( datum );
 					}
 				}
 
@@ -372,6 +398,7 @@ public class IoPump implements Runnable {
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception, name, " ", exception.getMessage() );
 		} finally {
+			if( lineTimeoutTask != null ) lineTimeoutTask.cancel();
 			startNotify();
 			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump finished." );
 		}
@@ -393,6 +420,55 @@ public class IoPump implements Runnable {
 	protected void writeToWriter( char[] buffer, int count ) throws IOException {
 		writer.write( buffer, 0, count );
 		writer.flush();
+	}
+
+	private void sendToLog( int datum ) {
+		boolean binary = false;
+		boolean newLine = false;
+
+		if( datum < 32 || datum > 127 ) binary = true;
+
+		synchronized( builder ) {
+			if( datum == 10 || datum == 13 || builder.length() > lineLength || ( binary && builder.length() > 80 ) ) {
+				if( !newLine ) {
+					flushLogLine();
+					binary = false;
+				}
+				newLine = true;
+			} else {
+				builder.append( TextUtil.toPrintableString( (char)datum ) );
+				newLine = false;
+			}
+		}
+		lineTimerReset();
+	}
+
+	private void flushLogLine() {
+		synchronized( builder ) {
+			if( builder.length() == 0 ) return;
+			Log.write( Log.TRACE, name, ": ", builder.toString() );
+			builder.delete( 0, builder.length() );
+		}
+	}
+
+	private void lineTimerReset() {
+		lineReadTime.set( System.currentTimeMillis() + lineTimeout );
+	}
+
+	private class LineTimeoutTask extends TimerTask {
+
+		@Override
+		public void run() {
+			long delta = lineReadTime.get() - System.currentTimeMillis();
+
+			if( delta > 0 ) {
+				timer.schedule( ( lineTimeoutTask = new LineTimeoutTask() ), delta + 5 );
+			} else {
+				flushLogLine();
+				timer.schedule( ( lineTimeoutTask = new LineTimeoutTask() ), lineTimeout );
+			}
+		}
+
 	}
 
 }

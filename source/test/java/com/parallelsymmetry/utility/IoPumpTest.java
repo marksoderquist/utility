@@ -4,13 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
-import com.parallelsymmetry.utility.IoPump;
+import com.parallelsymmetry.utility.log.DefaultHandler;
 import com.parallelsymmetry.utility.log.Log;
 
 public class IoPumpTest extends TestCase {
@@ -213,6 +215,122 @@ public class IoPumpTest extends TestCase {
 		pump.startAndWait();
 		pump.waitFor();
 		assertEquals( string, new String( writer.toCharArray() ) );
+	}
+
+	public void testLogContent() throws Exception {
+		String string = "abcd";
+		Reader reader = new CharArrayReader( string.toCharArray() );
+		CharArrayWriter writer = new CharArrayWriter();
+
+		ByteArrayOutputStream logOutput = new ByteArrayOutputStream();
+		Log.setDefaultHandler( new DefaultHandler( logOutput ) );
+
+		Level level = Log.getLevel();
+		Log.setLevel( Log.TRACE );
+		IoPump pump = new IoPump( "Test", reader, writer );
+		pump.setLogEnabled( true );
+		pump.setLogContent( true );
+		pump.startAndWait();
+		pump.waitFor();
+		Log.setLevel( level );
+
+		assertEquals( "abcd", new String( writer.toCharArray() ) );
+
+		StringBuilder builder = new StringBuilder();
+		builder.append( "[T] Test IOPump started.\n" );
+		builder.append( "[T] Test: abcd\n" );
+		builder.append( "[T] Test IOPump finished.\n" );
+		assertEquals( builder.toString(), new String( logOutput.toByteArray() ) );
+	}
+
+	public void testLogContentWithSlowReader() throws Exception {
+		String string = "abcde";
+		Reader reader = new SlowCharArrayReader( string.toCharArray(), 50 );
+		CharArrayWriter writer = new CharArrayWriter();
+
+		ByteArrayOutputStream logOutput = new ByteArrayOutputStream();
+		Log.setDefaultHandler( new DefaultHandler( logOutput ) );
+
+		Level level = Log.getLevel();
+		Log.setLevel( Log.TRACE );
+		IoPump pump = new IoPump( "Test", reader, writer );
+		pump.setLogEnabled( true );
+		pump.setLogContent( true );
+		pump.setLineTimeout( 20 );
+		pump.startAndWait();
+		pump.waitFor();
+		Log.setLevel( level );
+
+		assertEquals( string, new String( writer.toCharArray() ) );
+
+		StringBuilder builder = new StringBuilder();
+		builder.append( "[T] Test IOPump started.\n" );
+		builder.append( "[T] Test: a\n" );
+		builder.append( "[T] Test: b\n" );
+		builder.append( "[T] Test: c\n" );
+		builder.append( "[T] Test: d\n" );
+		builder.append( "[T] Test: e\n" );
+		builder.append( "[T] Test IOPump finished.\n" );
+		assertEquals( builder.toString(), new String( logOutput.toByteArray() ) );
+	}
+
+	public void testLogLinesWithSlowReader() throws Exception {
+		String string = "some lines\nof text";
+		Reader reader = new SlowCharArrayReader( string.toCharArray(), 20 );
+		CharArrayWriter writer = new CharArrayWriter();
+
+		ByteArrayOutputStream logOutput = new ByteArrayOutputStream();
+		Log.setDefaultHandler( new DefaultHandler( logOutput ) );
+
+		Level level = Log.getLevel();
+		Log.setLevel( Log.TRACE );
+		IoPump pump = new IoPump( "Test", reader, writer );
+		pump.setLogEnabled( true );
+		pump.setLogContent( true );
+		pump.setLineTimeout( 50 );
+		pump.startAndWait();
+		pump.waitFor();
+		Log.setLevel( level );
+
+		assertEquals( string, new String( writer.toCharArray() ) );
+
+		StringBuilder builder = new StringBuilder();
+		builder.append( "[T] Test IOPump started.\n" );
+		builder.append( "[T] Test: some lines\n" );
+		builder.append( "[T] Test: of text\n" );
+		builder.append( "[T] Test IOPump finished.\n" );
+		assertEquals( builder.toString(), logOutput.toString() );
+	}
+
+	private class SlowCharArrayReader extends CharArrayReader {
+
+		private int delay = 100;
+
+		public SlowCharArrayReader( char[] buffer, int delay ) {
+			super( buffer, 0, buffer.length );
+			this.delay = delay;
+		}
+
+		public SlowCharArrayReader( char[] buffer, int offset, int length ) {
+			super( buffer, offset, length );
+		}
+
+		public int read() throws IOException {
+			ThreadUtil.pause( delay );
+			return super.read();
+		}
+
+		public int read( char[] buffer ) throws IOException {
+			ThreadUtil.pause( delay );
+			return super.read( buffer, 0, 1 );
+		}
+
+		public int read( char[] buffer, int offset, int length ) throws IOException {
+			ThreadUtil.pause( delay );
+			new Throwable( "read" ).printStackTrace( System.out );
+			return super.read( buffer, offset, 1 );
+		}
+
 	}
 
 }
