@@ -1,5 +1,7 @@
 package com.parallelsymmetry.utility;
 
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -69,6 +71,24 @@ public class IoUtil {
 		}
 
 		return writer.toString();
+	}
+
+	public static final void closeQuietly( Closeable closeable ) {
+		if( closeable == null ) return;
+
+		// Flush
+		try {
+			if( closeable instanceof Flushable ) ( (Flushable)closeable ).flush();
+		} catch( IOException exception ) {
+			// Intentionally ignore exception.
+		}
+		
+		// Close
+		try {
+			closeable.close();
+		} catch( IOException exception ) {
+			// Intentionally ignore exception.
+		}
 	}
 
 }
