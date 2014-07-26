@@ -4,6 +4,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.parallelsymmetry.utility.TextUtil;
 import com.parallelsymmetry.utility.log.Log;
@@ -89,6 +92,21 @@ public class SwingUtil {
 		for( Component component : container.getComponents() ) {
 			Log.write( Log.DEBUG, indentString, component );
 			if( component instanceof Container ) printComponentHierarchy( (Container)component, indent + 1 );
+		}
+	}
+
+	public static final void printComponetAncestry( Component component ) {
+		List<Component> tree = new ArrayList<Component>();
+		while( component != null ) {
+			tree.add( component );
+			component = component.getParent();
+		}
+
+		Collections.reverse( tree );
+
+		int index = 0;
+		for( Component parent : tree ) {
+			Log.write( Log.DEBUG, TextUtil.pad( index++ ), parent );
 		}
 	}
 
