@@ -211,26 +211,26 @@ public class OperatingSystem {
 			// See the following links for further information:
 			// http://stackoverflow.com/questions/2414991/how-to-launch-a-program-as-as-a-normal-user-from-a-uac-elevated-installer (comment 2 in answer)
 			// http://mdb-blog.blogspot.com/2013/01/nsis-lunch-program-as-user-from-uac.html
-			
-			//			StringBuilder inner = new StringBuilder();
-			//
-			//			for( String c : builder.command() ) {
-			//				if( c.contains( " " ) ) {
-			//					inner.append( "\\\"" );
-			//					inner.append( c );
-			//					inner.append( "\\\"" );
-			//				} else {
-			//					inner.append( c );
-			//				}
-			//				inner.append( " " );
-			//			}
-			//
-			//			StringBuilder outer = new StringBuilder();
-			//			outer.append( "\"" );
-			//			outer.append( inner.toString().trim() );
-			//			outer.append( "\"" );
-			//
-			//			command.add( outer.toString() );
+
+			StringBuilder inner = new StringBuilder();
+
+			for( String c : builder.command() ) {
+				if( c.contains( " " ) ) {
+					inner.append( "\\\"" );
+					inner.append( c );
+					inner.append( "\\\"" );
+				} else {
+					inner.append( c );
+				}
+				inner.append( " " );
+			}
+
+			StringBuilder outer = new StringBuilder();
+			outer.append( "\"" );
+			outer.append( inner.toString().trim() );
+			outer.append( "\"" );
+
+			command.add( outer.toString() );
 		} else {
 			command.addAll( builder.command() );
 			builder.command( command );
@@ -461,8 +461,8 @@ public class OperatingSystem {
 		List<String> commands = new ArrayList<String>();
 
 		if( isWindows() ) {
-			commands.add( "runas" );
-			commands.add( "/trustlevel:0x20000" );
+			//commands.add( "runas" );
+			//commands.add( "/trustlevel:0x20000" );
 		} else {
 			commands.add( "su" );
 			commands.add( "-" );
