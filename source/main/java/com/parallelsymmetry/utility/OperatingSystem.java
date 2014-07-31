@@ -208,27 +208,29 @@ public class OperatingSystem {
 
 		if( isWindows() ) {
 			// FIXME Launching normal processes from elevated processes is impossible in Windows.
-			// See the following link for reasonable workaround (comment 2 in answer):
-			// http://stackoverflow.com/questions/2414991/how-to-launch-a-program-as-as-a-normal-user-from-a-uac-elevated-installer
-			StringBuilder inner = new StringBuilder();
-
-			for( String c : builder.command() ) {
-				if( c.contains( " " ) ) {
-					inner.append( "\\\"" );
-					inner.append( c );
-					inner.append( "\\\"" );
-				} else {
-					inner.append( c );
-				}
-				inner.append( " " );
-			}
-
-			StringBuilder outer = new StringBuilder();
-			outer.append( "\"" );
-			outer.append( inner.toString().trim() );
-			outer.append( "\"" );
-
-			command.add( outer.toString() );
+			// See the following links for further information:
+			// http://stackoverflow.com/questions/2414991/how-to-launch-a-program-as-as-a-normal-user-from-a-uac-elevated-installer (comment 2 in answer)
+			// http://mdb-blog.blogspot.com/2013/01/nsis-lunch-program-as-user-from-uac.html
+			
+			//			StringBuilder inner = new StringBuilder();
+			//
+			//			for( String c : builder.command() ) {
+			//				if( c.contains( " " ) ) {
+			//					inner.append( "\\\"" );
+			//					inner.append( c );
+			//					inner.append( "\\\"" );
+			//				} else {
+			//					inner.append( c );
+			//				}
+			//				inner.append( " " );
+			//			}
+			//
+			//			StringBuilder outer = new StringBuilder();
+			//			outer.append( "\"" );
+			//			outer.append( inner.toString().trim() );
+			//			outer.append( "\"" );
+			//
+			//			command.add( outer.toString() );
 		} else {
 			command.addAll( builder.command() );
 			builder.command( command );
@@ -236,7 +238,8 @@ public class OperatingSystem {
 
 		builder.command( command );
 
-		return builder;	}
+		return builder;
+	}
 
 	public static final String getJavaExecutableName() {
 		return isWindows() ? "javaw" : "java";
