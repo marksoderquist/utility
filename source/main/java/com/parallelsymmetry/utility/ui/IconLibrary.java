@@ -228,13 +228,9 @@ public class IconLibrary {
 		loaders.remove( path );
 	}
 
-	public void reset() {
-		proxies.clear();
-	}
-
 	@Override
 	protected void finalize() {
-		reset();
+		proxies.clear();
 	}
 
 	private URL getIconUrl( String name ) {
