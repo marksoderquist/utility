@@ -207,15 +207,16 @@ public class OperatingSystemTest extends TestCase {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		ProcessBuilder builder = new ProcessBuilder( "javaw", "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
-		File reduce = new File( System.getProperty( "java.io.tmpdir" ), "reduce.js" );
 
 		OperatingSystem.reduceProcessBuilder( builder );
 
 		int index = 0;
-		assertEquals( 1, builder.command().size() );
-		//assertEquals( "runas", builder.command().get( index++ ) );
-		//assertEquals( "/trustlevel:0x20000", builder.command().get( index++ ) );
-		assertEquals( "\"javaw -jar \\\"C:\\Program Files\\Escape\\program.jar\\\" -update false\"", builder.command().get( index++ ) );
+		assertEquals( 5, builder.command().size() );
+		assertEquals( "javaw", builder.command().get( index++ ) );
+		assertEquals( "-jar", builder.command().get( index++ ) );
+		assertEquals( "C:\\Program Files\\Escape\\program.jar", builder.command().get( index++ ) );
+		assertEquals( "-update", builder.command().get( index++ ) );
+		assertEquals( "false", builder.command().get( index++ ) );
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {

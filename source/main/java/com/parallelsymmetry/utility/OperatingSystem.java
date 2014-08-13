@@ -212,25 +212,26 @@ public class OperatingSystem {
 			// http://stackoverflow.com/questions/2414991/how-to-launch-a-program-as-as-a-normal-user-from-a-uac-elevated-installer (comment 2 in answer)
 			// http://mdb-blog.blogspot.com/2013/01/nsis-lunch-program-as-user-from-uac.html
 
-			StringBuilder inner = new StringBuilder();
-
-			for( String c : builder.command() ) {
-				if( c.contains( " " ) ) {
-					inner.append( "\\\"" );
-					inner.append( c );
-					inner.append( "\\\"" );
-				} else {
-					inner.append( c );
-				}
-				inner.append( " " );
-			}
-
-			StringBuilder outer = new StringBuilder();
-			outer.append( "\"" );
-			outer.append( inner.toString().trim() );
-			outer.append( "\"" );
-
-			command.add( outer.toString() );
+			//			StringBuilder inner = new StringBuilder();
+			//
+			//			for( String c : builder.command() ) {
+			//				if( c.contains( " " ) ) {
+			//					inner.append( "\\\"" );
+			//					inner.append( c );
+			//					inner.append( "\\\"" );
+			//				} else {
+			//					inner.append( c );
+			//				}
+			//				inner.append( " " );
+			//			}
+			//
+			//			StringBuilder outer = new StringBuilder();
+			//			outer.append( "\"" );
+			//			outer.append( inner.toString().trim() );
+			//			outer.append( "\"" );
+			//
+			//			command.add( outer.toString() );
+			command.addAll( builder.command() );
 		} else {
 			command.addAll( builder.command() );
 			builder.command( command );
@@ -407,7 +408,8 @@ public class OperatingSystem {
 	}
 
 	static final boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) )
+			|| ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 	static final void clearProcessElevatedCache() {
