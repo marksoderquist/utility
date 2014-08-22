@@ -1,5 +1,6 @@
 package com.parallelsymmetry.utility;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -10,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IoUtil {
 
@@ -73,6 +76,27 @@ public class IoUtil {
 		return writer.toString();
 	}
 
+	public static final List<String> loadAsLines( InputStream input, String encoding ) throws IOException {
+		BufferedReader reader = new BufferedReader( new InputStreamReader( input, encoding ) );
+
+		String line = null;
+		List<String> list = new ArrayList<String>();
+		try {
+			while( ( line = reader.readLine() ) != null ) {
+				list.add( line );
+			}
+		} finally {
+			if( reader != null ) reader.close();
+		}
+
+		return list;
+	}
+
+	public static final String[] loadAsLineArray( InputStream input, String encoding ) throws IOException {
+		List<String> list = loadAsLines( input, encoding );
+		return list.toArray( new String[list.size()] );
+	}
+
 	public static final void closeQuietly( Closeable closeable ) {
 		if( closeable == null ) return;
 
@@ -82,7 +106,7 @@ public class IoUtil {
 		} catch( IOException exception ) {
 			// Intentionally ignore exception.
 		}
-		
+
 		// Close
 		try {
 			closeable.close();

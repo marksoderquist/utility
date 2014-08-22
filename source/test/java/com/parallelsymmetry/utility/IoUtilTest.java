@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -57,6 +58,34 @@ public class IoUtilTest extends TestCase {
 		IoUtil.save( content, output, TextUtil.DEFAULT_ENCODING );
 
 		assertEquals( content, IoUtil.load( new ByteArrayInputStream( output.toByteArray() ), TextUtil.DEFAULT_ENCODING ) );
+	}
+
+	public void testLoadAsLines() throws Exception {
+		String content = "This\nis\ntest\ncontent\n.";
+
+		List<String> lines = IoUtil.loadAsLines( new ByteArrayInputStream( content.getBytes( TextUtil.DEFAULT_CHARSET ) ), TextUtil.DEFAULT_ENCODING );
+
+		int index = 0;
+		assertEquals( "This", lines.get( index++ ) );
+		assertEquals( "is", lines.get( index++ ) );
+		assertEquals( "test", lines.get( index++ ) );
+		assertEquals( "content", lines.get( index++ ) );
+		assertEquals( ".", lines.get( index++ ) );
+		assertEquals( 5, lines.size() );
+	}
+
+	public void testLoadAsLineArray() throws Exception {
+		String content = "This\nis\ntest\ncontent\n.";
+
+		String[] lines = IoUtil.loadAsLineArray( new ByteArrayInputStream( content.getBytes( TextUtil.DEFAULT_CHARSET ) ), TextUtil.DEFAULT_ENCODING );
+
+		int index = 0;
+		assertEquals( "This", lines[index++] );
+		assertEquals( "is", lines[index++] );
+		assertEquals( "test", lines[index++] );
+		assertEquals( "content", lines[index++] );
+		assertEquals( ".", lines[index++] );
+		assertEquals( 5, lines.length );
 	}
 
 }

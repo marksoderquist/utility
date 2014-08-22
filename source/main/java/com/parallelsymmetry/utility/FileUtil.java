@@ -1,12 +1,10 @@
 package com.parallelsymmetry.utility;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -300,19 +298,7 @@ public final class FileUtil {
 	}
 
 	public static List<String> loadAsLines( File source, String encoding ) throws IOException {
-		BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( source ), encoding ) );
-
-		String line = null;
-		List<String> list = new ArrayList<String>();
-		try {
-			while( ( line = reader.readLine() ) != null ) {
-				list.add( line );
-			}
-		} finally {
-			if( reader != null ) reader.close();
-		}
-
-		return list;
+		return IoUtil.loadAsLines( new FileInputStream( source ), encoding );
 	}
 
 	public static void zip( File source, File target ) throws IOException {
