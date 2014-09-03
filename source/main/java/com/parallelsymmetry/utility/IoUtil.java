@@ -17,6 +17,8 @@ import java.util.List;
 public class IoUtil {
 
 	private static final int DEFAULT_BUFFER_SIZE = 4 * 1024;
+	
+	private IoUtil() {}
 
 	public static final long copy( InputStream source, OutputStream target ) throws IOException {
 		int read = 0;
