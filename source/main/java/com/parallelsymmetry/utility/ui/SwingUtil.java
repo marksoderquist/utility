@@ -21,20 +21,23 @@ import com.parallelsymmetry.utility.log.Log;
 
 public class SwingUtil {
 
-	/**
-	 * Cause the calling thread to wait until all events on the AWT event queue at
-	 * the time this method was called have been processed. This is done by
-	 * submitting a token event on the queue and waiting until the token event is
-	 * processed.
-	 */
-	public static final void swingWait() {
-		try {
-			EventQueue.invokeAndWait( new WaitToken() );
-		} catch( InterruptedException event ) {
-			return;
-		} catch( InvocationTargetException event ) {
-			return;
-		}
+	public static final void center( Window window ) {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screenSize = toolkit.getScreenSize();
+	
+		int x = ( screenSize.width - window.getWidth() ) / 2;
+		int y = ( screenSize.height - window.getHeight() ) / 2;
+	
+		window.setLocation( x, y );
+	}
+
+	public static final void center( JInternalFrame iframe ) {
+		JLayeredPane parent = JLayeredPane.getLayeredPaneAbove( iframe );
+	
+		int x = ( parent.getWidth() - iframe.getWidth() ) / 2;
+		int y = ( parent.getHeight() - iframe.getHeight() ) / 2;
+	
+		iframe.setLocation( x, y );
 	}
 
 	public static final void invokeLater( Runnable runnable ) {
@@ -118,32 +121,6 @@ public class SwingUtil {
 		}
 	}
 
-	private static class WaitToken implements Runnable {
-
-		@Override
-		public void run() {}
-
-	}
-
-	public static final void center( Window window ) {
-		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		Dimension screenSize = toolkit.getScreenSize();
-	
-		int x = ( screenSize.width - window.getWidth() ) / 2;
-		int y = ( screenSize.height - window.getHeight() ) / 2;
-	
-		window.setLocation( x, y );
-	}
-
-	public static final void center( JInternalFrame iframe ) {
-		JLayeredPane parent = JLayeredPane.getLayeredPaneAbove( iframe );
-	
-		int x = ( parent.getWidth() - iframe.getWidth() ) / 2;
-		int y = ( parent.getHeight() - iframe.getHeight() ) / 2;
-	
-		iframe.setLocation( x, y );
-	}
-
 	/**
 	 * Convenience method for searching up the component hierarchy from
 	 * <code>component</code> and returns the first component of class
@@ -195,6 +172,29 @@ public class SwingUtil {
 		}
 	
 		return found;
+	}
+
+	/**
+	 * Cause the calling thread to wait until all events on the AWT event queue at
+	 * the time this method was called have been processed. This is done by
+	 * submitting a token event on the queue and waiting until the token event is
+	 * processed.
+	 */
+	public static final void swingWait() {
+		try {
+			EventQueue.invokeAndWait( new WaitToken() );
+		} catch( InterruptedException event ) {
+			return;
+		} catch( InvocationTargetException event ) {
+			return;
+		}
+	}
+
+	private static class WaitToken implements Runnable {
+	
+		@Override
+		public void run() {}
+	
 	}
 
 }

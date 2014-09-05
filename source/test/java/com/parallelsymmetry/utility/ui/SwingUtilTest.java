@@ -4,6 +4,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.Panel;
+import java.awt.Point;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 import junit.framework.TestCase;
 
@@ -44,6 +48,27 @@ public class SwingUtilTest extends TestCase {
 		assertNull( SwingUtil.getNamedComponent( container, "zero" ) );
 		assertEquals( one, SwingUtil.getNamedComponent( container, "one" ) );
 		assertEquals( two, SwingUtil.getNamedComponent( container, "two" ) );
+	}
+
+	public void testGetChildOfType() {
+		JPanel parent = new JPanel();
+		JPanel container1 = new JPanel();
+		JPanel container2 = new JPanel();
+
+		JButton button = new JButton();
+
+		parent.add( container1 );
+		parent.add( container2 );
+		container2.add( button );
+
+		parent.setBounds( 0, 0, 100, 100 );
+		container1.setBounds( 20, 20, 60, 60 );
+		container2.setBounds( 20, 20, 60, 60 );
+		button.setBounds( 20, 20, 20, 20 );
+
+		Component component = SwingUtil.getChildOfType( parent, JButton.class, new Point( 50, 50 ) );
+		assertNotNull( component );
+		assertSame( button, component );
 	}
 
 	private static final class ExecuteTester implements Runnable {
