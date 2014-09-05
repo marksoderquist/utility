@@ -2,11 +2,19 @@ package com.parallelsymmetry.utility.ui;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.swing.JInternalFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.SwingUtilities;
 
 import com.parallelsymmetry.utility.TextUtil;
 import com.parallelsymmetry.utility.log.Log;
@@ -115,6 +123,78 @@ public class SwingUtil {
 		@Override
 		public void run() {}
 
+	}
+
+	public static final void center( Window window ) {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screenSize = toolkit.getScreenSize();
+	
+		int x = ( screenSize.width - window.getWidth() ) / 2;
+		int y = ( screenSize.height - window.getHeight() ) / 2;
+	
+		window.setLocation( x, y );
+	}
+
+	public static final void center( JInternalFrame iframe ) {
+		JLayeredPane parent = JLayeredPane.getLayeredPaneAbove( iframe );
+	
+		int x = ( parent.getWidth() - iframe.getWidth() ) / 2;
+		int y = ( parent.getHeight() - iframe.getHeight() ) / 2;
+	
+		iframe.setLocation( x, y );
+	}
+
+	/**
+	 * Convenience method for searching up the component hierarchy from
+	 * <code>component</code> and returns the first component of class
+	 * <code>type</code> it finds. Returns {@code null}, if a component of class
+	 * <code>type</code> cannot be found.
+	 */
+	public static final Component getParentOfClass( Class<?> type, Component component ) {
+		if( component == null || type == null ) return null;
+	
+		while( component != null && !( type.isInstance( component ) ) ) {
+			component = component.getParent();
+		}
+	
+		return component;
+	}
+
+	/**
+	 * Convenience method for searching down the component hierarchy from
+	 * <code>component</code> at <code>point</code> and returns the first child of
+	 * class <code>type</code> it finds. Returns {@code null}, if a child of class
+	 * <code>type</code> cannot be found.
+	 * 
+	 * @param component
+	 * @param type
+	 * @param point
+	 * @return
+	 */
+	public static final Component getChildOfType( Component component, Class<?> type, Point point ) {
+		if( component == null ) return null;
+		if( !( component instanceof Container ) ) return null;
+	
+		Component found = null;
+		Container container = (Container)component;
+	
+		// Find the components that contain the point.
+		List<Component> containing = new ArrayList<Component>();
+		for( Component child : container.getComponents() ) {
+			Point childPoint = SwingUtilities.convertPoint( container, point, child );
+			if( child.contains( childPoint ) ) containing.add( child );
+		}
+	
+		// Check the containing components.
+		for( Component child : containing ) {
+			if( type.isInstance( child ) ) {
+				return child;
+			} else {
+				found = getChildOfType( child, type, SwingUtilities.convertPoint( container, point, child ) );
+			}
+		}
+	
+		return found;
 	}
 
 }
