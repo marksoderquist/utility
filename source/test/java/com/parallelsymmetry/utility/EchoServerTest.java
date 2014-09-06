@@ -22,14 +22,20 @@ public class EchoServerTest extends TestCase {
 		Socket socket = null;
 		String data = String.valueOf( System.currentTimeMillis() );
 		try {
+			// Open the socket.
 			socket = new Socket();
 			socket.setSoTimeout( timeout );
 			socket.connect( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ), timeout );
+			
+			// Write the current time.
 			socket.getOutputStream().write( data.getBytes( TextUtil.DEFAULT_CHARSET ) );
 			socket.getOutputStream().write( '\n' );
 			socket.getOutputStream().flush();
+			
+			// Read the response.
 			BufferedReader reader = new BufferedReader( new InputStreamReader( socket.getInputStream(), TextUtil.DEFAULT_CHARSET ) );
 			String echo = reader.readLine();
+			
 			assertEquals( data, echo );
 		} finally {
 			if( socket != null ) socket.close();
