@@ -54,8 +54,8 @@ public class IoUtilTest extends TestCase {
 		String content = "This is test content to test save and load methods.";
 
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
-
 		IoUtil.save( content, output, TextUtil.DEFAULT_ENCODING );
+		output.close();
 
 		assertEquals( content, IoUtil.load( new ByteArrayInputStream( output.toByteArray() ), TextUtil.DEFAULT_ENCODING ) );
 	}
