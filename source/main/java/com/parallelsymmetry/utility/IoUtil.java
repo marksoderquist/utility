@@ -17,7 +17,7 @@ import java.util.List;
 public class IoUtil {
 
 	private static final int DEFAULT_BUFFER_SIZE = 4 * 1024;
-	
+
 	private IoUtil() {}
 
 	public static final long copy( InputStream source, OutputStream target ) throws IOException {
@@ -50,13 +50,9 @@ public class IoUtil {
 
 	public static final void save( String data, OutputStream target, String encoding ) throws IOException {
 		OutputStreamWriter writer = null;
-
-		try {
-			writer = new OutputStreamWriter( target, encoding == null ? TextUtil.DEFAULT_ENCODING : encoding );
-			writer.write( data );
-		} finally {
-			if( writer != null ) writer.close();
-		}
+		writer = new OutputStreamWriter( target, encoding == null ? TextUtil.DEFAULT_ENCODING : encoding );
+		writer.write( data );
+		writer.flush();
 	}
 
 	public static final String load( InputStream input ) throws IOException {

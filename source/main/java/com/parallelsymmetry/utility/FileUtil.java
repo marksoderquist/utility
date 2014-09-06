@@ -282,7 +282,9 @@ public final class FileUtil {
 	}
 
 	public static void save( String data, File target, String encoding ) throws IOException {
-		IoUtil.save( data, new FileOutputStream( target ), encoding );
+		OutputStream output = new FileOutputStream( target );
+		IoUtil.save( data, output, encoding );
+		output.close();
 	}
 
 	public static String load( File source ) throws IOException {
