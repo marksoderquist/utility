@@ -25,17 +25,18 @@ public class EchoServerTest extends TestCase {
 			// Open the socket.
 			socket = new Socket();
 			socket.setSoTimeout( timeout );
-			socket.connect( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ), timeout );
-			
+			socket.connect( new InetSocketAddress( InetAddress.getByName( "127.0.0.1" ), port ), timeout );
+			//socket.connect( new InetSocketAddress( InetAddress.getLoopbackAddress(), port ), timeout );
+
 			// Write the current time.
 			socket.getOutputStream().write( data.getBytes( TextUtil.DEFAULT_CHARSET ) );
 			socket.getOutputStream().write( '\n' );
 			socket.getOutputStream().flush();
-			
+
 			// Read the response.
 			BufferedReader reader = new BufferedReader( new InputStreamReader( socket.getInputStream(), TextUtil.DEFAULT_CHARSET ) );
 			String echo = reader.readLine();
-			
+
 			assertEquals( data, echo );
 		} finally {
 			if( socket != null ) socket.close();

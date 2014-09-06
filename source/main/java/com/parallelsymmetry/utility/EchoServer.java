@@ -3,6 +3,9 @@ package com.parallelsymmetry.utility;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -16,7 +19,7 @@ public class EchoServer extends Thread {
 	public EchoServer() {
 		setDaemon( true );
 		try {
-			server = new ServerSocket( 0 );
+			server = new ServerSocket( 0, 1, InetAddress.getByName( "127.0.0.1" ) );
 		} catch( IOException exception ) {
 			Log.write( exception );
 		}
