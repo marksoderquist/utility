@@ -19,7 +19,7 @@ class SetAttributeOperation extends Operation {
 	protected OperationResult process() {
 		OperationResult result = new OperationResult( this );
 
-		getData().doSetAttribute( name, oldValue, newValue );
+		getData().doSetDataValue( name, oldValue, newValue );
 
 		DataEvent.Action type = DataEvent.Action.MODIFY;
 		type = oldValue == null ? DataEvent.Action.INSERT : type;

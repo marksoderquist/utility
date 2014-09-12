@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.utility.ObjectUtil;
+import com.parallelsymmetry.utility.log.Log;
 
 public abstract class DataNode {
 
@@ -20,21 +21,21 @@ public abstract class DataNode {
 
 	protected DataNode parent;
 
-	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
-
 	private boolean selfModified;
+
+	private int modifiedAttributeCount;
 
 	private Map<String, Object> dataValues;
 
 	private Map<String, Object> metaValues;
-
-	private int modifiedAttributeCount;
 
 	private Map<String, Object> modifiedDataValues;
 
 	private Map<String, Object> modifiedMetaValues;
 
 	private Map<String, Object> resources;
+
+	protected Set<DataListener> listeners = new CopyOnWriteArraySet<DataListener>();
 
 	/**
 	 * Is the node modified. The node is modified if any data value has been
@@ -276,16 +277,20 @@ public abstract class DataNode {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Meta value name cannot be null." );
 
-		return (T)( dataValues == null ? null : dataValues.get( name ) );
+		return (T)( metaValues == null ? null : metaValues.get( name ) );
 	}
 
 	protected void setMetaValue( String name, Object newValue ) {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Meta value name cannot be null." );
 
+
 		// If the old value is equal to the new value no changes are necessary.
-		Object oldValue = getMetaValue( name );
+		// NEXT Fix should use getMetaValue, not getAttribute.
+		Object oldValue = getAttribute( name );
+		Log.write( Log.DEVEL, "Set meta value: ", oldValue, "  ", newValue );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
+		Log.write( Log.DEVEL, "Setting modified: ", modified );
 
 		Transaction.create();
 		Transaction.submit( new SetMetaValueOperation( this, name, oldValue, newValue ) );
@@ -332,9 +337,10 @@ public abstract class DataNode {
 
 	void updateModifiedFlag() {
 		modified = selfModified || modifiedAttributeCount != 0;
+		Log.write( Log.DEVEL, "self: ", selfModified, " data: ", modifiedAttributeCount != 0 );
 	}
 
-	void doSetAttribute( String name, Object oldValue, Object newValue ) {
+	void doSetDataValue( String name, Object oldValue, Object newValue ) {
 		// Create the attribute map if necessary.
 		if( dataValues == null ) dataValues = new ConcurrentHashMap<String, Object>();
 

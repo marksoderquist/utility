@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.parallelsymmetry.utility.Accessor;
+import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
@@ -271,6 +272,16 @@ public class DataNodeTest extends DataTestCase {
 		data.setModified( false );
 		assertNodeState( data, false, 0 );
 		assertEventCounts( handler, 4, 2, 3 );
+	}
+
+	@Test
+	public void testTestMetaValue() {
+		MockDataNode data = new MockDataNode();
+		assertEquals( null, data.getMetaValue( "test" ) );
+		data.setMetaValue( "test", true );
+		assertEquals( true, data.getMetaValue( "test" ) );
+		data.setMetaValue( "test", false );
+		assertEquals( false, data.getMetaValue( "test" ) );
 	}
 
 	@Test
@@ -653,7 +664,9 @@ public class DataNodeTest extends DataTestCase {
 		assertNodeState( parent, true, 1 );
 		assertEventCounts( parentHandler, 1, 1, 1 );
 
+		Log.setLevel(Log.DEBUG );
 		parent.setModified( false );
+		Log.setLevel(Log.NONE );
 		assertNodeState( parent, false, 0 );
 		assertEventCounts( parentHandler, 2, 2, 1 );
 
