@@ -275,13 +275,25 @@ public class DataNodeTest extends DataTestCase {
 	}
 
 	@Test
-	public void testTestMetaValue() {
+	public void testTestMetaValueModified() {
+		String key = DataNode.MODIFIED;
 		MockDataNode data = new MockDataNode();
-		assertEquals( null, data.getMetaValue( "test" ) );
-		data.setMetaValue( "test", true );
-		assertEquals( true, data.getMetaValue( "test" ) );
-		data.setMetaValue( "test", false );
-		assertEquals( false, data.getMetaValue( "test" ) );
+		assertEquals( false, data.getMetaValue( key ) );
+		data.setMetaValue( key, true );
+		assertEquals( true, data.getMetaValue( key ) );
+		data.setMetaValue( key, false );
+		assertEquals( false, data.getMetaValue( key ) );
+	}
+
+	@Test
+	public void testTestMetaValueOther() {
+		String key = "other";
+		MockDataNode data = new MockDataNode();
+		assertEquals( null, data.getMetaValue( key ) );
+		data.setMetaValue( key, true );
+		assertEquals( true, data.getMetaValue( key ) );
+		data.setMetaValue( key, false );
+		assertEquals( false, data.getMetaValue( key ) );
 	}
 
 	@Test

@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.parallelsymmetry.utility.ObjectUtil;
-import com.parallelsymmetry.utility.log.Log;
 
 public abstract class DataNode {
 
@@ -277,6 +276,8 @@ public abstract class DataNode {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Meta value name cannot be null." );
 
+		if( MODIFIED.equals( name ) ) return (T)(isModified() ? Boolean.TRUE : Boolean.FALSE);
+
 		return (T)( metaValues == null ? null : metaValues.get( name ) );
 	}
 
@@ -284,13 +285,9 @@ public abstract class DataNode {
 		// Null attribute names are not allowed.
 		if( name == null ) throw new NullPointerException( "Meta value name cannot be null." );
 
-
 		// If the old value is equal to the new value no changes are necessary.
-		// NEXT Fix should use getMetaValue, not getAttribute.
-		Object oldValue = getAttribute( name );
-		Log.write( Log.DEVEL, "Set meta value: ", oldValue, "  ", newValue );
+		Object oldValue = getMetaValue( name );
 		if( ObjectUtil.areEqual( oldValue, newValue ) ) return;
-		Log.write( Log.DEVEL, "Setting modified: ", modified );
 
 		Transaction.create();
 		Transaction.submit( new SetMetaValueOperation( this, name, oldValue, newValue ) );
@@ -337,7 +334,6 @@ public abstract class DataNode {
 
 	void updateModifiedFlag() {
 		modified = selfModified || modifiedAttributeCount != 0;
-		Log.write( Log.DEVEL, "self: ", selfModified, " data: ", modifiedAttributeCount != 0 );
 	}
 
 	void doSetDataValue( String name, Object oldValue, Object newValue ) {
