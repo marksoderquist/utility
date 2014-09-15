@@ -148,11 +148,11 @@ public class IconLibrary {
 	}
 
 	public Image getImage( String name, ImageFilter filter ) {
-		return getImage( getIcon( name, filter ) );
+		return filterImage( getImage( name ), filter );
 	}
 
 	public Image getImage( String name, int size, ImageFilter filter ) {
-		return getImage( getIcon( name, size ), filter );
+		return filterImage( getImage( name, size ), filter );
 	}
 
 	/**
