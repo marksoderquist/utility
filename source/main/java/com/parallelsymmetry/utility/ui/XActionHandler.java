@@ -54,7 +54,7 @@ public abstract class XActionHandler implements ActionListener {
 
 	private final void fireEnabledChanged( boolean enabled ) {
 		for( XAction action : actions ) {
-			action.handleEnabledChanged( this, enabled );
+			action.updateEnabledState();
 		}
 	}
 

@@ -140,7 +140,7 @@ public class XAction extends AbstractAction {
 		handlers.remove( handler );
 		handlers.push( handler );
 		handler.addActionCallback( this );
-		new SetEnabled( handler.isEnabled() );
+		updateEnabledState();
 	}
 
 	/**
@@ -161,12 +161,7 @@ public class XAction extends AbstractAction {
 		handler.removeActionCallback( this );
 		handlers.remove( handler );
 
-		XActionHandler next = peekHandler();
-		if( next == null ) {
-			new SetEnabled( false );
-		} else {
-			new SetEnabled( next.isEnabled() );
-		}
+		updateEnabledState();
 
 		return handler;
 	}
@@ -255,32 +250,26 @@ public class XAction extends AbstractAction {
 		return buffer.toString();
 	}
 
-	/**
-	 * This method may be called from any thread. It will ensure that the action
-	 * will be enabled or disabled on the event dispatch thread.
-	 * 
-	 * @param handler
-	 * @param enabled
-	 */
-	void handleEnabledChanged( XActionHandler handler, boolean enabled ) {
-		SwingUtil.invokeNowOrLater( new SetEnabled( peekHandler().isEnabled() ) );
+	void updateEnabledState() {
+		XActionHandler handler = peekHandler();
+		SwingUtil.invokeNowOrLater( new UpdateEnabled( handler == null ? false : handler.isEnabled() ) );
 	}
 
 	/**
 	 * The class to set the enabled flag from the event dispatch thread.
 	 */
-	private class SetEnabled implements Runnable {
+	private class UpdateEnabled implements Runnable {
 
 		/**
 		 * The enabled state.
 		 */
-		private boolean enabled;
+		private boolean actionEnabled;
 
 		/**
 		 * Create the <code>SetEnabled</code> class.
 		 */
-		public SetEnabled( boolean enabled ) {
-			this.enabled = enabled;
+		public UpdateEnabled( boolean enabled ) {
+			this.actionEnabled = enabled;
 		}
 
 		/**
@@ -288,7 +277,7 @@ public class XAction extends AbstractAction {
 		 */
 		@Override
 		public void run() {
-			XAction.super.setEnabled( enabled );
+			XAction.super.setEnabled( actionEnabled );
 		}
 
 	}
