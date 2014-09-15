@@ -30,6 +30,12 @@ public abstract class XActionHandler implements ActionListener {
 		return this.enabled;
 	}
 
+	/**
+	 * This method may be called from any thread. It ensures that the action is
+	 * enabled or disabled on the event dispatch thread.
+	 * 
+	 * @param enabled
+	 */
 	public void setEnabled( boolean enabled ) {
 		if( this.enabled == enabled ) return;
 

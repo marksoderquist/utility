@@ -1,6 +1,5 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -256,8 +255,15 @@ public class XAction extends AbstractAction {
 		return buffer.toString();
 	}
 
+	/**
+	 * This method may be called from any thread. It will ensure that the action
+	 * will be enabled or disabled on the event dispatch thread.
+	 * 
+	 * @param handler
+	 * @param enabled
+	 */
 	void handleEnabledChanged( XActionHandler handler, boolean enabled ) {
-		new SetEnabled( peekHandler().isEnabled() );
+		SwingUtil.invokeNowOrLater( new SetEnabled( peekHandler().isEnabled() ) );
 	}
 
 	/**
@@ -275,12 +281,6 @@ public class XAction extends AbstractAction {
 		 */
 		public SetEnabled( boolean enabled ) {
 			this.enabled = enabled;
-
-			if( EventQueue.isDispatchThread() ) {
-				run();
-			} else {
-				EventQueue.invokeLater( this );
-			}
 		}
 
 		/**
