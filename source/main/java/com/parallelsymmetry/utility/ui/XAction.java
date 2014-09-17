@@ -252,13 +252,13 @@ public class XAction extends AbstractAction {
 
 	void updateEnabledState() {
 		XActionHandler handler = peekHandler();
-		SwingUtil.invokeNowOrLater( new UpdateEnabled( handler == null ? false : handler.isEnabled() ) );
+		SwingUtil.invokeLater( new UpdateEnabledState( handler == null ? false : handler.isEnabled() ) );
 	}
 
 	/**
 	 * The class to set the enabled flag from the event dispatch thread.
 	 */
-	private class UpdateEnabled implements Runnable {
+	private class UpdateEnabledState implements Runnable {
 
 		/**
 		 * The enabled state.
@@ -268,7 +268,7 @@ public class XAction extends AbstractAction {
 		/**
 		 * Create the <code>SetEnabled</code> class.
 		 */
-		public UpdateEnabled( boolean enabled ) {
+		public UpdateEnabledState( boolean enabled ) {
 			this.actionEnabled = enabled;
 		}
 

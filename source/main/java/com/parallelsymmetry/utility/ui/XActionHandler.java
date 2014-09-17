@@ -5,8 +5,6 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.parallelsymmetry.utility.log.Log;
-
 public abstract class XActionHandler implements ActionListener {
 
 	private boolean enabled;
@@ -39,10 +37,6 @@ public abstract class XActionHandler implements ActionListener {
 	 * @param enabled
 	 */
 	public void setEnabled( boolean enabled ) {
-		track = getClass().getName().endsWith( "SaveActionHandler" ) && this.enabled != enabled && !enabled;
-		if( track ) Log.write( Log.DEVEL, "SaveActionHandler should be disabled" );
-
-		// FIXME This line keeps the action from being disabled because it was already disabled.
 		if( this.enabled == enabled ) return;
 
 		this.enabled = enabled;
@@ -59,11 +53,10 @@ public abstract class XActionHandler implements ActionListener {
 		actions.remove( action );
 	}
 
-	private boolean track;
+	public static boolean track;
 
 	private final void fireEnabledChanged( boolean enabled ) {
 		for( XAction action : actions ) {
-			if( track ) Log.write( Log.DEVEL, "Sending enabled changed event: ", enabled );
 			action.updateEnabledState();
 		}
 	}
