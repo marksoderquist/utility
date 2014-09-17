@@ -200,7 +200,7 @@ public class XAction extends AbstractAction {
 	}
 
 	/**
-	 * Get the displayable text for a accelerator.
+	 * Get the displayable text for an accelerator.
 	 */
 	public static final String getAcceleratorDisplayText( String accelerator ) {
 		if( accelerator == null || accelerator == "" ) return "";
