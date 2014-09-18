@@ -8,7 +8,6 @@ import java.util.Set;
 import org.w3c.dom.Node;
 
 import com.parallelsymmetry.utility.Descriptor;
-import com.parallelsymmetry.utility.log.Log;
 
 public class DescriptorSettingProvider implements SettingProvider {
 
