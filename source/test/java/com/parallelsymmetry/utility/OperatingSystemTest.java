@@ -1,6 +1,7 @@
 package com.parallelsymmetry.utility;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
@@ -178,15 +179,15 @@ public class OperatingSystemTest extends TestCase {
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
 		ProcessBuilder builder = new ProcessBuilder( "javaw", "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
 
-		OperatingSystem.reduceProcessBuilder( builder );
+		IOException exception = null;
+		try {
+			OperatingSystem.reduceProcessBuilder( builder );
+			fail( "Launching a normal processes from an elevated processes in Windows is impossible." );
+		} catch( IOException ioexception ) {
+			exception = ioexception;
+		}
 
-		int index = 0;
-		assertEquals( 5, builder.command().size() );
-		assertEquals( "javaw", builder.command().get( index++ ) );
-		assertEquals( "-jar", builder.command().get( index++ ) );
-		assertEquals( "C:\\Program Files\\Escape\\program.jar", builder.command().get( index++ ) );
-		assertEquals( "-update", builder.command().get( index++ ) );
-		assertEquals( "false", builder.command().get( index++ ) );
+		assertNotNull( exception );
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {

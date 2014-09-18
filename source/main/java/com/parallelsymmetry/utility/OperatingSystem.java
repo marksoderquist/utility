@@ -207,31 +207,10 @@ public class OperatingSystem {
 		List<String> command = getReduceCommands();
 
 		if( isWindows() ) {
-			// FIXME Launching normal processes from elevated processes is impossible in Windows.
 			// See the following links for further information:
 			// http://stackoverflow.com/questions/2414991/how-to-launch-a-program-as-as-a-normal-user-from-a-uac-elevated-installer (comment 2 in answer)
 			// http://mdb-blog.blogspot.com/2013/01/nsis-lunch-program-as-user-from-uac.html
-
-			//			StringBuilder inner = new StringBuilder();
-			//
-			//			for( String c : builder.command() ) {
-			//				if( c.contains( " " ) ) {
-			//					inner.append( "\\\"" );
-			//					inner.append( c );
-			//					inner.append( "\\\"" );
-			//				} else {
-			//					inner.append( c );
-			//				}
-			//				inner.append( " " );
-			//			}
-			//
-			//			StringBuilder outer = new StringBuilder();
-			//			outer.append( "\"" );
-			//			outer.append( inner.toString().trim() );
-			//			outer.append( "\"" );
-			//
-			//			command.add( outer.toString() );
-			command.addAll( builder.command() );
+			throw new IOException( "Launching a normal processes from an elevated processes is impossible in Windows." );
 		} else {
 			command.addAll( builder.command() );
 			builder.command( command );
@@ -489,22 +468,6 @@ public class OperatingSystem {
 		elevator.setExecutable( true );
 
 		return elevator;
-	}
-
-	private static final File extractWinReduce() throws IOException {
-		File reducer = new File( System.getProperty( "java.io.tmpdir" ), "reduce.js" ).getCanonicalFile();
-		InputStream source = OperatingSystem.class.getResourceAsStream( "/elevate/win/reduce.js" );
-		FileOutputStream target = new FileOutputStream( reducer );
-		try {
-			IoUtil.copy( source, target );
-		} finally {
-			source.close();
-			target.close();
-		}
-
-		reducer.setExecutable( true );
-
-		return reducer;
 	}
 
 	private static final File extractMacElevate() throws IOException {
