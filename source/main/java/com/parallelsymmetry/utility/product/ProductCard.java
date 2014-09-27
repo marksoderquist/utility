@@ -109,6 +109,7 @@ public class ProductCard {
 	public ProductCard( String group, String artifact ) throws ProductCardException {
 		this.group = group;
 		this.artifact = artifact;
+		updateKey();
 	}
 
 	private ProductCard update( URI base, Descriptor descriptor ) throws ProductCardException {
