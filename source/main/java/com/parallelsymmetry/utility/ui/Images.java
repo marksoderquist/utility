@@ -31,7 +31,7 @@ public final class Images {
 	/**
 	 * Standard grayscale filter.
 	 */
-	public static final RGBImageFilter STANDARD_FILTER = new GrayscaleFilter( 0, 0 );
+	public static final RGBImageFilter STANDARD_FILTER = new GrayscaleFilter( 0 );
 
 	/**
 	 * Brighter grayscale filter.
