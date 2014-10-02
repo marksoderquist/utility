@@ -821,6 +821,8 @@ public class Settings {
 	 * @param listener
 	 */
 	public void removeSettingListener( String path, SettingListener listener ) {
+		if( listeners == null ) return;
+		
 		String full = getAbsolutePath( path );
 		synchronized( root.listeners ) {
 			Set<SettingListener> listeners = root.listeners.get( full );
