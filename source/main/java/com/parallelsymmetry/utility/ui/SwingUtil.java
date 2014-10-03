@@ -24,20 +24,21 @@ public class SwingUtil {
 	public static final void center( Window window ) {
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Dimension screenSize = toolkit.getScreenSize();
-	
+
 		int x = ( screenSize.width - window.getWidth() ) / 2;
 		int y = ( screenSize.height - window.getHeight() ) / 2;
-	
+
 		window.setLocation( x, y );
 	}
 
 	public static final void center( JInternalFrame iframe ) {
-		JLayeredPane parent = JLayeredPane.getLayeredPaneAbove( iframe );
-	
-		int x = ( parent.getWidth() - iframe.getWidth() ) / 2;
-		int y = ( parent.getHeight() - iframe.getHeight() ) / 2;
-	
-		iframe.setLocation( x, y );
+		center( iframe, JLayeredPane.getLayeredPaneAbove( iframe ) );
+	}
+
+	public static final void center( Component component, Container container ) {
+		int x = ( container.getWidth() - component.getWidth() ) / 2;
+		int y = ( container.getHeight() - component.getHeight() ) / 2;
+		component.setLocation( x, y );
 	}
 
 	public static final void invokeLater( Runnable runnable ) {
@@ -127,14 +128,15 @@ public class SwingUtil {
 	 * <code>type</code> it finds. Returns {@code null}, if a component of class
 	 * <code>type</code> cannot be found.
 	 */
-	public static final Component getParentOfClass( Class<?> type, Component component ) {
+	@SuppressWarnings( "unchecked" )
+	public static final <T> T getParentOfClass( Class<T> type, Component component ) {
 		if( component == null || type == null ) return null;
-	
+
 		while( component != null && !( type.isInstance( component ) ) ) {
 			component = component.getParent();
 		}
-	
-		return component;
+
+		return (T)component;
 	}
 
 	/**
@@ -151,17 +153,17 @@ public class SwingUtil {
 	public static final Component getChildOfType( Component component, Class<?> type, Point point ) {
 		if( component == null ) return null;
 		if( !( component instanceof Container ) ) return null;
-	
+
 		Component found = null;
 		Container container = (Container)component;
-	
+
 		// Find the components that contain the point.
 		List<Component> containing = new ArrayList<Component>();
 		for( Component child : container.getComponents() ) {
 			Point childPoint = SwingUtilities.convertPoint( container, point, child );
 			if( child.contains( childPoint ) ) containing.add( child );
 		}
-	
+
 		// Check the containing components.
 		for( Component child : containing ) {
 			if( type.isInstance( child ) ) {
@@ -170,7 +172,7 @@ public class SwingUtil {
 				found = getChildOfType( child, type, SwingUtilities.convertPoint( container, point, child ) );
 			}
 		}
-	
+
 		return found;
 	}
 
@@ -191,10 +193,10 @@ public class SwingUtil {
 	}
 
 	private static class WaitToken implements Runnable {
-	
+
 		@Override
 		public void run() {}
-	
+
 	}
 
 }
