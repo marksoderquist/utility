@@ -66,6 +66,12 @@ public abstract class BaseImage {
 	protected static final double OUTLINE_COLOR_FACTOR = -0.75;
 
 	protected static final float DEFAULT_OUTLINE_SIZE = 1f / 32f;
+	
+	protected static final Stroke DEFAULT_STROKE = new BasicStroke( (float)DEFAULT_OUTLINE_SIZE * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
+
+	protected static final Stroke DOUBLE_STROKE = new BasicStroke( (float)DEFAULT_OUTLINE_SIZE * 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
+
+	protected static final Stroke HALF_STROKE = new BasicStroke( (float)DEFAULT_OUTLINE_SIZE / 2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND );
 
 	protected static final double RADIANS_PER_DEGREE = Math.PI / 180;
 
