@@ -141,6 +141,7 @@ public class XAction extends AbstractAction {
 		handlers.push( handler );
 		handler.addActionCallback( this );
 		updateEnabledState();
+		updateSelectedState();
 	}
 
 	/**
@@ -162,6 +163,7 @@ public class XAction extends AbstractAction {
 		handlers.remove( handler );
 
 		updateEnabledState();
+		updateSelectedState();
 
 		return handler;
 	}
@@ -254,6 +256,11 @@ public class XAction extends AbstractAction {
 		XActionHandler handler = peekHandler();
 		SwingUtil.invokeLater( new UpdateEnabledState( handler == null ? false : handler.isEnabled() ) );
 	}
+	
+	void updateSelectedState() {
+		XActionHandler handler = peekHandler();
+		SwingUtil.invokeLater( new UpdateSelectedState( handler == null ? false : handler.isSelected() ) );
+	}
 
 	/**
 	 * The class to set the enabled flag from the event dispatch thread.
@@ -278,6 +285,33 @@ public class XAction extends AbstractAction {
 		@Override
 		public void run() {
 			XAction.super.setEnabled( actionEnabled );
+		}
+
+	}
+
+	/**
+	 * The class to set the selected flag from the event dispatch thread.
+	 */
+	private class UpdateSelectedState implements Runnable {
+
+		/**
+		 * The enabled state.
+		 */
+		private boolean actionSelected;
+
+		/**
+		 * Create the <code>SetEnabled</code> class.
+		 */
+		public UpdateSelectedState( boolean enabled ) {
+			this.actionSelected = enabled;
+		}
+
+		/**
+		 * Called by the thread.
+		 */
+		@Override
+		public void run() {
+			XAction.super.putValue(Action.SELECTED_KEY, actionSelected );
 		}
 
 	}

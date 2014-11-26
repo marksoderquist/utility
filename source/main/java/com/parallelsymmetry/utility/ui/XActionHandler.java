@@ -5,9 +5,13 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.parallelsymmetry.utility.log.Log;
+
 public abstract class XActionHandler implements ActionListener {
 
 	private boolean enabled;
+
+	private boolean selected;
 
 	private Collection<XAction> actions;
 
@@ -16,7 +20,12 @@ public abstract class XActionHandler implements ActionListener {
 	}
 
 	public XActionHandler( boolean enabled ) {
+		this( enabled, false );
+	}
+
+	public XActionHandler( boolean enabled, boolean selected ) {
 		this.enabled = enabled;
+		this.selected = selected;
 		actions = new CopyOnWriteArraySet<XAction>();
 	}
 
@@ -42,7 +51,24 @@ public abstract class XActionHandler implements ActionListener {
 		this.enabled = enabled;
 
 		fireEnabledChanged( enabled );
-		track = false;
+	}
+
+	public boolean isSelected() {
+		return this.selected;
+	}
+
+	/**
+	 * This method may be called from any thread. It ensures that the action is
+	 * selected or unselected on the event dispatch thread.
+	 * 
+	 * @param selected
+	 */
+	public void setSelected( boolean selected ) {
+		if( this.selected == selected ) return;
+
+		this.selected = selected;
+
+		fireSelectedChanged( this.selected );
 	}
 
 	public void addActionCallback( XAction action ) {
@@ -53,11 +79,15 @@ public abstract class XActionHandler implements ActionListener {
 		actions.remove( action );
 	}
 
-	public static boolean track;
-
 	private final void fireEnabledChanged( boolean enabled ) {
 		for( XAction action : actions ) {
 			action.updateEnabledState();
+		}
+	}
+
+	private final void fireSelectedChanged( boolean selected ) {
+		for( XAction action : actions ) {
+			action.updateSelectedState();
 		}
 	}
 
