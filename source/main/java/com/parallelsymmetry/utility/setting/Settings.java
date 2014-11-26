@@ -532,8 +532,9 @@ public class Settings {
 	}
 
 	public <T extends Persistent> List<Settings> getNodeList( String path, List<T> defaultList ) {
-		int count = getInt( path + SEPARATOR + ITEM_COUNT, -1 );
-
+		String absolute = getAbsolutePath( path );
+		
+		int count = getInt( absolute + SEPARATOR + ITEM_COUNT, -1 );
 		if( count < 0 && defaultList == null ) return null;
 
 		List<Settings> list = new ArrayList<Settings>();
@@ -555,8 +556,10 @@ public class Settings {
 	}
 
 	public <T extends Persistent> void putNodeList( String path, List<T> list ) {
+		String absolute = getAbsolutePath( path );
+
 		// Remove the old list.
-		int oldCount = getInt( path + SEPARATOR + ITEM_COUNT, 0 );
+		int oldCount = getInt( absolute + SEPARATOR + ITEM_COUNT, 0 );
 		for( int index = 0; index < oldCount; index++ ) {
 			removeNode( getItemPath( path, index ) );
 		}
@@ -569,7 +572,7 @@ public class Settings {
 			for( int index = 0; index < count; index++ ) {
 				list.get( index ).saveSettings( getNode( getItemPath( path, index ) ) );
 			}
-			putInt( path + SEPARATOR + ITEM_COUNT, count );
+			putInt( absolute + SEPARATOR + ITEM_COUNT, count );
 		}
 	}
 
@@ -620,7 +623,7 @@ public class Settings {
 			for( String name : map.keySet() ) {
 				map.get( name ).saveSettings( getNode( path + "/" + name ) );
 			}
-			putInt( path + SEPARATOR + ITEM_COUNT, map.size() );
+			putInt( getAbsolutePath( path ) + SEPARATOR + ITEM_COUNT, map.size() );
 		}
 	}
 
