@@ -906,6 +906,12 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, buffer.toString() );
 	}
 
+	public void testGetSafeUuid() {
+		String id = Settings.getSafeUuid();
+		assertNotNull( id );
+		assertTrue( id.startsWith( "uuid-" ) );
+	}
+
 	public void testAddListener() {
 		MockSettingListener listener1 = new MockSettingListener();
 		MockSettingListener listener2 = new MockSettingListener();

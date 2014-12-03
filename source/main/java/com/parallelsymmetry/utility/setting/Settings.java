@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -533,7 +534,7 @@ public class Settings {
 
 	public <T extends Persistent> List<Settings> getNodeList( String path, List<T> defaultList ) {
 		String absolute = getAbsolutePath( path );
-		
+
 		int count = getInt( absolute + SEPARATOR + ITEM_COUNT, -1 );
 		if( count < 0 && defaultList == null ) return null;
 
@@ -854,6 +855,19 @@ public class Settings {
 
 	public void printAsXml( PrintStream stream ) {
 		printAsXml( this, stream );
+	}
+
+	/**
+	 * Get a settings safe UUID. A settings safe UUID does not start with a number
+	 * and therefore is prefixed with "uuid-".
+	 */
+	public static String getSafeUuid() {
+		UUID id = UUID.randomUUID();
+
+		StringBuilder builder = new StringBuilder( "uuid-" );
+		builder.append( id.toString() );
+
+		return builder.toString();
 	}
 
 	public static void printAsPaths( Settings settings, PrintStream stream ) {
