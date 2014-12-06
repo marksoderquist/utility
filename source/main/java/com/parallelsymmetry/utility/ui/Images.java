@@ -41,7 +41,7 @@ public final class Images {
 	/**
 	 * Slightly darker grayscale filter.
 	 */
-	public static final RGBImageFilter PRESSED_FILTER = new GrayscaleFilter( -0.125 );
+	public static final RGBImageFilter PRESSED_FILTER = new GrayscaleFilter( -0.1 );
 
 	public static final RGBImageFilter ROLLOVER_FILTER = new RescaleFilter( 0x80808080 );
 
