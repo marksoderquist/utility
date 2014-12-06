@@ -3,9 +3,7 @@ package com.parallelsymmetry.utility.ui;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -148,11 +146,11 @@ public class IconLibrary {
 	}
 
 	public Image getImage( String name, ImageFilter filter ) {
-		return filterImage( getImage( name ), filter );
+		return Images.filter( getImage( name ), filter );
 	}
 
 	public Image getImage( String name, int size, ImageFilter filter ) {
-		return filterImage( getImage( name, size ), filter );
+		return Images.filter( getImage( name, size ), filter );
 	}
 
 	/**
@@ -249,10 +247,9 @@ public class IconLibrary {
 	 */
 	private IconProxy getProxiedIcon( String name, int size, ImageFilter filter ) {
 		if( name == null ) name = BROKEN;
-		//name = BROKEN;
 
 		IconProxy proxy = null;
-		String key = name + ":" + size;
+		String key = name + "-" + size + ( filter == null ? "" : ":" + filter.getClass().getName() );
 
 		// Get a proxy from the cache.
 		proxy = proxies.get( key );
@@ -289,7 +286,7 @@ public class IconLibrary {
 
 		IconProxy proxy = null;
 		String name = HashUtil.hash( uri.toString() );
-		String key = name + ":" + size;
+		String key = name + "-" + size + ( filter == null ? "" : ":" + filter.getClass().getName() );
 
 		// Get a proxy from the cache.
 		proxy = proxies.get( key );
@@ -385,23 +382,10 @@ public class IconLibrary {
 
 		// Scale the image to the icon size of the cache.
 		image = image.getScaledInstance( width, height, Image.SCALE_SMOOTH );
-		image = filterImage( image, filter );
+		image = Images.filter( image, filter );
 
 		// Return a new ImageIcon.
 		return new ImageIcon( image );
-	}
-
-	/**
-	 * Filter the image.
-	 * 
-	 * @param image
-	 * @param filter
-	 * @return
-	 */
-	private Image filterImage( Image image, ImageFilter filter ) {
-		if( image == null ) return null;
-		if( filter == null ) return image;
-		return Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( image.getSource(), filter ) );
 	}
 
 	/**
