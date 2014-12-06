@@ -70,6 +70,7 @@ public final class Images {
 
 	public static Image filter( Image image, ImageFilter filter ) {
 		if( filter == null ) return image;
+		if( image == null ) return null;
 		return Toolkit.getDefaultToolkit().createImage( new FilteredImageSource( image.getSource(), filter ) );
 	}
 
