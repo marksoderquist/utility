@@ -251,9 +251,10 @@ public class IconLibrary {
 		IconProxy proxy = null;
 		String key = name + "-" + size + ( filter == null ? "" : ":" + filter.getClass().getName() );
 
+		// FIXME Icon proxy cache breaks icon filters.
 		// Get a proxy from the cache.
-		proxy = proxies.get( key );
-		if( proxy != null ) return proxy;
+		//proxy = proxies.get( key );
+		//if( proxy != null ) return proxy;
 
 		// Get the icon renderer.
 		Icon renderer = icons.get( name );
@@ -288,9 +289,10 @@ public class IconLibrary {
 		String name = HashUtil.hash( uri.toString() );
 		String key = name + "-" + size + ( filter == null ? "" : ":" + filter.getClass().getName() );
 
+		// FIXME Icon proxy cache breaks icon filters.
 		// Get a proxy from the cache.
-		proxy = proxies.get( key );
-		if( proxy != null ) return proxy;
+		//proxy = proxies.get( key );
+		//if( proxy != null ) return proxy;
 
 		// Get the icon renderer.
 		Icon renderer = icons.get( name );
