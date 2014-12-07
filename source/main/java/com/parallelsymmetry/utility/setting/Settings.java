@@ -349,23 +349,23 @@ public class Settings {
 		}
 	}
 
-	public void sync() {
-		sync( getPath() );
-	}
-
-	public void sync( String path ) {
-		try {
-			for( SettingProvider provider : root.providers ) {
-				if( provider instanceof WritableSettingProvider ) {
-					String full = getProviderPath( provider, path );
-					if( full != null ) ( (WritableSettingProvider)provider ).sync( full );
-				}
-			}
-		} catch( SettingsStoreException exception ) {
-			Log.write( exception );
-		}
-
-	}
+//	public void sync() {
+//		sync( getPath() );
+//	}
+//
+//	public void sync( String path ) {
+//		try {
+//			for( SettingProvider provider : root.providers ) {
+//				if( provider instanceof WritableSettingProvider ) {
+//					String full = getProviderPath( provider, path );
+//					if( full != null ) ( (WritableSettingProvider)provider ).sync( full );
+//				}
+//			}
+//		} catch( SettingsStoreException exception ) {
+//			Log.write( exception );
+//		}
+//
+//	}
 
 	/**
 	 * Copy the values from this settings object to the specified settings object.
