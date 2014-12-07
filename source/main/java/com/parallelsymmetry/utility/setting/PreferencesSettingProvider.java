@@ -124,8 +124,7 @@ public class PreferencesSettingProvider implements WritableSettingProvider {
 		Preferences preferences = getPreferences();
 		try {
 			if( !preferences.nodeExists( path ) ) return;
-			// FIXME Calling flush too often appears to cause problems with the file based preferences implementations.
-			//preferences.node( path ).flush();
+			preferences.node( path ).flush();
 		} catch( IllegalArgumentException exception ) {
 			Log.write( Log.ERROR, "Path: " + path );
 			Log.write( exception );
