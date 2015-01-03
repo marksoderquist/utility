@@ -7,6 +7,11 @@ import java.util.prefs.Preferences;
 
 import com.parallelsymmetry.utility.log.Log;
 
+/**
+ * @deprecated In favor of PersistentMapSettingProvider.
+ * @author Mark Soderquist
+ */
+@Deprecated
 public class PreferencesSettingProvider implements WritableSettingProvider {
 
 	private String path;

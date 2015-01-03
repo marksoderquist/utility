@@ -29,10 +29,10 @@ public class MapSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public Set<String> getKeys( String path ) {
+		path = nodePath( path );
+
 		Set<String> keys = new HashSet<String>();
 		if( !nodeExists( path ) ) return keys;
-
-		if( !path.endsWith( "/" ) ) path += "/";
 
 		for( String key : store.keySet() ) {
 			if( key.startsWith( path ) && key.indexOf( "/", path.length() ) < 0 ) {
@@ -45,10 +45,10 @@ public class MapSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public Set<String> getChildNames( String path ) {
+		path = nodePath( path );
+
 		Set<String> names = new HashSet<String>();
 		if( !nodeExists( path ) ) return names;
-
-		if( !path.endsWith( "/" ) ) path += "/";
 
 		for( String key : store.keySet() ) {
 			if( key.startsWith( path ) ) {
@@ -62,8 +62,8 @@ public class MapSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public boolean nodeExists( String path ) {
+		path = nodePath( path );
 		Set<String> keys = store.keySet();
-		if( !path.endsWith( "/" ) ) path += "/";
 
 		// If a key starts with the path return true.
 		for( String key : keys ) {
@@ -84,7 +84,7 @@ public class MapSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public void removeNode( String path ) {
-		if( !path.endsWith( "/" ) ) path += "/";
+		path = nodePath( path );
 		Iterator<String> iterator = store.keySet().iterator();
 
 		while( iterator.hasNext() ) {
@@ -114,6 +114,11 @@ public class MapSettingProvider implements WritableSettingProvider {
 		for( String key : keys ) {
 			System.out.println( key + "=" + store.get( key ) );
 		}
+	}
+
+	protected String nodePath( String path ) {
+		if( !path.endsWith( "/" ) ) path += "/";
+		return path;
 	}
 
 }

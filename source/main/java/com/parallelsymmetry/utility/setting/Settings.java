@@ -349,30 +349,30 @@ public class Settings {
 		}
 	}
 
-//	public void sync() {
-//		sync( getPath() );
-//	}
-//
-//	public void sync( String path ) {
-//		try {
-//			for( SettingProvider provider : root.providers ) {
-//				if( provider instanceof WritableSettingProvider ) {
-//					String full = getProviderPath( provider, path );
-//					if( full != null ) ( (WritableSettingProvider)provider ).sync( full );
-//				}
-//			}
-//		} catch( SettingsStoreException exception ) {
-//			Log.write( exception );
-//		}
-//
-//	}
+	public void sync() {
+		sync( getPath() );
+	}
+
+	public void sync( String path ) {
+		try {
+			for( SettingProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingProvider ) {
+					String full = getProviderPath( provider, path );
+					if( full != null ) ( (WritableSettingProvider)provider ).sync( full );
+				}
+			}
+		} catch( SettingsStoreException exception ) {
+			Log.write( exception );
+		}
+
+	}
 
 	/**
 	 * Copy the values from this settings object to the specified settings object.
 	 * 
 	 * @param settings
 	 */
-	public void copy( Settings settings ) {
+	public void copyTo( Settings settings ) {
 		for( String key : getKeys() ) {
 			settings.put( key, get( key, null ) );
 		}
@@ -384,11 +384,36 @@ public class Settings {
 	 * 
 	 * @param settings
 	 */
-	public void deepCopy( Settings settings ) {
-		copy( settings );
+	public void copyDeepTo( Settings settings ) {
+		copyTo( settings );
 
 		for( Settings child : getChildNodes() ) {
-			child.deepCopy( settings.getNode( child.getName() ) );
+			child.copyDeepTo( settings.getNode( child.getName() ) );
+		}
+	}
+
+	/**
+	 * Copy the values from this settings object to the specified settings object.
+	 * 
+	 * @param settings
+	 */
+	public void copyFrom( Settings settings ) {
+		for( String key : settings.getKeys() ) {
+			put( key, settings.get( key, null ) );
+		}
+	}
+
+	/**
+	 * Deep copy the values from this settings object to the specified settings
+	 * object.
+	 * 
+	 * @param settings
+	 */
+	public void copyDeepFrom( Settings settings ) {
+		copyFrom( settings );
+
+		for( Settings child : settings.getChildNodes() ) {
+			getNode( child.getName() ).copyDeepFrom( child );
 		}
 	}
 

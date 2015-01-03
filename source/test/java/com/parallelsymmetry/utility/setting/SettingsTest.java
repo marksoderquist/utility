@@ -133,7 +133,7 @@ public class SettingsTest extends TestCase {
 		Settings newSettings = new Settings();
 		newSettings.addProvider( new MapSettingProvider() );
 
-		settings.copy( newSettings );
+		settings.copyTo( newSettings );
 
 		assertEquals( 2, newSettings.getKeys().size() );
 		assertEquals( 0, newSettings.getChildCount() );
@@ -148,7 +148,7 @@ public class SettingsTest extends TestCase {
 		Settings newSettings = new Settings();
 		newSettings.addProvider( new MapSettingProvider() );
 
-		settings.deepCopy( newSettings );
+		settings.copyDeepTo( newSettings );
 
 		assertEquals( 2, newSettings.getKeys().size() );
 		assertEquals( 1, newSettings.getChildCount() );
