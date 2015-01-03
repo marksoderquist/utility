@@ -7,11 +7,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.channels.FileLock;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.parallelsymmetry.utility.IoUtil;
@@ -20,7 +24,13 @@ import com.parallelsymmetry.utility.log.Log;
 
 public class PersistentMapSettingProvider extends MapSettingProvider {
 
+	private static final int FLUSH_DELAY = 100;
+
 	private File file;
+
+	private Timer timer;
+
+	private TimerTask task;
 
 	public PersistentMapSettingProvider( File file ) {
 		this( new ConcurrentHashMap<String, String>(), file );
@@ -34,6 +44,19 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 		} catch( SettingsStoreException exception ) {
 			Log.write( exception );
 		}
+		timer = new Timer( true );
+	}
+
+	@Override
+	public void put( String path, String value ) {
+		super.put( path, value );
+		triggerFlush();
+	}
+
+	@Override
+	public void removeNode( String path ) {
+		super.removeNode( path );
+		triggerFlush();
 	}
 
 	/**
@@ -74,6 +97,7 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 		// Save the settings back to the file.
 		try {
 			save( map, file );
+			Log.write( Log.TRACE, "Settings flushed." );
 		} catch( IOException exception ) {
 			throw new SettingsStoreException( exception );
 		}
@@ -102,6 +126,14 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 		}
 	}
 
+	private void triggerFlush() {
+		if( task == null ) {
+			timer.schedule( task = new Flush(), FLUSH_DELAY );
+		} else if( task.cancel() ) {
+			timer.schedule( task = new Flush(), FLUSH_DELAY );
+		}
+	}
+
 	private void save( Map<String, String> map, File file ) throws IOException {
 		FileOutputStream output = new FileOutputStream( file );
 
@@ -122,7 +154,11 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 
 	private void saveData( Map<String, String> map, FileOutputStream output ) throws IOException {
 		PrintStream stream = new PrintStream( output, false, TextUtil.DEFAULT_ENCODING );
-		for( String key : map.keySet() ) {
+
+		List<String> keys = new ArrayList<String>( map.keySet() );
+		Collections.sort( keys );
+
+		for( String key : keys ) {
 			stream.print( key );
 			stream.print( "=" );
 			stream.println( map.get( key ) );
@@ -147,6 +183,21 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 			String[] elements = line.split( "=" );
 			map.put( elements[0], elements[1] );
 		}
+	}
+
+	private class Flush extends TimerTask {
+
+		@Override
+		public void run() {
+			try {
+				flush( "/" );
+			} catch( SettingsStoreException exception ) {
+				Log.write( exception );
+			}
+
+			task = null;
+		}
+
 	}
 
 }
