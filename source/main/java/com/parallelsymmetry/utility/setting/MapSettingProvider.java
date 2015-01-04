@@ -19,12 +19,13 @@ public class MapSettingProvider implements WritableSettingProvider {
 	}
 
 	public MapSettingProvider( Map<String, String> store ) {
-		this.store = store;
+		this.store = new ConcurrentHashMap<String, String>();
+		this.store.putAll( store );
 	}
 
 	@Override
 	public String get( String path ) {
-		return store.get( path );
+		return getInternalStore().get( path );
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class MapSettingProvider implements WritableSettingProvider {
 		Set<String> keys = new HashSet<String>();
 		if( !nodeExists( path ) ) return keys;
 
-		for( String key : store.keySet() ) {
+		for( String key : getInternalStore().keySet() ) {
 			if( key.startsWith( path ) && key.indexOf( "/", path.length() ) < 0 ) {
 				keys.add( key.substring( path.length() ) );
 			}
@@ -50,7 +51,7 @@ public class MapSettingProvider implements WritableSettingProvider {
 		Set<String> names = new HashSet<String>();
 		if( !nodeExists( path ) ) return names;
 
-		for( String key : store.keySet() ) {
+		for( String key : getInternalStore().keySet() ) {
 			if( key.startsWith( path ) ) {
 				int index = key.indexOf( "/", path.length() );
 				if( index > 0 ) names.add( key.substring( path.length(), index ) );
@@ -63,7 +64,7 @@ public class MapSettingProvider implements WritableSettingProvider {
 	@Override
 	public boolean nodeExists( String path ) {
 		path = nodePath( path );
-		Set<String> keys = store.keySet();
+		Set<String> keys = getInternalStore().keySet();
 
 		// If a key starts with the path return true.
 		for( String key : keys ) {
@@ -76,20 +77,20 @@ public class MapSettingProvider implements WritableSettingProvider {
 	@Override
 	public void put( String path, String value ) {
 		if( value == null ) {
-			store.remove( path );
+			getInternalStore().remove( path );
 		} else {
-			store.put( path, value );
+			getInternalStore().put( path, value );
 		}
 	}
 
 	@Override
 	public void removeNode( String path ) {
 		path = nodePath( path );
-		Iterator<String> iterator = store.keySet().iterator();
+		Iterator<String> iterator = getInternalStore().keySet().iterator();
 
 		while( iterator.hasNext() ) {
 			String key = iterator.next();
-			if( key.startsWith( path ) ) store.remove( key );
+			if( key.startsWith( path ) ) getInternalStore().remove( key );
 		}
 	}
 
@@ -101,19 +102,23 @@ public class MapSettingProvider implements WritableSettingProvider {
 
 	@Override
 	public String toString() {
-		return store.toString();
+		return getInternalStore().toString();
 	}
 
 	public Map<String, String> getStore() {
-		return new HashMap<String, String>( store );
+		return new HashMap<String, String>( getInternalStore() );
 	}
 
 	public void show() {
-		List<String> keys = new ArrayList<String>( store.keySet() );
+		List<String> keys = new ArrayList<String>( getInternalStore().keySet() );
 		Collections.sort( keys );
 		for( String key : keys ) {
-			System.out.println( key + "=" + store.get( key ) );
+			System.out.println( key + "=" + getInternalStore().get( key ) );
 		}
+	}
+
+	protected Map<String, String> getInternalStore() {
+		return store;
 	}
 
 	protected String nodePath( String path ) {

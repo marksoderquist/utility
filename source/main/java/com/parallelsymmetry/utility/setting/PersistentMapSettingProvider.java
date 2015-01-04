@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.parallelsymmetry.utility.IoUtil;
 import com.parallelsymmetry.utility.TextUtil;
@@ -24,27 +27,29 @@ import com.parallelsymmetry.utility.log.Log;
 
 public class PersistentMapSettingProvider extends MapSettingProvider {
 
-	private static final int FLUSH_DELAY = 100;
+	private static final Map<String, Map<String, String>> stores = new ConcurrentHashMap<String, Map<String, String>>();
+
+	private static final Timer timer = new Timer( "PersistentMapSettingProvider", true );
 
 	private File file;
 
-	private Timer timer;
+	private String uri;
 
 	private TimerTask task;
+
+	private ReadWriteLock storeLock;
 
 	public PersistentMapSettingProvider( File file ) {
 		this( new ConcurrentHashMap<String, String>(), file );
 	}
 
 	public PersistentMapSettingProvider( Map<String, String> store, File file ) {
-		super( store );
 		this.file = file;
-		try {
-			sync( "/" );
-		} catch( SettingsStoreException exception ) {
-			Log.write( exception );
-		}
-		timer = new Timer( true );
+		this.uri = file.toURI().toString();
+		this.storeLock = new ReentrantReadWriteLock();
+		if( stores.get( uri ) == null ) stores.put( this.uri, new ConcurrentHashMap<String, String>() );
+		getInternalStore().putAll( store );
+		syncAll();
 	}
 
 	@Override
@@ -60,78 +65,107 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 	}
 
 	/**
-	 * Save the settings to the file.
+	 * Update the settings from the file.
 	 */
 	@Override
-	public synchronized void flush( String path ) throws SettingsStoreException {
-		path = nodePath( path );
-		if( !nodeExists( path ) ) return;
+	public void sync( String path ) throws SettingsStoreException {
+		storeLock.readLock().lock();
+		try {
+			path = nodePath( path );
 
-		// Temporary buffer map.
-		Map<String, String> map = new HashMap<String, String>();
-
-		// Load the existing settings.
-		if( file.exists() ) {
+			Map<String, String> map = new HashMap<String, String>();
 			try {
 				load( file, map );
+			} catch( FileNotFoundException exception ) {
+				// Intentionally ignore exception.
 			} catch( IOException exception ) {
 				throw new SettingsStoreException( exception );
 			}
-		}
 
-		// Remove the values for the specified path from the buffer map.
-		Set<String> keys = new HashSet<String>( map.keySet() );
-		for( String key : keys ) {
-			if( key.startsWith( path ) ) {
-				map.remove( key );
+			for( String key : map.keySet() ) {
+				if( key.startsWith( path ) ) {
+					getInternalStore().put( key, map.get( key ) );
+				}
 			}
-		}
-
-		// Copy the values for the path from the memory store to the buffer map.
-		for( String key : store.keySet() ) {
-			if( key.startsWith( path ) ) {
-				map.put( key, store.get( key ) );
-			}
-		}
-
-		// Save the settings back to the file.
-		try {
-			save( map, file );
-			Log.write( Log.TRACE, "Settings flushed." );
-		} catch( IOException exception ) {
-			throw new SettingsStoreException( exception );
+		} finally {
+			storeLock.readLock().unlock();
 		}
 	}
 
 	/**
-	 * Update the settings from the file.
+	 * Save the settings to the file.
 	 */
 	@Override
-	public synchronized void sync( String path ) throws SettingsStoreException {
-		path = nodePath( path );
+	public void flush( String path ) throws SettingsStoreException {
+		if( !storeLock.writeLock().tryLock() ) return;
 
-		Map<String, String> map = new HashMap<String, String>();
 		try {
-			load( file, map );
-		} catch( FileNotFoundException exception ) {
-			// Intentionally ignore exception.
-		} catch( IOException exception ) {
-			throw new SettingsStoreException( exception );
-		}
+			path = nodePath( path );
+			if( !nodeExists( path ) ) new SettingsStoreException( "Path does not exist: " + path );
 
-		for( String key : map.keySet() ) {
-			if( key.startsWith( path ) ) {
-				store.put( key, map.get( key ) );
+			// Temporary buffer map.
+			Map<String, String> map = new HashMap<String, String>();
+
+			// Load the existing settings.
+			if( file.exists() ) {
+				try {
+					load( file, map );
+				} catch( IOException exception ) {
+					throw new SettingsStoreException( exception );
+				}
 			}
+
+			// Remove the values for the specified path from the buffer map.
+			Set<String> keys = new HashSet<String>( map.keySet() );
+			for( String key : keys ) {
+				if( key.startsWith( path ) ) {
+					map.remove( key );
+				}
+			}
+
+			// Copy the values for the path from the memory store to the buffer map.
+			Map<String, String> internalStore = getInternalStore();
+			for( String key : internalStore.keySet() ) {
+				if( key.startsWith( path ) ) {
+					map.put( key, internalStore.get( key ) );
+				}
+			}
+
+			// Save the settings back to the file.
+			try {
+				save( map, file );
+				Log.write( Log.DEBUG, "Settings flushed: ", path );
+			} catch( IOException exception ) {
+				throw new SettingsStoreException( exception );
+			}
+		} finally {
+			storeLock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	protected Map<String, String> getInternalStore() {
+		return stores.get( uri );
+	}
+
+	private void syncAll() {
+		try {
+			sync( "/" );
+		} catch( Exception exception ) {
+			Log.write( exception );
+		}
+	}
+
+	private void flushAll() {
+		try {
+			flush( "/" );
+		} catch( Exception exception ) {
+			Log.write( exception );
 		}
 	}
 
 	private void triggerFlush() {
-		if( task == null ) {
-			timer.schedule( task = new Flush(), FLUSH_DELAY );
-		} else if( task.cancel() ) {
-			timer.schedule( task = new Flush(), FLUSH_DELAY );
-		}
+		if( task == null || task.cancel() ) timer.schedule( task = new FlushAll(), 100 );
 	}
 
 	private void save( Map<String, String> map, File file ) throws IOException {
@@ -139,14 +173,18 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 
 		try {
 			// Lock the file.
-			FileLock lock = output.getChannel().lock();
-			try {
-				// Save the file.
-				saveData( map, output );
-			} finally {
-				// Unlock the file.
-				if( lock != null ) lock.release();
+			FileLock lock = output.getChannel().tryLock();
+			if( lock != null ) {
+				try {
+					// Save the file.
+					saveData( map, output );
+				} finally {
+					// Unlock the file.
+					lock.release();
+				}
 			}
+		} catch( OverlappingFileLockException exception ) {
+			// 
 		} finally {
 			if( output != null ) output.close();
 		}
@@ -181,20 +219,16 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 		List<String> lines = IoUtil.loadAsLines( input, TextUtil.DEFAULT_ENCODING );
 		for( String line : lines ) {
 			String[] elements = line.split( "=" );
+			if( elements.length < 2 ) continue;
 			map.put( elements[0], elements[1] );
 		}
 	}
 
-	private class Flush extends TimerTask {
+	private class FlushAll extends TimerTask {
 
 		@Override
 		public void run() {
-			try {
-				flush( "/" );
-			} catch( SettingsStoreException exception ) {
-				Log.write( exception );
-			}
-
+			flushAll();
 			task = null;
 		}
 
