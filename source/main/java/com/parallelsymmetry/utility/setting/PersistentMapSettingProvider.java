@@ -169,6 +169,7 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 	}
 
 	private void save( Map<String, String> map, File file ) throws IOException {
+		file.getParentFile().mkdirs();
 		FileOutputStream output = new FileOutputStream( file );
 
 		try {
