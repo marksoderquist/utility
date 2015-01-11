@@ -46,6 +46,14 @@ public final class JavaUtil {
 		return ( getClassName( type.getName() ) );
 	}
 
+	public static String getKeySafeClassName( String name ) {
+		return name.replace( "$", "." );
+	}
+
+	public static String getKeySafeClassName( Class<?> type ) {
+		return getKeySafeClassName( type.getName() );
+	}
+
 	public static String getPackageName( String name ) {
 		return name.substring( 0, name.lastIndexOf( '.' ) );
 	}

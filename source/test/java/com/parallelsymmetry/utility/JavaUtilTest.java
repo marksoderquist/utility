@@ -1,5 +1,6 @@
 package com.parallelsymmetry.utility;
 
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -27,6 +28,14 @@ public class JavaUtilTest extends TestCase {
 
 	public void testGetClassNameWithClass() {
 		assertEquals( "Object", JavaUtil.getClassName( Object.class ) );
+	}
+
+	public void testGetKeySafeClassNameWithString() {
+		assertEquals( "java.awt.geom.Rectangle2D.Double", JavaUtil.getKeySafeClassName( "java.awt.geom.Rectangle2D$Double" ) );
+	}
+
+	public void testGetKeySafeClassNameWithClass() {
+		assertEquals( "java.awt.geom.Rectangle2D.Double", JavaUtil.getKeySafeClassName( Rectangle2D.Double.class ) );
 	}
 
 	public void testGetPackageNameWithString() {
