@@ -512,6 +512,22 @@ public class Settings {
 		put( path, String.valueOf( value ) );
 	}
 
+	public long getLong( String path, int defaultValue ) {
+		try {
+			return Long.parseLong( get( path, null ) );
+		} catch( Throwable throwable ) {
+			return defaultValue;
+		}
+	}
+
+	public long getDefaultLong( String path ) {
+		return Long.parseLong( getDefault( path ) );
+	}
+
+	public void putLong( String path, long value ) {
+		put( path, String.valueOf( value ) );
+	}
+
 	public float getFloat( String path, float defaultValue ) {
 		try {
 			return Float.parseFloat( get( path, null ) );

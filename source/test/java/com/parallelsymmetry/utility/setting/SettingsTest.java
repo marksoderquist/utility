@@ -99,6 +99,12 @@ public class SettingsTest extends TestCase {
 		assertEquals( "73", settings.get( "int", null ) );
 		assertEquals( 73, settings.getInt( "int", -1 ) );
 	}
+	
+	public void testPutGetLong() {
+		settings.putLong( "long", 23234993237L );
+		assertEquals( "23234993237", settings.get( "long", null ) );
+		assertEquals( 23234993237L, settings.getLong( "long", -1 ) );
+	}
 
 	public void testPutGetFloat() {
 		settings.putFloat( "float", 2.718283f );
