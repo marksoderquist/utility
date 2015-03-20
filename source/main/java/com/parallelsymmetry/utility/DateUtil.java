@@ -122,4 +122,48 @@ public class DateUtil {
 		return formatter.format( date );
 	}
 
+	public static final String formatDuration( long time ) {
+		long millis = time % 1000;
+		time /= 1000;
+		long seconds = time % 60;
+		time /= 60;
+		long minutes = time % 60;
+		time /= 60;
+		long hours = time % 24;
+		time /= 24;
+
+		StringBuilder builder = new StringBuilder();
+		if( time != 0 ) {
+			builder.append( " " );
+			builder.append( time );
+			builder.append( "d" );
+		}
+		
+		if( hours != 0 ) {
+			builder.append( " " );
+			builder.append( hours );
+			builder.append( "h" );
+		}
+
+		if( minutes != 0 ) {
+			builder.append( " " );
+			builder.append( minutes );
+			builder.append( "m" );
+		}
+
+		if( seconds != 0 ) {
+			builder.append( " " );
+			builder.append( seconds );
+			builder.append( "s" );
+		}
+
+		if( millis != 0 ) {
+			builder.append( " " );
+			builder.append( millis );
+			builder.append( "ms" );
+		}
+
+		return builder.toString().trim();
+	}
+
 }
