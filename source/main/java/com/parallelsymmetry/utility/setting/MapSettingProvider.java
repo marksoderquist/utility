@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,6 +17,14 @@ public class MapSettingProvider implements WritableSettingProvider {
 
 	public MapSettingProvider() {
 		this( new ConcurrentHashMap<String, String>() );
+	}
+
+	public MapSettingProvider( Properties properties ) {
+		this.store = new ConcurrentHashMap<String, String>();
+		for( Object object : properties.keySet() ) {
+			String key = object.toString();
+			store.put( key, properties.getProperty( key ).toString() );
+		}
 	}
 
 	public MapSettingProvider( Map<String, String> store ) {
