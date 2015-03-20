@@ -11,15 +11,15 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MapSettingProvider implements WritableSettingProvider {
+public class MapSettingsProvider implements WritableSettingsProvider {
 
 	protected Map<String, String> store;
 
-	public MapSettingProvider() {
+	public MapSettingsProvider() {
 		this( new ConcurrentHashMap<String, String>() );
 	}
 
-	public MapSettingProvider( Properties properties ) {
+	public MapSettingsProvider( Properties properties ) {
 		this.store = new ConcurrentHashMap<String, String>();
 		for( Object object : properties.keySet() ) {
 			String key = object.toString();
@@ -27,7 +27,7 @@ public class MapSettingProvider implements WritableSettingProvider {
 		}
 	}
 
-	public MapSettingProvider( Map<String, String> store ) {
+	public MapSettingsProvider( Map<String, String> store ) {
 		this.store = new ConcurrentHashMap<String, String>();
 		this.store.putAll( store );
 	}

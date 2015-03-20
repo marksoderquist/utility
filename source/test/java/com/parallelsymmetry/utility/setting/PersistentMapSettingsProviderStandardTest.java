@@ -8,7 +8,7 @@ import java.util.Map;
 import com.parallelsymmetry.utility.FileUtil;
 import com.parallelsymmetry.utility.TextUtil;
 
-public class PersistentMapSettingProviderStandardTest extends SettingProviderStandardTest {
+public class PersistentMapSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
 	private File folder = new File( "target/test/java" );
 
@@ -23,7 +23,7 @@ public class PersistentMapSettingProviderStandardTest extends SettingProviderSta
 		map.put( "/path/subkey1", "subvalue1" );
 		map.put( "/path/subkey2", "subvalue2" );
 		map.put( "/path/subkey3", "subvalue3" );
-		provider = new PersistentMapSettingProvider( map, new File( folder, "persistent.map.settings" ) );
+		provider = new PersistentMapSettingsProvider( map, new File( folder, "persistent.map.settings" ) );
 	}
 
 	public void testSync() throws Exception {
@@ -37,7 +37,7 @@ public class PersistentMapSettingProviderStandardTest extends SettingProviderSta
 		FileUtil.save( "/key1=value1\n/key2=value2\n/key3=value3\n/path/subkey1=subvalue1\n/path/subkey2=subvalue2\n/path/subkey3=subvalue3\n", syncFile, TextUtil.DEFAULT_ENCODING );
 		assertTrue( syncFile.exists() );
 	
-		PersistentMapSettingProvider provider = new PersistentMapSettingProvider( syncFile );
+		PersistentMapSettingsProvider provider = new PersistentMapSettingsProvider( syncFile );
 		provider.sync( "/" );
 	
 		Map<String, String> map = provider.getStore();
@@ -59,7 +59,7 @@ public class PersistentMapSettingProviderStandardTest extends SettingProviderSta
 		if( flushFile.exists() ) assertTrue( flushFile.delete() );
 
 		// Flush the settings.
-		PersistentMapSettingProvider provider = new PersistentMapSettingProvider( map, flushFile );
+		PersistentMapSettingsProvider provider = new PersistentMapSettingsProvider( map, flushFile );
 		provider.flush( "/" );
 		assertTrue( flushFile.exists() );
 
@@ -83,7 +83,7 @@ public class PersistentMapSettingProviderStandardTest extends SettingProviderSta
 		if( flushFile.exists() ) assertTrue( flushFile.delete() );
 
 		// Flush the settings.
-		PersistentMapSettingProvider provider = new PersistentMapSettingProvider( map, flushFile );
+		PersistentMapSettingsProvider provider = new PersistentMapSettingsProvider( map, flushFile );
 		provider.flush( "/path" );
 		assertTrue( flushFile.exists() );
 
@@ -108,7 +108,7 @@ public class PersistentMapSettingProviderStandardTest extends SettingProviderSta
 		assertTrue( flushFile.exists() );
 
 		// Flush the settings.
-		PersistentMapSettingProvider provider = new PersistentMapSettingProvider( map, flushFile );
+		PersistentMapSettingsProvider provider = new PersistentMapSettingsProvider( map, flushFile );
 		provider.flush( "/path" );
 		assertTrue( flushFile.exists() );
 

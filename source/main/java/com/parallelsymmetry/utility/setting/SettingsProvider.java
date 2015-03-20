@@ -2,7 +2,7 @@ package com.parallelsymmetry.utility.setting;
 
 import java.util.Set;
 
-public interface SettingProvider {
+public interface SettingsProvider {
 
 	String get( String path );
 

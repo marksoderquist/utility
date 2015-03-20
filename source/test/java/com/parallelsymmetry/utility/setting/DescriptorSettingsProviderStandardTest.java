@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
 
 import com.parallelsymmetry.utility.Descriptor;
 
-public class DescriptorSettingProviderStandardTest extends SettingProviderStandardTest {
+public class DescriptorSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
 	@Override
 	public void setUp() throws Exception {
@@ -41,7 +41,7 @@ public class DescriptorSettingProviderStandardTest extends SettingProviderStanda
 		path.appendChild( subkey2 );
 		path.appendChild( subkey3 );
 
-		provider = new DescriptorSettingProvider( new Descriptor( document ), true );
+		provider = new DescriptorSettingsProvider( new Descriptor( document ), true );
 	}
 
 }

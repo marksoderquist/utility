@@ -25,7 +25,7 @@ import com.parallelsymmetry.utility.IoUtil;
 import com.parallelsymmetry.utility.TextUtil;
 import com.parallelsymmetry.utility.log.Log;
 
-public class PersistentMapSettingProvider extends MapSettingProvider {
+public class PersistentMapSettingsProvider extends MapSettingsProvider {
 
 	private static final Map<String, Map<String, String>> stores = new ConcurrentHashMap<String, Map<String, String>>();
 
@@ -39,11 +39,11 @@ public class PersistentMapSettingProvider extends MapSettingProvider {
 
 	private ReadWriteLock storeLock;
 
-	public PersistentMapSettingProvider( File file ) {
+	public PersistentMapSettingsProvider( File file ) {
 		this( new ConcurrentHashMap<String, String>(), file );
 	}
 
-	public PersistentMapSettingProvider( Map<String, String> store, File file ) {
+	public PersistentMapSettingsProvider( Map<String, String> store, File file ) {
 		this.file = file;
 		this.uri = file.toURI().toString();
 		this.storeLock = new ReentrantReadWriteLock();

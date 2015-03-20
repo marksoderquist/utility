@@ -2,7 +2,7 @@ package com.parallelsymmetry.utility.setting;
 
 import java.util.prefs.Preferences;
 
-public class PreferencesSettingProviderStandardTest extends SettingProviderStandardTest {
+public class PreferencesSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
 	@Override
 	public void setUp() throws Exception {
@@ -22,7 +22,7 @@ public class PreferencesSettingProviderStandardTest extends SettingProviderStand
 		path.put( "subkey2", "subvalue2" );
 		path.put( "subkey3", "subvalue3" );
 
-		provider = new PreferencesSettingProvider( preferences );
+		provider = new PreferencesSettingsProvider( preferences );
 	}
 
 }

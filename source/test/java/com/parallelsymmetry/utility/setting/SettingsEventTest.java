@@ -5,7 +5,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.parallelsymmetry.utility.mock.MockWritableSettingProvider;
+import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
 import com.parallelsymmetry.utility.setting.SettingEvent;
 import com.parallelsymmetry.utility.setting.SettingListener;
 import com.parallelsymmetry.utility.setting.Settings;
@@ -14,7 +14,7 @@ public class SettingsEventTest extends TestCase {
 
 	public void testSettingChanged() {
 		Settings settings = new Settings();
-		MockWritableSettingProvider provider = new MockWritableSettingProvider( "changed.events" );
+		MockWritableSettingsProvider provider = new MockWritableSettingsProvider( "changed.events" );
 		SettingWatcher rootWatcher = new SettingWatcher();
 		SettingWatcher nodeWatcher = new SettingWatcher();
 		SettingWatcher valueWatcher = new SettingWatcher();

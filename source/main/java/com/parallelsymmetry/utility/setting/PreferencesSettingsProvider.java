@@ -12,11 +12,11 @@ import com.parallelsymmetry.utility.log.Log;
  * @author Mark Soderquist
  */
 @Deprecated
-public class PreferencesSettingProvider implements WritableSettingProvider {
+public class PreferencesSettingsProvider implements WritableSettingsProvider {
 
 	private String path;
 
-	public PreferencesSettingProvider( Preferences preferences ) {
+	public PreferencesSettingsProvider( Preferences preferences ) {
 		this.path = preferences.absolutePath();
 	}
 

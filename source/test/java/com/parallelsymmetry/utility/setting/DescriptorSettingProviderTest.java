@@ -5,21 +5,21 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import com.parallelsymmetry.utility.Descriptor;
-import com.parallelsymmetry.utility.setting.DescriptorSettingProvider;
+import com.parallelsymmetry.utility.setting.DescriptorSettingsProvider;
 
 public class DescriptorSettingProviderTest extends TestCase {
 
 	private Descriptor descriptor;
 
-	private DescriptorSettingProvider provider;
+	private DescriptorSettingsProvider provider;
 
-	private DescriptorSettingProvider rootedProvider;
+	private DescriptorSettingsProvider rootedProvider;
 
 	@Override
 	public void setUp() throws Exception {
 		descriptor = new Descriptor( getClass().getResourceAsStream( "/test.descriptor.xml" ) );
-		provider = new DescriptorSettingProvider( descriptor );
-		rootedProvider = new DescriptorSettingProvider( descriptor, false );
+		provider = new DescriptorSettingsProvider( descriptor );
+		rootedProvider = new DescriptorSettingsProvider( descriptor, false );
 	}
 
 	public void testGet() {

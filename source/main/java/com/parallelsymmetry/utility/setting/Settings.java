@@ -88,11 +88,11 @@ public class Settings {
 	 */
 	public static final String ITEM_CLASS = ITEM_PREFIX + "class";
 
-	private SettingProvider defaultProvider;
+	private SettingsProvider defaultProvider;
 
-	private List<SettingProvider> providers;
+	private List<SettingsProvider> providers;
 
-	private Map<SettingProvider, String> mounts;
+	private Map<SettingsProvider, String> mounts;
 
 	private Map<String, Set<SettingListener>> listeners;
 
@@ -111,12 +111,12 @@ public class Settings {
 		this( null );
 	}
 
-	public Settings( SettingProvider defaultProvider ) {
+	public Settings( SettingsProvider defaultProvider ) {
 		root = this;
 		path = "/";
 
-		providers = new CopyOnWriteArrayList<SettingProvider>();
-		mounts = new ConcurrentHashMap<SettingProvider, String>();
+		providers = new CopyOnWriteArrayList<SettingsProvider>();
+		mounts = new ConcurrentHashMap<SettingsProvider, String>();
 		listeners = new ConcurrentHashMap<String, Set<SettingListener>>();
 
 		if( defaultProvider != null ) setDefaultProvider( defaultProvider );
@@ -143,7 +143,7 @@ public class Settings {
 		return root.providers.size();
 	}
 
-	public SettingProvider getDefaultProvider() {
+	public SettingsProvider getDefaultProvider() {
 		return defaultProvider;
 	}
 
@@ -153,38 +153,38 @@ public class Settings {
 	 * 
 	 * @param provider
 	 */
-	public void setDefaultProvider( SettingProvider provider ) {
+	public void setDefaultProvider( SettingsProvider provider ) {
 		this.defaultProvider = provider;
 	}
 
-	public SettingProvider getProvider( int index ) {
+	public SettingsProvider getProvider( int index ) {
 		return providers.get( index );
 	}
 
-	public String getMount( SettingProvider provider ) {
+	public String getMount( SettingsProvider provider ) {
 		return mounts.get( provider );
 	}
 
-	public void addProvider( SettingProvider provider ) {
+	public void addProvider( SettingsProvider provider ) {
 		addProvider( provider, null );
 	}
 
-	public void addProvider( SettingProvider provider, String mount ) {
+	public void addProvider( SettingsProvider provider, String mount ) {
 		providers.add( provider );
 		if( defaultProvider == provider ) defaultProvider = null;
 		if( mount != null ) mounts.put( provider, mount );
 	}
 
-	public void addProvider( int index, SettingProvider provider ) {
+	public void addProvider( int index, SettingsProvider provider ) {
 		addProvider( index, provider, null );
 	}
 
-	public void addProvider( int index, SettingProvider provider, String mount ) {
+	public void addProvider( int index, SettingsProvider provider, String mount ) {
 		providers.add( index, provider );
 		if( mount != null ) mounts.put( provider, mount );
 	}
 
-	public void removeProvider( SettingProvider provider ) {
+	public void removeProvider( SettingsProvider provider ) {
 		providers.remove( provider );
 		mounts.remove( provider );
 	}
@@ -195,7 +195,7 @@ public class Settings {
 
 	public boolean nodeExists( String path ) {
 		boolean result = false;
-		for( SettingProvider provider : root.providers ) {
+		for( SettingsProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
 			if( full != null ) result = provider.nodeExists( full );
 			if( result == true ) return true;
@@ -221,7 +221,7 @@ public class Settings {
 	public Set<String> getKeys() {
 		Set<String> keys = new HashSet<String>();
 
-		for( SettingProvider provider : root.providers ) {
+		for( SettingsProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
 			if( full != null ) {
 				Set<String> providerKeys = provider.getKeys( full );
@@ -255,7 +255,7 @@ public class Settings {
 	public Set<String> getChildNames( String path ) {
 		Set<String> names = new HashSet<String>();
 
-		for( SettingProvider provider : root.providers ) {
+		for( SettingsProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
 			if( full != null ) {
 				Set<String> providerNames = provider.getChildNames( full );
@@ -321,10 +321,10 @@ public class Settings {
 
 	public void removeNode( String path ) {
 		try {
-			for( SettingProvider provider : root.providers ) {
-				if( provider instanceof WritableSettingProvider ) {
+			for( SettingsProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingsProvider ) {
 					String full = getProviderPath( provider, path );
-					if( full != null ) ( (WritableSettingProvider)provider ).removeNode( full );
+					if( full != null ) ( (WritableSettingsProvider)provider ).removeNode( full );
 				}
 			}
 		} catch( SettingsStoreException exception ) {
@@ -338,10 +338,10 @@ public class Settings {
 
 	public void flush( String path ) {
 		try {
-			for( SettingProvider provider : root.providers ) {
-				if( provider instanceof WritableSettingProvider ) {
+			for( SettingsProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingsProvider ) {
 					String full = getProviderPath( provider, path );
-					if( full != null ) ( (WritableSettingProvider)provider ).flush( full );
+					if( full != null ) ( (WritableSettingsProvider)provider ).flush( full );
 				}
 			}
 		} catch( SettingsStoreException exception ) {
@@ -355,10 +355,10 @@ public class Settings {
 
 	public void sync( String path ) {
 		try {
-			for( SettingProvider provider : root.providers ) {
-				if( provider instanceof WritableSettingProvider ) {
+			for( SettingsProvider provider : root.providers ) {
+				if( provider instanceof WritableSettingsProvider ) {
 					String full = getProviderPath( provider, path );
-					if( full != null ) ( (WritableSettingProvider)provider ).sync( full );
+					if( full != null ) ( (WritableSettingsProvider)provider ).sync( full );
 				}
 			}
 		} catch( SettingsStoreException exception ) {
@@ -427,7 +427,7 @@ public class Settings {
 	 */
 	public String get( String path, String defaultValue ) {
 		String result = null;
-		for( SettingProvider provider : root.providers ) {
+		for( SettingsProvider provider : root.providers ) {
 			String full = getProviderPath( provider, path );
 			if( full != null ) result = provider.get( full );
 			if( result != null ) return result;
@@ -466,11 +466,11 @@ public class Settings {
 		String absolute = getAbsolutePath( path );
 		boolean changed = false;
 
-		for( SettingProvider provider : root.providers ) {
-			if( provider instanceof WritableSettingProvider ) {
+		for( SettingsProvider provider : root.providers ) {
+			if( provider instanceof WritableSettingsProvider ) {
 				String full = getProviderPath( provider, path );
 				if( full != null ) {
-					( (WritableSettingProvider)provider ).put( full, value );
+					( (WritableSettingsProvider)provider ).put( full, value );
 					changed = true;
 				}
 			}
@@ -1066,7 +1066,7 @@ public class Settings {
 		}
 	}
 
-	private String getProviderPath( SettingProvider provider, String path ) {
+	private String getProviderPath( SettingsProvider provider, String path ) {
 		String full = getAbsolutePath( path );
 
 		String mount = root.mounts.get( provider );

@@ -3,7 +3,7 @@ package com.parallelsymmetry.utility.setting;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import com.parallelsymmetry.utility.setting.PreferencesSettingProvider;
+import com.parallelsymmetry.utility.setting.PreferencesSettingsProvider;
 
 import junit.framework.TestCase;
 
@@ -11,12 +11,12 @@ public class PreferencesSettingProviderTest extends TestCase {
 
 	private Preferences preferences;
 
-	private PreferencesSettingProvider provider;
+	private PreferencesSettingsProvider provider;
 
 	@Override
 	public void setUp() {
 		preferences = Preferences.userNodeForPackage( getClass() );
-		provider = new PreferencesSettingProvider( preferences );
+		provider = new PreferencesSettingsProvider( preferences );
 
 		preferences.node( "test" ).put( "path1", "value1" );
 	}

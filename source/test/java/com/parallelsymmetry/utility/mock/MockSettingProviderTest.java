@@ -3,9 +3,9 @@ package com.parallelsymmetry.utility.mock;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.parallelsymmetry.utility.setting.SettingProviderStandardTest;
+import com.parallelsymmetry.utility.setting.SettingsProviderStandardTest;
 
-public class MockSettingProviderTest extends SettingProviderStandardTest {
+public class MockSettingProviderTest extends SettingsProviderStandardTest {
 
 	@Override
 	public void setUp() {
@@ -17,7 +17,7 @@ public class MockSettingProviderTest extends SettingProviderStandardTest {
 		map.put( "/path/subkey2", "subvalue2" );
 		map.put( "/path/subkey3", "subvalue3" );
 
-		provider = new MockSettingProvider( "test", map );
+		provider = new MockSettingsProvider( "test", map );
 	}
 
 }

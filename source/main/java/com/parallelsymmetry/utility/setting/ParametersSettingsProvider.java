@@ -5,11 +5,11 @@ import java.util.Set;
 
 import com.parallelsymmetry.utility.Parameters;
 
-public class ParametersSettingProvider implements SettingProvider {
+public class ParametersSettingsProvider implements SettingsProvider {
 
 	private Parameters parameters;
 
-	public ParametersSettingProvider( Parameters parameters ) {
+	public ParametersSettingsProvider( Parameters parameters ) {
 		this.parameters = parameters;
 	}
 

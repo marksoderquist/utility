@@ -13,20 +13,20 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import com.parallelsymmetry.utility.log.Log;
-import com.parallelsymmetry.utility.mock.MockSettingProvider;
-import com.parallelsymmetry.utility.mock.MockWritableSettingProvider;
+import com.parallelsymmetry.utility.mock.MockSettingsProvider;
+import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
 
 public class SettingsTest extends TestCase {
 
 	private Settings settings = new Settings();
 
-	private MockSettingProvider provider1 = new MockSettingProvider( "Provider 1" );
+	private MockSettingsProvider provider1 = new MockSettingsProvider( "Provider 1" );
 
-	private MockSettingProvider provider2 = new MockWritableSettingProvider( "Provider 2" );
+	private MockSettingsProvider provider2 = new MockWritableSettingsProvider( "Provider 2" );
 
-	private MockSettingProvider provider3 = new MockSettingProvider( "Provider 3" );
+	private MockSettingsProvider provider3 = new MockSettingsProvider( "Provider 3" );
 
-	private MockSettingProvider providerD = new MockSettingProvider( "Provider D" );
+	private MockSettingsProvider providerD = new MockSettingsProvider( "Provider D" );
 
 	@Override
 	public void setUp() {
@@ -137,7 +137,7 @@ public class SettingsTest extends TestCase {
 		settings.put( "/p/b", "B" );
 
 		Settings newSettings = new Settings();
-		newSettings.addProvider( new MapSettingProvider() );
+		newSettings.addProvider( new MapSettingsProvider() );
 
 		settings.copyTo( newSettings );
 
@@ -152,7 +152,7 @@ public class SettingsTest extends TestCase {
 		settings.put( "/p/b", "B" );
 
 		Settings newSettings = new Settings();
-		newSettings.addProvider( new MapSettingProvider() );
+		newSettings.addProvider( new MapSettingsProvider() );
 
 		settings.copyDeepTo( newSettings );
 
@@ -503,7 +503,7 @@ public class SettingsTest extends TestCase {
 		List<Settings> checkList = new ArrayList<Settings>();
 		for( MockPersistent object : sourceList ) {
 			Settings settings = new Settings();
-			settings.addProvider( new MapSettingProvider() );
+			settings.addProvider( new MapSettingsProvider() );
 			object.saveSettings( settings );
 			checkList.add( settings );
 		}
@@ -559,7 +559,7 @@ public class SettingsTest extends TestCase {
 		List<Settings> checkList = new ArrayList<Settings>();
 		for( MockPersistent object : sourceList ) {
 			Settings settings = new Settings();
-			settings.addProvider( new MapSettingProvider() );
+			settings.addProvider( new MapSettingsProvider() );
 			object.saveSettings( settings );
 			checkList.add( settings );
 		}
@@ -615,7 +615,7 @@ public class SettingsTest extends TestCase {
 		List<Settings> checkList = new ArrayList<Settings>();
 		for( MockPersistent object : sourceSet ) {
 			Settings settings = new Settings();
-			settings.addProvider( new MapSettingProvider() );
+			settings.addProvider( new MapSettingsProvider() );
 			object.saveSettings( settings );
 			checkList.add( settings );
 		}
@@ -673,7 +673,7 @@ public class SettingsTest extends TestCase {
 		List<Settings> checkList = new ArrayList<Settings>();
 		for( MockPersistent object : sourceSet ) {
 			Settings settings = new Settings();
-			settings.addProvider( new MapSettingProvider() );
+			settings.addProvider( new MapSettingsProvider() );
 			object.saveSettings( settings );
 			checkList.add( settings );
 		}
@@ -709,7 +709,7 @@ public class SettingsTest extends TestCase {
 		Map<String, Settings> checkMap = new HashMap<String, Settings>();
 		for( String name : sourceMap.keySet() ) {
 			Settings settings = new Settings();
-			settings.addProvider( new MapSettingProvider() );
+			settings.addProvider( new MapSettingsProvider() );
 			sourceMap.get( name ).saveSettings( settings );
 			checkMap.put( name, settings );
 		}
@@ -763,7 +763,7 @@ public class SettingsTest extends TestCase {
 		Map<String, Settings> checkMap = new HashMap<String, Settings>();
 		for( String name : sourceMap.keySet() ) {
 			Settings settings = new Settings();
-			settings.addProvider( new MapSettingProvider() );
+			settings.addProvider( new MapSettingsProvider() );
 			sourceMap.get( name ).saveSettings( settings );
 			checkMap.put( name, settings );
 		}
@@ -940,8 +940,8 @@ public class SettingsTest extends TestCase {
 	protected void showProviderData( Settings settings ) {
 		int pCount = settings.getProviderCount();
 		for( int pIndex = 0; pIndex < pCount; pIndex++ ) {
-			SettingProvider provider = settings.getProvider( pIndex );
-			( (MockSettingProvider)provider ).show();
+			SettingsProvider provider = settings.getProvider( pIndex );
+			( (MockSettingsProvider)provider ).show();
 			System.out.println();
 		}
 	}

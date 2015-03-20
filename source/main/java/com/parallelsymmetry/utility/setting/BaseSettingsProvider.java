@@ -16,15 +16,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * 
  * @author mvsoder
  */
-public class BaseSettingProvider implements SettingProvider {
+public class BaseSettingsProvider implements SettingsProvider {
 
-	private SettingProvider provider;
+	private SettingsProvider provider;
 
-	private Set<SettingProvider> providers;
+	private Set<SettingsProvider> providers;
 
-	public BaseSettingProvider( SettingProvider provider ) {
+	public BaseSettingsProvider( SettingsProvider provider ) {
 		this.provider = provider;
-		providers = new CopyOnWriteArraySet<SettingProvider>();
+		providers = new CopyOnWriteArraySet<SettingsProvider>();
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class BaseSettingProvider implements SettingProvider {
 		if( value == null ) value = provider.get( path );
 
 		if( value == null ) {
-			for( SettingProvider provider : providers ) {
+			for( SettingsProvider provider : providers ) {
 				value = provider.get( path );
 				if( value != null ) break;
 			}
@@ -48,7 +48,7 @@ public class BaseSettingProvider implements SettingProvider {
 		Set<String> keys = new HashSet<String>();
 
 		keys.addAll( provider.getKeys( path ) );
-		for( SettingProvider provider : providers ) {
+		for( SettingsProvider provider : providers ) {
 			keys.addAll( provider.getKeys( path ) );
 		}
 
@@ -60,7 +60,7 @@ public class BaseSettingProvider implements SettingProvider {
 		Set<String> names = new HashSet<String>();
 
 		names.addAll( provider.getChildNames( path ) );
-		for( SettingProvider provider : providers ) {
+		for( SettingsProvider provider : providers ) {
 			names.addAll( provider.getChildNames( path ) );
 		}
 
@@ -74,7 +74,7 @@ public class BaseSettingProvider implements SettingProvider {
 		if( exists == false ) exists = provider.nodeExists( path );
 
 		if( exists == false ) {
-			for( SettingProvider provider : providers ) {
+			for( SettingsProvider provider : providers ) {
 				exists = provider.nodeExists( path );
 				if( exists ) break;
 			}
@@ -83,15 +83,15 @@ public class BaseSettingProvider implements SettingProvider {
 		return exists;
 	}
 
-	public void setProvider( SettingProvider provider ) {
+	public void setProvider( SettingsProvider provider ) {
 		this.provider = provider;
 	}
 
-	public void addProvider( SettingProvider provider ) {
+	public void addProvider( SettingsProvider provider ) {
 		providers.add( provider );
 	}
 
-	public void removeProvider( SettingProvider provider ) {
+	public void removeProvider( SettingsProvider provider ) {
 		providers.remove( provider );
 	}
 

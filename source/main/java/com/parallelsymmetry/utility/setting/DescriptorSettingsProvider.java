@@ -14,25 +14,25 @@ import com.parallelsymmetry.utility.Descriptor;
  *             when there are values and sub elements in the same element.
  */
 @Deprecated
-public class DescriptorSettingProvider implements SettingProvider {
+public class DescriptorSettingsProvider implements SettingsProvider {
 
 	private Descriptor descriptor;
 
 	private String root = "/";
 
-	public DescriptorSettingProvider( Descriptor descriptor ) {
+	public DescriptorSettingsProvider( Descriptor descriptor ) {
 		this( descriptor, true );
 	}
 
-	public DescriptorSettingProvider( Descriptor descriptor, boolean skipRoot ) {
+	public DescriptorSettingsProvider( Descriptor descriptor, boolean skipRoot ) {
 		init( descriptor, skipRoot );
 	}
 
-	public DescriptorSettingProvider( InputStream input ) {
+	public DescriptorSettingsProvider( InputStream input ) {
 		this( input, true );
 	}
 
-	public DescriptorSettingProvider( InputStream input, boolean skipRoot ) {
+	public DescriptorSettingsProvider( InputStream input, boolean skipRoot ) {
 		Descriptor descriptor = null;
 		try {
 			descriptor = new Descriptor( input );

@@ -1,6 +1,6 @@
 package com.parallelsymmetry.utility.setting;
 
-public interface WritableSettingProvider extends SettingProvider {
+public interface WritableSettingsProvider extends SettingsProvider {
 
 	void put( String path, String value );
 

@@ -6,9 +6,9 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public abstract class SettingProviderStandardTest extends TestCase {
+public abstract class SettingsProviderStandardTest extends TestCase {
 
-	protected SettingProvider provider;
+	protected SettingsProvider provider;
 
 	@Test
 	public void testGet() {

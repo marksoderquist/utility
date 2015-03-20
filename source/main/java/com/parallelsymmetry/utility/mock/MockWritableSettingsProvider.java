@@ -3,15 +3,15 @@ package com.parallelsymmetry.utility.mock;
 import java.util.Iterator;
 
 import com.parallelsymmetry.utility.setting.SettingsStoreException;
-import com.parallelsymmetry.utility.setting.WritableSettingProvider;
+import com.parallelsymmetry.utility.setting.WritableSettingsProvider;
 
-public class MockWritableSettingProvider extends MockSettingProvider implements WritableSettingProvider {
+public class MockWritableSettingsProvider extends MockSettingsProvider implements WritableSettingsProvider {
 
-	public MockWritableSettingProvider() {
+	public MockWritableSettingsProvider() {
 		super();
 	}
 
-	public MockWritableSettingProvider( String name ) {
+	public MockWritableSettingsProvider( String name ) {
 		super( name );
 	}
 

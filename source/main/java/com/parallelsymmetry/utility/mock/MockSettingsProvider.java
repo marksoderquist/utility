@@ -8,23 +8,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.parallelsymmetry.utility.setting.SettingProvider;
+import com.parallelsymmetry.utility.setting.SettingsProvider;
 
-public class MockSettingProvider implements SettingProvider {
+public class MockSettingsProvider implements SettingsProvider {
 
 	protected final Map<String, String> store = new ConcurrentHashMap<String, String>();
 
 	private String name;
 
-	public MockSettingProvider() {
+	public MockSettingsProvider() {
 		this( null );
 	}
 
-	public MockSettingProvider( String name ) {
+	public MockSettingsProvider( String name ) {
 		this.name = name;
 	}
 
-	public MockSettingProvider( String name, Map<String, String> values ) {
+	public MockSettingsProvider( String name, Map<String, String> values ) {
 		this.name = name;
 		store.putAll( values );
 	}

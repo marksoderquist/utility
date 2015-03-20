@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.parallelsymmetry.utility.Parameters;
 
-public class ParametersSettingProviderStandardTest extends SettingProviderStandardTest {
+public class ParametersSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
 	@Override
 	public void setUp() {
@@ -23,7 +23,7 @@ public class ParametersSettingProviderStandardTest extends SettingProviderStanda
 		values.add( "-path.subkey3" );
 		values.add( "subvalue3" );
 
-		provider = new ParametersSettingProvider( Parameters.parse( values.toArray( new String[values.size()] ) ) );
+		provider = new ParametersSettingsProvider( Parameters.parse( values.toArray( new String[values.size()] ) ) );
 	}
 
 }

@@ -3,7 +3,7 @@ package com.parallelsymmetry.utility.setting;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapSettingProviderStandardTest extends SettingProviderStandardTest {
+public class MapSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
 	@Override
 	public void setUp() {
@@ -15,7 +15,7 @@ public class MapSettingProviderStandardTest extends SettingProviderStandardTest 
 		map.put( "/path/subkey2", "subvalue2" );
 		map.put( "/path/subkey3", "subvalue3" );
 
-		provider = new MapSettingProvider( map );
+		provider = new MapSettingsProvider( map );
 	}
 
 }

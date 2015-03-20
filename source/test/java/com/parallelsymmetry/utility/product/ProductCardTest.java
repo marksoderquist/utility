@@ -12,7 +12,7 @@ import com.parallelsymmetry.utility.Descriptor;
 import com.parallelsymmetry.utility.Release;
 import com.parallelsymmetry.utility.UriUtil;
 import com.parallelsymmetry.utility.Version;
-import com.parallelsymmetry.utility.mock.MockWritableSettingProvider;
+import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
 import com.parallelsymmetry.utility.setting.Settings;
 
 public class ProductCardTest extends BaseTestCase {
@@ -221,7 +221,7 @@ public class ProductCardTest extends BaseTestCase {
 
 	public void testSaveLoadSaveSettings() throws Exception {
 		ProductCard standard = loadCard( COMPLETE_CARD );
-		MockWritableSettingProvider provider = new MockWritableSettingProvider();
+		MockWritableSettingsProvider provider = new MockWritableSettingsProvider();
 		Settings settings = new Settings();
 		settings.addProvider( provider );
 		standard.saveSettings( settings );
