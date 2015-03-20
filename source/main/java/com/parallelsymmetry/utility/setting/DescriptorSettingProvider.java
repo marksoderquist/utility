@@ -9,6 +9,11 @@ import org.w3c.dom.Node;
 
 import com.parallelsymmetry.utility.Descriptor;
 
+/**
+ * @deprecated This class is deprecated because it can cause anomalous effects
+ *             when there are values and sub elements in the same element.
+ */
+@Deprecated
 public class DescriptorSettingProvider implements SettingProvider {
 
 	private Descriptor descriptor;
