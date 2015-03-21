@@ -1,5 +1,7 @@
 package com.parallelsymmetry.utility.setting;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,9 +9,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.parallelsymmetry.utility.IoUtil;
+import com.parallelsymmetry.utility.log.Log;
 
 public class MapSettingsProvider implements WritableSettingsProvider {
 
@@ -19,11 +23,17 @@ public class MapSettingsProvider implements WritableSettingsProvider {
 		this( new ConcurrentHashMap<String, String>() );
 	}
 
-	public MapSettingsProvider( Properties properties ) {
-		this.store = new ConcurrentHashMap<String, String>();
-		for( Object object : properties.keySet() ) {
-			String key = object.toString();
-			store.put( key, properties.getProperty( key ).toString() );
+	public MapSettingsProvider( InputStream input ) {
+		try {
+			this.store = new ConcurrentHashMap<String, String>( IoUtil.loadAsMap( input ) );
+		} catch( IOException exception ) {
+			Log.write( exception );
+		} finally {
+			try {
+				input.close();
+			} catch( IOException exception ) {
+				Log.write( exception );
+			}
 		}
 	}
 
