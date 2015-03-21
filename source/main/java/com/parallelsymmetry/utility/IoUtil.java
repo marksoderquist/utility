@@ -12,7 +12,10 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class IoUtil {
 
@@ -93,6 +96,24 @@ public class IoUtil {
 	public static final String[] loadAsLineArray( InputStream input, String encoding ) throws IOException {
 		List<String> list = loadAsLines( input, encoding );
 		return list.toArray( new String[list.size()] );
+	}
+
+	public static final Map<String, String> loadAsMap( InputStream input ) throws IOException {
+		return loadAsMap( input, TextUtil.DEFAULT_ENCODING );
+	}
+
+	public static final Map<String, String> loadAsMap( InputStream input, String encoding ) throws IOException {
+		InputStreamReader reader = new InputStreamReader( input, encoding );
+		Properties properties = new Properties();
+		properties.load( reader );
+
+		Map<String, String> map = new HashMap<String, String>();
+		for( Object object : properties.keySet() ) {
+			String key = object.toString();
+			map.put( key, properties.getProperty( key ).toString() );
+		}
+
+		return map;
 	}
 
 	public static final void closeQuietly( Closeable closeable ) {

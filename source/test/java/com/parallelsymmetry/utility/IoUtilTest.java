@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -86,6 +87,14 @@ public class IoUtilTest extends TestCase {
 		assertEquals( "content", lines[index++] );
 		assertEquals( ".", lines[index++] );
 		assertEquals( 5, lines.length );
+	}
+
+	public void testLoadAsMap() throws Exception {
+		String content = "a=1\nb=B\nc=3";
+		Map<String, String> map = IoUtil.loadAsMap( new ByteArrayInputStream( content.getBytes( TextUtil.DEFAULT_CHARSET ) ), TextUtil.DEFAULT_ENCODING );
+		assertEquals( "1", map.get( "a" ) );
+		assertEquals( "B", map.get( "b" ) );
+		assertEquals( "3", map.get( "c" ) );
 	}
 
 }
