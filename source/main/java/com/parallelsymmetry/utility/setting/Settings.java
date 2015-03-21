@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -883,6 +884,7 @@ public class Settings {
 		return buffer.toString();
 	}
 
+	@Deprecated
 	public String toStringXml() {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
@@ -894,6 +896,7 @@ public class Settings {
 		printAsPaths( this, stream );
 	}
 
+	@Deprecated
 	public void printAsXml( PrintStream stream ) {
 		printAsXml( this, stream );
 	}
@@ -911,30 +914,44 @@ public class Settings {
 		return builder.toString();
 	}
 
-	public static void printAsPaths( Settings settings, PrintStream stream ) {
+	public static List<String> getPaths( Settings settings ) {
+		List<String> paths = new LinkedList<String>();
+	
 		String path = settings.getPath();
 		List<String> keys = new ArrayList<String>( settings.getKeys() );
-		Set<Settings> children = settings.getChildNodes();
-
-		Collections.sort( keys );
-
+	
 		for( String key : keys ) {
-			if( !"/".equals( path ) ) stream.append( path );
-			stream.append( "/" );
-			stream.append( key );
-			stream.append( "=" );
-			stream.append( settings.get( key, null ) );
-			stream.append( "\n" );
+			StringBuilder builder = new StringBuilder();
+			if( !"/".equals( path ) ) builder.append( path );
+			builder.append( "/" );
+			builder.append( key );
+			builder.append( "=" );
+			builder.append( settings.get( key, null ) );
+			paths.add( builder.toString() );
 		}
+	
+		Set<Settings> children = settings.getChildNodes();
 		for( Settings child : children ) {
-			printAsPaths( child, stream );
+			paths.addAll( getPaths( child ) );
+		}
+	
+		Collections.sort( paths );
+	
+		return paths;
+	}
+
+	public static void printAsPaths( Settings settings, PrintStream stream ) {
+		for( String path : getPaths( settings ) ) {
+			stream.println( path );
 		}
 	}
 
+	@Deprecated
 	public static void printAsXml( Settings settings, PrintStream stream ) {
 		printAsXml( settings, stream, 0 );
 	}
 
+	@Deprecated
 	private static void printAsXml( Settings settings, PrintStream stream, int level ) {
 		String name = settings.getName();
 		Set<String> keys = settings.getKeys();

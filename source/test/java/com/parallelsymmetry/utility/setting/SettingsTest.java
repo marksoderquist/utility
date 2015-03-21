@@ -37,8 +37,6 @@ public class SettingsTest extends TestCase {
 		settings.setDefaultProvider( providerD );
 	}
 
-	// TODO Test if a MapSettingProvider is faster than DescriptorSettingProvider to provide better startup performance.
-
 	public void testGetName() {
 		assertEquals( "", settings.getName() );
 		assertEquals( "test", settings.getNode( "/test" ).getName() );
@@ -99,7 +97,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "73", settings.get( "int", null ) );
 		assertEquals( 73, settings.getInt( "int", -1 ) );
 	}
-	
+
 	public void testPutGetLong() {
 		settings.putLong( "long", 23234993237L );
 		assertEquals( "23234993237", settings.get( "long", null ) );
@@ -817,6 +815,25 @@ public class SettingsTest extends TestCase {
 		assertEquals( "setting", Settings.getSettingKey( "/path/to/setting" ) );
 	}
 
+	public void testGetPaths() {
+		providerD.set( "/a", "A" );
+		providerD.set( "/b", "B" );
+		providerD.set( "/z/a", "A" );
+		providerD.set( "/z/b", "B" );
+		providerD.set( "/y/b", "B" );
+		providerD.set( "/y/a", "A" );
+
+		List<String> paths = Settings.getPaths( settings );
+
+		int index = 0;
+		assertEquals( "/a=A", paths.get( index++ ) );
+		assertEquals( "/b=B", paths.get( index++ ) );
+		assertEquals( "/y/a=A", paths.get( index++ ) );
+		assertEquals( "/y/b=B", paths.get( index++ ) );
+		assertEquals( "/z/a=A", paths.get( index++ ) );
+		assertEquals( "/z/b=B", paths.get( index++ ) );
+	}
+
 	public void testToStringPaths() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -860,7 +877,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, buffer.toString() );
 	}
 
-	public void testPrintAsPathsStatc() {
+	public void testPrintAsPathsStatic() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
 		providerD.set( "/z/a", "A" );
