@@ -5,6 +5,9 @@ import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.swing.Action;
+import javax.swing.Icon;
+
 public abstract class XActionHandler implements ActionListener {
 
 	private boolean enabled;
@@ -62,6 +65,10 @@ public abstract class XActionHandler implements ActionListener {
 
 		fireSelectedChanged( this.selected );
 	}
+	
+	public void setIcon( Icon icon ) {
+		fireIconChanged( icon );
+	}
 
 	public void addActionCallback( XAction action ) {
 		actions.add( action );
@@ -80,6 +87,12 @@ public abstract class XActionHandler implements ActionListener {
 	private final void fireSelectedChanged( boolean selected ) {
 		for( XAction action : actions ) {
 			action.updateSelectedState();
+		}
+	}
+	
+	private final void fireIconChanged( Icon icon ) {
+		for( XAction action : actions ) {
+			action.putValue( Action.SMALL_ICON, icon );
 		}
 	}
 

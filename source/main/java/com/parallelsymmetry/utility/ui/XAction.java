@@ -256,7 +256,7 @@ public class XAction extends AbstractAction {
 		XActionHandler handler = peekHandler();
 		SwingUtil.invokeLater( new UpdateEnabledState( handler == null ? false : handler.isEnabled() ) );
 	}
-	
+
 	void updateSelectedState() {
 		XActionHandler handler = peekHandler();
 		SwingUtil.invokeLater( new UpdateSelectedState( handler == null ? false : handler.isSelected() ) );
@@ -311,7 +311,7 @@ public class XAction extends AbstractAction {
 		 */
 		@Override
 		public void run() {
-			XAction.super.putValue(Action.SELECTED_KEY, actionSelected );
+			XAction.super.putValue( Action.SELECTED_KEY, actionSelected );
 		}
 
 	}
