@@ -190,6 +190,15 @@ public class OperatingSystemTest extends TestCase {
 		assertNotNull( exception );
 	}
 
+	public void testGetJavaExecutableName() {
+		assertEquals( OperatingSystem.isWindows() ? "javaw" : "java", OperatingSystem.getJavaExecutableName() );
+	}
+
+	public void testGetJavaExecutablePath() {
+		String java = OperatingSystem.isWindows() ? "javaw" : "java";
+		assertEquals( System.getProperty( "java.home" ) + File.separator + "bin" + File.separator + java, OperatingSystem.getJavaExecutablePath() );
+	}
+
 	public static final void init( String name, String arch, String version ) throws Exception {
 		Method initMethod = OperatingSystem.class.getDeclaredMethod( "init", String.class, String.class, String.class );
 		initMethod.setAccessible( true );

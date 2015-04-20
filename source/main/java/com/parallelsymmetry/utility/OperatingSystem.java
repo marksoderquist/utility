@@ -225,6 +225,15 @@ public class OperatingSystem {
 		return isWindows() ? "javaw" : "java";
 	}
 
+	public static final String getJavaExecutablePath() {
+		StringBuilder builder = new StringBuilder( System.getProperty( "java.home" ) );
+		builder.append( File.separator );
+		builder.append( "bin" );
+		builder.append( File.separator );
+		builder.append( getJavaExecutableName() );
+		return builder.toString();
+	}
+
 	/**
 	 * Returns the total system memory in bytes or -1 if it cannot be determined.
 	 * 
