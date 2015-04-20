@@ -177,7 +177,7 @@ public class OperatingSystemTest extends TestCase {
 	public void testReduceProcessWindows() throws Exception {
 		OperatingSystemTest.init( "Windows 7", "x86", "6.1" );
 		System.setProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY, OperatingSystem.ELEVATED_PRIVILEGE_VALUE );
-		ProcessBuilder builder = new ProcessBuilder( "javaw", "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
+		ProcessBuilder builder = new ProcessBuilder( OperatingSystem.getJavaExecutablePath(), "-jar", "C:\\Program Files\\Escape\\program.jar", "-update", "false" );
 
 		IOException exception = null;
 		try {
@@ -188,6 +188,15 @@ public class OperatingSystemTest extends TestCase {
 		}
 
 		assertNotNull( exception );
+	}
+
+	public void testGetJavaExecutableName() {
+		assertEquals( OperatingSystem.isWindows() ? "javaw" : "java", OperatingSystem.getJavaExecutableName() );
+	}
+
+	public void testGetJavaExecutablePath() {
+		String java = OperatingSystem.isWindows() ? "javaw" : "java";
+		assertEquals( System.getProperty( "java.home" ) + File.separator + "bin" + File.separator + java, OperatingSystem.getJavaExecutablePath() );
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {
