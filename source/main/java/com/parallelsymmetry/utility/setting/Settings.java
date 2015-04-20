@@ -916,10 +916,10 @@ public class Settings {
 
 	public static List<String> getPaths( Settings settings ) {
 		List<String> paths = new LinkedList<String>();
-	
+
 		String path = settings.getPath();
 		List<String> keys = new ArrayList<String>( settings.getKeys() );
-	
+
 		for( String key : keys ) {
 			StringBuilder builder = new StringBuilder();
 			if( !"/".equals( path ) ) builder.append( path );
@@ -929,20 +929,21 @@ public class Settings {
 			builder.append( settings.get( key, null ) );
 			paths.add( builder.toString() );
 		}
-	
+
 		Set<Settings> children = settings.getChildNodes();
 		for( Settings child : children ) {
 			paths.addAll( getPaths( child ) );
 		}
-	
+
 		Collections.sort( paths );
-	
+
 		return paths;
 	}
 
 	public static void printAsPaths( Settings settings, PrintStream stream ) {
 		for( String path : getPaths( settings ) ) {
-			stream.println( path );
+			stream.print( path );
+			stream.print( "\n" );
 		}
 	}
 
