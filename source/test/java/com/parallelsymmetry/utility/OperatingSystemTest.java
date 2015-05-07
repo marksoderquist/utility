@@ -231,7 +231,7 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "linux/x86_64/librxtxSerial.so", OperatingSystem.resolveNativeLibPath( "rxtxSerial" ) );
 	}
 
-	public static final void init( String name, String arch, String version ) throws Exception {
+	private static final void init( String name, String arch, String version ) throws Exception {
 		Method initMethod = OperatingSystem.class.getDeclaredMethod( "init", String.class, String.class, String.class );
 		initMethod.setAccessible( true );
 		initMethod.invoke( null, name, arch, version );

@@ -396,13 +396,15 @@ public class OperatingSystem {
 	}
 
 	public static final String resolveNativeLibPath( String libname ) {
-		File path = null;
+		StringBuilder builder = new StringBuilder();
 
-		path = new File( getPlatformFolder() );
-		path = new File( path, getArchitectureFolder() );
-		path = new File( path, mapLibraryName( libname ) );
+		builder.append( getPlatformFolder() );
+		builder.append( "/" );
+		builder.append( getArchitectureFolder() );
+		builder.append( "/" );
+		builder.append( mapLibraryName( libname ) );
 
-		return path.toString();
+		return builder.toString();
 	}
 
 	private static final String mapLibraryName( String libname ) {
