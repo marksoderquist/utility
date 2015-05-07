@@ -13,7 +13,7 @@ import com.parallelsymmetry.utility.log.Log;
 public class OperatingSystem {
 
 	public static enum Family {
-		UNKNOWN, LINUX, UNIX, WINDOWS, OS2, MAC, MAC_OLD
+		UNKNOWN, LINUX, UNIX, WINDOWS, OS2, MACOSX, MAC
 	};
 
 	public static enum Architecture {
@@ -68,9 +68,9 @@ public class OperatingSystem {
 			family = Family.UNIX;
 		} else if( name.contains( "Mac OS" ) ) {
 			if( name.contains( "Mac OS X" ) ) {
-				family = Family.MAC;
+				family = Family.MACOSX;
 			} else {
-				family = Family.MAC_OLD;
+				family = Family.MAC;
 			}
 		} else {
 			family = Family.UNKNOWN;
@@ -121,11 +121,11 @@ public class OperatingSystem {
 	}
 
 	public static final boolean isMac() {
-		return family == Family.MAC;
+		return family == Family.MACOSX;
 	}
 
 	public static final boolean isUnix() {
-		return family == Family.LINUX || family == Family.MAC || family == Family.UNIX;
+		return family == Family.LINUX || family == Family.MACOSX || family == Family.UNIX;
 	}
 
 	public static final boolean isWindows() {
@@ -395,9 +395,60 @@ public class OperatingSystem {
 		return null;
 	}
 
+	public static final String resolveNativeLibPath( String libname ) {
+		File path = null;
+
+		path = new File( getPlatformFolder() );
+		path = new File( path, getArchitectureFolder() );
+		path = new File( path, mapLibraryName( libname ) );
+
+		return path.toString();
+	}
+
+	private static final String mapLibraryName( String libname ) {
+		switch( family ) {
+			case LINUX: {
+				return "lib" + libname + ".so";
+			}
+			case MACOSX: {
+				return "lib" + libname + ".jnilib";
+			}
+			case WINDOWS: {
+				return libname + ".dll";
+			}
+			default: {
+				return System.mapLibraryName( libname );
+			}
+		}
+	}
+
+	private static final String getArchitectureFolder() {
+		switch( architecture ) {
+			case X86: {
+				return "x86";
+			}
+			case X64: {
+				return "x86_64";
+			}
+			default: {
+				return architecture.name().toLowerCase();
+			}
+		}
+	}
+
+	private static final String getPlatformFolder() {
+		switch( family ) {
+			case WINDOWS: {
+				return "win";
+			}
+			default: {
+				return family.name().toLowerCase();
+			}
+		}
+	}
+
 	static final boolean isElevatedFlagSet() {
-		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) )
-			|| ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
+		return ELEVATED_PRIVILEGE_VALUE.equals( System.getenv( ELEVATED_PRIVILEGE_KEY ) ) || ELEVATED_PRIVILEGE_VALUE.equals( System.getProperty( ELEVATED_PRIVILEGE_KEY ) );
 	}
 
 	static final void clearProcessElevatedCache() {

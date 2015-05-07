@@ -35,17 +35,41 @@ public class OperatingSystemTest extends TestCase {
 		assertFalse( OperatingSystem.isWindows() );
 		assertEquals( "10", OperatingSystem.getVersion() );
 		assertEquals( "ppc", OperatingSystem.getSystemArchitecture() );
-		assertEquals( OperatingSystem.Family.MAC, OperatingSystem.getFamily() );
+		assertEquals( OperatingSystem.Family.MACOSX, OperatingSystem.getFamily() );
 		assertEquals( "java", OperatingSystem.getJavaExecutableName() );
 	}
 
-	public void testWindows() throws Exception {
+	public void testWindows7() throws Exception {
 		init( "Windows 7", "x86", "6.1" );
 		assertFalse( OperatingSystem.isLinux() );
 		assertFalse( OperatingSystem.isMac() );
 		assertFalse( OperatingSystem.isUnix() );
 		assertTrue( OperatingSystem.isWindows() );
 		assertEquals( "6.1", OperatingSystem.getVersion() );
+		assertEquals( "x86", OperatingSystem.getSystemArchitecture() );
+		assertEquals( OperatingSystem.Family.WINDOWS, OperatingSystem.getFamily() );
+		assertEquals( "javaw", OperatingSystem.getJavaExecutableName() );
+	}
+
+	public void testWindows8() throws Exception {
+		init( "Windows 8", "x86", "6.2" );
+		assertFalse( OperatingSystem.isLinux() );
+		assertFalse( OperatingSystem.isMac() );
+		assertFalse( OperatingSystem.isUnix() );
+		assertTrue( OperatingSystem.isWindows() );
+		assertEquals( "6.2", OperatingSystem.getVersion() );
+		assertEquals( "x86", OperatingSystem.getSystemArchitecture() );
+		assertEquals( OperatingSystem.Family.WINDOWS, OperatingSystem.getFamily() );
+		assertEquals( "javaw", OperatingSystem.getJavaExecutableName() );
+	}
+
+	public void testWindows8_1() throws Exception {
+		init( "Windows 8.1", "x86", "6.3" );
+		assertFalse( OperatingSystem.isLinux() );
+		assertFalse( OperatingSystem.isMac() );
+		assertFalse( OperatingSystem.isUnix() );
+		assertTrue( OperatingSystem.isWindows() );
+		assertEquals( "6.3", OperatingSystem.getVersion() );
 		assertEquals( "x86", OperatingSystem.getSystemArchitecture() );
 		assertEquals( OperatingSystem.Family.WINDOWS, OperatingSystem.getFamily() );
 		assertEquals( "javaw", OperatingSystem.getJavaExecutableName() );
@@ -197,6 +221,14 @@ public class OperatingSystemTest extends TestCase {
 	public void testGetJavaExecutablePath() {
 		String java = OperatingSystem.isWindows() ? "javaw" : "java";
 		assertEquals( System.getProperty( "java.home" ) + File.separator + "bin" + File.separator + java, OperatingSystem.getJavaExecutablePath() );
+	}
+
+	public void testResolveNativeLibPath() throws Exception {
+		init( "Windows 8", "x86", "6.2" );
+		assertEquals( "win/x86/rxtxSerial.dll", OperatingSystem.resolveNativeLibPath( "rxtxSerial" ) );
+
+		init( "Linux", "x86_64", "2.6.32_45" );
+		assertEquals( "linux/x86_64/librxtxSerial.so", OperatingSystem.resolveNativeLibPath( "rxtxSerial" ) );
 	}
 
 	public static final void init( String name, String arch, String version ) throws Exception {
