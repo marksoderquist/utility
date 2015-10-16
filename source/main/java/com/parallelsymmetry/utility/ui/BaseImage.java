@@ -656,11 +656,11 @@ public abstract class BaseImage {
 
 		private static final long serialVersionUID = -1520877460686311009L;
 
-		private double x;
+		public double x;
 
-		private double y;
+		public double y;
 
-		private double z;
+		public double z;
 
 		public Point( double x, double y ) {
 			this( x, y, 0 );
@@ -679,6 +679,10 @@ public abstract class BaseImage {
 
 		public final double getMagnitude() {
 			return Math.sqrt( x * x + y * y + z * z );
+		}
+		
+		public final double getAngle() {
+			return Math.atan2( y, x );
 		}
 
 		public final double dot( Point vector ) {
