@@ -1,7 +1,7 @@
 package com.parallelsymmetry.utility;
 
 /**
- * The TripLock class is thread synchronization tool intended to block threads
+ * The TripLock class a is thread synchronization tool intended to block threads
  * if not tripped, release the threads when tripped, and not to block threads if
  * already tripped.
  * 
