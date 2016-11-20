@@ -1,13 +1,7 @@
 package com.parallelsymmetry.utility;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Parameters class is used to convert command line parameters into an
@@ -84,7 +78,7 @@ import java.util.Set;
  * specified in the command line that does not match the valid set an
  * InvalidParameterException is thrown.
  * <p>
- * 
+ *
  * @author Mark Soderquist
  */
 public class Parameters {
@@ -112,7 +106,7 @@ public class Parameters {
 	}
 
 	public static final Parameters create() {
-		return parse( new String[0] );
+		return parse( new String[ 0 ] );
 	}
 
 	public static final Parameters parse( String[] commands ) {
@@ -128,13 +122,13 @@ public class Parameters {
 		Map<String, List<String>> values = new HashMap<String, List<String>>();
 		List<String> uris = new ArrayList<String>();
 
-		String[] resolved = new String[commands.length];
+		String[] resolved = new String[ commands.length ];
 		System.arraycopy( commands, 0, resolved, 0, commands.length );
 
 		boolean terminated = false;
 
 		for( int index = 0; index < commands.length; index++ ) {
-			String command = commands[index];
+			String command = commands[ index ];
 
 			if( command == null ) throw new IllegalArgumentException( "Null command at index: " + index );
 
@@ -143,9 +137,10 @@ public class Parameters {
 			} else if( !terminated && command.startsWith( DOUBLE ) ) {
 				if( validCommands != null && !validCommands.contains( command ) ) throw new InvalidParameterException( "Unknown parameter: " + command );
 
-				List<String> valueList = new ArrayList<String>();
-				while( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( SINGLE ) ) ) {
-					String value = commands[index + 1];
+				List<String> valueList = values.get( removePrefix( command ) );
+				if( valueList == null ) valueList = new ArrayList<String>();
+				while( (commands.length > index + 1) && (!commands[ index + 1 ].startsWith( SINGLE )) ) {
+					String value = commands[ index + 1 ];
 					if( value.startsWith( "\\-" ) ) value = value.substring( 1 );
 					valueList.add( value );
 					index++;
@@ -157,9 +152,10 @@ public class Parameters {
 			} else if( !terminated && command.startsWith( SINGLE ) ) {
 				if( validCommands != null && !validCommands.contains( command ) ) throw new InvalidParameterException( "Unknown command: " + command );
 
-				List<String> valueList = new ArrayList<String>();
-				if( ( commands.length > index + 1 ) && ( !commands[index + 1].startsWith( SINGLE ) ) ) {
-					valueList.add( commands[index + 1] );
+				List<String> valueList = values.get( removePrefix( command ) );
+				if( valueList == null ) valueList = new ArrayList<String>();
+				if( (commands.length > index + 1) && (!commands[ index + 1 ].startsWith( SINGLE )) ) {
+					valueList.add( commands[ index + 1 ] );
 					index++;
 				}
 				if( valueList.size() == 0 ) valueList.add( "true" );
@@ -168,7 +164,7 @@ public class Parameters {
 				values.put( removePrefix( command ), valueList );
 			} else {
 				terminated = true;
-				uris.add( resolved[index] = UriUtil.resolve( command ).toString() );
+				uris.add( resolved[ index ] = UriUtil.resolve( command ).toString() );
 			}
 
 		}
@@ -194,7 +190,7 @@ public class Parameters {
 	 * Returns the parameter value as a boolean. The boolean returned represents
 	 * the value true if the parameter value is not null and is equal, ignoring
 	 * case, to the string "true".
-	 * 
+	 *
 	 * @param flag
 	 * @return
 	 */
@@ -208,7 +204,7 @@ public class Parameters {
 	 * is not null and is equal, ignoring case, to the string "true". If the
 	 * parameter was not specified on the command line then the default value is
 	 * returned.
-	 * 
+	 *
 	 * @param flag
 	 * @param defaultValue
 	 * @return
@@ -220,12 +216,12 @@ public class Parameters {
 
 	/**
 	 * Returns whether the parameter was specified on the command line.
-	 * 
+	 *
 	 * @param flag
 	 * @return
 	 */
 	public boolean isSet( String flag ) {
-		return !( get( flag ) == null );
+		return !(get( flag ) == null);
 	}
 
 	public Set<String> getFlags() {
@@ -273,7 +269,7 @@ public class Parameters {
 
 	@Override
 	public boolean equals( Object object ) {
-		if( !( object instanceof Parameters ) ) return false;
+		if( !(object instanceof Parameters) ) return false;
 
 		Parameters that = (Parameters)object;
 
@@ -281,7 +277,7 @@ public class Parameters {
 
 		int count = this.resolvedCommands.length;
 		for( int index = 0; index < count; index++ ) {
-			if( !TextUtil.areEqual( this.resolvedCommands[index], that.resolvedCommands[index] ) ) return false;
+			if( !TextUtil.areEqual( this.resolvedCommands[ index ], that.resolvedCommands[ index ] ) ) return false;
 		}
 
 		return true;
