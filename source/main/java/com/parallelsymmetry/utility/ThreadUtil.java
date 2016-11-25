@@ -1,6 +1,8 @@
 package com.parallelsymmetry.utility;
 
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class ThreadUtil {
@@ -8,7 +10,7 @@ public class ThreadUtil {
 	/**
 	 * Pause a thread for a specific amount of time. If an InterruptedException
 	 * occurs the method returns immediately.
-	 * 
+	 *
 	 * @param duration
 	 */
 	public static final void pause( long duration ) {
@@ -18,7 +20,7 @@ public class ThreadUtil {
 	/**
 	 * Pause a thread for a specific amount of time with the given unit. If an
 	 * InterruptedException occurs the method returns immediately.
-	 * 
+	 *
 	 * @param duration
 	 */
 	public static final void pause( long duration, TimeUnit unit ) {
@@ -29,6 +31,10 @@ public class ThreadUtil {
 		}
 	}
 
+	public static final ThreadFactory createDaemonThreadFactory() {
+		return new DaemonThreadFactory();
+	}
+
 	/**
 	 * Check if the calling method was called from a different method. Class names
 	 * are compared both by the simple name and by the full name. For example,
@@ -37,7 +43,7 @@ public class ThreadUtil {
 	 * <blockquote> <code>ThreadUtil.calledFrom( "Thread", "run" );</code><br/>
 	 * <code>ThreadUtil.calledFrom( "java.lang.Thread", "run" );</code>
 	 * </blockquote>
-	 * 
+	 *
 	 * @param className
 	 * @param methodName
 	 * @return
@@ -55,7 +61,7 @@ public class ThreadUtil {
 
 	/**
 	 * Append the stack trace of the source throwable to the target throwable.
-	 * 
+	 *
 	 * @param source
 	 * @param target
 	 * @return
@@ -68,7 +74,7 @@ public class ThreadUtil {
 
 	/**
 	 * Append stack trace to the target throwable.
-	 * 
+	 *
 	 * @param target
 	 * @param trace
 	 * @return
@@ -77,7 +83,7 @@ public class ThreadUtil {
 		if( target == null ) return null;
 		if( trace != null ) {
 			StackTraceElement[] originalStack = target.getStackTrace();
-			StackTraceElement[] elements = new StackTraceElement[originalStack.length + trace.length];
+			StackTraceElement[] elements = new StackTraceElement[ originalStack.length + trace.length ];
 			System.arraycopy( originalStack, 0, elements, 0, originalStack.length );
 			System.arraycopy( trace, 0, elements, originalStack.length, trace.length );
 			target.setStackTrace( elements );
@@ -94,7 +100,7 @@ public class ThreadUtil {
 	 * before this method is called. The element at index 0 is the calling class
 	 * of this method, the element at index 1 is the calling class of the method
 	 * in the previous class, and so on.
-	 * 
+	 *
 	 * @return A class array of the execution stack before this method was called.
 	 */
 	public static final Class<?>[] getStackClasses() {
@@ -107,6 +113,16 @@ public class ThreadUtil {
 		@Override
 		public Class<?>[] getClassContext() {
 			return super.getClassContext();
+		}
+
+	}
+
+	private static final class DaemonThreadFactory implements ThreadFactory {
+
+		public Thread newThread( Runnable runnable ) {
+			Thread thread = Executors.defaultThreadFactory().newThread( runnable );
+			thread.setDaemon( true );
+			return thread;
 		}
 
 	}
