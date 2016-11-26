@@ -1,11 +1,11 @@
 package com.parallelsymmetry.utility.agent;
 
+import com.parallelsymmetry.utility.ThreadUtil;
+import com.parallelsymmetry.utility.log.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import com.parallelsymmetry.utility.ThreadUtil;
-import com.parallelsymmetry.utility.log.Log;
 
 public abstract class PipeAgent extends Agent implements Pipe {
 
@@ -279,6 +279,11 @@ public abstract class PipeAgent extends Agent implements Pipe {
 				reconnect();
 				return read( data, offset, length );
 			}
+		}
+
+		@Override
+		public int available() throws IOException {
+			return realInput.available();
 		}
 
 		@Override
