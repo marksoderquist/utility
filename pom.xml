@@ -18,7 +18,7 @@
 
 	<repositories>
 		<repository>
-			<scope>psm</scope>
+			<id>psm</id>
 			<url>http://code.parallelsymmetry.com/repo/psm</url>
 		</repository>
 	</repositories>
