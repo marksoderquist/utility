@@ -397,19 +397,19 @@ public class Log {
 	private static final Logger getLogger( String name ) {
 		Logger logger = Logger.getLogger( name );
 
-//		synchronized( defaultHandlers ) {
-//			// Ensure a default handler exists for the logger.
-//			if( defaultHandlers.get( logger ) == null ) {
-//				logger.setUseParentHandlers( false );
-//				logger.setLevel( ALL );
-//
-//				Handler handler = new DefaultHandler( System.out );
-//				logger.addHandler( handler );
-//				handler.setLevel( INFO );
-//
-//				defaultHandlers.put( logger, handler );
-//			}
-//		}
+		synchronized( defaultHandlers ) {
+			// Ensure a default handler exists for the logger.
+			if( defaultHandlers.get( logger ) == null ) {
+				logger.setUseParentHandlers( false );
+				logger.setLevel( ALL );
+
+				Handler handler = new DefaultHandler( System.out );
+				logger.addHandler( handler );
+				handler.setLevel( INFO );
+
+				defaultHandlers.put( logger, handler );
+			}
+		}
 
 		return logger;
 	}
