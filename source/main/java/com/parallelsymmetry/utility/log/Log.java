@@ -1,25 +1,15 @@
 package com.parallelsymmetry.utility.log;
 
+import com.parallelsymmetry.utility.Parameters;
+import com.parallelsymmetry.utility.agent.Worker;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.logging.FileHandler;
+import java.util.logging.*;
 import java.util.logging.Formatter;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
-
-import com.parallelsymmetry.utility.Parameters;
-import com.parallelsymmetry.utility.agent.Worker;
 
 /**
  * Provides a facade to the standard Java logging architecture. This facade
@@ -407,19 +397,19 @@ public class Log {
 	private static final Logger getLogger( String name ) {
 		Logger logger = Logger.getLogger( name );
 
-		synchronized( defaultHandlers ) {
-			// Ensure a default handler exists for the logger.
-			if( defaultHandlers.get( logger ) == null ) {
-				logger.setUseParentHandlers( false );
-				logger.setLevel( ALL );
-
-				Handler handler = new DefaultHandler( System.out );
-				logger.addHandler( handler );
-				handler.setLevel( INFO );
-
-				defaultHandlers.put( logger, handler );
-			}
-		}
+//		synchronized( defaultHandlers ) {
+//			// Ensure a default handler exists for the logger.
+//			if( defaultHandlers.get( logger ) == null ) {
+//				logger.setUseParentHandlers( false );
+//				logger.setLevel( ALL );
+//
+//				Handler handler = new DefaultHandler( System.out );
+//				logger.addHandler( handler );
+//				handler.setLevel( INFO );
+//
+//				defaultHandlers.put( logger, handler );
+//			}
+//		}
 
 		return logger;
 	}
