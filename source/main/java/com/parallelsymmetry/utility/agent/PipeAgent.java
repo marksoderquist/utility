@@ -163,7 +163,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 				internalConnect();
 				Log.write( Log.TRACE, getName(), " reconnected." );
 				break;
-			} catch( Exception exception ) {
+			} catch( Throwable exception ) {
 				if( start && ( connectOnce || stopOnConnectException ) ) {
 					Log.write( Log.ERROR, exception );
 					Log.write( getName() + " failed to connect!" );
