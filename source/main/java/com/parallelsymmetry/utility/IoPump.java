@@ -50,15 +50,15 @@ public class IoPump implements Runnable {
 
 	private int lineLength = DEFAULT_LINE_LENGTH;
 
-	private boolean started;
-
-	private Object startLock = new Object();
-
 	private int lineTimeout = DEFAULT_LINE_TIMEOUT;
 
-	private AtomicLong lineReadTime = new AtomicLong();
+	private final Object startLock = new Object();
 
-	private StringBuilder builder = new StringBuilder();
+	private final AtomicLong lineReadTime = new AtomicLong();
+
+	private final StringBuilder builder = new StringBuilder();
+
+	private boolean started;
 
 	private LineTimeoutTask lineTimeoutTask;
 
@@ -344,15 +344,16 @@ public class IoPump implements Runnable {
 				}
 			}
 
-			int read = 0;
+			int read;
 			while( execute ) {
-				// Read data.
+				// Read data
 				if( reader == null ) {
 					read = readFromInputStream( bytearray );
 				} else {
 					read = readFromReader( chararray );
 				}
 
+				// End of stream
 				if( read == -1 ) {
 					synchronized( builder ) {
 						if( logEnabled && logContent && builder.length() > 0 ) flushLogLine();
@@ -361,8 +362,16 @@ public class IoPump implements Runnable {
 					continue;
 				}
 
+				// Write data
+				if( writer == null ) {
+					writeToOutputStream( bytearray, read );
+				} else {
+					writeToWriter( chararray, read );
+				}
+
+				// Logging
 				if( logEnabled && logContent ) {
-					int datum = 0;
+					int datum;
 					for( int index = 0; index < read; index++ ) {
 						if( reader == null ) {
 							datum = bytearray[index];
@@ -373,13 +382,6 @@ public class IoPump implements Runnable {
 						}
 						sendToLog( datum );
 					}
-				}
-
-				// Write data.
-				if( writer == null ) {
-					writeToOutputStream( bytearray, read );
-				} else {
-					writeToWriter( chararray, read );
 				}
 			}
 			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump finished." );
