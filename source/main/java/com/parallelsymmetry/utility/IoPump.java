@@ -1,23 +1,12 @@
 package com.parallelsymmetry.utility;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.InterruptedIOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.Writer;
+import com.parallelsymmetry.utility.log.Log;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.parallelsymmetry.utility.log.Log;
 
 /**
  * The IOPump class reads data from an InputStream writes it to an OutputStream.
@@ -333,6 +322,8 @@ public class IoPump implements Runnable {
 	@Override
 	public final void run() {
 		try {
+			startNotify();
+
 			// Check for bad parameters.
 			if( input == null & reader == null || output == null & writer == null ) return;
 
@@ -352,8 +343,6 @@ public class IoPump implements Runnable {
 					timer.schedule( ( lineTimeoutTask = new LineTimeoutTask() ), lineTimeout );
 				}
 			}
-
-			startNotify();
 
 			int read = 0;
 			while( execute ) {
@@ -393,14 +382,13 @@ public class IoPump implements Runnable {
 					writeToWriter( chararray, read );
 				}
 			}
+			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump finished." );
 		} catch( InterruptedIOException exception ) {
-			Log.write( Log.TRACE, name, " interrupted." );
+			if( logEnabled ) Log.write( Log.TRACE, name, " interrupted." );
 		} catch( IOException exception ) {
 			if( logEnabled ) Log.write( exception, name, " ", exception.getMessage() );
 		} finally {
 			if( lineTimeoutTask != null ) lineTimeoutTask.cancel();
-			startNotify();
-			if( logEnabled ) Log.write( Log.TRACE, name, " IOPump finished." );
 		}
 	}
 
