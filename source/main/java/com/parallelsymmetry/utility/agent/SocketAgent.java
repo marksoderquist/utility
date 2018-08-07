@@ -8,9 +8,9 @@ import java.net.Socket;
 
 public class SocketAgent extends PipeAgent {
 
-	public static final int DEFAULT_CONNECT_TIMEOUT = 5000;
+	public static final int DEFAULT_CONNECT_TIMEOUT = 10000;
 
-	public static final int DEFAULT_READ_TIMEOUT = 10000;
+	public static final int DEFAULT_READ_TIMEOUT = 30000;
 
 	private String host;
 
