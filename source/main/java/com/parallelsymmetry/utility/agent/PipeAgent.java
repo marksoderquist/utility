@@ -66,7 +66,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 
 	/**
 	 * Should the agent connect only once.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isConnectOnce() {
@@ -75,7 +75,7 @@ public abstract class PipeAgent extends Agent implements Pipe {
 
 	/**
 	 * Set if the agent should connect only once.
-	 * 
+	 *
 	 * @param connectOnce
 	 */
 	public void setConnectOnce( boolean connectOnce ) {
@@ -164,12 +164,12 @@ public abstract class PipeAgent extends Agent implements Pipe {
 				Log.write( Log.TRACE, getName(), " reconnected." );
 				break;
 			} catch( Throwable exception ) {
-				if( start && ( connectOnce || stopOnConnectException ) ) {
+				if( start && (connectOnce || stopOnConnectException) ) {
 					Log.write( Log.ERROR, exception );
 					Log.write( getName() + " failed to connect!" );
 				} else {
 					Log.write( Log.ERROR, exception );
-					Log.write( getName() + " failed to connect! Waiting " + (int)( reconnectDelay / 1000.0 ) + " seconds..." );
+					Log.write( getName() + " failed to connect! Waiting " + (int)(reconnectDelay / 1000.0) + " seconds..." );
 					ThreadUtil.pause( reconnectDelay );
 				}
 			}
@@ -309,34 +309,12 @@ public abstract class PipeAgent extends Agent implements Pipe {
 
 		@Override
 		public void write( int bite ) throws IOException {
-			checkForWritablility();
-			try {
-				realOutput.write( bite );
-			} catch( IOException exception ) {
-				if( !isRunning() || isConnectOnce() ) return;
-				if( stopOnException ) {
-					stop();
-					throw exception;
-				}
-				reconnect();
-				write( bite );
-			}
+			write( new byte[]{ (byte)bite } );
 		}
 
 		@Override
 		public void write( byte[] data ) throws IOException {
-			checkForWritablility();
-			try {
-				realOutput.write( data );
-			} catch( IOException exception ) {
-				if( !isRunning() || isConnectOnce() ) return;
-				if( stopOnException ) {
-					stop();
-					throw exception;
-				}
-				reconnect();
-				write( data );
-			}
+			write( data, 0, data.length );
 		}
 
 		@Override

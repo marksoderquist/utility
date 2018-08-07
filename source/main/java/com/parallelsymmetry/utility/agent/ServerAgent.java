@@ -1,5 +1,8 @@
 package com.parallelsymmetry.utility.agent;
 
+import com.parallelsymmetry.utility.TripLock;
+import com.parallelsymmetry.utility.log.Log;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -7,9 +10,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-
-import com.parallelsymmetry.utility.TripLock;
-import com.parallelsymmetry.utility.log.Log;
 
 public class ServerAgent extends PipeAgent {
 
@@ -121,6 +121,7 @@ public class ServerAgent extends PipeAgent {
 				}
 			}
 			if( listener == null ) {
+				socket.setSoTimeout( SocketAgent.DEFAULT_READ_TIMEOUT );
 				setRealInputStream( new BufferedInputStream( socket.getInputStream() ) );
 				setRealOutputStream( new BufferedOutputStream( socket.getOutputStream() ) );
 

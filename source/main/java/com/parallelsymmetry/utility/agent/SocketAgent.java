@@ -1,14 +1,16 @@
 package com.parallelsymmetry.utility.agent;
 
+import com.parallelsymmetry.utility.log.Log;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import com.parallelsymmetry.utility.log.Log;
-
 public class SocketAgent extends PipeAgent {
 
 	public static final int DEFAULT_CONNECT_TIMEOUT = 5000;
+
+	public static final int DEFAULT_READ_TIMEOUT = 10000;
 
 	private String host;
 
@@ -45,6 +47,7 @@ public class SocketAgent extends PipeAgent {
 		String server = host == null ? "localhost" : host;
 		Log.write( Log.DEBUG, getName() + ": Connecting to " + host + ":" + port + "..." );
 		socket = new Socket();
+		socket.setSoTimeout( DEFAULT_READ_TIMEOUT );
 		socket.connect( new InetSocketAddress( server, port ), connectTimeout );
 		setRealInputStream( socket.getInputStream() );
 		setRealOutputStream( socket.getOutputStream() );
@@ -53,7 +56,7 @@ public class SocketAgent extends PipeAgent {
 
 	@Override
 	protected void disconnect() throws IOException {
-		Log.write( Log.DEBUG, getName() + ": Disconnecting..." );
+		Log.write( Log.DEBUG, getName() + ": Disconnecting from " + host + ":" + port + "..." );
 		if( socket != null ) {
 			Log.write( Log.DEBUG, getName() + ": Closing socket..." );
 			socket.close();
@@ -61,7 +64,7 @@ public class SocketAgent extends PipeAgent {
 		}
 		setRealInputStream( null );
 		setRealOutputStream( null );
-		Log.write( getName() + ": Disconnected." );
+		Log.write( getName() + ": Disconnected from: " + host + ":" + port );
 	}
 
 }
