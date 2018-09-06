@@ -1,15 +1,13 @@
 package com.parallelsymmetry.utility;
 
+import junit.framework.TestCase;
+
 import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
-
-import com.parallelsymmetry.utility.JavaUtil;
-
-import junit.framework.TestCase;
 
 public class JavaUtilTest extends TestCase {
 
@@ -107,6 +105,13 @@ public class JavaUtilTest extends TestCase {
 		assertEquals( one, JavaUtil.getRootCause( one ) );
 		assertEquals( one, JavaUtil.getRootCause( two ) );
 		assertEquals( one, JavaUtil.getRootCause( three ) );
+	}
+
+	public void testCompareJavaVersion() {
+		assertTrue( JavaUtil.compareJavaVersion( "8", "1.8" ) == 0 );
+		assertTrue( JavaUtil.compareJavaVersion( "8", "1.8.0_u11" ) < 0 );
+		assertTrue( JavaUtil.compareJavaVersion( "8", "10.0.2+13-Ubuntu-1ubuntu0.18.04.1" ) < 0 );
+		assertTrue( JavaUtil.compareJavaVersion( "10", "10.0.2+13-Ubuntu-1ubuntu0.18.04.1" ) < 0 );
 	}
 
 }

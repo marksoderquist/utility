@@ -176,4 +176,10 @@ public final class JavaUtil {
 		return object.getClass().getClassLoader();
 	}
 
+	public static int compareJavaVersion( String a, String b ) {
+		if( a.startsWith( "1." ) ) a = a.substring( 2 );
+		if( b.startsWith( "1." ) ) b = b.substring( 2 );
+		return Version.compareVersions( a, b );
+	}
+
 }
