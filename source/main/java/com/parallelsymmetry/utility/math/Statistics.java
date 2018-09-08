@@ -18,9 +18,9 @@ public class Statistics {
 		double median = Double.NaN;
 		int index = values.length / 2;
 		if( values.length % 2 == 0 ) {
-			median = ( values[index - 1] + values[index] ) / 2;
+			median = (values[ index - 1 ] + values[ index ]) / 2;
 		} else {
-			median = ( values[index] );
+			median = (values[ index ]);
 		}
 
 		return median;
@@ -67,7 +67,7 @@ public class Statistics {
 			if( value > max ) max = value;
 		}
 
-		return ( min + max ) / 2;
+		return (min + max) / 2;
 	}
 
 	public static final double variance( double[] values ) {
@@ -80,6 +80,29 @@ public class Statistics {
 		}
 
 		return sum / values.length;
+	}
+
+	public static final double leastSquaresSlope( double[] x, double[] y ) {
+		if( x.length != y.length ) return Double.NaN;
+		int count = x.length;
+		double meanX = mean( x );
+		double meanY = mean( y );
+		double numerator = 0;
+		double denominator = 0;
+		for( int index = 0; index < count; index++ ) {
+			double dX = x[ index ] - meanX;
+			double dY = y[ index ] - meanY;
+			numerator += dX * dY;
+			denominator += dX * dX;
+		}
+		return numerator / denominator;
+	}
+
+	public static final double leastSquaresIntercept( double[] x, double[] y ) {
+		if( x.length != y.length ) return Double.NaN;
+		double meanX = mean( x );
+		double meanY = mean( y );
+		return meanY - leastSquaresSlope( x, y ) * meanX;
 	}
 
 	public static final double standardDeviation( double[] values ) {
