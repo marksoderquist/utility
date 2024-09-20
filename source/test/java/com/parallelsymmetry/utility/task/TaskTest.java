@@ -1,30 +1,34 @@
 package com.parallelsymmetry.utility.task;
 
+import com.parallelsymmetry.utility.BaseTestCase;
+import com.parallelsymmetry.utility.ThreadUtil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.concurrent.TimeUnit;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.parallelsymmetry.utility.ThreadUtil;
-import com.parallelsymmetry.utility.task.Task;
-import com.parallelsymmetry.utility.task.TaskManager;
+public class TaskTest extends BaseTestCase {
 
-public class TaskTest extends TestCase {
-
-	private TaskManager manager = new TaskManager();
+	private final TaskManager manager = new TaskManager();
 
 	/*
 	 * Don't make this number too small. The smaller the number, the more likely
 	 * the computer can't complete the task quickly enough to pass the test. A
 	 * good time is between 10-50 milliseconds.
 	 */
-	private int delay = 50;
+	private final int delay = 50;
 
+	@BeforeEach
 	@Override
-	public void setUp() throws Exception {
+	public void setup() throws Exception {
+		super.setup();
 		manager.startAndWait();
 	}
 
-	public void testPriority() throws Exception {
+	@Test
+	public void testPriority() {
 		Task<?> task = new MockTask( manager );
 
 		// Check default priority.
@@ -35,6 +39,7 @@ public class TaskTest extends TestCase {
 		assertEquals( Task.Priority.LOW, task.getPriority() );
 	}
 
+	@Test
 	public void testSuccess() throws Exception {
 		Task<?> task = new MockTask( manager, 4 * delay );
 		ThreadUtil.pause( delay );
@@ -56,6 +61,7 @@ public class TaskTest extends TestCase {
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 	}
 
+	@Test
 	public void testFailure() throws Exception {
 		Task<?> task = new MockTask( manager, 4 * delay, true );
 		ThreadUtil.pause( delay );

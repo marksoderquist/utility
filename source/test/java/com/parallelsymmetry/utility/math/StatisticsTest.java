@@ -1,10 +1,11 @@
 package com.parallelsymmetry.utility.math;
 
+import com.parallelsymmetry.utility.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class StatisticsTest  {
+public class StatisticsTest extends BaseTestCase {
 
 	@Test
 	public void testMin() {
@@ -52,14 +53,14 @@ public class StatisticsTest  {
 	public void testLeastSquaresSlope() {
 		double[] x = new double[]{ 1, 2, 4, 5, 6, 6, 8, 9, 11, 12 };
 		double[] y = new double[]{ 14, 10, 12, 8, 6, 9, 3, 4, 3, 1 };
-		assertEquals( -1.1064189189189184, Statistics.leastSquaresSlope( x,y ));
+		assertEquals( -1.1064189189189184, Statistics.leastSquaresSlope( x, y ) );
 	}
 
 	@Test
 	public void testLeastSquaresIntercept() {
 		double[] x = new double[]{ 1, 2, 4, 5, 6, 6, 8, 9, 11, 12 };
 		double[] y = new double[]{ 14, 10, 12, 8, 6, 9, 3, 4, 3, 1 };
-		assertEquals( 14.081081081081077, Statistics.leastSquaresIntercept( x,y ));
+		assertEquals( 14.081081081081077, Statistics.leastSquaresIntercept( x, y ) );
 	}
 
 }

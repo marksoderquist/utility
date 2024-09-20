@@ -1,13 +1,15 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.Color;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
 
-import com.parallelsymmetry.utility.ui.ColorScheme;
+import java.awt.*;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ColorSchemeTest extends TestCase {
+public class ColorSchemeTest extends BaseTestCase {
 
+	@Test
 	public void testGetPrimary() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -18,6 +20,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
 
+	@Test
 	public void testGetPrimaryWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -28,6 +31,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
 
+	@Test
 	public void testGetPrimaryWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -38,6 +42,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getPrimary( 1 ) );
 	}
 
+	@Test
 	public void testGetSecondaryA() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -48,6 +53,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
 
+	@Test
 	public void testGetSecondaryAWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -58,6 +64,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
 
+	@Test
 	public void testGetSecondaryAWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -68,6 +75,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryA( 1 ) );
 	}
 
+	@Test
 	public void testGetSecondaryB() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -78,6 +86,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
 	}
 
+	@Test
 	public void testGetSecondaryBWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -88,6 +97,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
 	}
 
+	@Test
 	public void testGetSecondaryBWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 
@@ -98,6 +108,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getSecondaryB( 1 ) );
 	}
 
+	@Test
 	public void testGetComplement() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ff0000" ) );
 
@@ -108,6 +119,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
 	}
 
+	@Test
 	public void testGetComplementWithBlack() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#000000" ) );
 
@@ -118,6 +130,7 @@ public class ColorSchemeTest extends TestCase {
 		assertEquals( Color.decode( "#ffffff" ), scheme.getComplement( 1 ) );
 	}
 
+	@Test
 	public void testGetComplementWithWhite() {
 		ColorScheme scheme = new ColorScheme( Color.decode( "#ffffff" ) );
 

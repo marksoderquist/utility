@@ -18,11 +18,11 @@ public class MockSettingListener implements SettingListener {
 	}
 
 	public List<SettingEvent> getEvents() {
-		return new ArrayList<SettingEvent>( events );
+		return new ArrayList<>( events );
 	}
 
 	public void reset() {
-		events = new CopyOnWriteArrayList<SettingEvent>();
+		events = new CopyOnWriteArrayList<>();
 	}
 
 }

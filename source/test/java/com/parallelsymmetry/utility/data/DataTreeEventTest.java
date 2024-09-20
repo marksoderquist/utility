@@ -2,6 +2,10 @@ package com.parallelsymmetry.utility.data;
 
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.WatchedMockData;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class DataTreeEventTest extends DataTestCase {
 
@@ -18,15 +22,15 @@ public abstract class DataTreeEventTest extends DataTestCase {
 	protected DataEventWatcher childWatcher;
 
 	@Override
-	public void setUp() {
-		super.setUp();
+	public void setup() throws Exception {
+		super.setup();
 		DataNode localGrandparent = createNode( "grandparent" );
 		DataNode localParent = createNode( "parent" );
 		DataNode localChild = createNode( "child" );
 
-		DataEventWatcher localGrandparentWatcher = ( (WatchedMockData)localGrandparent ).getDataEventWatcher();
-		DataEventWatcher localParentWatcher = ( (WatchedMockData)localParent ).getDataEventWatcher();
-		DataEventWatcher localChildWatcher = ( (WatchedMockData)localChild ).getDataEventWatcher();
+		DataEventWatcher localGrandparentWatcher = ((WatchedMockData)localGrandparent).getDataEventWatcher();
+		DataEventWatcher localParentWatcher = ((WatchedMockData)localParent).getDataEventWatcher();
+		DataEventWatcher localChildWatcher = ((WatchedMockData)localChild).getDataEventWatcher();
 
 		assertFalse( localGrandparent.isModified() );
 		assertFalse( localParent.isModified() );
@@ -71,6 +75,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 
 	protected abstract void addChild( DataNode parent, DataNode child );
 
+	@Test
 	public void testInitialState() {
 		assertFalse( grandparent.isModified() );
 		assertFalse( parent.isModified() );
@@ -80,6 +85,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testSetAttributeOnGrandparent() {
 		grandparent.setAttribute( "a", "1" );
 		assertTrue( grandparent.isModified() );
@@ -93,6 +99,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testSetAttributeOnParent() {
 		parent.setAttribute( "a", "1" );
 		assertTrue( grandparent.isModified() );
@@ -109,6 +116,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testSetAttributeOnChild() {
 		child.setAttribute( "a", "1" );
 		assertTrue( grandparent.isModified() );
@@ -128,6 +136,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventState( childWatcher, 2, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
 
+	@Test
 	public void testResetAttributeOnGrandparent() {
 		testSetAttributeOnGrandparent();
 		resetWatchers();
@@ -144,6 +153,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testResetAttributeOnParent() {
 		testSetAttributeOnParent();
 		resetWatchers();
@@ -163,6 +173,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testResetAttributeOnChild() {
 		testSetAttributeOnChild();
 		resetWatchers();
@@ -185,6 +196,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventState( childWatcher, 2, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
 
+	@Test
 	public void testUnmodifyGrandparent() {
 		testSetAttributeOnGrandparent();
 		resetWatchers();
@@ -200,6 +212,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testUnmodifyParent() {
 		testSetAttributeOnParent();
 		resetWatchers();
@@ -217,6 +230,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testUnmodifyChild() {
 		testSetAttributeOnChild();
 		resetWatchers();
@@ -236,6 +250,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventState( childWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
 
+	@Test
 	public void testModifyParentSetGrandparentUnmodified() {
 		testSetAttributeOnParent();
 		resetWatchers();
@@ -253,6 +268,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventCounts( childWatcher, 0, 0, 0 );
 	}
 
+	@Test
 	public void testModifyChildSetGrandparentUnmodified() {
 		testSetAttributeOnChild();
 		resetWatchers();
@@ -272,6 +288,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 		assertEventState( childWatcher, 1, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, child );
 	}
 
+	@Test
 	public void testModifyChildSetParentUnmodified() {
 		testSetAttributeOnChild();
 		resetWatchers();

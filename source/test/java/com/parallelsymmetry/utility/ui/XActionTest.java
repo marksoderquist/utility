@@ -1,19 +1,21 @@
 package com.parallelsymmetry.utility.ui;
 
+import com.parallelsymmetry.utility.BaseTestCase;
+import lombok.Getter;
+import org.junit.jupiter.api.Test;
+
 import java.awt.event.ActionEvent;
 
-import com.parallelsymmetry.utility.ui.SwingUtil;
-import com.parallelsymmetry.utility.ui.XAction;
-import com.parallelsymmetry.utility.ui.XActionHandler;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
+public class XActionTest extends BaseTestCase {
 
-public class XActionTest extends TestCase {
-
+	@Test
 	public void testCreate() throws Exception {
 		assertNotNull( new XAction( "test", "Test" ) );
 	}
 
+	@Test
 	public void testAddHandlerWithNull() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		try {
@@ -25,6 +27,7 @@ public class XActionTest extends TestCase {
 		fail( "IllegalArgumentException not thrown." );
 	}
 
+	@Test
 	public void testAddHandler() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
@@ -40,6 +43,7 @@ public class XActionTest extends TestCase {
 		assertEquals( "test", handler.getEvent().getActionCommand() );
 	}
 
+	@Test
 	public void testAddTwoHandlers() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler1 = new TestActionHandler();
@@ -60,6 +64,7 @@ public class XActionTest extends TestCase {
 		assertNotSame( "other", handler1.getEvent().getActionCommand() );
 	}
 
+	@Test
 	public void testActionEnable() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
@@ -69,6 +74,7 @@ public class XActionTest extends TestCase {
 		assertTrue( action.isEnabled() );
 	}
 
+	@Test
 	public void testActionForceDisabled() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
@@ -78,6 +84,7 @@ public class XActionTest extends TestCase {
 		assertFalse( action.isEnabled() );
 	}
 
+	@Test
 	public void testSetEnabled() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler = new TestActionHandler();
@@ -91,6 +98,7 @@ public class XActionTest extends TestCase {
 		assertTrue( action.isEnabled() );
 	}
 
+	@Test
 	public void testSetEnabledWithTwoHandlers() throws Exception {
 		XAction action = new XAction( "test", "Test" );
 		TestActionHandler handler1 = new TestActionHandler();
@@ -114,6 +122,7 @@ public class XActionTest extends TestCase {
 		assertFalse( action.isEnabled() );
 	}
 
+	@Test
 	public void testGetAcceleratorDisplayText() {
 		assertEquals( XAction.DEFAULT_ALT_PREFIX + "+A", XAction.getAcceleratorDisplayText( "a-a" ) );
 		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+A", XAction.getAcceleratorDisplayText( "c-a" ) );
@@ -133,6 +142,7 @@ public class XActionTest extends TestCase {
 		assertEquals( XAction.DEFAULT_CTRL_PREFIX + "+K " + XAction.DEFAULT_ALT_PREFIX + "+L M", XAction.getAcceleratorDisplayText( "c-k a-l m" ) );
 	}
 
+	@Getter
 	private static class TestActionHandler extends XActionHandler {
 
 		private ActionEvent event;
@@ -140,10 +150,6 @@ public class XActionTest extends TestCase {
 		@Override
 		public void actionPerformed( ActionEvent event ) {
 			this.event = event;
-		}
-
-		public ActionEvent getEvent() {
-			return event;
 		}
 
 	}

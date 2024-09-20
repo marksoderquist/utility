@@ -14,9 +14,9 @@ final class MockTask extends Task<Object> {
 
 	private Task<?> nest;
 
-	private TaskManager manager;
+	private final TaskManager manager;
 
-	private Object object;
+	private final Object object;
 
 	public MockTask( TaskManager manager ) {
 		this( manager, null );

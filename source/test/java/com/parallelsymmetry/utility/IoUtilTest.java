@@ -1,5 +1,7 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
@@ -7,10 +9,11 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class IoUtilTest extends TestCase {
+public class IoUtilTest extends BaseTestCase {
 
+	@Test
 	public void testCopyWithBytes() throws Exception {
 		String content = "This is test content to test save and load methods.";
 		byte[] sourceData = content.getBytes( TextUtil.DEFAULT_CHARSET );
@@ -25,10 +28,11 @@ public class IoUtilTest extends TestCase {
 		assertEquals( sourceData.length, count );
 		assertEquals( sourceData.length, targetData.length );
 		for( int index = 0; index < sourceData.length; index++ ) {
-			assertEquals( sourceData[index], targetData[index] );
+			assertEquals( sourceData[ index ], targetData[ index ] );
 		}
 	}
 
+	@Test
 	public void testCopyWithChars() throws Exception {
 		String content = "This is test content to test save and load methods.";
 
@@ -41,6 +45,7 @@ public class IoUtilTest extends TestCase {
 		assertEquals( content, writer.toString() );
 	}
 
+	@Test
 	public void testSaveAndLoad() throws Exception {
 		String content = "This is test content to test save and load methods.";
 
@@ -51,6 +56,7 @@ public class IoUtilTest extends TestCase {
 		assertEquals( content, IoUtil.load( new ByteArrayInputStream( output.toByteArray() ) ) );
 	}
 
+	@Test
 	public void testSaveAndLoadWithEncoding() throws Exception {
 		String content = "This is test content to test save and load methods.";
 
@@ -61,6 +67,7 @@ public class IoUtilTest extends TestCase {
 		assertEquals( content, IoUtil.load( new ByteArrayInputStream( output.toByteArray() ), TextUtil.DEFAULT_ENCODING ) );
 	}
 
+	@Test
 	public void testLoadAsLines() throws Exception {
 		String content = "This\nis\ntest\ncontent\n.";
 
@@ -75,20 +82,22 @@ public class IoUtilTest extends TestCase {
 		assertEquals( 5, lines.size() );
 	}
 
+	@Test
 	public void testLoadAsLineArray() throws Exception {
 		String content = "This\nis\ntest\ncontent\n.";
 
 		String[] lines = IoUtil.loadAsLineArray( new ByteArrayInputStream( content.getBytes( TextUtil.DEFAULT_CHARSET ) ), TextUtil.DEFAULT_ENCODING );
 
 		int index = 0;
-		assertEquals( "This", lines[index++] );
-		assertEquals( "is", lines[index++] );
-		assertEquals( "test", lines[index++] );
-		assertEquals( "content", lines[index++] );
-		assertEquals( ".", lines[index++] );
+		assertEquals( "This", lines[ index++ ] );
+		assertEquals( "is", lines[ index++ ] );
+		assertEquals( "test", lines[ index++ ] );
+		assertEquals( "content", lines[ index++ ] );
+		assertEquals( ".", lines[ index++ ] );
 		assertEquals( 5, lines.length );
 	}
 
+	@Test
 	public void testLoadAsMap() throws Exception {
 		String content = "a=1\nb=B\nc=3";
 		Map<String, String> map = IoUtil.loadAsMap( new ByteArrayInputStream( content.getBytes( TextUtil.DEFAULT_CHARSET ) ), TextUtil.DEFAULT_ENCODING );

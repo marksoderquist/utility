@@ -1,30 +1,31 @@
 package com.parallelsymmetry.utility.ui;
 
+import com.parallelsymmetry.utility.Accessor;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.parallelsymmetry.utility.Accessor;
-import com.parallelsymmetry.utility.ui.ActionAcceleratorWatcher;
-import com.parallelsymmetry.utility.ui.ActionLibrary;
-import com.parallelsymmetry.utility.ui.IconLibrary;
+public class ActionAcceleratorWatcherTest extends BaseTestCase {
 
-public class ActionAcceleratorWatcherTest extends TestCase {
-
+	@Test
 	public void testMatch() throws Exception {
-		List<String> accelerators = new ArrayList<String>();
+		List<String> accelerators = new ArrayList<>();
 		ActionAcceleratorWatcher watcher = new ActionAcceleratorWatcher( new ActionLibrary( new IconLibrary() ) );
 
-		assertEquals( ActionAcceleratorWatcher.Match.NONE, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, null ) );
-		assertEquals( ActionAcceleratorWatcher.Match.NONE, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-o" ) );
+		assertEquals( ActionAcceleratorWatcher.Match.NONE, Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, null ) );
+		assertEquals( ActionAcceleratorWatcher.Match.NONE, Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-o" ) );
 
 		accelerators.add( "c-n a" );
 		accelerators.add( "c-n b" );
-		assertEquals( ActionAcceleratorWatcher.Match.PARTIAL, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-n" ) );
-		assertEquals( ActionAcceleratorWatcher.Match.EXACT, (ActionAcceleratorWatcher.Match)Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-n a" ) );
+		assertEquals( ActionAcceleratorWatcher.Match.PARTIAL, Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-n" ) );
+		assertEquals( ActionAcceleratorWatcher.Match.EXACT, Accessor.callMethod( watcher, "match", List.class, accelerators, String.class, "c-n a" ) );
 	}
 
+	@Test
 	public void testStartsWith() throws Exception {
 		ActionAcceleratorWatcher watcher = new ActionAcceleratorWatcher( new ActionLibrary( new IconLibrary() ) );
 
@@ -40,4 +41,5 @@ public class ActionAcceleratorWatcherTest extends TestCase {
 
 		assertFalse( (Boolean)Accessor.callMethod( watcher, "sequenceStartsWith", "a-a a-b", "a-a a-c" ) );
 	}
+
 }

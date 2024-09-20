@@ -1,17 +1,18 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.parallelsymmetry.utility.LineParser;
-import com.parallelsymmetry.utility.TextUtil;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
+public class TextUtilTest extends BaseTestCase {
 
-public class TextUtilTest extends TestCase {
-
+	@Test
 	public void testIsEmpty() {
 		assertTrue( TextUtil.isEmpty( null ) );
 		assertTrue( TextUtil.isEmpty( "" ) );
@@ -19,6 +20,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.isEmpty( "." ) );
 	}
 
+	@Test
 	public void testAreEqual() {
 		assertTrue( TextUtil.areEqual( null, null ) );
 		assertTrue( TextUtil.areEqual( "", "" ) );
@@ -31,6 +33,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areEqual( "b", "a" ) );
 	}
 
+	@Test
 	public void testAreEqualIgnoreCase() {
 		assertTrue( TextUtil.areEqualIgnoreCase( null, null ) );
 		assertTrue( TextUtil.areEqualIgnoreCase( "", "" ) );
@@ -44,6 +47,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areEqual( "B", "a" ) );
 	}
 
+	@Test
 	public void testAreSame() {
 		assertTrue( TextUtil.areSame( null, null ) );
 		assertTrue( TextUtil.areSame( "", "" ) );
@@ -59,6 +63,7 @@ public class TextUtilTest extends TestCase {
 		assertFalse( TextUtil.areSame( " ", "a" ) );
 	}
 
+	@Test
 	public void testCompare() {
 		assertEquals( 0, TextUtil.compare( null, null ) );
 		assertEquals( -1, TextUtil.compare( null, "" ) );
@@ -70,6 +75,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, TextUtil.compare( "b", "a" ) );
 	}
 
+	@Test
 	public void testCompareIgnoreCase() {
 		assertEquals( 0, TextUtil.compareIgnoreCase( null, null ) );
 		assertEquals( -1, TextUtil.compareIgnoreCase( null, "" ) );
@@ -84,6 +90,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, TextUtil.compareIgnoreCase( "b", "A" ) );
 	}
 
+	@Test
 	public void testCleanNull() {
 		assertEquals( null, TextUtil.cleanNull( null ) );
 		assertEquals( null, TextUtil.cleanNull( "" ) );
@@ -91,6 +98,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "a", TextUtil.cleanNull( " a " ) );
 	}
 
+	@Test
 	public void testCleanEmpty() {
 		assertEquals( "", TextUtil.cleanEmpty( null ) );
 		assertEquals( "", TextUtil.cleanEmpty( "" ) );
@@ -98,117 +106,129 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "a", TextUtil.cleanEmpty( " a " ) );
 	}
 
+	@Test
 	public void testConcatenate() {
 		assertEquals( "Count: 10", TextUtil.concatenate( "Count: ", 10 ) );
 		assertEquals( "Flag: false", TextUtil.concatenate( "Flag: ", false ) );
 		assertEquals( "Test String", TextUtil.concatenate( "Test", " ", "String" ) );
 	}
 
+	@Test
 	public void testGetMD5Sum() {
 		assertEquals( null, TextUtil.getMD5Sum( null ) );
 		assertEquals( "d41d8cd98f00b204e9800998ecf8427e", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( "" ) ) );
 		assertEquals( "7215ee9c7d9dc229d2921a40e899ec5f", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( " " ) ) );
 		assertEquals( "ae2b1fca515949e5d54fb22b8ed95575", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( "testing" ) ) );
 
-		char[] data = new char[8192];
+		char[] data = new char[ 8192 ];
 		Arrays.fill( data, 't' );
 		assertEquals( "aea6ce04bb28d644a8d4e0bc6a319b54", TextUtil.toHexEncodedString( TextUtil.getMD5Sum( new String( data ) ) ) );
 	}
 
+	@Test
 	public void testToPrintableStringUsingByte() {
-		assertEquals( "Bad conversion", "[0]", TextUtil.toPrintableString( (byte)0 ) );
-		assertEquals( "Bad conversion", "[27]", TextUtil.toPrintableString( (byte)27 ) );
-		assertEquals( "Bad conversion", "[31]", TextUtil.toPrintableString( (byte)31 ) );
-		assertEquals( "Bad conversion", " ", TextUtil.toPrintableString( (byte)32 ) );
-		assertEquals( "Bad conversion", "A", TextUtil.toPrintableString( (byte)65 ) );
-		assertEquals( "Bad conversion", "~", TextUtil.toPrintableString( (byte)126 ) );
-		assertEquals( "Bad conversion", "[127]", TextUtil.toPrintableString( (byte)127 ) );
-		assertEquals( "Bad conversion", "[128]", TextUtil.toPrintableString( (byte)128 ) );
-		assertEquals( "Bad conversion", "[255]", TextUtil.toPrintableString( (byte)255 ) );
-		
-		assertEquals( "Bad conversion", "[255]", TextUtil.toPrintableString( (byte)-1 ) );
-		assertEquals( "Bad conversion", "[0]", TextUtil.toPrintableString( (byte)256 ) );
+		assertEquals( "[0]", TextUtil.toPrintableString( (byte)0 ) );
+		assertEquals( "[27]", TextUtil.toPrintableString( (byte)27 ) );
+		assertEquals( "[31]", TextUtil.toPrintableString( (byte)31 ) );
+		assertEquals( " ", TextUtil.toPrintableString( (byte)32 ) );
+		assertEquals( "A", TextUtil.toPrintableString( (byte)65 ) );
+		assertEquals( "~", TextUtil.toPrintableString( (byte)126 ) );
+		assertEquals( "[127]", TextUtil.toPrintableString( (byte)127 ) );
+		assertEquals( "[128]", TextUtil.toPrintableString( (byte)128 ) );
+		assertEquals( "[255]", TextUtil.toPrintableString( (byte)255 ) );
+
+		assertEquals( "[255]", TextUtil.toPrintableString( (byte)-1 ) );
+		assertEquals( "[0]", TextUtil.toPrintableString( (byte)256 ) );
 	}
 
+	@Test
 	public void testToPrintableString() {
-		assertEquals( "Bad conversion.", "[0]", TextUtil.toPrintableString( (char)0 ) );
-		assertEquals( "Bad conversion.", "[27]", TextUtil.toPrintableString( (char)27 ) );
-		assertEquals( "Bad conversion.", "[31]", TextUtil.toPrintableString( (char)31 ) );
-		assertEquals( "Bad conversion.", " ", TextUtil.toPrintableString( (char)32 ) );
-		assertEquals( "Bad conversion.", "A", TextUtil.toPrintableString( (char)65 ) );
-		assertEquals( "Bad conversion.", "~", TextUtil.toPrintableString( (char)126 ) );
-		assertEquals( "Bad conversion.", "[127]", TextUtil.toPrintableString( (char)127 ) );
-		assertEquals( "Bad conversion.", "[255]", TextUtil.toPrintableString( (char)255 ) );
+		assertEquals( "[0]", TextUtil.toPrintableString( (char)0 ) );
+		assertEquals( "[27]", TextUtil.toPrintableString( (char)27 ) );
+		assertEquals( "[31]", TextUtil.toPrintableString( (char)31 ) );
+		assertEquals( " ", TextUtil.toPrintableString( (char)32 ) );
+		assertEquals( "A", TextUtil.toPrintableString( (char)65 ) );
+		assertEquals( "~", TextUtil.toPrintableString( (char)126 ) );
+		assertEquals( "[127]", TextUtil.toPrintableString( (char)127 ) );
+		assertEquals( "[255]", TextUtil.toPrintableString( (char)255 ) );
 	}
 
+	@Test
 	public void testToHexEncodedStringWithBytes() {
-		Charset encoding = Charset.forName( "ISO-8859-1" );
-		assertEquals( "Bad conversion.", "", TextUtil.toHexEncodedString( "".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "00", TextUtil.toHexEncodedString( "\u0000".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "0001", TextUtil.toHexEncodedString( "\u0000\u0001".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "ff01", TextUtil.toHexEncodedString( "\u00ff\u0001".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "00010f", TextUtil.toHexEncodedString( "\u0000\u0001\u000f".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "74657374", TextUtil.toHexEncodedString( "test".getBytes( encoding ) ) );
+		Charset encoding = StandardCharsets.ISO_8859_1;
+		assertEquals( "", TextUtil.toHexEncodedString( "".getBytes( encoding ) ) );
+		assertEquals( "00", TextUtil.toHexEncodedString( "\u0000".getBytes( encoding ) ) );
+		assertEquals( "0001", TextUtil.toHexEncodedString( "\u0000\u0001".getBytes( encoding ) ) );
+		assertEquals( "ff01", TextUtil.toHexEncodedString( "\u00ff\u0001".getBytes( encoding ) ) );
+		assertEquals( "00010f", TextUtil.toHexEncodedString( "\u0000\u0001\u000f".getBytes( encoding ) ) );
+		assertEquals( "74657374", TextUtil.toHexEncodedString( "test".getBytes( encoding ) ) );
 	}
 
+	@Test
 	public void testHexEncodeWithString() {
-		assertEquals( "Bad conversion.", "", TextUtil.hexEncode( "" ) );
-		assertEquals( "Bad conversion.", "0000", TextUtil.hexEncode( "\u0000" ) );
-		assertEquals( "Bad conversion.", "00000001", TextUtil.hexEncode( "\u0000\u0001" ) );
-		assertEquals( "Bad conversion.", "00000001000f", TextUtil.hexEncode( "\u0000\u0001\u000f" ) );
-		assertEquals( "Bad conversion.", "0074006500730074", TextUtil.hexEncode( "test" ) );
+		assertEquals( "", TextUtil.hexEncode( "" ) );
+		assertEquals( "0000", TextUtil.hexEncode( "\u0000" ) );
+		assertEquals( "00000001", TextUtil.hexEncode( "\u0000\u0001" ) );
+		assertEquals( "00000001000f", TextUtil.hexEncode( "\u0000\u0001\u000f" ) );
+		assertEquals( "0074006500730074", TextUtil.hexEncode( "test" ) );
 	}
 
+	@Test
 	public void testHexDecodeWithString() {
-		assertEquals( "Bad conversion.", null, TextUtil.hexDecode( null ) );
-		assertEquals( "Bad conversion.", "", TextUtil.hexDecode( "" ) );
-		assertEquals( "Bad conversion.", "\u0000", TextUtil.hexDecode( "0000" ) );
-		assertEquals( "Bad conversion.", "\u0000\u0001", TextUtil.hexDecode( "00000001" ) );
-		assertEquals( "Bad conversion.", "\u0000\u0001\u000f", TextUtil.hexDecode( "00000001000f" ) );
-		assertEquals( "Bad conversion.", "test", TextUtil.hexDecode( "0074006500730074" ) );
+		assertEquals( null, TextUtil.hexDecode( null ) );
+		assertEquals( "", TextUtil.hexDecode( "" ) );
+		assertEquals( "\u0000", TextUtil.hexDecode( "0000" ) );
+		assertEquals( "\u0000\u0001", TextUtil.hexDecode( "00000001" ) );
+		assertEquals( "\u0000\u0001\u000f", TextUtil.hexDecode( "00000001000f" ) );
+		assertEquals( "test", TextUtil.hexDecode( "0074006500730074" ) );
 
 	}
 
+	@Test
 	public void testHexByteEncode() {
-		Charset encoding = Charset.forName( "ISO-8859-1" );
-		assertEquals( "Bad conversion.", "", TextUtil.secureHexByteEncode( "".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "00", TextUtil.secureHexByteEncode( "\u0000".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "0001", TextUtil.secureHexByteEncode( "\u0000\u0001".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "ff01", TextUtil.secureHexByteEncode( "\u00ff\u0001".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "00010f", TextUtil.secureHexByteEncode( "\u0000\u0001\u000f".getBytes( encoding ) ) );
-		assertEquals( "Bad conversion.", "74657374", TextUtil.secureHexByteEncode( "test".getBytes( encoding ) ) );
+		Charset encoding = StandardCharsets.ISO_8859_1;
+		assertEquals( "", TextUtil.secureHexByteEncode( "".getBytes( encoding ) ) );
+		assertEquals( "00", TextUtil.secureHexByteEncode( "\u0000".getBytes( encoding ) ) );
+		assertEquals( "0001", TextUtil.secureHexByteEncode( "\u0000\u0001".getBytes( encoding ) ) );
+		assertEquals( "ff01", TextUtil.secureHexByteEncode( "\u00ff\u0001".getBytes( encoding ) ) );
+		assertEquals( "00010f", TextUtil.secureHexByteEncode( "\u0000\u0001\u000f".getBytes( encoding ) ) );
+		assertEquals( "74657374", TextUtil.secureHexByteEncode( "test".getBytes( encoding ) ) );
 	}
 
+	@Test
 	public void testHexByteDecode() {
-		Charset encoding = Charset.forName( "ISO-8859-1" );
-		assertEquals( "Bad conversion.", null, TextUtil.secureHexByteDecode( null ) );
-		assertEquals( "Bad conversion.", "", new String( TextUtil.secureHexByteDecode( "" ), encoding ) );
-		assertEquals( "Bad conversion.", "\u0000", new String( TextUtil.secureHexByteDecode( "00" ), encoding ) );
-		assertEquals( "Bad conversion.", "\u0000\u0001", new String( TextUtil.secureHexByteDecode( "0001" ), encoding ) );
-		assertEquals( "Bad conversion.", "\u00ff\u0001", new String( TextUtil.secureHexByteDecode( "ff01" ), encoding ) );
-		assertEquals( "Bad conversion.", "\u0000\u0001\u000f", new String( TextUtil.secureHexByteDecode( "00010f" ), encoding ) );
-		assertEquals( "Bad conversion.", "test", new String( TextUtil.secureHexByteDecode( "74657374" ), encoding ) );
+		Charset encoding = StandardCharsets.ISO_8859_1;
+		assertEquals( null, TextUtil.secureHexByteDecode( null ) );
+		assertEquals( "", new String( TextUtil.secureHexByteDecode( "" ), encoding ) );
+		assertEquals( "\u0000", new String( TextUtil.secureHexByteDecode( "00" ), encoding ) );
+		assertEquals( "\u0000\u0001", new String( TextUtil.secureHexByteDecode( "0001" ), encoding ) );
+		assertEquals( "\u00ff\u0001", new String( TextUtil.secureHexByteDecode( "ff01" ), encoding ) );
+		assertEquals( "\u0000\u0001\u000f", new String( TextUtil.secureHexByteDecode( "00010f" ), encoding ) );
+		assertEquals( "test", new String( TextUtil.secureHexByteDecode( "74657374" ), encoding ) );
 	}
 
+	@Test
 	public void testHexCharEncode() {
-		assertEquals( "Bad conversion.", null, TextUtil.secureHexEncode( null ) );
-		assertEquals( "Bad conversion.", "", TextUtil.secureHexEncode( "".toCharArray() ) );
-		assertEquals( "Bad conversion.", "0000", TextUtil.secureHexEncode( "\u0000".toCharArray() ) );
-		assertEquals( "Bad conversion.", "00000001", TextUtil.secureHexEncode( "\u0000\u0001".toCharArray() ) );
-		assertEquals( "Bad conversion.", "00000001000f", TextUtil.secureHexEncode( "\u0000\u0001\u000f".toCharArray() ) );
-		assertEquals( "Bad conversion.", "0074006500730074", TextUtil.secureHexEncode( "test".toCharArray() ) );
+		assertEquals( null, TextUtil.secureHexEncode( null ) );
+		assertEquals( "", TextUtil.secureHexEncode( "".toCharArray() ) );
+		assertEquals( "0000", TextUtil.secureHexEncode( "\u0000".toCharArray() ) );
+		assertEquals( "00000001", TextUtil.secureHexEncode( "\u0000\u0001".toCharArray() ) );
+		assertEquals( "00000001000f", TextUtil.secureHexEncode( "\u0000\u0001\u000f".toCharArray() ) );
+		assertEquals( "0074006500730074", TextUtil.secureHexEncode( "test".toCharArray() ) );
 	}
 
+	@Test
 	public void testHexCharDecode() {
-		assertEquals( "Bad conversion.", null, TextUtil.secureHexDecode( null ) );
-		assertEquals( "Bad conversion.", "", new String( TextUtil.secureHexDecode( "" ) ) );
-		assertEquals( "Bad conversion.", "\u0000", new String( TextUtil.secureHexDecode( "0000" ) ) );
-		assertEquals( "Bad conversion.", "\u0000\u0001", new String( TextUtil.secureHexDecode( "00000001" ) ) );
-		assertEquals( "Bad conversion.", "\u0000\u0001\u000f", new String( TextUtil.secureHexDecode( "00000001000f" ) ) );
-		assertEquals( "Bad conversion.", "test", new String( TextUtil.secureHexDecode( "0074006500730074" ) ) );
+		assertEquals( null, TextUtil.secureHexDecode( null ) );
+		assertEquals( "", new String( TextUtil.secureHexDecode( "" ) ) );
+		assertEquals( "\u0000", new String( TextUtil.secureHexDecode( "0000" ) ) );
+		assertEquals( "\u0000\u0001", new String( TextUtil.secureHexDecode( "00000001" ) ) );
+		assertEquals( "\u0000\u0001\u000f", new String( TextUtil.secureHexDecode( "00000001000f" ) ) );
+		assertEquals( "test", new String( TextUtil.secureHexDecode( "0074006500730074" ) ) );
 	}
 
-	public void testIsInteger() throws Exception {
+	@Test
+	public void testIsInteger() {
 		assertEquals( false, TextUtil.isInteger( null ) );
 		assertEquals( false, TextUtil.isInteger( "" ) );
 
@@ -222,7 +242,8 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isInteger( "-2147483648" ) );
 	}
 
-	public void testIsLong() throws Exception {
+	@Test
+	public void testIsLong() {
 		assertEquals( false, TextUtil.isLong( null ) );
 		assertEquals( false, TextUtil.isLong( "" ) );
 
@@ -236,7 +257,8 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isLong( "-9223372036854775808" ) );
 	}
 
-	public void testIsFloat() throws Exception {
+	@Test
+	public void testIsFloat() {
 		assertEquals( false, TextUtil.isFloat( null ) );
 		assertEquals( false, TextUtil.isFloat( "" ) );
 
@@ -248,7 +270,8 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isFloat( "-1e-10" ) );
 	}
 
-	public void testIsDouble() throws Exception {
+	@Test
+	public void testIsDouble() {
 		assertEquals( false, TextUtil.isDouble( null ) );
 		assertEquals( false, TextUtil.isDouble( "" ) );
 
@@ -260,6 +283,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( true, TextUtil.isDouble( "-1e-10" ) );
 	}
 
+	@Test
 	public void testCapitalize() {
 		assertEquals( null, TextUtil.capitalize( null ) );
 		assertEquals( "", TextUtil.capitalize( "" ) );
@@ -267,6 +291,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "New brunswick", TextUtil.capitalize( "new brunswick" ) );
 	}
 
+	@Test
 	public void testJustify() {
 		assertEquals( "Incorrect format.", "        ", TextUtil.justify( TextUtil.LEFT, "", 8 ) );
 		assertEquals( "Incorrect format.", "X       ", TextUtil.justify( TextUtil.LEFT, "X", 8 ) );
@@ -277,6 +302,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect format.", "       X", TextUtil.justify( TextUtil.RIGHT, "X", 8 ) );
 	}
 
+	@Test
 	public void testJustifyWithChar() {
 		assertEquals( "Incorrect format.", "........", TextUtil.justify( TextUtil.LEFT, "", 8, '.' ) );
 		assertEquals( "Incorrect format.", "X.......", TextUtil.justify( TextUtil.LEFT, "X", 8, '.' ) );
@@ -287,6 +313,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect format.", ".......X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.' ) );
 	}
 
+	@Test
 	public void testJustifyWithCharAndPad() {
 		assertEquals( "Incorrect format.", "  ......", TextUtil.justify( TextUtil.LEFT, "", 8, '.', 2 ) );
 		assertEquals( "Incorrect format.", "X  .....", TextUtil.justify( TextUtil.LEFT, "X", 8, '.', 2 ) );
@@ -297,6 +324,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect format.", ".....  X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.', 2 ) );
 	}
 
+	@Test
 	public void testPad() {
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( -1 ) );
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( 0 ) );
@@ -305,6 +333,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "        ", TextUtil.pad( 8 ) );
 	}
 
+	@Test
 	public void testPadWithChar() {
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( -1, '.' ) );
 		assertEquals( "Incorrect pad.", "", TextUtil.pad( 0, '.' ) );
@@ -313,6 +342,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Incorrect pad.", "--------", TextUtil.pad( 8, '-' ) );
 	}
 
+	@Test
 	public void testGetLines() {
 		String test = "This\nis\na\ntest.";
 		List<String> lines = TextUtil.getLines( test );
@@ -323,6 +353,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "test.", lines.get( 3 ) );
 	}
 
+	@Test
 	public void testGetLineCount() {
 		assertEquals( 0, TextUtil.getLineCount( null ) );
 		assertEquals( 1, TextUtil.getLineCount( "" ) );
@@ -332,8 +363,9 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 2, TextUtil.getLineCount( " \r\n " ) );
 	}
 
+	@Test
 	public void testCountLines() {
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		for( int index = 0; index < 5; index++ ) {
 			lines.add( "Test line " + index );
 		}
@@ -345,8 +377,9 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, TextUtil.countLines( lines, ".*4" ) );
 	}
 
+	@Test
 	public void testFindLine() {
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		for( int index = 0; index < 5; index++ ) {
 			lines.add( "Test line " + index );
 		}
@@ -359,8 +392,9 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "Test line 4", TextUtil.findLine( lines, ".*4" ) );
 	}
 
+	@Test
 	public void testFindLines() {
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		for( int index = 0; index < 5; index++ ) {
 			lines.add( "Test line " + index );
 		}
@@ -383,8 +417,9 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 1, result.size() );
 	}
 
+	@Test
 	public void testFindLineIndex() {
-		List<String> lines = new ArrayList<String>();
+		List<String> lines = new ArrayList<>();
 		for( int index = 0; index < 5; index++ ) {
 			lines.add( "Test line " + index );
 		}
@@ -397,6 +432,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( 4, TextUtil.findLineIndex( lines, ".*4" ) );
 	}
 
+	@Test
 	public void testPrepend() {
 		assertEquals( null, TextUtil.prepend( null, "X" ) );
 		assertEquals( "A", TextUtil.prepend( "A", null ) );
@@ -407,6 +443,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "XF\nXG\nX", TextUtil.prepend( "F\nG\n", "X" ) );
 	}
 
+	@Test
 	public void testAppend() {
 		assertEquals( null, TextUtil.append( null, "X" ) );
 		assertEquals( "A", TextUtil.append( "A", null ) );
@@ -417,6 +454,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "FX\nGX\nX", TextUtil.append( "F\nG\n", "X" ) );
 	}
 
+	@Test
 	public void testReline() {
 		int length = 40;
 
@@ -440,78 +478,85 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "id est laborum.", parser.next() );
 	}
 
+	@Test
 	public void testArrayToString() {
-		Integer[] array = new Integer[5];
+		Integer[] array = new Integer[ 5 ];
 
-		array[0] = 0;
-		array[1] = 1;
-		array[2] = 2;
-		array[3] = 3;
-		array[4] = 4;
+		array[ 0 ] = 0;
+		array[ 1 ] = 1;
+		array[ 2 ] = 2;
+		array[ 3 ] = 3;
+		array[ 4 ] = 4;
 
 		assertEquals( "[0] [1] [2] [3] [4]", TextUtil.toString( array ) );
 	}
 
+	@Test
 	public void testArrayToStringWithOffset() {
-		Integer[] array = new Integer[5];
+		Integer[] array = new Integer[ 5 ];
 
-		array[0] = 0;
-		array[1] = 1;
-		array[2] = 2;
-		array[3] = 3;
-		array[4] = 4;
+		array[ 0 ] = 0;
+		array[ 1 ] = 1;
+		array[ 2 ] = 2;
+		array[ 3 ] = 3;
+		array[ 4 ] = 4;
 
 		assertEquals( "[2] [3] [4]", TextUtil.toString( array, 2 ) );
 	}
 
+	@Test
 	public void testArrayToStringWithOffsetAndLength() {
-		Integer[] array = new Integer[5];
+		Integer[] array = new Integer[ 5 ];
 
-		array[0] = 0;
-		array[1] = 1;
-		array[2] = 2;
-		array[3] = 3;
-		array[4] = 4;
+		array[ 0 ] = 0;
+		array[ 1 ] = 1;
+		array[ 2 ] = 2;
+		array[ 3 ] = 3;
+		array[ 4 ] = 4;
 
 		assertEquals( "[1] [2] [3]", TextUtil.toString( array, 1, 3 ) );
 	}
 
+	@Test
 	public void testArrayToStringWithDelimiter() {
-		Integer[] array = new Integer[5];
+		Integer[] array = new Integer[ 5 ];
 
-		array[0] = 0;
-		array[1] = 1;
-		array[2] = 2;
-		array[3] = 3;
-		array[4] = 4;
+		array[ 0 ] = 0;
+		array[ 1 ] = 1;
+		array[ 2 ] = 2;
+		array[ 3 ] = 3;
+		array[ 4 ] = 4;
 
 		assertEquals( "0_1_2_3_4", TextUtil.toString( array, "_" ) );
 	}
 
+	@Test
 	public void testArrayToStringWithDelimiterAndOffset() {
-		Integer[] array = new Integer[5];
+		Integer[] array = new Integer[ 5 ];
 
-		array[0] = 0;
-		array[1] = 1;
-		array[2] = 2;
-		array[3] = 3;
-		array[4] = 4;
+		array[ 0 ] = 0;
+		array[ 1 ] = 1;
+		array[ 2 ] = 2;
+		array[ 3 ] = 3;
+		array[ 4 ] = 4;
 
 		assertEquals( "2_3_4", TextUtil.toString( array, "_", 2 ) );
 	}
 
+	@Test
 	public void testArrayToStringWithDelimiterLengthAndOffset() {
-		Integer[] array = new Integer[5];
+		Integer[] array = new Integer[ 5 ];
 
-		array[0] = 0;
-		array[1] = 1;
-		array[2] = 2;
-		array[3] = 3;
-		array[4] = 4;
+		array[ 0 ] = 0;
+		array[ 1 ] = 1;
+		array[ 2 ] = 2;
+		array[ 3 ] = 3;
+		array[ 4 ] = 4;
 
 		assertEquals( "1_2_3", TextUtil.toString( array, "_", 1, 3 ) );
 	}
 
+	@Test
 	public void testListToString() {
 		List<Integer> list = new ArrayList<Integer>();
 
@@ -524,6 +569,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "[0] [1] [2] [3] [4]", TextUtil.toString( list ) );
 	}
 
+	@Test
 	public void testListToStringWithDelimiter() {
 		List<Integer> list = new ArrayList<Integer>();
 
@@ -536,6 +582,7 @@ public class TextUtilTest extends TestCase {
 		assertEquals( "0 1 2 3 4", TextUtil.toString( list, " " ) );
 	}
 
+	@Test
 	public void testListToStringWithPrefixAndSuffix() {
 		List<Integer> list = new ArrayList<Integer>();
 

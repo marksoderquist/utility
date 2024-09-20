@@ -1,11 +1,15 @@
 package com.parallelsymmetry.utility.setting;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import java.util.prefs.Preferences;
 
 public class PreferencesSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
+	@BeforeEach
 	@Override
-	public void setUp() throws Exception {
+	public void setup() throws Exception {
+		super.setup();
 		Preferences preferences = Preferences.userNodeForPackage( getClass() );
 
 		for( String name : preferences.childrenNames() ) {

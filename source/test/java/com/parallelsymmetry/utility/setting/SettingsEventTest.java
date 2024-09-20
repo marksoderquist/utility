@@ -1,17 +1,17 @@
 package com.parallelsymmetry.utility.setting;
 
+import com.parallelsymmetry.utility.BaseTestCase;
+import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
-import com.parallelsymmetry.utility.setting.SettingEvent;
-import com.parallelsymmetry.utility.setting.SettingListener;
-import com.parallelsymmetry.utility.setting.Settings;
+public class SettingsEventTest extends BaseTestCase {
 
-public class SettingsEventTest extends TestCase {
-
+	@Test
 	public void testSettingChanged() {
 		Settings settings = new Settings();
 		MockWritableSettingsProvider provider = new MockWritableSettingsProvider( "changed.events" );

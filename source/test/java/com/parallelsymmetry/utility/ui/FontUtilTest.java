@@ -1,20 +1,21 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.Font;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
+
+import java.awt.*;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+public class FontUtilTest extends BaseTestCase {
 
-import com.parallelsymmetry.utility.ui.FontUtil;
-
-public class FontUtilTest extends TestCase {
-
-	private Font baseFont;
+	private final Font baseFont;
 
 	public FontUtilTest() throws Exception {
 		InputStream input = getClass().getResourceAsStream( "/fonts/ConsolaMono.ttf" );
+		assertNotNull( input );
 		baseFont = Font.createFont( Font.TRUETYPE_FONT, input );
 	}
 

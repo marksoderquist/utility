@@ -1,22 +1,28 @@
 package com.parallelsymmetry.utility.setting;
 
+import com.parallelsymmetry.utility.FileUtil;
+import com.parallelsymmetry.utility.TextUtil;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.parallelsymmetry.utility.FileUtil;
-import com.parallelsymmetry.utility.TextUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PersistentMapSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
-	private File folder = new File( "target/test/java" );
+	private final File folder = new File( "target/test/java" );
 
 	private Map<String, String> map;
 
+	@BeforeEach
 	@Override
-	public void setUp() {
-		map = new HashMap<String, String>();
+	public void setup() {
+		map = new HashMap<>();
 		map.put( "/key1", "value1" );
 		map.put( "/key2", "value2" );
 		map.put( "/key3", "value3" );
@@ -26,22 +32,23 @@ public class PersistentMapSettingsProviderStandardTest extends SettingsProviderS
 		provider = new PersistentMapSettingsProvider( map, new File( folder, "persistent.map.settings" ) );
 	}
 
+	@Test
 	public void testSync() throws Exception {
 		// Define the settings file.
 		File syncFile = new File( folder, "persistent.map.sync.settings" );
-	
+
 		// Cleanup a previous test if it exists.
 		if( syncFile.exists() ) assertTrue( syncFile.delete() );
-	
+
 		// Create an existing file.
 		FileUtil.save( "/key1=value1\n/key2=value2\n/key3=value3\n/path/subkey1=subvalue1\n/path/subkey2=subvalue2\n/path/subkey3=subvalue3\n", syncFile, TextUtil.DEFAULT_ENCODING );
 		assertTrue( syncFile.exists() );
-	
+
 		PersistentMapSettingsProvider provider = new PersistentMapSettingsProvider( syncFile );
 		provider.sync( "/" );
-	
+
 		Map<String, String> map = provider.getStore();
-	
+
 		assertEquals( 6, map.size() );
 		assertEquals( "value1", provider.get( "/key1" ) );
 		assertEquals( "value2", provider.get( "/key2" ) );
@@ -51,6 +58,7 @@ public class PersistentMapSettingsProviderStandardTest extends SettingsProviderS
 		assertEquals( "subvalue3", provider.get( "/path/subkey3" ) );
 	}
 
+	@Test
 	public void testFlush() throws Exception {
 		// Define the settings file.
 		File flushFile = new File( folder, "persistent.map.flush.settings" );
@@ -75,6 +83,7 @@ public class PersistentMapSettingsProviderStandardTest extends SettingsProviderS
 		assertTrue( lines.contains( "/path/subkey3=subvalue3" ) );
 	}
 
+	@Test
 	public void testFlushPartial() throws Exception {
 		// Define the settings file.
 		File flushFile = new File( folder, "persistent.map.flush.settings" );
@@ -96,6 +105,7 @@ public class PersistentMapSettingsProviderStandardTest extends SettingsProviderS
 		assertTrue( lines.contains( "/path/subkey3=subvalue3" ) );
 	}
 
+	@Test
 	public void testFlushPartialWithExisting() throws Exception {
 		// Define the settings file.
 		File flushFile = new File( folder, "persistent.map.flush.settings" );

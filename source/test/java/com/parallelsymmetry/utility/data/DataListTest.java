@@ -1,13 +1,14 @@
 package com.parallelsymmetry.utility.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Test;
-
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataListTest extends DataTestCase {
 
@@ -24,9 +25,9 @@ public class DataListTest extends DataTestCase {
 		MockDataList child1 = new MockDataList();
 		MockDataList child2 = new MockDataList();
 
-		MockDataList[] children = new MockDataList[2];
-		children[0] = child1;
-		children[1] = child2;
+		MockDataList[] children = new MockDataList[ 2 ];
+		children[ 0 ] = child1;
+		children[ 1 ] = child2;
 
 		MockDataList parent = new MockDataList( children );
 
@@ -96,13 +97,13 @@ public class DataListTest extends DataTestCase {
 		Object value = "value";
 
 		MockDataList node = new MockDataList();
-		assertNull( "Missing attribute should be null.", node.getAttribute( key ) );
+		assertNull( node.getAttribute( key ), "Missing attribute should be null." );
 
 		node.setAttribute( key, value );
-		assertEquals( "Attribute value incorrect", value, node.getAttribute( key ) );
+		assertEquals( value, node.getAttribute( key ), "Attribute value incorrect" );
 
 		node.setAttribute( key, null );
-		assertNull( "Removed attribute should be null.", node.getAttribute( key ) );
+		assertNull( node.getAttribute( key ), "Removed attribute should be null." );
 	}
 
 	@Test
@@ -112,7 +113,7 @@ public class DataListTest extends DataTestCase {
 		MockDataList node = new MockDataList();
 		node.setAttribute( key, value );
 		Object check = node.getAttribute( key );
-		assertEquals( "Object value not equal", value, check );
+		assertEquals( value, check, "Object value not equal" );
 	}
 
 	@Test
@@ -121,8 +122,8 @@ public class DataListTest extends DataTestCase {
 		String value = "value";
 		MockDataList node = new MockDataList();
 		node.setAttribute( key, value );
-		String check = (String)node.getAttribute( key );
-		assertEquals( "String value not equal", value, check );
+		String check = node.getAttribute( key );
+		assertEquals( value, check, "String value not equal" );
 	}
 
 	@Test
@@ -131,8 +132,8 @@ public class DataListTest extends DataTestCase {
 		boolean value = true;
 		MockDataList node = new MockDataList();
 		node.setAttribute( key, value );
-		boolean check = (Boolean)node.getAttribute( key );
-		assertEquals( "Integer value not equal", value, check );
+		boolean check = node.getAttribute( key );
+		assertEquals( value, check, "Boolean value not equal" );
 	}
 
 	@Test
@@ -141,8 +142,8 @@ public class DataListTest extends DataTestCase {
 		int value = 0;
 		MockDataList node = new MockDataList();
 		node.setAttribute( key, value );
-		int check = (Integer)node.getAttribute( key );
-		assertEquals( "Integer value not equal", value, check );
+		int check = node.getAttribute( key );
+		assertEquals( value, check, "Integer value not equal" );
 	}
 
 	@Test
@@ -387,7 +388,7 @@ public class DataListTest extends DataTestCase {
 	@Test
 	public void testRemoveAll() {
 		MockDataList list = new MockDataList();
-		List<DataNode> nodes = new ArrayList<DataNode>();
+		List<DataNode> nodes = new ArrayList<>();
 		MockDataNode node0 = new MockDataNode( "0" );
 		MockDataNode node1 = new MockDataNode( "1" );
 		MockDataNode node2 = new MockDataNode( "2" );
@@ -397,7 +398,7 @@ public class DataListTest extends DataTestCase {
 		nodes.add( node2 );
 		list.addAll( nodes );
 
-		List<DataNode> remove = new ArrayList<DataNode>();
+		List<DataNode> remove = new ArrayList<>();
 		remove.add( node0 );
 		remove.add( node2 );
 
@@ -410,7 +411,7 @@ public class DataListTest extends DataTestCase {
 	@Test
 	public void testToArray() {
 		MockDataList node = new MockDataList();
-		MockDataList[] array = new MockDataList[0];
+		MockDataList[] array = new MockDataList[ 0 ];
 		assertEquals( array, node.toArray( array ) );
 
 		node.add( new MockDataList() );
@@ -693,10 +694,10 @@ public class DataListTest extends DataTestCase {
 
 		node.setAttribute( "list", list );
 		node.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
 
 		list.add( child );
-		assertTrue( "Addition of the child from the list should modify the node.", node.isModified() );
+		assertTrue( node.isModified(), "Addition of the child from the list should modify the node." );
 	}
 
 	@Test
@@ -707,13 +708,13 @@ public class DataListTest extends DataTestCase {
 
 		node.setAttribute( "list", list );
 		node.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
 
 		list.add( child );
-		assertTrue( "Addition of the child from the list should modify the node.", node.isModified() );
+		assertTrue( node.isModified(), "Addition of the child from the list should modify the node." );
 
 		list.remove( child );
-		assertFalse( "Removal of the child from the list should unmodify the node.", node.isModified() );
+		assertFalse( node.isModified(), "Removal of the child from the list should unmodify the node." );
 	}
 
 	@Test
@@ -725,7 +726,7 @@ public class DataListTest extends DataTestCase {
 		node.setAttribute( "list", list );
 		list.add( child );
 		node.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
 
 		child.setAttribute( "key", "value" );
 		assertTrue( child.isModified() );
@@ -733,7 +734,8 @@ public class DataListTest extends DataTestCase {
 		assertTrue( node.isModified() );
 	}
 
-	public void testDataChangedEventTriggering() throws Exception {
+	@Test
+	public void testDataChangedEventTriggering() {
 		MockDataList parent = new MockDataList();
 		MockDataNode child = new MockDataNode();
 		DataEventWatcher handler = parent.getDataEventWatcher();
@@ -758,7 +760,7 @@ public class DataListTest extends DataTestCase {
 	}
 
 	@Test
-	public void testDataChangedEventFiredFromChildAttributeNode() throws Exception {
+	public void testDataChangedEventFiredFromChildAttributeNode() {
 		MockDataList node = new MockDataList();
 		MockDataList attribute = new MockDataList();
 		DataEventWatcher watcher = node.getDataEventWatcher();
@@ -794,16 +796,16 @@ public class DataListTest extends DataTestCase {
 		node.setModified( false );
 		watcher.reset();
 
-		assertFalse( "The node should not be modified.", node.isModified() );
-		assertFalse( "The list should not be modified.", list.isModified() );
-		assertFalse( "The child should not be modified.", child.isModified() );
-		assertFalse( "The attribute should not be modified.", attribute.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
+		assertFalse( list.isModified(), "The list should not be modified." );
+		assertFalse( child.isModified(), "The child should not be modified." );
+		assertFalse( attribute.isModified(), "The attribute should not be modified." );
 
 		attribute.setAttribute( "key", "value1" );
-		assertTrue( "The node should be modified.", node.isModified() );
-		assertTrue( "The list should be modified.", list.isModified() );
-		assertTrue( "The child should be modified.", child.isModified() );
-		assertTrue( "The attribute should be modified.", attribute.isModified() );
+		assertTrue( node.isModified(), "The node should be modified." );
+		assertTrue( list.isModified(), "The list should be modified." );
+		assertTrue( child.isModified(), "The child should be modified." );
+		assertTrue( attribute.isModified(), "The attribute should be modified." );
 		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
 		watcher.reset();
 
@@ -816,10 +818,10 @@ public class DataListTest extends DataTestCase {
 		watcher.reset();
 
 		attribute.setModified( false );
-		assertFalse( "The attribute should not be modified.", attribute.isModified() );
-		assertFalse( "The child should not be modified.", child.isModified() );
-		assertFalse( "The list should not be modified.", list.isModified() );
-		assertFalse( "The node should not be modified.", node.isModified() );
+		assertFalse( attribute.isModified(), "The attribute should not be modified." );
+		assertFalse( child.isModified(), "The child should not be modified." );
+		assertFalse( list.isModified(), "The list should not be modified." );
+		assertFalse( node.isModified(), "The node should not be modified." );
 		assertEventCounts( watcher, 1, 1, 0, 0, 0 );
 		watcher.reset();
 	}
@@ -859,8 +861,8 @@ public class DataListTest extends DataTestCase {
 
 		node.setModified( false );
 		list.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
-		assertFalse( "The list should not be modified.", list.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
+		assertFalse( list.isModified(), "The list should not be modified." );
 
 		node.setAttribute( "list", list );
 		assertEventCounts( watcher, 1, 1, 1, 0, 0 );
@@ -880,8 +882,8 @@ public class DataListTest extends DataTestCase {
 
 		node.setAttribute( "list", list );
 		node.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
-		assertFalse( "The list should not be modified.", list.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
+		assertFalse( list.isModified(), "The list should not be modified." );
 		watcher.reset();
 
 		list.add( child );
@@ -904,9 +906,9 @@ public class DataListTest extends DataTestCase {
 		node.add( child1 );
 		child1.setAttribute( "list", list );
 		node.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
-		assertFalse( "The child1 should not be modified.", child1.isModified() );
-		assertFalse( "The list should not be modified.", list.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
+		assertFalse( child1.isModified(), "The child1 should not be modified." );
+		assertFalse( list.isModified(), "The list should not be modified." );
 		watcher.reset();
 
 		list.add( child2 );
@@ -925,7 +927,7 @@ public class DataListTest extends DataTestCase {
 		DataEventWatcher watcher = node.getDataEventWatcher();
 
 		node.setModified( false );
-		assertFalse( "The node should not be modified.", node.isModified() );
+		assertFalse( node.isModified(), "The node should not be modified." );
 		watcher.reset();
 
 		node.add( child );
@@ -939,10 +941,10 @@ public class DataListTest extends DataTestCase {
 
 	@Test
 	public void testEquals() {
-		MockDataList node1 = null;
-		MockDataList node2 = null;
-		MockDataNode child1 = null;
-		MockDataNode child2 = null;
+		MockDataList node1;
+		MockDataList node2;
+		MockDataNode child1;
+		MockDataNode child2;
 
 		node1 = new MockDataList();
 		node2 = new MockDataList();
@@ -975,10 +977,10 @@ public class DataListTest extends DataTestCase {
 
 	@Test
 	public void testEqualsUsingChildren() {
-		MockDataList node1 = null;
-		MockDataList node2 = null;
-		MockDataNode child1 = null;
-		MockDataNode child2 = null;
+		MockDataList node1;
+		MockDataList node2;
+		MockDataNode child1;
+		MockDataNode child2;
 
 		node1 = new MockDataList();
 		node2 = new MockDataList();
@@ -1011,10 +1013,10 @@ public class DataListTest extends DataTestCase {
 
 	@Test
 	public void testEqualsUsingAttributesAndChildren() {
-		MockDataList node1 = null;
-		MockDataList node2 = null;
-		MockDataNode child1 = null;
-		MockDataNode child2 = null;
+		MockDataList node1;
+		MockDataList node2;
+		MockDataNode child1;
+		MockDataNode child2;
 
 		node1 = new MockDataList();
 		node2 = new MockDataList();

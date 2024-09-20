@@ -1,24 +1,20 @@
 package com.parallelsymmetry.utility;
 
 import com.parallelsymmetry.utility.log.Log;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import junit.framework.TestCase;
-
-public abstract class BaseTestCase extends TestCase {
+public abstract class BaseTestCase {
 
 	public BaseTestCase() {}
 
-	public BaseTestCase( String name ) {
-		super( name );
-	}
-
-	@Override
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void setup() throws Exception {
 		Log.setLevel( Log.NONE );
 	}
 
-	@Override
-	public void tearDown() throws Exception {
+	@AfterEach
+	public void teardown() {
 		Log.setLevel( Log.NONE );
 	}
 

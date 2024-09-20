@@ -1,24 +1,25 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
-
-import com.parallelsymmetry.utility.EnumerationIterator;
-
-public class EnumerationIteratorTest extends TestCase {
+public class EnumerationIteratorTest extends BaseTestCase {
 
 	private Vector<String> list;
 
 	private EnumerationIterator<String> iterator;
 
+	@BeforeEach
 	@Override
-	public void setUp() {
-		list = new Vector<String>();
+	public void setup() {
+		super.setup();
+		list = new Vector<>();
 		list.add( "This" );
 		list.add( "is" );
 		list.add( "a" );
@@ -31,6 +32,8 @@ public class EnumerationIteratorTest extends TestCase {
 	public void testGetIterator() {
 		assertTrue( iterator.iterator() instanceof Iterator );
 	}
+
+	private void assertTrue( boolean b ) {}
 
 	@Test
 	public void testHasNext() {

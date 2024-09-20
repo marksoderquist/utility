@@ -1,20 +1,22 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 
-import com.parallelsymmetry.utility.FileUtil;
-import com.parallelsymmetry.utility.HashUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import junit.framework.TestCase;
+public class HashUtilTest extends BaseTestCase {
 
-public class HashUtilTest extends TestCase {
-
+	@Test
 	public void testHash() {
 		assertNull( HashUtil.hash( (String)null ) );
 		assertEquals( "da39a3ee5e6b4b0d3255bfef95601890afd80709", HashUtil.hash( "" ) );
 		assertEquals( "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3", HashUtil.hash( "test" ) );
 	}
 
+	@Test
 	public void testHashWithFile() throws Exception {
 		assertNull( HashUtil.hash( (File)null ) );
 		File empty = File.createTempFile( "HashUtil", "test" );
@@ -25,6 +27,7 @@ public class HashUtilTest extends TestCase {
 		assertEquals( "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3", HashUtil.hash( test ) );
 	}
 
+	@Test
 	public void testHashUsingKeccak() {
 		assertNull( HashUtil.hash( (String)null ) );
 		assertEquals( "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470", HashUtil.hash( "", HashUtil.KECCAK ) );

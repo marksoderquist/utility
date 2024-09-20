@@ -2,6 +2,7 @@ package com.parallelsymmetry.utility.setting;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -9,8 +10,10 @@ import com.parallelsymmetry.utility.Descriptor;
 
 public class DescriptorSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
+	@BeforeEach
 	@Override
-	public void setUp() throws Exception {
+	public void setup() throws Exception {
+		super.setup();
 		Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
 		Element root = document.createElement( "settings" );

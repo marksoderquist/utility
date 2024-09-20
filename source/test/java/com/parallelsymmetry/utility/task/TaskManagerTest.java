@@ -1,33 +1,36 @@
 package com.parallelsymmetry.utility.task;
 
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.parallelsymmetry.utility.task.Task;
-import com.parallelsymmetry.utility.task.TaskEvent;
-import com.parallelsymmetry.utility.task.TaskListener;
-import com.parallelsymmetry.utility.task.TaskManager;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
-
-public class TaskManagerTest extends TestCase {
+public class TaskManagerTest extends BaseTestCase {
 
 	private TaskManager manager;
 
+	@BeforeEach
 	@Override
-	public void setUp() {
+	public void setup() {
+		super.setup();
 		manager = new TaskManager();
 	}
 
+	@Test
 	public void testStartAndWait() throws Exception {
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
 		manager.stopAndWait();
 	}
 
+	@Test
 	public void testStopAndWait() throws Exception {
 		manager.startAndWait();
 		assertTrue( manager.isRunning() );
@@ -35,6 +38,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( manager.isRunning() );
 	}
 
+	@Test
 	public void testStartAndStop() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -45,6 +49,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( manager.isRunning() );
 	}
 
+	@Test
 	public void testRestart() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -61,6 +66,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( manager.isRunning() );
 	}
 
+	@Test
 	public void testStopBeforeStart() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -68,6 +74,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( manager.isRunning() );
 	}
 
+	@Test
 	public void testSubmitWithNull() throws Exception {
 		assertFalse( manager.isRunning() );
 		manager.startAndWait();
@@ -81,6 +88,7 @@ public class TaskManagerTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testSubmitNullResult() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -99,6 +107,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	@Test
 	public void testSubmitWithResult() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -118,6 +127,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	@Test
 	public void testFailedTask() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -141,6 +151,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	@Test
 	public void testSubmitBeforeStart() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -162,6 +173,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	@Test
 	public void testUsingTaskAsFuture() throws Exception {
 		assertFalse( manager.isRunning() );
 
@@ -181,6 +193,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	@Test
 	public void testNestedTask() throws Exception {
 		manager.setThreadCount( 1 );
 		manager.startAndWait();
@@ -201,6 +214,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( task.isCancelled() );
 	}
 
+	@Test
 	public void testNestedTaskWithException() throws Exception {
 		manager.setThreadCount( 1 );
 		manager.startAndWait();
@@ -238,6 +252,7 @@ public class TaskManagerTest extends TestCase {
 		assertFalse( nestedTask.isCancelled() );
 	}
 
+	@Test
 	public void testTaskListener() throws Exception {
 		manager.setThreadCount( 1 );
 		manager.startAndWait();
@@ -268,7 +283,7 @@ public class TaskManagerTest extends TestCase {
 		assertEquals( TaskEvent.Type.TASK_COMPLETED, listener.events.get( index++ ).getType() );
 	}
 
-	private class MockTaskListener implements TaskListener {
+	private static class MockTaskListener implements TaskListener {
 
 		public List<TaskEvent> events = new CopyOnWriteArrayList<TaskEvent>();
 

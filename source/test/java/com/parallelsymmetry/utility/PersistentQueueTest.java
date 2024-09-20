@@ -1,23 +1,18 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.parallelsymmetry.utility.PersistentQueue;
-import com.parallelsymmetry.utility.log.Log;
+public class PersistentQueueTest extends BaseTestCase {
 
-public class PersistentQueueTest extends TestCase {
-
-	@Override
-	public void setUp() throws Exception {
-		Log.setLevel( Log.NONE );
-	}
-
-	public void testConstructorWithBadFile() throws Exception {
+	@Test
+	public void testConstructorWithBadFile() {
 		try {
 			new PersistentQueue<String>( new File( "/path/should/not/exist/test.queue" ) );
 			fail( "Queue constructor with a bad file string should throw an exception." );
@@ -26,11 +21,13 @@ public class PersistentQueueTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testConstructorWithNewFile() throws Exception {
 		PersistentQueue<String> queue1 = createTemporaryQueue();
 		assertTrue( queue1.getStore().exists() );
 	}
 
+	@Test
 	public void testConstructorWithExistingFile() throws Exception {
 		PersistentQueue<String> queue1 = createTemporaryQueue();
 		assertTrue( queue1.getStore().exists() );
@@ -38,10 +35,11 @@ public class PersistentQueueTest extends TestCase {
 		queue1.add( "element 1" );
 		queue1.add( "element 2" );
 
-		Queue<String> queue2 = new PersistentQueue<String>( queue1.getStore() );
+		Queue<String> queue2 = new PersistentQueue<>( queue1.getStore() );
 		assertEquals( 2, queue2.size() );
 	}
 
+	@Test
 	public void testAdd() throws Exception {
 		PersistentQueue<String> queue = createTemporaryQueue();
 		queue.add( "element 1" );
@@ -50,6 +48,7 @@ public class PersistentQueueTest extends TestCase {
 		assertEquals( 2, queue.size() );
 	}
 
+	@Test
 	public void testRemove() throws Exception {
 		PersistentQueue<String> queue = createTemporaryQueue();
 		queue.add( "element 1" );
@@ -68,6 +67,7 @@ public class PersistentQueueTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testOffer() throws Exception {
 		PersistentQueue<String> queue = createTemporaryQueue();
 		queue.offer( "element 1" );
@@ -76,6 +76,7 @@ public class PersistentQueueTest extends TestCase {
 		assertEquals( 2, queue.size() );
 	}
 
+	@Test
 	public void testPoll() throws Exception {
 		PersistentQueue<String> queue = createTemporaryQueue();
 		queue.offer( "element 1" );
@@ -89,6 +90,7 @@ public class PersistentQueueTest extends TestCase {
 		assertNull( queue.poll() );
 	}
 
+	@Test
 	public void testDefraggingWithRemove() throws Exception {
 		PersistentQueue<String> queue = createTemporaryQueue( 0 );
 		queue.add( "element 1" );
@@ -107,6 +109,7 @@ public class PersistentQueueTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testDefraggingWithPoll() throws Exception {
 		PersistentQueue<String> queue = createTemporaryQueue( 0 );
 		queue.offer( "element 1" );
@@ -128,7 +131,7 @@ public class PersistentQueueTest extends TestCase {
 		String filename = "store" + System.nanoTime() + ".queue";
 		File store = new File( System.getProperty( "java.io.tmpdir" ), filename );
 		store.deleteOnExit();
-		return new PersistentQueue<String>( store, defragInterval );
+		return new PersistentQueue<>( store, defragInterval );
 	}
 
 }

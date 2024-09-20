@@ -14,6 +14,9 @@ import com.parallelsymmetry.utility.UriUtil;
 import com.parallelsymmetry.utility.Version;
 import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
 import com.parallelsymmetry.utility.setting.Settings;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ProductCardTest extends BaseTestCase {
 
@@ -21,12 +24,14 @@ public class ProductCardTest extends BaseTestCase {
 
 	private static final String MINIMAL_CARD = "/META-INF/product.card.minimum.xml";
 
+	@Test
 	public void testAssertDescriptorPaths() {
 		assertEquals( "/product", ProductCard.PRODUCT_PATH );
 		assertEquals( "/product/group", ProductCard.GROUP_PATH );
 		assertEquals( "/product/artifact", ProductCard.ARTIFACT_PATH );
 	}
 
+	@Test
 	public void testUriMethods() throws Exception {
 		URL url = new URL( "jar:file:/C:/Program%20Files/Escape/program.jar!/META-INF/product.xml" );
 		URI uri = url.toURI();
@@ -37,14 +42,17 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( "jar:file:/C:/Program%20Files/Escape/program.jar!/META-INF/product.xml", URI.create( ".." ).resolve( uri ).toString() );
 	}
 
+	@Test
 	public void testGetKey() throws Exception {
 		assertEquals( "com.parallelsymmetry.mock", loadCard( COMPLETE_CARD ).getProductKey() );
 	}
 
+	@Test
 	public void testGetGroup() throws Exception {
 		assertEquals( "com.parallelsymmetry", loadCard( COMPLETE_CARD ).getGroup() );
 	}
 
+	@Test
 	public void testSetGroup() throws Exception {
 		ProductCard card = loadCard( COMPLETE_CARD );
 		assertEquals( "com.parallelsymmetry", card.getGroup() );
@@ -55,10 +63,12 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( "com.parallelsymmetry.test.mock", card.getProductKey() );
 	}
 
+	@Test
 	public void testGetArtifact() throws Exception {
 		assertEquals( "mock", loadCard( COMPLETE_CARD ).getArtifact() );
 	}
 
+	@Test
 	public void testSetArtifact() throws Exception {
 		ProductCard card = loadCard( COMPLETE_CARD );
 		assertEquals( "com.parallelsymmetry", card.getGroup() );
@@ -69,10 +79,12 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( "com.parallelsymmetry.test-mock", card.getProductKey() );
 	}
 
+	@Test
 	public void testGetRelease() throws Exception {
 		assertEquals( "1.0.0 Alpha 00  1973-08-14 22:29:00", loadCard( COMPLETE_CARD ).getRelease().toHumanString() );
 	}
 
+	@Test
 	public void testSetRelease() throws Exception {
 		ProductCard card = loadCard( COMPLETE_CARD );
 		assertEquals( "com.parallelsymmetry", card.getGroup() );
@@ -83,18 +95,22 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( "com.parallelsymmetry.mock", card.getProductKey() );
 	}
 
+	@Test
 	public void testGetIcon() throws Exception {
 		assertEquals( new File( "target/sandbox/icon.png" ).toURI(), loadCard( COMPLETE_CARD ).getIconUri() );
 	}
 
+	@Test
 	public void testGetName() throws Exception {
 		assertEquals( "Mock Service", loadCard( COMPLETE_CARD ).getName() );
 	}
 
+	@Test
 	public void testGetProvider() throws Exception {
 		assertEquals( "Parallel Symmetry", loadCard( COMPLETE_CARD ).getProvider() );
 	}
 
+	@Test
 	public void testContributors() throws Exception {
 		List<String> contributors = loadCard( COMPLETE_CARD ).getContributors();
 		assertEquals( 3, contributors.size() );
@@ -103,38 +119,47 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( "Mike", contributors.get( 2 ) );
 	}
 
+	@Test
 	public void testGetInceptionYear() throws Exception {
 		assertEquals( 1973, loadCard( COMPLETE_CARD ).getInceptionYear() );
 	}
 
+	@Test
 	public void testGetSummary() throws Exception {
 		assertEquals( "Mock service for testing", loadCard( COMPLETE_CARD ).getSummary() );
 	}
 
+	@Test
 	public void testGetDescription() throws Exception {
 		assertEquals( "The Mock Service is used for product development and testing.", loadCard( COMPLETE_CARD ).getDescription() );
 	}
 
+	@Test
 	public void testGetCopyrightHolder() throws Exception {
 		assertEquals( "Parallel Symmetry", loadCard( COMPLETE_CARD ).getCopyrightHolder() );
 	}
 
+	@Test
 	public void testGetCopyrightNotice() throws Exception {
 		assertEquals( "All rights reserved.", loadCard( COMPLETE_CARD ).getCopyrightNotice() );
 	}
 
+	@Test
 	public void testGetLicenseUri() throws Exception {
 		assertEquals( URI.create( "http://www.parallelsymmetry.com/legal/software.license.html" ), loadCard( COMPLETE_CARD ).getLicenseUri() );
 	}
 
+	@Test
 	public void testGetLicenseSummary() throws Exception {
 		assertEquals( "Mock Service comes with ABSOLUTELY NO WARRANTY. This is open software, and you are welcome to redistribute it under certain conditions.", loadCard( COMPLETE_CARD ).getLicenseSummary() );
 	}
 
+	@Test
 	public void testGetSourceUri() throws Exception {
 		assertEquals( new File( "target/sandbox/update.xml" ).toURI(), loadCard( COMPLETE_CARD ).getSourceUri() );
 	}
 
+	@Test
 	public void testGetInstallFolder() throws Exception {
 		ProductCard card = loadCard( COMPLETE_CARD );
 		assertNull( card.getInstallFolder() );
@@ -143,6 +168,7 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( new File( "." ), card.getInstallFolder() );
 	}
 
+	@Test
 	public void testEquals() throws Exception {
 		URL url = getClass().getResource( COMPLETE_CARD );
 		Descriptor descriptor = new Descriptor( url );
@@ -162,6 +188,7 @@ public class ProductCardTest extends BaseTestCase {
 		assertFalse( card1.equals( card2 ) );
 	}
 
+	@Test
 	public void testDeepEquals() throws Exception {
 		URL url = getClass().getResource( COMPLETE_CARD );
 		Descriptor descriptor = new Descriptor( url );
@@ -171,6 +198,7 @@ public class ProductCardTest extends BaseTestCase {
 		assertTrue( card1.deepEquals( card2 ) );
 	}
 
+	@Test
 	public void testHashCode() throws Exception {
 		URL url = getClass().getResource( COMPLETE_CARD );
 		Descriptor descriptor = new Descriptor( url );
@@ -190,6 +218,7 @@ public class ProductCardTest extends BaseTestCase {
 		assertFalse( card1.hashCode() == card2.hashCode() );
 	}
 
+	@Test
 	public void testMinimalProductInfo() throws Exception {
 		ProductCard card = loadCard( MINIMAL_CARD );
 
@@ -219,6 +248,7 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( getClass().getResource( MINIMAL_CARD ).toURI(), card.getSourceUri() );
 	}
 
+	@Test
 	public void testSaveLoadSaveSettings() throws Exception {
 		ProductCard standard = loadCard( COMPLETE_CARD );
 		MockWritableSettingsProvider provider = new MockWritableSettingsProvider();
@@ -230,23 +260,23 @@ public class ProductCardTest extends BaseTestCase {
 		assertEquals( standard, test );
 	}
 
-	public static final void assertEquals( ProductCard standard, ProductCard test ) {
-		assertEquals( standard.getProductKey(), test.getProductKey() );
-		assertEquals( standard.getGroup(), test.getGroup() );
-		assertEquals( standard.getArtifact(), test.getArtifact() );
-		assertEquals( standard.getRelease(), test.getRelease() );
-		assertEquals( standard.getIconUri(), test.getIconUri() );
-		assertEquals( standard.getName(), test.getName() );
-		assertEquals( standard.getProvider(), test.getProvider() );
-		assertEquals( standard.getInceptionYear(), test.getInceptionYear() );
-		assertEquals( standard.getSummary(), test.getSummary() );
-		assertEquals( standard.getDescription(), test.getDescription() );
-		assertEquals( standard.getCopyrightHolder(), test.getCopyrightHolder() );
-		assertEquals( standard.getCopyrightNotice(), test.getCopyrightNotice() );
-		assertEquals( standard.getLicenseUri(), test.getLicenseUri() );
-		assertEquals( standard.getLicenseSummary(), test.getLicenseSummary() );
-		assertEquals( standard.getSourceUri(), test.getSourceUri() );
-	}
+//	public static final void assertEquals( ProductCard standard, ProductCard test ) {
+//		assertEquals( standard.getProductKey(), test.getProductKey() );
+//		assertEquals( standard.getGroup(), test.getGroup() );
+//		assertEquals( standard.getArtifact(), test.getArtifact() );
+//		assertEquals( standard.getRelease(), test.getRelease() );
+//		assertEquals( standard.getIconUri(), test.getIconUri() );
+//		assertEquals( standard.getName(), test.getName() );
+//		assertEquals( standard.getProvider(), test.getProvider() );
+//		assertEquals( standard.getInceptionYear(), test.getInceptionYear() );
+//		assertEquals( standard.getSummary(), test.getSummary() );
+//		assertEquals( standard.getDescription(), test.getDescription() );
+//		assertEquals( standard.getCopyrightHolder(), test.getCopyrightHolder() );
+//		assertEquals( standard.getCopyrightNotice(), test.getCopyrightNotice() );
+//		assertEquals( standard.getLicenseUri(), test.getLicenseUri() );
+//		assertEquals( standard.getLicenseSummary(), test.getLicenseSummary() );
+//		assertEquals( standard.getSourceUri(), test.getSourceUri() );
+//	}
 
 	private ProductCard loadCard( String path ) throws Exception {
 		URL url = getClass().getResource( path );

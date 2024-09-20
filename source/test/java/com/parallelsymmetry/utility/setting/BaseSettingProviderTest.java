@@ -1,14 +1,11 @@
 package com.parallelsymmetry.utility.setting;
 
-import junit.framework.TestCase;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-public class BaseSettingProviderTest extends TestCase {
+public class BaseSettingProviderTest extends BaseTestCase {
 
 	@Test
-	public void testNoop() {
-
-	}
+	public void testNoop() {}
 
 }

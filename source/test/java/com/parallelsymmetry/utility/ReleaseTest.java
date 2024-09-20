@@ -10,13 +10,13 @@ import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ReleaseTest {
+public class ReleaseTest extends BaseTestCase {
 
-	private String versionString = "1.2.3-u-04";
+	private final String versionString = "1.2.3-u-04";
 
-	private String timestampString = "1970-01-01 00:00:00";
+	private final String timestampString = "1970-01-01 00:00:00";
 
-	private DateFormat dateFormat = new SimpleDateFormat( Release.DATE_FORMAT );
+	private final DateFormat dateFormat = new SimpleDateFormat( Release.DATE_FORMAT );
 
 	@BeforeEach
 	public void setup() {
@@ -52,7 +52,7 @@ public class ReleaseTest {
 	@Test
 	public void testGetDateString() {
 		assertEquals( "", new Release( versionString ).getDateString() );
-		assertEquals( "1970-01-01 00:00:00", new Release( versionString, new Date( 0 ) ).getDateString() );
+		assertEquals( timestampString, new Release( versionString, new Date( 0 ) ).getDateString() );
 	}
 
 	@Test
@@ -65,13 +65,13 @@ public class ReleaseTest {
 	@Test
 	public void testToString() {
 		assertEquals( "1.2.3-u-04", new Release( versionString ).toString() );
-		assertEquals( "1.2.3-u-04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toString() );
+		assertEquals( "1.2.3-u-04  " + timestampString, new Release( new Version( versionString ), new Date( 0 ) ).toString() );
 	}
 
 	@Test
 	public void testToHumanString() {
 		assertEquals( "1.2.3 Update 04", new Release( versionString ).toHumanString() );
-		assertEquals( "1.2.3 Update 04  1970-01-01 00:00:00", new Release( new Version( versionString ), new Date( 0 ) ).toHumanString() );
+		assertEquals( "1.2.3 Update 04  " + timestampString, new Release( new Version( versionString ), new Date( 0 ) ).toHumanString() );
 	}
 
 	@Test

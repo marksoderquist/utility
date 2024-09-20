@@ -1,13 +1,17 @@
 package com.parallelsymmetry.utility;
 
+import lombok.Getter;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LineOutputStreamTest extends TestCase {
+public class LineOutputStreamTest extends BaseTestCase {
 
-	public void testNoLines() throws Exception {
+	@Test
+	public void testNoLines() {
 		MockLineListener listener = new MockLineListener();
 		LineOutputStream stream = new LineOutputStream();
 		stream.addLineListener( listener );
@@ -18,6 +22,7 @@ public class LineOutputStreamTest extends TestCase {
 		assertEquals( 0, lines.size() );
 	}
 
+	@Test
 	public void testWriteOneLine() throws Exception {
 		MockLineListener listener = new MockLineListener();
 		LineOutputStream stream = new LineOutputStream();
@@ -30,9 +35,10 @@ public class LineOutputStreamTest extends TestCase {
 		assertEquals( 1, lines.size() );
 
 		int index = 0;
-		assertEquals( "line one", lines.get( index++ ) );
+		assertEquals( "line one", lines.get( index ) );
 	}
 
+	@Test
 	public void testWriteTwoLines() throws Exception {
 		MockLineListener listener = new MockLineListener();
 		LineOutputStream stream = new LineOutputStream();
@@ -46,19 +52,16 @@ public class LineOutputStreamTest extends TestCase {
 
 		int index = 0;
 		assertEquals( "line one", lines.get( index++ ) );
-		assertEquals( "line two", lines.get( index++ ) );
+		assertEquals( "line two", lines.get( index ) );
 	}
 
-	private class MockLineListener implements LineListener {
+	@Getter
+	private static class MockLineListener implements LineListener {
 
-		private List<String> lines = new ArrayList<String>();
+		private final List<String> lines = new ArrayList<>();
 
 		public void line( String line ) {
 			lines.add( line );
-		}
-
-		public List<String> getLines() {
-			return lines;
 		}
 
 	}

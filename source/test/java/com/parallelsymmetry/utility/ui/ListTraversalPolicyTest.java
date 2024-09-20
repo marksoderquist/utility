@@ -1,14 +1,16 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.Component;
-import java.awt.Container;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
-import javax.swing.JTextField;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import junit.framework.TestCase;
-
-public class ListTraversalPolicyTest extends TestCase {
+public class ListTraversalPolicyTest extends BaseTestCase {
 
 	private Container container;
 
@@ -16,8 +18,9 @@ public class ListTraversalPolicyTest extends TestCase {
 
 	private ListTraversalPolicy policy;
 
+	@BeforeEach
 	@Override
-	public void setUp() {
+	public void setup() {
 		JTextField field0 = new JTextField( "field0" );
 		JTextField field1 = new JTextField( "field1" );
 		JTextField field2 = new JTextField( "field2" );
@@ -31,7 +34,7 @@ public class ListTraversalPolicyTest extends TestCase {
 		container.add( field3 );
 		container.add( field4 );
 
-		order = new ArrayList<Component>();
+		order = new ArrayList<>();
 		order.add( field0 );
 		order.add( field1 );
 		order.add( field2 );
@@ -41,14 +44,17 @@ public class ListTraversalPolicyTest extends TestCase {
 		policy = new ListTraversalPolicy( order );
 	}
 
+	@Test
 	public void testGetDefaultComponent() {
 		assertEquals( order.get( 0 ), policy.getDefaultComponent( container ) );
 	}
 
+	@Test
 	public void testGetFirstComponent() {
 		assertEquals( order.get( 0 ), policy.getFirstComponent( container ) );
 	}
 
+	@Test
 	public void testGetComponentAfter() {
 		assertEquals( order.get( 1 ), policy.getComponentAfter( container, order.get( 0 ) ) );
 		assertEquals( order.get( 2 ), policy.getComponentAfter( container, order.get( 1 ) ) );
@@ -57,6 +63,7 @@ public class ListTraversalPolicyTest extends TestCase {
 		assertEquals( order.get( 0 ), policy.getComponentAfter( container, order.get( 4 ) ) );
 	}
 
+	@Test
 	public void testGetComponentBefore() {
 		assertEquals( order.get( 4 ), policy.getComponentBefore( container, order.get( 0 ) ) );
 		assertEquals( order.get( 0 ), policy.getComponentBefore( container, order.get( 1 ) ) );
@@ -65,6 +72,7 @@ public class ListTraversalPolicyTest extends TestCase {
 		assertEquals( order.get( 3 ), policy.getComponentBefore( container, order.get( 4 ) ) );
 	}
 
+	@Test
 	public void testGetLastComponent() {
 		assertEquals( order.get( 4 ), policy.getLastComponent( container ) );
 	}

@@ -12,13 +12,13 @@ public class DataListTreeEventTest extends DataTreeEventTest {
 	@Override
 	@SuppressWarnings( "unchecked" )
 	protected void addParent( DataNode grandparent, DataNode parent ) {
-		( (DataList<DataNode>)grandparent ).add( parent );
+		((DataList<DataNode>)grandparent).add( parent );
 	}
 
 	@Override
 	@SuppressWarnings( "unchecked" )
 	protected void addChild( DataNode parent, DataNode child ) {
-		( (DataList<DataNode>)parent ).add( child );
+		((DataList<DataNode>)parent).add( child );
 	}
 
 }

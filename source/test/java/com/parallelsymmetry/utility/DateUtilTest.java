@@ -1,14 +1,15 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.parallelsymmetry.utility.DateUtil;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
+public class DateUtilTest extends BaseTestCase {
 
-public class DateUtilTest extends TestCase {
-
+	@Test
 	public void testParse() {
 		try {
 			DateUtil.parse( "", null );
@@ -24,6 +25,7 @@ public class DateUtilTest extends TestCase {
 		assertEquals( new Date( 0 ), DateUtil.parse( "1970-01-01 00:00:00", "yyyy-MM-dd HH:mm:ss" ) );
 	}
 
+	@Test
 	public void testParseWithTimeZone() {
 		try {
 			DateUtil.parse( "", null, (TimeZone)null );
@@ -61,6 +63,7 @@ public class DateUtilTest extends TestCase {
 		assertEquals( new Date( 0 ), DateUtil.parse( "1970-01-01 05:00:00", "yyyy-MM-dd HH:mm:ss", "GMT+05" ) );
 	}
 
+	@Test
 	public void testFormatDuration() {
 		assertEquals( "", DateUtil.formatDuration( 0L ) );
 		assertEquals( "345ms", DateUtil.formatDuration( 345L ) );

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ObjectUtilTest {
+public class ObjectUtilTest extends BaseTestCase {
 
 	@Test
 	public void testAreEqual() {

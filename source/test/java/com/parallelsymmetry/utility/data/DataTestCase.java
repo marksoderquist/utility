@@ -1,25 +1,11 @@
 package com.parallelsymmetry.utility.data;
 
-import junit.framework.TestCase;
-
-import com.parallelsymmetry.utility.data.DataAttributeEvent;
-import com.parallelsymmetry.utility.data.DataEvent;
-import com.parallelsymmetry.utility.data.DataNode;
-import com.parallelsymmetry.utility.data.MetaAttributeEvent;
-import com.parallelsymmetry.utility.log.Log;
+import com.parallelsymmetry.utility.BaseTestCase;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 
-public abstract class DataTestCase extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-	@Override
-	public void setUp() {
-		Log.setLevel( Log.NONE );
-	}
-
-	@Override
-	public void tearDown() {
-		Log.setLevel( Log.NONE );
-	}
+public abstract class DataTestCase extends BaseTestCase {
 
 	protected void assertNodeState( DataNode node, boolean modified, int modifiedAttributeCount ) {
 		assertEquals( modified, node.isModified() );
@@ -71,7 +57,19 @@ public abstract class DataTestCase extends TestCase {
 		assertEventState( handler, index, type, action, data, cause, null, null, null, listIndex, child );
 	}
 
-	private void assertEventState( DataEventWatcher handler, int index, DataEvent.Type type, DataEvent.Action action, DataNode data, DataNode cause, String name, Object oldValue, Object newValue, int listIndex, DataNode child ) {
+	private void assertEventState(
+		DataEventWatcher handler,
+		int index,
+		DataEvent.Type type,
+		DataEvent.Action action,
+		DataNode data,
+		DataNode cause,
+		String name,
+		Object oldValue,
+		Object newValue,
+		int listIndex,
+		DataNode child
+	) {
 		DataEvent event = handler.getEvents().get( index );
 
 		// Check things common to all event types.

@@ -1,11 +1,10 @@
 package com.parallelsymmetry.utility;
 
-import com.parallelsymmetry.utility.Accessor;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AccessorTest {
+public class AccessorTest extends BaseTestCase {
 
 	@Test
 	public void testCreate() throws Exception {

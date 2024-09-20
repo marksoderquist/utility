@@ -6,43 +6,43 @@ import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class VersionTest {
+public class VersionTest extends BaseTestCase {
 
 	private static final String[] VERSIONS_QUALIFIER = { "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-m2", "1-m11", "1-rc", "1-cr2", "1-rc123", "1-SNAPSHOT", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-pom-1", "1-1-snapshot", "1-1", "1-2", "1-123" };
 
 	private static final String[] VERSIONS_NUMBER = { "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1", "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m" };
 
-	private Version version = new Version( "3.4.5-b-06" );
+	private final Version version = new Version( "3.4.5-b-06" );
 
-	private Version majorGreater = new Version( "4.4.5-b-06" );
+	private final Version majorGreater = new Version( "4.4.5-b-06" );
 
-	private Version majorLesser = new Version( "2.4.5-b-06" );
+	private final Version majorLesser = new Version( "2.4.5-b-06" );
 
-	private Version minorGreater = new Version( "3.5.3-b-04" );
+	private final Version minorGreater = new Version( "3.5.3-b-04" );
 
-	private Version minorLesser = new Version( "3.3.3-b-04" );
+	private final Version minorLesser = new Version( "3.3.3-b-04" );
 
-	private Version microGreater = new Version( "3.4.6-b-04" );
+	private final Version microGreater = new Version( "3.4.6-b-04" );
 
-	private Version microLesser = new Version( "3.4.4-b-04" );
+	private final Version microLesser = new Version( "3.4.4-b-04" );
 
-	private Version revisionGreater = new Version( "3.4.5-u-04" );
+	private final Version revisionGreater = new Version( "3.4.5-u-04" );
 
-	private Version revisionLesser = new Version( "3.4.5-a-04" );
+	private final Version revisionLesser = new Version( "3.4.5-a-04" );
 
-	private Version buildGreater = new Version( "3.4.5-b-07" );
+	private final Version buildGreater = new Version( "3.4.5-b-07" );
 
-	private Version buildLesser = new Version( "3.4.5-b-05" );
+	private final Version buildLesser = new Version( "3.4.5-b-05" );
 
-	private Version alpha = new Version( "3.4.5-a-06" );
+	private final Version alpha = new Version( "3.4.5-a-06" );
 
-	private Version beta = new Version( "3.4.5-b-06" );
+	private final Version beta = new Version( "3.4.5-b-06" );
 
-	private Version release = new Version( "3.4.5-u-00" );
+	private final Version release = new Version( "3.4.5-u-00" );
 
-	private Version update = new Version( "3.4.5-u-06" );
+	private final Version update = new Version( "3.4.5-u-06" );
 
-	private Version snapshot = new Version( "3.4.5-SNAPSHOT" );
+	private final Version snapshot = new Version( "3.4.5-SNAPSHOT" );
 
 	@Test
 	public void testIsSnapshot() {
@@ -96,6 +96,7 @@ public class VersionTest {
 		assertEquals( false, new Version( "11m" ).isSnapshot() );
 	}
 
+	@Test
 	public void testHasQulifierAlpha() {
 		assertEquals( true, new Version( "1-alpha2snapshot" ).hasQualifier( "alpha" ) );
 		assertEquals( true, new Version( "1-alpha2" ).hasQualifier( "alpha" ) );
@@ -147,6 +148,7 @@ public class VersionTest {
 		assertEquals( false, new Version( "11m" ).hasQualifier( "alpha" ) );
 	}
 
+	@Test
 	public void testHasQualifierBeta() {
 		assertEquals( false, new Version( "1-alpha2snapshot" ).hasQualifier( "beta" ) );
 		assertEquals( false, new Version( "1-alpha2" ).hasQualifier( "beta" ) );

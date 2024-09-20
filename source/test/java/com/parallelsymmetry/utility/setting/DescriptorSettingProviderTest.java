@@ -1,13 +1,14 @@
 package com.parallelsymmetry.utility.setting;
 
+import com.parallelsymmetry.utility.Descriptor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Set;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.parallelsymmetry.utility.Descriptor;
-import com.parallelsymmetry.utility.setting.DescriptorSettingsProvider;
-
-public class DescriptorSettingProviderTest extends TestCase {
+public class DescriptorSettingProviderTest extends BaseSettingProviderTest {
 
 	private Descriptor descriptor;
 
@@ -15,17 +16,21 @@ public class DescriptorSettingProviderTest extends TestCase {
 
 	private DescriptorSettingsProvider rootedProvider;
 
+	@BeforeEach
 	@Override
-	public void setUp() throws Exception {
+	public void setup() throws Exception {
+		super.setup();
 		descriptor = new Descriptor( getClass().getResourceAsStream( "/test.descriptor.xml" ) );
 		provider = new DescriptorSettingsProvider( descriptor );
 		rootedProvider = new DescriptorSettingsProvider( descriptor, false );
 	}
 
+	@Test
 	public void testGet() {
 		assertEquals( "test.path.value", provider.get( "/path/value" ) );
 	}
 
+	@Test
 	public void testGetWithAttributes() {
 		assertNull( provider.get( "/invalid/path" ) );
 		assertEquals( "5", provider.get( "/bounds/x" ) );
@@ -34,6 +39,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "15", provider.get( "/bounds/h" ) );
 	}
 
+	@Test
 	public void testGetChildNames() {
 		Set<String> names = provider.getChildNames( "" );
 
@@ -44,15 +50,18 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertTrue( names.contains( "nodes" ) );
 	}
 
+	@Test
 	public void testNodeExists() {
 		assertFalse( provider.nodeExists( "/path/invalid" ) );
 		assertTrue( provider.nodeExists( "/path" ) );
 	}
 
+	@Test
 	public void testRootedProviderGet() {
 		assertEquals( "test.path.value", rootedProvider.get( "/test/path/value" ) );
 	}
 
+	@Test
 	public void testRootedProviderGetWithAttributes() {
 		assertNull( provider.get( "/test/invalid/path" ) );
 		assertEquals( "5", rootedProvider.get( "/test/bounds/x" ) );
@@ -61,6 +70,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertEquals( "15", rootedProvider.get( "/test/bounds/h" ) );
 	}
 
+	@Test
 	public void testRootedProviderGetChildNames() {
 		Set<String> names = rootedProvider.getChildNames( "" );
 
@@ -68,6 +78,7 @@ public class DescriptorSettingProviderTest extends TestCase {
 		assertTrue( names.contains( "test" ) );
 	}
 
+	@Test
 	public void testRootedProviderNodeExists() {
 		assertFalse( rootedProvider.nodeExists( "/test/path/invalid" ) );
 		assertTrue( rootedProvider.nodeExists( "/test/path" ) );

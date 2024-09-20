@@ -1,19 +1,22 @@
 package com.parallelsymmetry.utility.event;
 
-import com.parallelsymmetry.utility.event.Event;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EventTest extends TestCase {
+public class EventTest extends BaseTestCase {
 
-	public void testEventConstructor() throws Exception {
+	@Test
+	public void testEventConstructor() {
 		Event event = new Event( this );
 		assertEquals( this, event.getSource() );
 		assertEquals( null, event.getScope() );
 		assertEquals( Event.DEFAULT_PRIORITY, event.getPriority() );
 	}
 
-	public void testEventConstructorWithSourceScopePriority() throws Exception {
+	@Test
+	public void testEventConstructorWithSourceScopePriority() {
 		Object source = new Object();
 		Object scope = new Object();
 		int priority = Event.HIGHEST_PRIORITY;

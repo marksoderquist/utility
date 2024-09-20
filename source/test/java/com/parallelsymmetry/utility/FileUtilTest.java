@@ -22,18 +22,20 @@ import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileUtilTest {
+public class FileUtilTest extends BaseTestCase {
 
 	private static final String PREFIX = "test";
 
 	private static final FilenameFilter TEST_FILE_FILTER = new TestFilenameFilter();
 
 	@AfterEach
-	public void teardown() throws Exception {
+	@Override
+	public void teardown() {
 		File tmp = new File( System.getProperty( "java.io.tmpdir" ) );
 		for( File file : Objects.requireNonNull( tmp.listFiles( TEST_FILE_FILTER ) ) ) {
 			FileUtil.delete( file );
 		}
+		super.teardown();
 	}
 
 	@Test

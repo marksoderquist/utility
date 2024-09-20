@@ -1,18 +1,17 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.EventQueue;
-import java.awt.Panel;
-import java.awt.Point;
+import com.parallelsymmetry.utility.BaseTestCase;
+import lombok.Getter;
+import org.junit.jupiter.api.Test;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class SwingUtilTest extends TestCase {
+public class SwingUtilTest extends BaseTestCase {
 
+	@Test
 	public void testSwingWait() {
 		ExecuteTester tester = new ExecuteTester();
 
@@ -21,6 +20,7 @@ public class SwingUtilTest extends TestCase {
 		assertTrue( tester.isDone() );
 	}
 
+	@Test
 	public void testExecuteSafely() {
 		ExecuteTester tester = new ExecuteTester();
 
@@ -34,6 +34,7 @@ public class SwingUtilTest extends TestCase {
 		assertTrue( tester.isSafe() );
 	}
 
+	@Test
 	public void testGetNamedComponent() {
 		Container container = new Container();
 
@@ -50,6 +51,7 @@ public class SwingUtilTest extends TestCase {
 		assertEquals( two, SwingUtil.getNamedComponent( container, "two" ) );
 	}
 
+	@Test
 	public void testGetChildOfType() {
 		JPanel parent = new JPanel();
 		JPanel container1 = new JPanel();
@@ -71,6 +73,7 @@ public class SwingUtilTest extends TestCase {
 		assertSame( button, component );
 	}
 
+	@Getter
 	private static final class ExecuteTester implements Runnable {
 
 		private boolean done;
@@ -82,14 +85,6 @@ public class SwingUtilTest extends TestCase {
 			safe = EventQueue.isDispatchThread();
 			done = true;
 			notifyAll();
-		}
-
-		public boolean isDone() {
-			return done;
-		}
-
-		public boolean isSafe() {
-			return safe;
 		}
 
 		public void reset() {

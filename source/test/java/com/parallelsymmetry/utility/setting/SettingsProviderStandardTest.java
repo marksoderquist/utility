@@ -1,12 +1,13 @@
 package com.parallelsymmetry.utility.setting;
 
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
+
 import java.util.Set;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
-
-public abstract class SettingsProviderStandardTest extends TestCase {
+public abstract class SettingsProviderStandardTest extends BaseTestCase {
 
 	protected SettingsProvider provider;
 

@@ -4,9 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.parallelsymmetry.utility.PersistentBlockingQueue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class PersistentBlockingQueueTest extends PersistentQueueTest {
 

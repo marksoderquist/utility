@@ -1,12 +1,12 @@
 package com.parallelsymmetry.utility;
 
-import com.parallelsymmetry.utility.ThreadUtil;
-import com.parallelsymmetry.utility.TripLock;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TripLockTest extends TestCase {
+public class TripLockTest extends BaseTestCase {
 
+	@Test
 	public void testHoldAndTripWaitingCaller() throws Exception {
 		TripLock lock = new TripLock();
 		Holder holder = new Holder( lock );
@@ -16,6 +16,7 @@ public class TripLockTest extends TestCase {
 		assertTrue( holder.released() );
 	}
 
+	@Test
 	public void testHoldAndTripWaitingHolder() throws Exception {
 		TripLock lock = new TripLock();
 		Holder holder = new Holder( lock, 50 );
@@ -26,17 +27,15 @@ public class TripLockTest extends TestCase {
 
 	private static class Holder implements Runnable {
 
-		private TripLock lock;
+		private final TripLock lock;
 
-		private int pause;
-
-		private Thread thread;
+		private final int pause;
 
 		private boolean released;
 
-		private TripLock startLock = new TripLock();
+		private final TripLock startLock = new TripLock();
 
-		private TripLock releaseLock = new TripLock();
+		private final TripLock releaseLock = new TripLock();
 
 		public Holder( TripLock lock ) {
 			this( lock, 0 );
@@ -48,7 +47,7 @@ public class TripLockTest extends TestCase {
 		}
 
 		public void start() {
-			thread = new Thread( this );
+			Thread thread = new Thread( this );
 			thread.setPriority( Thread.NORM_PRIORITY );
 			thread.setDaemon( true );
 			thread.start();
@@ -64,7 +63,7 @@ public class TripLockTest extends TestCase {
 			releaseLock.trip();
 		}
 
-		public synchronized boolean released() throws InterruptedException {
+		public synchronized boolean released() {
 			releaseLock.hold();
 			return released;
 		}

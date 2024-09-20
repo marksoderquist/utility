@@ -3,8 +3,6 @@ package com.parallelsymmetry.utility.log;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-import com.parallelsymmetry.utility.log.Log;
-
 public class MockLogHandler extends Handler {
 
 	private LogRecord record;

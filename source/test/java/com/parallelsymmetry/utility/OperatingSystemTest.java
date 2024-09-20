@@ -1,20 +1,24 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+public class OperatingSystemTest extends BaseTestCase {
 
-public class OperatingSystemTest extends TestCase {
-
+	@BeforeEach
 	@Override
-	public void setUp() throws Exception {
+	public void setup() {
+		super.setup();
 		System.clearProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY );
 	}
 
+	@Test
 	public void testLinux() throws Exception {
 		init( "Linux", "x86_64", "2.6.32_45" );
 		assertTrue( OperatingSystem.isLinux() );
@@ -27,6 +31,7 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "java", OperatingSystem.getJavaExecutableName() );
 	}
 
+	@Test
 	public void testMac() throws Exception {
 		init( "Mac OS X", "ppc", "10" );
 		assertFalse( OperatingSystem.isLinux() );
@@ -39,6 +44,7 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "java", OperatingSystem.getJavaExecutableName() );
 	}
 
+	@Test
 	public void testWindows7() throws Exception {
 		init( "Windows 7", "x86", "6.1" );
 		assertFalse( OperatingSystem.isLinux() );
@@ -51,6 +57,7 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "javaw", OperatingSystem.getJavaExecutableName() );
 	}
 
+	@Test
 	public void testWindows8() throws Exception {
 		init( "Windows 8", "x86", "6.2" );
 		assertFalse( OperatingSystem.isLinux() );
@@ -63,6 +70,7 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "javaw", OperatingSystem.getJavaExecutableName() );
 	}
 
+	@Test
 	public void testWindows8_1() throws Exception {
 		init( "Windows 8.1", "x86", "6.3" );
 		assertFalse( OperatingSystem.isLinux() );
@@ -214,15 +222,18 @@ public class OperatingSystemTest extends TestCase {
 		assertNotNull( exception );
 	}
 
+	@Test
 	public void testGetJavaExecutableName() {
 		assertEquals( OperatingSystem.isWindows() ? "javaw" : "java", OperatingSystem.getJavaExecutableName() );
 	}
 
+	@Test
 	public void testGetJavaExecutablePath() {
 		String java = OperatingSystem.isWindows() ? "javaw" : "java";
 		assertEquals( System.getProperty( "java.home" ) + File.separator + "bin" + File.separator + java, OperatingSystem.getJavaExecutablePath() );
 	}
 
+	@Test
 	public void testResolveNativeLibPath() throws Exception {
 		init( "Windows 8", "x86", "6.2" );
 		assertEquals( "win/x86/rxtxSerial.dll", OperatingSystem.resolveNativeLibPath( "rxtxSerial" ) );
@@ -231,7 +242,7 @@ public class OperatingSystemTest extends TestCase {
 		assertEquals( "linux/x86_64/librxtxSerial.so", OperatingSystem.resolveNativeLibPath( "rxtxSerial" ) );
 	}
 
-	private static final void init( String name, String arch, String version ) throws Exception {
+	private static void init( String name, String arch, String version ) throws Exception {
 		Method initMethod = OperatingSystem.class.getDeclaredMethod( "init", String.class, String.class, String.class );
 		initMethod.setAccessible( true );
 		initMethod.invoke( null, name, arch, version );

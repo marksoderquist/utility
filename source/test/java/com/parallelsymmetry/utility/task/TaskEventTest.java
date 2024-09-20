@@ -1,19 +1,13 @@
 package com.parallelsymmetry.utility.task;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.parallelsymmetry.utility.task.Task;
-import com.parallelsymmetry.utility.task.TaskEvent;
-import com.parallelsymmetry.utility.task.TaskListener;
-import com.parallelsymmetry.utility.task.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskEventTest {
 
@@ -63,7 +57,7 @@ public class TaskEventTest {
 		try {
 			task.get();
 			fail( "Exception should be thrown." );
-		} catch( Exception exception ) {
+		} catch( ExecutionException | InterruptedException exception ) {
 			assertNotNull( exception );
 		}
 

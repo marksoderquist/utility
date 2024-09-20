@@ -1,44 +1,45 @@
 package com.parallelsymmetry.utility;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ParametersTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ParametersTest extends BaseTestCase {
 
 	@Test
-	public void testNull() throws Exception {
+	public void testNull() {
 		try {
 			Parameters.parse( null );
 			fail( "Parameters.parse(null) should throw a NullPointerException." );
 		} catch( NullPointerException exception ) {
-			// 
+			//
 		}
 	}
 
 	@Test
-	public void testEmpty() throws Exception {
+	public void testEmpty() {
 		Parameters parameters = Parameters.parse( new String[]{} );
 		assertEquals( 0, parameters.size() );
 	}
 
 	@Test
-	public void testParse() throws Exception {
+	public void testParse() {
 		Parameters parameters = Parameters.parse( new String[]{ "-help" } );
 		assertEquals( "true", parameters.get( "help" ) );
 	}
 
 	@Test
-	public void testParseWithValue() throws Exception {
+	public void testParseWithValue() {
 		Parameters parameters = Parameters.parse( new String[]{ "-help", "topic" } );
 		assertEquals( "topic", parameters.get( "help" ) );
 	}
 
 	@Test
-	public void testParseWithMultiValues() throws Exception {
+	public void testParseWithMultiValues() {
 		Parameters parameters = Parameters.parse( new String[]{ "-module", "a", "-module", "b", "--module", "c" } );
 		assertEquals( 3, parameters.getValues( "module" ).size() );
 		assertEquals( "a", parameters.getValues( "module" ).get( 0 ) );
@@ -47,24 +48,24 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testParseWithValueAndFile() throws Exception {
+	public void testParseWithValueAndFile() {
 		Parameters parameters = Parameters.parse( new String[]{ "-help", "topic", "test.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 1, parameters.getUris().size() );
-		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getUris().get( 0 ).toString() );
+		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getUris().get( 0 ) );
 	}
 
 	@Test
-	public void testParseWithValueAndFiles() throws Exception {
+	public void testParseWithValueAndFiles() {
 		Parameters parameters = Parameters.parse( new String[]{ "-help", "topic", "test1.txt", "test2.txt" } );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 2, parameters.getUris().size() );
-		assertEquals( UriUtil.resolve( "test1.txt" ).toString(), parameters.getUris().get( 0 ).toString() );
-		assertEquals( UriUtil.resolve( "test2.txt" ).toString(), parameters.getUris().get( 1 ).toString() );
+		assertEquals( UriUtil.resolve( "test1.txt" ).toString(), parameters.getUris().get( 0 ) );
+		assertEquals( UriUtil.resolve( "test2.txt" ).toString(), parameters.getUris().get( 1 ) );
 	}
 
 	@Test
-	public void testParseWithFlags() throws Exception {
+	public void testParseWithFlags() {
 		Parameters parameters = Parameters.parse( new String[]{ "-one", "-two", "-three" } );
 		assertEquals( "true", parameters.get( "one" ) );
 		assertEquals( "true", parameters.get( "two" ) );
@@ -72,15 +73,15 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testParseWithFlagAndFile() throws Exception {
+	public void testParseWithFlagAndFile() {
 		Parameters parameters = Parameters.parse( new String[]{ "-help", "topic", "test.txt" }, "-help" );
 		assertEquals( "topic", parameters.get( "help" ) );
 		assertEquals( 1, parameters.getUris().size() );
-		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getUris().get( 0 ).toString() );
+		assertEquals( UriUtil.resolve( "test.txt" ).toString(), parameters.getUris().get( 0 ) );
 	}
 
 	@Test
-	public void testParseWithUnknownFlagAndFile() throws Exception {
+	public void testParseWithUnknownFlagAndFile() {
 		try {
 			Parameters.parse( new String[]{ "-help", "topic", "-test", "test", "test.txt" }, "-help" );
 			fail( "Unknown flags should cause an exception" );
@@ -90,19 +91,19 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testParseWithFlag() throws Exception {
+	public void testParseWithFlag() {
 		String flag = "flag";
 		String notaflag = "notaflag";
 		String[] args = new String[]{ "-" + flag };
 		Parameters parameters = Parameters.parse( args );
 		assertFalse( parameters.isTrue( notaflag ) );
-		assertTrue( "Flag not set.", parameters.isTrue( flag ) );
+		assertTrue( parameters.isTrue( flag ) );
 	}
 
 	@Test
-	public void testParseWithFlags2() throws Exception {
+	public void testParseWithFlags2() {
 		String notaflag = "notaflag";
-		List<String> flags = new ArrayList<String>();
+		List<String> flags = new ArrayList<>();
 		flags.add( "flag1" );
 		flags.add( "flag2" );
 		flags.add( "flag3" );
@@ -118,11 +119,12 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( args );
 		assertFalse( parameters.isTrue( notaflag ) );
 		for( String flag : flags ) {
-			assertTrue( "Flag not set.", parameters.isTrue( flag ) );
+			assertTrue( parameters.isTrue( flag ) );
 		}
 	}
 
-	public void testParseWithValue2() throws Exception {
+	@Test
+	public void testParseWithValue2() {
 		String key = "key";
 		String value = "value";
 		String notakey = "notakey";
@@ -133,7 +135,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testParseWithValues() throws Exception {
+	public void testParseWithValues() {
 		int count = 5;
 		String notakey = "notakey";
 		List<String> keys = new ArrayList<String>();
@@ -158,7 +160,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testParseWithEscapedValues() throws Exception {
+	public void testParseWithEscapedValues() {
 		Parameters parameters = Parameters.parse( new String[]{ "--test", "go", "\\-help" } );
 		assertTrue( parameters.isSet( "test" ) );
 		assertFalse( parameters.isTrue( "test" ) );
@@ -169,37 +171,37 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testParseFlagsWithValue() throws Exception {
+	public void testParseFlagsWithValue() {
 		String[] args = new String[]{ "-flag1", "-key", "value", "-flag2" };
 		Parameters parameters = Parameters.parse( args );
-		assertTrue( "Flag 1 not set.", parameters.isTrue( "flag1" ) );
+		assertTrue( parameters.isTrue( "flag1" ) );
 		assertEquals( "Value not set.", "value", parameters.get( "key" ) );
-		assertTrue( "Flag 2 not set.", parameters.isTrue( "flag2" ) );
+		assertTrue( parameters.isTrue( "flag2" ) );
 	}
 
 	@Test
-	public void testParseValuesWithFlag() throws Exception {
+	public void testParseValuesWithFlag() {
 		String[] args = new String[]{ "-key1", "value1", "-flag", "-key2", "value2" };
 		Parameters parameters = Parameters.parse( args );
 		assertEquals( "Value 1 not set.", "value1", parameters.get( "key1" ) );
-		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
+		assertTrue( parameters.isTrue( "flag" ) );
 		assertEquals( "Value 2 not set.", "value2", parameters.get( "key2" ) );
 	}
 
 	@Test
-	public void testParseWithFile() throws Exception {
+	public void testParseWithFile() {
 		String filename = "test.file";
 		String[] args = new String[]{ filename };
 		Parameters parameters = Parameters.parse( args );
 		List<String> uris = parameters.getUris();
-		assertEquals( "Number of URIs incorrect.", 1, uris.size() );
+		assertEquals( 1, uris.size() );
 		assertEquals( "URI incorrect.", UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
 	}
 
 	@Test
-	public void testParseWithFiles() throws Exception {
+	public void testParseWithFiles() {
 		int count = 5;
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		for( int index = 0; index < count; index++ ) {
 			list.add( "test" + index + ".file" );
 		}
@@ -209,26 +211,26 @@ public class ParametersTest extends TestCase {
 		Parameters parameters = Parameters.parse( args );
 
 		List<String> uris = parameters.getUris();
-		assertEquals( "Number of URIs incorrect.", count, uris.size() );
+		assertEquals( count, uris.size() );
 		for( int index = 0; index < count; index++ ) {
 			assertEquals( "URI incorrect.", UriUtil.resolve( "test" + index + ".file" ).toString(), uris.get( index ) );
 		}
 	}
 
 	@Test
-	public void testParseFlagWithFile() throws Exception {
+	public void testParseFlagWithFile() {
 		String filename = "file";
 		String[] args = new String[]{ "-flag", "--", filename };
 		Parameters parameters = Parameters.parse( args );
 		List<String> uris = parameters.getUris();
 
-		assertTrue( "Flag not set.", parameters.isTrue( "flag" ) );
-		assertEquals( "URIs incorrect.", 1, uris.size() );
-		assertEquals( "URI incorrect.", UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
+		assertTrue( parameters.isTrue( "flag" ) );
+		assertEquals( 1, uris.size() );
+		assertEquals( UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
 	}
 
 	@Test
-	public void testParseWithNullEntry() throws Exception {
+	public void testParseWithNullEntry() {
 		String[] args = new String[ 1 ];
 		try {
 			Parameters.parse( args );
@@ -239,7 +241,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGet() throws Exception {
+	public void testGet() {
 		String[] args = new String[]{ "-flag", "-key", "value", "file" };
 		Parameters parameters = Parameters.parse( args );
 		assertEquals( null, parameters.get( "none" ) );
@@ -256,7 +258,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetWithDefault() throws Exception {
+	public void testGetWithDefault() {
 		String[] args = new String[]{ "-flag", "-key", "value", "file" };
 		Parameters parameters = Parameters.parse( args );
 
@@ -266,7 +268,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetFlags() throws Exception {
+	public void testGetFlags() {
 		String[] args = new String[]{ "-flag", "-key", "value", "--flag", "value1", "value2", "value3", "--", "file0", "file1" };
 		Parameters parameters = Parameters.parse( args );
 
@@ -285,7 +287,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetValues() throws Exception {
+	public void testGetValues() {
 		String[] args = new String[]{ "--flag", "value0", "value1", "value2" };
 		Parameters parameters = Parameters.parse( args );
 
@@ -303,7 +305,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetValuesWithFlags() throws Exception {
+	public void testGetValuesWithFlags() {
 		String[] args = new String[]{ "--flag", "value0", "value1", "value2", "-other" };
 		Parameters parameters = Parameters.parse( args );
 
@@ -316,7 +318,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetValuesWithFiles() throws Exception {
+	public void testGetValuesWithFiles() {
 		String[] args = new String[]{ "--flag", "value0", "value1", "value2", "--", "file1.txt" };
 		Parameters parameters = Parameters.parse( args );
 
@@ -328,7 +330,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetValuesWithFlagsAndFiles() throws Exception {
+	public void testGetValuesWithFlagsAndFiles() {
 		String[] args = new String[]{ "--flag", "value0", "value1", "value2", "-other", "test", "file1.txt" };
 		Parameters parameters = Parameters.parse( args );
 
@@ -343,7 +345,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testIsSet() throws Exception {
+	public void testIsSet() {
 		String[] args = new String[]{ "-flag1", "false", "-flag2", "true", "-flag3" };
 		Parameters parameters = Parameters.parse( args );
 		assertFalse( parameters.isSet( "flag0" ) );
@@ -384,12 +386,12 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testGetOriginalCommands() throws Exception {
+	public void testGetOriginalCommands() {
 		String[] args = new String[]{ "-flag", "-key", "value", "file" };
 		Parameters parameters = Parameters.parse( args );
 		String[] commands = parameters.getOriginalCommands();
 
-		assertNotSame( "Commands are same object.", args, parameters.getOriginalCommands() );
+		assertNotSame( args, parameters.getOriginalCommands() );
 
 		int index = 0;
 		assertEquals( "-flag", commands[ index++ ] );
@@ -399,7 +401,7 @@ public class ParametersTest extends TestCase {
 	}
 
 	@Test
-	public void testIdempotentParse() throws Exception {
+	public void testIdempotentParse() {
 		String[] commands = new String[]{ "-flag", "-key", "value", "file" };
 		Parameters parameters1 = Parameters.parse( commands );
 		Parameters parameters2 = Parameters.parse( parameters1.getOriginalCommands() );

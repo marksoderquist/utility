@@ -1,12 +1,14 @@
 package com.parallelsymmetry.utility.data;
 
-import org.junit.Test;
-
 import com.parallelsymmetry.utility.ObjectUtil;
 import com.parallelsymmetry.utility.log.Log;
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
+import lombok.Getter;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionTest extends DataTestCase {
 
@@ -41,7 +43,7 @@ public class TransactionTest extends DataTestCase {
 		assertEventState( handler, index++, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.INSERT, data, data, "attribute2", null, "value2" );
 		assertEventState( handler, index++, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, data, DataNode.MODIFIED, false, true );
 		assertEventState( handler, index++, DataEvent.Type.DATA_CHANGED, DataEvent.Action.MODIFY, data );
-		assertEquals( index++, handler.getEvents().size() );
+		assertEquals( index, handler.getEvents().size() );
 	}
 
 	@Test
@@ -187,7 +189,7 @@ public class TransactionTest extends DataTestCase {
 	}
 
 	@Test
-	public void testTransactionWithEventModifingNode() {
+	public void testTransactionWithEventModifyingNode() {
 		MockDataNode node = new MockDataNode();
 		node.addDataListener( new ModifyingDataHandler( node, "time", System.nanoTime() ) );
 		Transaction.create();
@@ -258,7 +260,7 @@ public class TransactionTest extends DataTestCase {
 		parentWatcher.reset();
 		childWatcher.reset();
 
-		// Unset the the child attribute but nothing should happen 
+		// Unset the child attribute but nothing should happen
 		// because the transaction has not been committed yet.
 		Transaction.create();
 		child.setAttribute( "key1", null );
@@ -271,7 +273,7 @@ public class TransactionTest extends DataTestCase {
 		Transaction.commit();
 		assertFalse( parent.isModified() );
 		assertFalse( child.isModified() );
-		assertEquals( null, child.getAttribute( "key1" ) );
+		assertNull( child.getAttribute( "key1" ) );
 		assertEventCounts( parentWatcher, 1, 1, 1, 0, 0 );
 		assertEventState( parentWatcher, 0, DataEvent.Type.DATA_ATTRIBUTE, DataEvent.Action.REMOVE, parent, child, "key1", "value1", null );
 		assertEventState( parentWatcher, 1, DataEvent.Type.META_ATTRIBUTE, DataEvent.Action.MODIFY, parent, DataNode.MODIFIED, true, false );
@@ -334,7 +336,7 @@ public class TransactionTest extends DataTestCase {
 		// Ensure that the nodes are in the correct state.
 		assertEquals( node1, node2 );
 		assertEquals( node1.hashCode(), node2.hashCode() );
-		assertFalse( node1 == node2 );
+		assertNotSame( node1, node2 );
 		assertEventCounts( watcher1, 0, 0, 0 );
 		assertEventCounts( watcher2, 0, 0, 0 );
 
@@ -350,7 +352,7 @@ public class TransactionTest extends DataTestCase {
 		// Check the equals() and hashCode() methods.
 		assertEquals( node1, node2 );
 		assertEquals( node1.hashCode(), node2.hashCode() );
-		assertFalse( node1 == node2 );
+		assertNotSame( node1, node2 );
 		// Check the event counts.
 		assertEventCounts( watcher1, 1, 1, 1 );
 		assertEventCounts( watcher2, 1, 1, 1 );
@@ -374,7 +376,7 @@ public class TransactionTest extends DataTestCase {
 		// Ensure that the nodes are in the correct state.
 		assertEquals( node1, node2 );
 		assertEquals( node1.hashCode(), node2.hashCode() );
-		assertFalse( node1 == node2 );
+		assertNotSame( node1, node2 );
 		assertEventCounts( watcher1, 0, 0, 0 );
 		assertEventCounts( watcher2, 0, 0, 0 );
 
@@ -397,12 +399,13 @@ public class TransactionTest extends DataTestCase {
 		// Check the equals() and hashCode() methods.
 		assertEquals( node1, node2 );
 		assertEquals( node1.hashCode(), node2.hashCode() );
-		assertFalse( node1 == node2 );
+		assertNotSame( node1, node2 );
 		// Check the event counts.
 		assertEventCounts( watcher1, 1, 1, 1 );
 		assertEventCounts( watcher2, 1, 1, 1 );
 	}
 
+	@Test
 	public void testThreadLocalTransaction() {
 		Log.setLevel( Log.TRACE );
 		ExecutorThread thread1 = new ExecutorThread( "Thread1" );
@@ -425,7 +428,7 @@ public class TransactionTest extends DataTestCase {
 
 			thread1.execute( get );
 			Transaction transactionB = get.getTransaction();
-			assertTrue( transactionA == transactionB );
+			assertSame( transactionA, transactionB );
 
 			thread2.execute( get );
 			assertNull( get.getTransaction() );
@@ -436,8 +439,8 @@ public class TransactionTest extends DataTestCase {
 
 			thread2.execute( get );
 			Transaction transactionD = get.getTransaction();
-			assertTrue( transactionC == transactionD );
-			assertTrue( transactionA != transactionC );
+			assertSame( transactionC, transactionD );
+			assertNotSame( transactionA, transactionC );
 
 			thread1.execute( commit );
 			assertTrue( commit.getResult() );
@@ -457,7 +460,7 @@ public class TransactionTest extends DataTestCase {
 		}
 	}
 
-	private class ExecutorThread extends Thread {
+	private static class ExecutorThread extends Thread {
 
 		private boolean execute = true;
 
@@ -516,12 +519,14 @@ public class TransactionTest extends DataTestCase {
 				} catch( InterruptedException exception ) {
 					break;
 				}
-			};
+			}
+			;
 		}
 
 	}
 
-	private class StartTransaction implements Runnable {
+	@Getter
+	private static class StartTransaction implements Runnable {
 
 		private Transaction transaction;
 
@@ -531,30 +536,22 @@ public class TransactionTest extends DataTestCase {
 			//Log.write( Thread.currentThread().getName(), ": Srt Transaction: ", transaction == null ? "null" : transaction.hashCode() );
 		}
 
-		public Transaction getTransaction() {
-			return transaction;
-		}
-
 	}
 
-	private class GetTransaction implements Runnable {
+	@Getter
+	private static class GetTransaction implements Runnable {
 
 		private Transaction transaction;
 
 		@Override
 		public void run() {
 			transaction = Transaction.current();
-
 			//Log.write( Thread.currentThread().getName(), ": Get Transaction: ", transaction == null ? "null" : transaction.hashCode() );
-		}
-
-		public Transaction getTransaction() {
-			return transaction;
 		}
 
 	}
 
-	private class CommitTransaction implements Runnable {
+	private static class CommitTransaction implements Runnable {
 
 		private boolean result;
 
@@ -569,13 +566,13 @@ public class TransactionTest extends DataTestCase {
 
 	}
 
-	private class ModifyingDataHandler extends DataAdapter {
+	private static class ModifyingDataHandler extends DataAdapter {
 
-		private DataNode node;
+		private final DataNode node;
 
-		private String name;
+		private final String name;
 
-		private Object value;
+		private final Object value;
 
 		public ModifyingDataHandler( DataNode node, String name, Object value ) {
 			this.node = node;
@@ -590,12 +587,12 @@ public class TransactionTest extends DataTestCase {
 
 	}
 
-	private class EqualHashOverrideNode extends DataNode {
+	private static class EqualHashOverrideNode extends DataNode {
 
 		private static final String KEY = "key";
 
 		public String getKey() {
-			return (String)getAttribute( KEY );
+			return getAttribute( KEY );
 		}
 
 		public void setKey( String key ) {
@@ -610,9 +607,9 @@ public class TransactionTest extends DataTestCase {
 
 		@Override
 		public boolean equals( Object object ) {
-			if( !( object instanceof EqualHashOverrideNode ) ) return false;
+			if( !(object instanceof EqualHashOverrideNode) ) return false;
 			String key = getKey();
-			return ObjectUtil.areEqual( key, ( (EqualHashOverrideNode)object ).getKey() );
+			return ObjectUtil.areEqual( key, ((EqualHashOverrideNode)object).getKey() );
 		}
 
 	}

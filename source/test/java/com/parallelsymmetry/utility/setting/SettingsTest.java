@@ -1,48 +1,50 @@
 package com.parallelsymmetry.utility.setting;
 
-import java.awt.Color;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import com.parallelsymmetry.utility.log.Log;
+import com.parallelsymmetry.utility.BaseTestCase;
 import com.parallelsymmetry.utility.mock.MockSettingsProvider;
 import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
+import lombok.Getter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SettingsTest extends TestCase {
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.*;
 
-	private Settings settings = new Settings();
+import static org.junit.jupiter.api.Assertions.*;
 
-	private MockSettingsProvider provider1 = new MockSettingsProvider( "Provider 1" );
+public class SettingsTest extends BaseTestCase {
 
-	private MockSettingsProvider provider2 = new MockWritableSettingsProvider( "Provider 2" );
+	private final Settings settings = new Settings();
 
-	private MockSettingsProvider provider3 = new MockSettingsProvider( "Provider 3" );
+	private final MockSettingsProvider provider1 = new MockSettingsProvider( "Provider 1" );
 
-	private MockSettingsProvider providerD = new MockSettingsProvider( "Provider D" );
+	private final MockSettingsProvider provider2 = new MockWritableSettingsProvider( "Provider 2" );
 
+	private final MockSettingsProvider provider3 = new MockSettingsProvider( "Provider 3" );
+
+	private final MockSettingsProvider providerD = new MockSettingsProvider( "Provider D" );
+
+	@BeforeEach
 	@Override
-	public void setUp() {
-		Log.setLevel( Log.NONE );
+	public void setup() throws Exception {
+		super.setup();
 		settings.addProvider( provider1 );
 		settings.addProvider( provider2 );
 		settings.addProvider( provider3 );
 		settings.setDefaultProvider( providerD );
 	}
 
+	@Test
 	public void testGetName() {
 		assertEquals( "", settings.getName() );
 		assertEquals( "test", settings.getNode( "/test" ).getName() );
 		assertEquals( "name", settings.getNode( "/test/name" ).getName() );
 	}
 
+	@Test
 	public void testGetPath() {
 		assertEquals( "/", settings.getPath() );
 		assertEquals( "/test", settings.getNode( "/test" ).getPath() );
@@ -50,6 +52,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "/test/name", settings.getNode( "test" ).getNode( "name" ).getPath() );
 	}
 
+	@Test
 	public void testGet() {
 		String path = "/test/get/value";
 		assertNull( settings.get( path, null ) );
@@ -71,6 +74,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "1", settings.get( path, null ) );
 	}
 
+	@Test
 	public void testGetWithSelf() {
 		String path = "/test/get/value";
 		settings.put( path, "5" );
@@ -80,6 +84,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "5", self.get( ".", null ) );
 	}
 
+	@Test
 	public void testPut() {
 		String path = "/test/put/value";
 		String value = "X";
@@ -92,18 +97,21 @@ public class SettingsTest extends TestCase {
 		assertNull( providerD.get( path ) );
 	}
 
+	@Test
 	public void testPutGetInt() {
 		settings.putInt( "int", 73 );
 		assertEquals( "73", settings.get( "int", null ) );
 		assertEquals( 73, settings.getInt( "int", -1 ) );
 	}
 
+	@Test
 	public void testPutGetLong() {
 		settings.putLong( "long", 23234993237L );
 		assertEquals( "23234993237", settings.get( "long", null ) );
 		assertEquals( 23234993237L, settings.getLong( "long", -1 ) );
 	}
 
+	@Test
 	public void testPutGetFloat() {
 		settings.putFloat( "float", 2.718283f );
 		assertEquals( "2.718283", settings.get( "float", null ) );
@@ -113,6 +121,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( Float.NaN, settings.getFloat( "float-nan", 0 ) );
 	}
 
+	@Test
 	public void testPutGetDouble() {
 		settings.putDouble( "double", 3.141593 );
 		assertEquals( "3.141593", settings.get( "double", null ) );
@@ -122,12 +131,14 @@ public class SettingsTest extends TestCase {
 		assertEquals( Double.NaN, settings.getDouble( "double-nan", 0 ) );
 	}
 
+	@Test
 	public void testPutGetColor() {
 		settings.putColor( "color", new Color( 73, 74, 99, 128 ) );
 		assertEquals( "#80494a63", settings.get( "color", null ) );
 		assertEquals( new Color( 73, 74, 99, 128 ), settings.getColor( "color", null ) );
 	}
 
+	@Test
 	public void testCopy() {
 		settings.put( "/a", "A" );
 		settings.put( "/b", "B" );
@@ -143,6 +154,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 0, newSettings.getChildCount() );
 	}
 
+	@Test
 	public void testDeepCopy() {
 		settings.put( "/a", "A" );
 		settings.put( "/b", "B" );
@@ -158,6 +170,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 1, newSettings.getChildCount() );
 	}
 
+	@Test
 	public void testMounts() {
 		settings.setDefaultProvider( providerD );
 
@@ -188,10 +201,12 @@ public class SettingsTest extends TestCase {
 		assertEquals( "3", settings.get( "/3/value", null ) );
 	}
 
+	@Test
 	public void testNoProviders() {
 		assertNull( new Settings().get( "/test", null ) );
 	}
 
+	@Test
 	public void testProviderOverride() {
 		provider1.set( "/test/path/1", "1" );
 
@@ -213,6 +228,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", settings.get( "/test/path/D", null ) );
 	}
 
+	@Test
 	public void testGetKeys() {
 		Set<String> keys = settings.getKeys();
 		assertEquals( 0, keys.size() );
@@ -225,6 +241,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 4, settings.getKeys().size() );
 	}
 
+	@Test
 	public void testGetChildCount() {
 		assertEquals( 0, settings.getChildCount() );
 
@@ -236,6 +253,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 1, settings.getChildCount() );
 	}
 
+	@Test
 	public void testGetChildCountWithString() {
 		assertEquals( 0, settings.getChildCount( "/test" ) );
 
@@ -247,6 +265,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 3, settings.getChildCount( "/test" ) );
 	}
 
+	@Test
 	public void testGetChildNames() {
 		assertEquals( 0, settings.getChildNames().size() );
 
@@ -280,6 +299,7 @@ public class SettingsTest extends TestCase {
 		assertTrue( names.contains( "pathD" ) );
 	}
 
+	@Test
 	public void testGetChildNodes() {
 		provider1.set( "/test/path1/value", "1" );
 		// Intentionally skip provider 2.
@@ -299,6 +319,7 @@ public class SettingsTest extends TestCase {
 		assertTrue( nodes.contains( settings.getNode( "/test/pathD" ) ) );
 	}
 
+	@Test
 	public void testGetChildNodesWithPath() {
 		provider1.set( "/test/path1/value", "1" );
 		// Intentionally skip provider 2.
@@ -324,6 +345,7 @@ public class SettingsTest extends TestCase {
 		assertTrue( nodes.contains( settings.getNode( "/test/pathD" ) ) );
 	}
 
+	@Test
 	public void testGetIndexedNodes() {
 		int count = 5;
 		String path = "/test/lists/list1";
@@ -343,6 +365,7 @@ public class SettingsTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGetIndexedNodesAtRoot() {
 		int count = 5;
 		String path = "/";
@@ -363,6 +386,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( count, index );
 	}
 
+	@Test
 	public void testGetIndexedNodesAtRootWithPath() {
 		int count = 5;
 		String path = "/";
@@ -383,6 +407,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( count, index );
 	}
 
+	@Test
 	public void testGetIndexedNodesAtRootWithEmptyPath() {
 		int count = 5;
 		String path = "/";
@@ -403,6 +428,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( count, index );
 	}
 
+	@Test
 	public void testGetNode() {
 		provider1.set( "/test/path/1", "1" );
 
@@ -443,6 +469,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "D", node.get( "D", null ) );
 	}
 
+	@Test
 	public void testRemoveNode() {
 		Settings node = settings.getNode( "/test/path/remove" );
 		assertEquals( "/test/path/remove", node.getPath() );
@@ -458,6 +485,7 @@ public class SettingsTest extends TestCase {
 		assertFalse( settings.nodeExists( "/test" ) );
 	}
 
+	@Test
 	public void testRemoveNodeWithPath() {
 		Settings node = settings.getNode( "/test/path/remove" );
 		assertEquals( "/test/path/remove", node.getPath() );
@@ -473,6 +501,7 @@ public class SettingsTest extends TestCase {
 		assertFalse( settings.nodeExists( "/test" ) );
 	}
 
+	@Test
 	public void testRemoveNodeWithParentPath() {
 		Settings node = settings.getNode( "/test/path/remove" );
 		assertEquals( "/test/path/remove", node.getPath() );
@@ -488,6 +517,7 @@ public class SettingsTest extends TestCase {
 		assertFalse( settings.nodeExists( "/test" ) );
 	}
 
+	@Test
 	public void testGetList() {
 		int count = 5;
 		String path = "/test/lists/list1";
@@ -515,10 +545,12 @@ public class SettingsTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGetInvalidList() {
 		assertNull( settings.getNodeList( "/invalid", null ) );
 	}
 
+	@Test
 	public void testGetListWithDefault() {
 		String path = "/test/lists/list4";
 		List<Settings> list = settings.getNodeList( path, null );
@@ -533,6 +565,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( list.get( 0 ), defaultList.get( 0 ).getSettings() );
 	}
 
+	@Test
 	public void testPutEmptyList() {
 		String path = "/test/lists/list0";
 		List<MockPersistent> list = new ArrayList<MockPersistent>();
@@ -540,6 +573,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 0, settings.getNodeList( path, null ).size() );
 	}
 
+	@Test
 	public void testRemoveList() {
 		int count = 5;
 		String path = "/test/lists/list2";
@@ -574,6 +608,7 @@ public class SettingsTest extends TestCase {
 		assertNull( targetList );
 	}
 
+	@Test
 	public void testPutSetEvents() {
 		int count = 5;
 		String path = "/test/sets/set5";
@@ -596,6 +631,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 6, listener.getEvents().size() );
 	}
 
+	@Test
 	public void testGetSet() {
 		int count = 5;
 		String path = "/test/sets/set1";
@@ -629,10 +665,12 @@ public class SettingsTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGetInvalidSet() {
 		assertNull( settings.getNodeSet( "/invalid", null ) );
 	}
 
+	@Test
 	public void testGetSetWithDefault() {
 		String path = "/test/sets/set4";
 		Set<Settings> set = settings.getNodeSet( path, null );
@@ -647,6 +685,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( set.iterator().next(), defaultSet.iterator().next().getSettings() );
 	}
 
+	@Test
 	public void testPutEmptySet() {
 		String path = "/test/sets/set0";
 		Set<MockPersistent> set = new HashSet<MockPersistent>();
@@ -654,6 +693,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( 0, settings.getNodeSet( path, null ).size() );
 	}
 
+	@Test
 	public void testRemoveSet() {
 		int count = 5;
 		String path = "/test/sets/set2";
@@ -693,13 +733,14 @@ public class SettingsTest extends TestCase {
 		assertNull( targetSet );
 	}
 
+	@Test
 	public void testGetMap() {
 		int count = 5;
 		String path = "/test/maps/map1";
 		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
 
 		for( int index = 0; index < count; index++ ) {
-			String name = String.valueOf( (char)( 65 + index ) );
+			String name = String.valueOf( (char)(65 + index) );
 			sourceMap.put( name, new MockPersistent( name ) );
 		}
 
@@ -717,15 +758,17 @@ public class SettingsTest extends TestCase {
 		Map<String, Settings> targetMap = settings.getNodeMap( path, null );
 		assertEquals( count, targetMap.size() );
 		for( int index = 0; index < count; index++ ) {
-			String name = String.valueOf( (char)( 65 + index ) );
+			String name = String.valueOf( (char)(65 + index) );
 			assertSettingsValues( checkMap.get( name ), targetMap.get( name ) );
 		}
 	}
 
+	@Test
 	public void testGetInvalidMap() {
 		assertNull( settings.getNodeMap( "/invalid", null ) );
 	}
 
+	@Test
 	public void testGetMapWithDefault() {
 		String path = "/test/maps/map4";
 		Map<String, Settings> map = settings.getNodeMap( path, null );
@@ -740,6 +783,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( map.get( "0" ), defaultMap.get( "0" ).getSettings() );
 	}
 
+	@Test
 	public void testPutEmptyMap() {
 		String path = "/test/maps/map0";
 		Map<String, MockPersistent> map = new HashMap<String, MockPersistent>();
@@ -747,13 +791,14 @@ public class SettingsTest extends TestCase {
 		assertEquals( 0, settings.getNodeSet( path, null ).size() );
 	}
 
+	@Test
 	public void testRemoveMap() {
 		int count = 5;
 		String path = "/test/maps/map2";
 		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
 
 		for( int index = 0; index < count; index++ ) {
-			String name = String.valueOf( (char)( 65 + index ) );
+			String name = String.valueOf( (char)(65 + index) );
 			sourceMap.put( name, new MockPersistent( name ) );
 		}
 
@@ -771,7 +816,7 @@ public class SettingsTest extends TestCase {
 		Map<String, Settings> targetMap = settings.getNodeMap( path, null );
 		assertEquals( count, targetMap.size() );
 		for( int index = 0; index < count; index++ ) {
-			String name = String.valueOf( (char)( 65 + index ) );
+			String name = String.valueOf( (char)(65 + index) );
 			assertSettingsValues( checkMap.get( name ), targetMap.get( name ) );
 		}
 
@@ -782,6 +827,7 @@ public class SettingsTest extends TestCase {
 		assertNull( targetMap );
 	}
 
+	@Test
 	public void testReset() {
 		assertFalse( settings.nodeExists( "/test/path/remove" ) );
 		assertFalse( settings.nodeExists( "/test/path" ) );
@@ -802,6 +848,7 @@ public class SettingsTest extends TestCase {
 
 	}
 
+	@Test
 	public void testGetParentPath() {
 		assertEquals( null, Settings.getParentPath( "/" ) );
 		assertEquals( "/", Settings.getParentPath( "/path/" ) );
@@ -810,11 +857,13 @@ public class SettingsTest extends TestCase {
 		assertEquals( "/path/to", Settings.getParentPath( "/path/to/setting" ) );
 	}
 
+	@Test
 	public void testGetSettingKey() {
 		assertEquals( null, Settings.getSettingKey( "/" ) );
 		assertEquals( "setting", Settings.getSettingKey( "/path/to/setting" ) );
 	}
 
+	@Test
 	public void testGetPaths() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -834,6 +883,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( "/z/b=B", paths.get( index++ ) );
 	}
 
+	@Test
 	public void testToStringPaths() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -846,6 +896,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, settings.toStringPaths() );
 	}
 
+	@Test
 	public void testToStringXml() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -861,6 +912,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, settings.toStringXml() );
 	}
 
+	@Test
 	public void testPrintAsPaths() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -877,6 +929,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, buffer.toString() );
 	}
 
+	@Test
 	public void testPrintAsPathsStatic() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -893,6 +946,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, buffer.toString() );
 	}
 
+	@Test
 	public void testPrintAsXml() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -911,6 +965,7 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, buffer.toString() );
 	}
 
+	@Test
 	public void testPrintAsXmlStatic() {
 		providerD.set( "/a", "A" );
 		providerD.set( "/b", "B" );
@@ -929,12 +984,14 @@ public class SettingsTest extends TestCase {
 		assertEquals( expected, buffer.toString() );
 	}
 
+	@Test
 	public void testGetSafeUuid() {
 		String id = Settings.getSafeUuid();
 		assertNotNull( id );
 		assertTrue( id.startsWith( "uuid-" ) );
 	}
 
+	@Test
 	public void testAddListener() {
 		MockSettingListener listener1 = new MockSettingListener();
 		MockSettingListener listener2 = new MockSettingListener();
@@ -958,7 +1015,7 @@ public class SettingsTest extends TestCase {
 		int pCount = settings.getProviderCount();
 		for( int pIndex = 0; pIndex < pCount; pIndex++ ) {
 			SettingsProvider provider = settings.getProvider( pIndex );
-			( (MockSettingsProvider)provider ).show();
+			((MockSettingsProvider)provider).show();
 			System.out.println();
 		}
 	}
@@ -989,6 +1046,7 @@ public class SettingsTest extends TestCase {
 
 		private String value;
 
+		@Getter
 		private Settings settings;
 
 		public MockPersistent() {
@@ -1001,10 +1059,6 @@ public class SettingsTest extends TestCase {
 
 		public MockPersistent( String value ) {
 			this.value = value;
-		}
-
-		public Settings getSettings() {
-			return settings;
 		}
 
 		@Override
@@ -1027,7 +1081,7 @@ public class SettingsTest extends TestCase {
 
 		@Override
 		public boolean equals( Object object ) {
-			if( !( object instanceof MockPersistent ) ) return false;
+			if( !(object instanceof MockPersistent) ) return false;
 			MockPersistent that = (MockPersistent)object;
 			return value == null ? this.index == that.index : this.value.equals( that.value );
 		}

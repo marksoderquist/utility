@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DescriptorTest {
+public class DescriptorTest extends BaseTestCase {
 
 	@Test
 	public void testConstructor() throws Exception {

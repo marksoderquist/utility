@@ -1,14 +1,17 @@
 package com.parallelsymmetry.utility.setting;
 
+import com.parallelsymmetry.utility.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.parallelsymmetry.utility.Parameters;
-
 public class ParametersSettingsProviderStandardTest extends SettingsProviderStandardTest {
 
+	@BeforeEach
 	@Override
-	public void setUp() {
+	public void setup() throws Exception {
+		super.setup();
 		List<String> values = new ArrayList<String>();
 		values.add( "-key1" );
 		values.add( "value1" );
@@ -23,7 +26,7 @@ public class ParametersSettingsProviderStandardTest extends SettingsProviderStan
 		values.add( "-path.subkey3" );
 		values.add( "subvalue3" );
 
-		provider = new ParametersSettingsProvider( Parameters.parse( values.toArray( new String[values.size()] ) ) );
+		provider = new ParametersSettingsProvider( Parameters.parse( values.toArray( new String[ 0 ] ) ) );
 	}
 
 }

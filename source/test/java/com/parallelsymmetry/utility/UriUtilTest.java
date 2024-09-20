@@ -9,7 +9,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class UriUtilTest {
+public class UriUtilTest extends BaseTestCase {
 
 	@Test
 	public void testResolveWithString() throws Exception {

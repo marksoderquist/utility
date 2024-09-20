@@ -1,30 +1,35 @@
 package com.parallelsymmetry.utility.setting;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Set;
 import java.util.prefs.Preferences;
 
-import com.parallelsymmetry.utility.setting.PreferencesSettingsProvider;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
-
-public class PreferencesSettingProviderTest extends TestCase {
+public class PreferencesSettingProviderTest extends BaseSettingProviderTest {
 
 	private Preferences preferences;
 
 	private PreferencesSettingsProvider provider;
 
+	@BeforeEach
 	@Override
-	public void setUp() {
+	public void setup() throws Exception {
+		super.setup();
 		preferences = Preferences.userNodeForPackage( getClass() );
 		provider = new PreferencesSettingsProvider( preferences );
 
 		preferences.node( "test" ).put( "path1", "value1" );
 	}
 
+	@Test
 	public void testGet() {
 		assertEquals( "value1", provider.get( "/test/path1" ) );
 	}
 
+	@Test
 	public void testPut() {
 		// Because preferences are persistent the value needs to be removed.
 		preferences.node( "test" ).remove( "path2" );
@@ -39,6 +44,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertNull( provider.get( "/test/path2" ) );
 	}
 
+	@Test
 	public void testGetChildNames() throws Exception {
 		String parent = "/test/children";
 		provider.removeNode( parent );
@@ -57,6 +63,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertTrue( names.contains( "child2" ) );
 	}
 
+	@Test
 	public void testNodeExists() throws Exception {
 		// Clear the node if it exists.
 		provider.removeNode( "/test/node" );
@@ -71,6 +78,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertTrue( provider.nodeExists( "/test/node" ) );
 	}
 
+	@Test
 	public void testRemoveNode() throws Exception {
 		String path = "/test/remove/node";
 		provider.put( path + "/value", "true" );
@@ -79,6 +87,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertFalse( provider.nodeExists( path ) );
 	}
 
+	@Test
 	public void testResetNode() throws Exception {
 		String path = "/test/reset/node";
 		provider.put( path + "/value", "true" );
@@ -91,6 +100,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertTrue( provider.nodeExists( path ) );
 	}
 
+	@Test
 	public void testFlushAfterRemoveDoesNotRecreateNode() throws Exception {
 		String path = "/test/remove/node";
 		provider.put( path + "/value", "true" );
@@ -101,6 +111,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 		assertFalse( provider.nodeExists( path ) );
 	}
 
+	@Test
 	public void testPreferencesRemove() throws Exception {
 		Preferences a = preferences.node( "/test/a" );
 		a.put( "key", "a" );
@@ -111,7 +122,7 @@ public class PreferencesSettingProviderTest extends TestCase {
 			a.put( "key", "a" );
 			fail();
 		} catch( IllegalStateException exception ) {
-			// 
+			//
 		}
 
 		a = preferences.node( "/test/a" );

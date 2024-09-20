@@ -1,51 +1,59 @@
 package com.parallelsymmetry.utility.ui;
 
-import java.awt.Graphics;
-import java.awt.Image;
+import com.parallelsymmetry.utility.Accessor;
+import com.parallelsymmetry.utility.BaseTestCase;
+import com.parallelsymmetry.utility.HashUtil;
+import com.parallelsymmetry.utility.JavaUtil;
+import lombok.Getter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.net.URI;
 
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
+public class IconLibraryTest extends BaseTestCase {
 
-import com.parallelsymmetry.utility.Accessor;
-import com.parallelsymmetry.utility.HashUtil;
-import com.parallelsymmetry.utility.JavaUtil;
-
-public class IconLibraryTest extends TestCase {
-
-	private File cachePath = new File( "target/iconcache" );
+	private final File cachePath = new File( "target/iconcache" );
 
 	private IconLibrary library;
 
+	@BeforeEach
 	@Override
-	public void setUp() {
+	public void setup() {
+		super.setup();
 		library = new IconLibrary();
 		library.setCachePath( cachePath );
 		assertTrue( cachePath.exists() );
 	}
 
+	@Test
 	public void testConstructor() {
 		assertNotNull( new IconLibrary() );
 	}
 
+	@Test
 	public void testGetIconUrl() throws Exception {
 		IconLibrary library = new IconLibrary();
 		library.addSearchPath( JavaUtil.getPackagePath( getClass() ), getClass().getClassLoader() );
 
-		assertNull( "Null icon should not be found and was.", Accessor.callMethod( library, "getIconUrl", "null" ) );
-		assertNotNull( "Test icon should be found and was not.", Accessor.callMethod( library, "getIconUrl", "test" ) );
+		assertNull( Accessor.callMethod( library, "getIconUrl", "null" ), "Null icon should not be found and was." );
+		assertNotNull( Accessor.callMethod( library, "getIconUrl", "test" ), "Test icon should be found and was not." );
 	}
 
+	@Test
 	public void testGetIconWithNull() {
 		//assertEquals( "broken", library.getIcon( (URI)null ).toString() );
 		assertNull( library.getIcon( (URI)null ) );
 	}
 
+	@Test
 	public void testGetIcon() throws Exception {
 		URI uri = new File( "source/test/resources/com/parallelsymmetry/utility/ui/test.png" ).toURI();
 
@@ -70,7 +78,8 @@ public class IconLibraryTest extends TestCase {
 		assertTrue( file.exists() );
 	}
 
-	public void testGetBrokenIcon() throws Exception {
+	@Test
+	public void testGetBrokenIcon() {
 		Icon icon = library.getIcon( IconLibrary.BROKEN );
 		assertNotNull( icon );
 
@@ -79,7 +88,8 @@ public class IconLibraryTest extends TestCase {
 		//assertEquals( "964e85e8361583ce5b2f6bf2b334a479085b38d6", HashUtil.hash( Images.getArrayFromImage( target ) ) );
 	}
 
-	public void testIconCache() throws Exception {
+	@Test
+	public void testIconCache() {
 		TestIcon renderer = new TestIcon();
 		library.putIcon( "test", renderer );
 		assertEquals( 0, renderer.getRenderCalledCount() );
@@ -96,6 +106,7 @@ public class IconLibraryTest extends TestCase {
 		assertEquals( 1, renderer.getRenderCalledCount() );
 	}
 
+	@Getter
 	private static class TestIcon extends BaseIcon {
 
 		private int renderCalledCount;
@@ -103,10 +114,6 @@ public class IconLibraryTest extends TestCase {
 		@Override
 		public void render() {
 			renderCalledCount++;
-		}
-
-		public int getRenderCalledCount() {
-			return renderCalledCount;
 		}
 
 	}

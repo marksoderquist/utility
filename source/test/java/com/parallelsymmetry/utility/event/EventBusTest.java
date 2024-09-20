@@ -1,28 +1,21 @@
 package com.parallelsymmetry.utility.event;
 
+import com.parallelsymmetry.utility.Accessor;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.parallelsymmetry.utility.Accessor;
-import com.parallelsymmetry.utility.event.Event;
-import com.parallelsymmetry.utility.event.EventBus;
-import com.parallelsymmetry.utility.event.EventListener;
-import com.parallelsymmetry.utility.log.Log;
-
-public class EventBusTest extends TestCase {
+public class EventBusTest extends BaseTestCase {
 
 	private static final String TEST_QUEUE_NAME = "test";
 
-	@Override
-	public void setUp() {
-		Log.setLevel( Log.NONE );
-		Log.write();
-	}
-
+	@Test
 	public void testStartAndStop() throws Exception {
 		EventBus bus = new EventBus();
 		assertFalse( bus.isRunning() );
@@ -32,6 +25,7 @@ public class EventBusTest extends TestCase {
 		assertFalse( bus.isRunning() );
 	}
 
+	@Test
 	public void testAddListener() throws Exception {
 		EventBus bus = new EventBus();
 		EventListener<Event> listener = new MockEventListener();
@@ -47,6 +41,7 @@ public class EventBusTest extends TestCase {
 		assertEquals( listener, classListeners.iterator().next() );
 	}
 
+	@Test
 	public void testAddListenerByQueue() throws Exception {
 		EventBus bus = new EventBus();
 		EventListener<Event> listener = new MockEventListener();
@@ -62,6 +57,7 @@ public class EventBusTest extends TestCase {
 		assertEquals( listener, classListeners.iterator().next() );
 	}
 
+	@Test
 	public void testAddListenerByClass() throws Exception {
 		EventBus bus = new EventBus();
 		EventListener<Event> listener = new MockEventListener();
@@ -77,6 +73,7 @@ public class EventBusTest extends TestCase {
 		assertEquals( listener, classListeners.iterator().next() );
 	}
 
+	@Test
 	public void testRemoveListener() throws Exception {
 		EventBus bus = new EventBus();
 		EventListener<Event> listener = new MockEventListener();
@@ -95,6 +92,7 @@ public class EventBusTest extends TestCase {
 		assertEquals( 0, classListeners.size() );
 	}
 
+	@Test
 	public void testRemoveListenerByQueue() throws Exception {
 		EventBus bus = new EventBus();
 		EventListener<Event> listener = new MockEventListener();
@@ -113,6 +111,7 @@ public class EventBusTest extends TestCase {
 		assertEquals( 0, classListeners.size() );
 	}
 
+	@Test
 	public void testRemoveListenerByClass() throws Exception {
 		EventBus bus = new EventBus();
 		EventListener<Event> listener = new MockEventListener();
@@ -131,6 +130,7 @@ public class EventBusTest extends TestCase {
 		assertEquals( 0, classListeners.size() );
 	}
 
+	@Test
 	public void testSubmit() throws Exception {
 		EventBus bus = new EventBus();
 		Event event = new TestEvent( getClass() );
@@ -156,6 +156,7 @@ public class EventBusTest extends TestCase {
 		bus.stopAndWait();
 	}
 
+	@Test
 	public void testSubmitCancelledEvent() throws Exception {
 		EventBus bus = new EventBus();
 		Event cancelledEvent = new TestEvent( "cancelled" );
@@ -178,6 +179,7 @@ public class EventBusTest extends TestCase {
 		bus.stopAndWait();
 	}
 
+	@Test
 	public void testSubmitToQueue() throws Exception {
 		EventBus bus = new EventBus();
 		Event event = new TestEvent( getClass() );
@@ -197,6 +199,7 @@ public class EventBusTest extends TestCase {
 		bus.stopAndWait();
 	}
 
+	@Test
 	public void testSubmitToClass() throws Exception {
 		EventBus bus = new EventBus();
 		Event event = new TestEvent( getClass() );
@@ -216,6 +219,7 @@ public class EventBusTest extends TestCase {
 		bus.stopAndWait();
 	}
 
+	@Test
 	public void testSubmitMultipleEvents() throws Exception {
 		EventBus bus = new EventBus();
 		MockEventListener listener = new MockEventListener();
@@ -237,22 +241,17 @@ public class EventBusTest extends TestCase {
 		bus.stopAndWait();
 	}
 
-	private class TestEvent extends Event {
+	private static class TestEvent extends Event {
 
 		public TestEvent( Object source ) {
 			super( source );
 		}
 
-		@Override
-		public boolean equals( Object object ) {
-			return this == object;
-		}
-
 	}
 
-	private class MockEventListener implements EventListener<Event> {
+	private static class MockEventListener implements EventListener<Event> {
 
-		private List<Event> events = new CopyOnWriteArrayList<Event>();
+		private final List<Event> events = new CopyOnWriteArrayList<Event>();
 
 		@Override
 		public synchronized void eventOccurred( Event event ) {

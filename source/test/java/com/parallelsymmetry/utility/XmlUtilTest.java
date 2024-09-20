@@ -10,7 +10,7 @@ import java.io.Reader;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class XmlUtilTest {
+public class XmlUtilTest extends BaseTestCase {
 
 	@Test
 	public void testLoadXmlDocument() throws Exception {

@@ -1,24 +1,24 @@
 package com.parallelsymmetry.utility.ui;
 
+import com.parallelsymmetry.utility.Accessor;
+import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
 import java.util.Map;
 
-import javax.swing.Action;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
+public class ActionLibraryTest extends BaseTestCase {
 
-import com.parallelsymmetry.utility.Accessor;
-import com.parallelsymmetry.utility.ui.ActionLibrary;
-import com.parallelsymmetry.utility.ui.IconLibrary;
-import com.parallelsymmetry.utility.ui.XAction;
+	private final ActionLibrary library = new ActionLibrary( new IconLibrary() );
 
-public class ActionLibraryTest extends TestCase {
-
-	private ActionLibrary library = new ActionLibrary( new IconLibrary() );
-
-	public void testCreate() throws Exception {
+	@Test
+	public void testCreate() {
 		assertNotNull( library );
 	}
 
+	@Test
 	public void testGetAction() throws Exception {
 		assertNull( library.getAction( null ) );
 		assertNotNull( library.getAction( "null" ) );
