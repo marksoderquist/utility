@@ -1,11 +1,13 @@
 package com.parallelsymmetry.utility;
 
 import com.parallelsymmetry.utility.Accessor;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class AccessorTest extends TestCase {
+public class AccessorTest {
 
+	@Test
 	public void testCreate() throws Exception {
 		PrivateClass object1 = null;
 		object1 = Accessor.create( PrivateClass.class );
@@ -24,6 +26,7 @@ public class AccessorTest extends TestCase {
 		assertEquals( "object", Accessor.getField( object3, "field" ) );
 	}
 
+	@Test
 	public void testCreateNestedClass() throws Exception {
 		Object object1 = Accessor.create( PrivateClass.NestedClass.class );
 		assertNotNull( object1 );
@@ -41,6 +44,7 @@ public class AccessorTest extends TestCase {
 		assertEquals( checkObject, Accessor.getField( object2, "object" ) );
 	}
 
+	@Test
 	public void testCreateInnerClass() throws Exception {
 		PrivateClass object = new PrivateClass();
 		PrivateClass.InnerClass object1 = Accessor.create( PrivateClass.InnerClass.class, object );
@@ -57,6 +61,7 @@ public class AccessorTest extends TestCase {
 		assertEquals( PrivateClass.InnerClass.class, object2.getClass() );
 	}
 
+	@Test
 	public void testCreateWithString() throws Exception {
 		Object object1 = Accessor.create( PrivateClass.class.getName() );
 		assertNotNull( object1 );
@@ -72,6 +77,7 @@ public class AccessorTest extends TestCase {
 		assertEquals( PrivateClass.class, object2.getClass() );
 	}
 
+	@Test
 	public void testCreateNestedClassWithString() throws Exception {
 		Object object1 = Accessor.create( PrivateClass.NestedClass.class.getName() );
 		assertNotNull( object1 );
@@ -87,12 +93,14 @@ public class AccessorTest extends TestCase {
 		assertEquals( PrivateClass.NestedClass.class, object2.getClass() );
 	}
 
+	@Test
 	public void testGetField() throws Exception {
 		Object object = new Object();
 		PrivateClass privateClass = new PrivateClass( object );
 		assertEquals( object, Accessor.getField( privateClass, "field" ) );
 	}
 
+	@Test
 	public void testSetField() throws Exception {
 		PrivateClass privateClass = new PrivateClass();
 		assertNull( Accessor.getField( privateClass, "field" ) );
@@ -102,6 +110,7 @@ public class AccessorTest extends TestCase {
 		assertEquals( object, Accessor.getField( privateClass, "field" ) );
 	}
 
+	@Test
 	public void testSetStaticField() throws Exception {
 		PrivateClass privateClass = new PrivateClass();
 		assertNull( Accessor.getField( PrivateClass.class, "staticField" ) );
@@ -111,18 +120,21 @@ public class AccessorTest extends TestCase {
 		assertEquals( object, Accessor.getField( privateClass, "staticField" ) );
 	}
 
+	@Test
 	public void testCallMethod() throws Exception {
 		Object object = new Object();
 		PrivateClass privateClass = new PrivateClass( object );
 		assertEquals( object, Accessor.callMethod( privateClass, "getObject" ) );
 	}
 
+	@Test
 	public void testCallMethodWithParameter() throws Exception {
 		Object object = new Object();
 		PrivateClass privateClass = new PrivateClass();
 		assertEquals( object, Accessor.callMethod( privateClass, "loopback", object ) );
 	}
 
+	@Test
 	public void testCallMethodWithTypeAndParameter() throws Exception {
 		String string = new String();
 		PrivateClass privateClass = new PrivateClass();
@@ -135,17 +147,20 @@ public class AccessorTest extends TestCase {
 		assertEquals( string, Accessor.callMethod( privateClass, "loopback", Object.class, string ) );
 	}
 
+	@Test
 	public void testCallStaticMethod() throws Exception {
 		Object object = new Object();
 		PrivateClass.staticField = object;
 		assertEquals( object, Accessor.callMethod( PrivateClass.class, "staticMethod" ) );
 	}
 
+	@Test
 	public void testCallStaticMethodWithParameter() throws Exception {
 		Object object = new Object();
 		assertEquals( object, Accessor.callMethod( PrivateClass.class, "staticLoopback", object ) );
 	}
 
+	@Test
 	public void testCallStaticMethodWithTypeAndParameter() throws Exception {
 		String string = new String();
 		PrivateClass privateClass = new PrivateClass( string );

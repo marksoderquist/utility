@@ -1,5 +1,8 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -12,26 +15,28 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FileUtilTest extends TestCase {
+public class FileUtilTest {
 
 	private static final String PREFIX = "test";
 
 	private static final FilenameFilter TEST_FILE_FILTER = new TestFilenameFilter();
 
-	@Override
-	public void tearDown() throws Exception {
+	@AfterEach
+	public void teardown() throws Exception {
 		File tmp = new File( System.getProperty( "java.io.tmpdir" ) );
-		for( File file : tmp.listFiles( TEST_FILE_FILTER ) ) {
+		for( File file : Objects.requireNonNull( tmp.listFiles( TEST_FILE_FILTER ) ) ) {
 			FileUtil.delete( file );
 		}
 	}
 
+	@Test
 	public void testConstants() throws Exception {
 		assertEquals( 1000L, FileUtil.KB );
 		assertEquals( 1000000L, FileUtil.MB );
@@ -48,6 +53,7 @@ public class FileUtilTest extends TestCase {
 		assertEquals( 1152921504606846976L, FileUtil.EiB );
 	}
 
+	@Test
 	public void testGlobToRE() {
 		assertEquals( null, FileUtil.globToRE( null ) );
 		assertEquals( "", FileUtil.globToRE( "" ) );
@@ -60,18 +66,21 @@ public class FileUtilTest extends TestCase {
 		Pattern.compile( FileUtil.globToRE( "*.*" ) );
 	}
 
+	@Test
 	public void testGetExtensionWithFile() throws Exception {
 		assertEquals( "Incorrect extension.", null, FileUtil.getExtension( (File)null ) );
 		assertEquals( "Incorrect extension.", "", FileUtil.getExtension( new File( "test" ) ) );
 		assertEquals( "Incorrect extension.", "txt", FileUtil.getExtension( new File( "test.txt" ) ) );
 	}
 
+	@Test
 	public void testGetExtensionWithName() throws Exception {
 		assertEquals( "Incorrect extension.", null, FileUtil.getExtension( (String)null ) );
 		assertEquals( "Incorrect extension.", "", FileUtil.getExtension( "test" ) );
 		assertEquals( "Incorrect extension.", "txt", FileUtil.getExtension( "test.txt" ) );
 	}
 
+	@Test
 	public void testGetHumanSize() throws Exception {
 		assertEquals( "0B", FileUtil.getHumanSize( 0 ) );
 		assertEquals( "1B", FileUtil.getHumanSize( 1 ) );
@@ -103,6 +112,7 @@ public class FileUtilTest extends TestCase {
 		assertEquals( "1.0EB", FileUtil.getHumanSize( FileUtil.EB ) );
 	}
 
+	@Test
 	public void testGetHumanBinSize() throws Exception {
 		assertEquals( "0B", FileUtil.getHumanBinSize( 0 ) );
 		assertEquals( "1B", FileUtil.getHumanBinSize( 1 ) );
@@ -134,18 +144,21 @@ public class FileUtilTest extends TestCase {
 		assertEquals( "1.0EiB", FileUtil.getHumanBinSize( FileUtil.EiB ) );
 	}
 
+	@Test
 	public void testRemoveExtensionWithFile() throws Exception {
-		assertEquals( "Incorrect file name.", null, FileUtil.removeExtension( (File)null ) );
-		assertEquals( "Incorrect file name.", new File( "test" ), FileUtil.removeExtension( new File( "test" ) ) );
-		assertEquals( "Incorrect file name.", new File( "test" ), FileUtil.removeExtension( new File( "test.txt" ) ) );
+		assertEquals( null, FileUtil.removeExtension( (File)null ) );
+		assertEquals( new File( "test" ), FileUtil.removeExtension( new File( "test" ) ) );
+		assertEquals( new File( "test" ), FileUtil.removeExtension( new File( "test.txt" ) ) );
 	}
 
+	@Test
 	public void testRemoveExtensionWithName() throws Exception {
 		assertEquals( "Incorrect file name.", null, FileUtil.removeExtension( (String)null ) );
 		assertEquals( "Incorrect file name.", "test", FileUtil.removeExtension( "test" ) );
 		assertEquals( "Incorrect file name.", "test", FileUtil.removeExtension( "test.txt" ) );
 	}
 
+	@Test
 	public void testCreateTempFolder() throws Exception {
 		File folder = FileUtil.createTempFolder( PREFIX, "createTempFolder" );
 		assertTrue( folder.exists() );
@@ -156,12 +169,14 @@ public class FileUtilTest extends TestCase {
 		folder.delete();
 	}
 
+	@Test
 	public void testSaveAndLoad() throws Exception {
 		File file = File.createTempFile( PREFIX, "Test" );
 		FileUtil.save( file.toString(), file );
 		assertEquals( file.toString(), FileUtil.load( file ) );
 	}
 
+	@Test
 	public void testSaveAndLoadAsLines() throws Exception {
 		String content = "A\nB\nC";
 		File file = File.createTempFile( PREFIX, "Test" );
@@ -174,6 +189,7 @@ public class FileUtilTest extends TestCase {
 		assertEquals( "C", lines.get( 2 ) );
 	}
 
+	@Test
 	public void testZipAndUnzip() throws Exception {
 		File sourceData = new File( "source/test/java" );
 		File zip = new File( "target/test.source.zip" );
@@ -223,10 +239,12 @@ public class FileUtilTest extends TestCase {
 		targetData.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyWithNonExistantFiles() throws Exception {
 		assertFalse( FileUtil.copy( new File( "" ), new File( "" ) ) );
 	}
 
+	@Test
 	public void testCopyFileToFile() throws Exception {
 		long time = System.currentTimeMillis();
 		File source = File.createTempFile( PREFIX, "copyFileToFileSource" );
@@ -247,6 +265,7 @@ public class FileUtilTest extends TestCase {
 		target.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyFileToNewFile() throws Exception {
 		long time = System.currentTimeMillis();
 		File source = File.createTempFile( PREFIX, "copyFileToFileSource" );
@@ -269,6 +288,7 @@ public class FileUtilTest extends TestCase {
 		target.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyFileToFolder() throws Exception {
 		long time = System.currentTimeMillis();
 		File source = File.createTempFile( PREFIX, "copyFileToFolderSource" );
@@ -290,6 +310,7 @@ public class FileUtilTest extends TestCase {
 		target.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyFolderToFile() throws Exception {
 		File source = FileUtil.createTempFolder( PREFIX, "copyFolderToFileSource" );
 		File target = File.createTempFile( PREFIX, "copyFolderToFileTarget" );
@@ -301,6 +322,7 @@ public class FileUtilTest extends TestCase {
 		target.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyFolderToFolder() throws Exception {
 		File parent0 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent0" );
 		File parent1 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent1", parent0 );
@@ -327,6 +349,7 @@ public class FileUtilTest extends TestCase {
 		parent1.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyFolderToFolderWithSourceFolder() throws Exception {
 		File parent0 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent0" );
 		File parent1 = FileUtil.createTempFolder( PREFIX, "copyFolderToFolderParent1", parent0 );
@@ -354,6 +377,7 @@ public class FileUtilTest extends TestCase {
 		parent1.deleteOnExit();
 	}
 
+	@Test
 	public void testCopyFileToOutputStream() throws Exception {
 		long time = System.currentTimeMillis();
 		File source = File.createTempFile( PREFIX, "copyFileToFileSource" );
@@ -373,6 +397,7 @@ public class FileUtilTest extends TestCase {
 		source.deleteOnExit();
 	}
 
+	@Test
 	public void testDeleteTree() throws Exception {
 		assertTrue( FileUtil.delete( new File( "" ) ) );
 		File file = File.createTempFile( PREFIX, "deleteTree" );
@@ -392,6 +417,7 @@ public class FileUtilTest extends TestCase {
 		assertTrue( file.delete() );
 	}
 
+	@Test
 	public void testDeleteTreeOnExit() throws Exception {
 		FileUtil.deleteOnExit( new File( "" ) );
 
@@ -407,8 +433,10 @@ public class FileUtilTest extends TestCase {
 		FileUtil.deleteOnExit( parent0 );
 	}
 
+	@Test
 	public void testIsWritable() throws Exception {
 		File folder = FileUtil.createTempFolder( "FileUtil", "test" );
+		assertNotNull( folder );
 		assertTrue( FileUtil.isWritable( folder ) );
 	}
 

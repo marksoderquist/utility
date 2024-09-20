@@ -1,12 +1,10 @@
 package com.parallelsymmetry.utility;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.parallelsymmetry.utility.ObjectUtil;
-
-public class ObjectUtilTest extends TestCase {
+public class ObjectUtilTest {
 
 	@Test
 	public void testAreEqual() {

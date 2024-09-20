@@ -1,16 +1,16 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
-import org.w3c.dom.Document;
-
-public class XmlUtilTest extends TestCase {
+public class XmlUtilTest {
 
 	@Test
 	public void testLoadXmlDocument() throws Exception {
@@ -21,26 +21,24 @@ public class XmlUtilTest extends TestCase {
 
 	@Test
 	public void testLoadXmlDocumentWithNullUri() throws Exception {
-		Document document = XmlUtil.loadXmlDocument( (String)null );
-		assertNull( document );
+		assertNull( XmlUtil.loadXmlDocument( (String)null ) );
 	}
 
 	@Test
 	public void testLoadXmlDocumentWithNullReader() throws Exception {
-		Document document = XmlUtil.loadXmlDocument( (Reader)null );
-		assertNull( document );
+		assertNull( XmlUtil.loadXmlDocument( (Reader)null ) );
 	}
 
 	@Test
 	public void testLoadXmlDocumentWithNullStream() throws Exception {
-		Document document = XmlUtil.loadXmlDocument( (InputStream)null );
-		assertNull( document );
+		assertNull( XmlUtil.loadXmlDocument( (InputStream)null ) );
 	}
 
 	@Test
 	public void testGetDocumentType() throws Exception {
 		InputStream input = XmlUtilTest.class.getResourceAsStream( "/test.xml" );
 		Document document = XmlUtil.loadXmlDocument( input );
+		assertNotNull( document );
 		assertEquals( "test", document.getDocumentElement().getNodeName() );
 	}
 
@@ -81,10 +79,12 @@ public class XmlUtilTest extends TestCase {
 		assertEquals( test, output.toString().replace( "\r\n", "\n" ).trim() );
 	}
 
+	@Test
 	public void testGetPath() throws Exception {
 		assertNull( XmlUtil.getPath( null ) );
 
 		Document document = XmlUtil.loadXmlDocument( XmlUtilTest.class.getResourceAsStream( "/test.xml" ) );
+		assertNotNull( document );
 		assertEquals( "/test", XmlUtil.getPath( document.getFirstChild() ) );
 		assertEquals( "/test/a", XmlUtil.getPath( document.getFirstChild().getFirstChild().getNextSibling() ) );
 	}

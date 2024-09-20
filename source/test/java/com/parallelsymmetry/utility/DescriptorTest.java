@@ -1,18 +1,18 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+public class DescriptorTest {
 
-import com.parallelsymmetry.utility.Descriptor;
-
-public class DescriptorTest extends TestCase {
-
+	@Test
 	public void testConstructor() throws Exception {
 		Descriptor descriptor = new Descriptor();
 		assertNotNull( descriptor );
@@ -20,6 +20,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( 0, descriptor.getPaths().size() );
 	}
 
+	@Test
 	public void testConstructorWithNullNode() throws Exception {
 		Descriptor descriptor = new Descriptor( (Node)null );
 		assertNotNull( descriptor );
@@ -27,6 +28,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( 0, descriptor.getPaths().size() );
 	}
 
+	@Test
 	public void testConstructorWithNullStream() throws Exception {
 		Descriptor descriptor = null;
 		try {
@@ -38,6 +40,7 @@ public class DescriptorTest extends TestCase {
 		assertNull( descriptor );
 	}
 
+	@Test
 	public void testConstructorWithNode() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 		Descriptor descriptor2 = new Descriptor( descriptor.getNode( "/test" ) );
@@ -45,16 +48,19 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "test.name", descriptor2.getValue( "name" ) );
 	}
 
+	@Test
 	public void testConstructorWithStream() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 		assertNotNull( descriptor );
 	}
 
+	@Test
 	public void testGetDocument() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 		assertNotNull( descriptor.getDocument() );
 	}
 
+	@Test
 	public void testGetPathsWithEmptyDescriptor() throws Exception {
 		Descriptor descriptor = new Descriptor();
 		List<String> paths = descriptor.getPaths();
@@ -62,6 +68,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( 0, paths.size() );
 	}
 
+	@Test
 	public void testGetValueWithEmptyDescriptor() throws Exception {
 		Descriptor descriptor = new Descriptor();
 		assertEquals( null, descriptor.getValue( null ) );
@@ -69,6 +76,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( null, descriptor.getValue( "test/name" ) );
 	}
 
+	@Test
 	public void testGetValueWithDefaultWithEmptyDescriptor() throws Exception {
 		Descriptor descriptor = new Descriptor();
 		assertEquals( null, descriptor.getValue( (String)null, null ) );
@@ -79,6 +87,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
 	}
 
+	@Test
 	public void testGetAttributeNames() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -90,6 +99,7 @@ public class DescriptorTest extends TestCase {
 		assertTrue( names.contains( "h" ) );
 	}
 
+	@Test
 	public void testGetNames() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -109,6 +119,7 @@ public class DescriptorTest extends TestCase {
 		assertTrue( names.contains( "three" ) );
 	}
 
+	@Test
 	public void testGetPaths() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -122,6 +133,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "/test/summary", paths.get( 9 ) );
 	}
 
+	@Test
 	public void testGetNode() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -133,6 +145,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( document.getDocumentElement(), descriptor.getNode( "/test" ) );
 	}
 
+	@Test
 	public void testGetNodes() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -140,11 +153,12 @@ public class DescriptorTest extends TestCase {
 		assertEquals( null, descriptor.getNodes( "" ) );
 
 		Node[] values = descriptor.getNodes( "/test/nodes/node" );
-		assertEquals( "one", values[0].getTextContent() );
-		assertEquals( "two", values[1].getTextContent() );
-		assertEquals( "three", values[2].getTextContent() );
+		assertEquals( "one", values[ 0 ].getTextContent() );
+		assertEquals( "two", values[ 1 ].getTextContent() );
+		assertEquals( "three", values[ 2 ].getTextContent() );
 	}
 
+	@Test
 	public void testGetValue() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -156,6 +170,7 @@ public class DescriptorTest extends TestCase {
 		assertEquals( null, descriptor.getValue( "notfound" ) );
 	}
 
+	@Test
 	public void testGetValueWithDefault() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -167,12 +182,17 @@ public class DescriptorTest extends TestCase {
 		assertEquals( "default", descriptor.getValue( "notfound", "default" ) );
 	}
 
+	@Test
 	public void testGetMultilineValue() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
-		assertEquals( "This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.", descriptor.getValue( "/test/summary" ) );
+		assertEquals(
+			"This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.",
+			descriptor.getValue( "/test/summary" )
+		);
 	}
 
+	@Test
 	public void testGetValues() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -181,11 +201,12 @@ public class DescriptorTest extends TestCase {
 
 		String[] values = descriptor.getValues( "/test/nodes/node" );
 		assertEquals( 3, values.length );
-		assertEquals( "one", values[0] );
-		assertEquals( "two", values[1] );
-		assertEquals( "three", values[2] );
+		assertEquals( "one", values[ 0 ] );
+		assertEquals( "two", values[ 1 ] );
+		assertEquals( "three", values[ 2 ] );
 	}
 
+	@Test
 	public void testGetMultilineValues() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 
@@ -194,9 +215,13 @@ public class DescriptorTest extends TestCase {
 
 		String[] values = descriptor.getValues( "/test/summary" );
 		assertEquals( 1, values.length );
-		assertEquals( "This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.", values[0] );
+		assertEquals(
+			"This summary needs to span multiple line in order for the test to work correctly. Please ensure that this summary is wrapped roughly at characters per line so that there are three lines.",
+			values[ 0 ]
+		);
 	}
 
+	@Test
 	public void testGetAttributeValueFromSubDescriptor() throws Exception {
 		Descriptor descriptor = loadTestDescriptor();
 		Descriptor subDescriptor = new Descriptor( descriptor.getNode( "/test/bounds" ) );

@@ -7,19 +7,25 @@ import com.parallelsymmetry.utility.task.Task;
 import com.parallelsymmetry.utility.task.TaskEvent;
 import com.parallelsymmetry.utility.task.TaskListener;
 import com.parallelsymmetry.utility.task.TaskManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class TaskEventTest extends TestCase {
+public class TaskEventTest {
 
 	private TaskManager manager;
 
-	@Override
-	public void setUp() throws Exception {
+	@BeforeEach
+	public void setup() throws Exception {
 		manager = new TaskManager();
 		manager.startAndWait();
 	}
 
+	@Test
 	public void testSucess() throws Exception {
 		Task<Object> task = new MockTask( manager );
 
@@ -33,7 +39,7 @@ public class TaskEventTest extends TestCase {
 		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.SUCCESS, task.getResult() );
 
-		/**
+		/*
 		 * Because there are two threads involved in this test, the test thread
 		 * needs to wait for the events to arrive. Task is required to ensure the
 		 * done state is set correctly before events are sent but this allows the
@@ -46,6 +52,7 @@ public class TaskEventTest extends TestCase {
 		assertEvent( watcher.events.get( 2 ), task, TaskEvent.Type.TASK_FINISH );
 	}
 
+	@Test
 	public void testFailure() throws Exception {
 		Task<Object> task = new MockTask( manager, null, true );
 
@@ -64,7 +71,7 @@ public class TaskEventTest extends TestCase {
 		assertEquals( Task.State.DONE, task.getState() );
 		assertEquals( Task.Result.FAILED, task.getResult() );
 
-		/**
+		/*
 		 * Because there are two threads involved in this test, the test thread
 		 * needs to wait for the events to arrive. Task is required to ensure the
 		 * done state is set correctly before events are sent but this allows the

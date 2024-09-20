@@ -1,13 +1,17 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class UriUtilTest extends TestCase {
+public class UriUtilTest {
 
+	@Test
 	public void testResolveWithString() throws Exception {
 		assertEquals( new File( "" ).getCanonicalFile().toURI(), UriUtil.resolve( "" ) );
 		assertEquals( new File( "." ).getCanonicalFile().toURI(), UriUtil.resolve( "." ) );
@@ -17,14 +21,15 @@ public class UriUtilTest extends TestCase {
 		assertEquals( URI.create( "ssh://localhost" ), UriUtil.resolve( "ssh://localhost" ) );
 	}
 
+	@Test
 	public void testResolveWithRelativeUri() {
 		URI base = URI.create( "file:/test/folder/" );
 		URI absolute = URI.create( "file:/test/folder/absolute" );
 		URI relative = URI.create( "relative" );
 		URI jar = URI.create( "jar:file:/test/folder%20with%20spaces/file.jar!/path/to/resource" );
 
-		assertEquals( null, UriUtil.resolve( null, null ) );
-		assertEquals( null, UriUtil.resolve( base, null ) );
+		assertNull( UriUtil.resolve( null, null ) );
+		assertNull( UriUtil.resolve( base, null ) );
 		assertEquals( URI.create( "relative" ), UriUtil.resolve( null, relative ) );
 		assertEquals( URI.create( "file:/test/folder/absolute" ), UriUtil.resolve( null, absolute ) );
 
@@ -38,6 +43,7 @@ public class UriUtilTest extends TestCase {
 		assertEquals( URI.create( "http://www.parallelsymmetry.com/images/icons/escape.png" ), UriUtil.resolve( jar, icon ) );
 	}
 
+	@Test
 	public void testGetParent() {
 		URI absolute = URI.create( "file:/test/folder/absolute" );
 		URI opaque = URI.create( "jar:" + absolute.toString() );
@@ -48,6 +54,7 @@ public class UriUtilTest extends TestCase {
 		assertEquals( "double:jar:file:/test/folder/", UriUtil.getParent( doubleOpaque ).toString() );
 	}
 
+	@Test
 	public void testParseQueryWithUri() {
 		assertNull( UriUtil.parseQuery( (URI)null ) );
 
@@ -62,6 +69,7 @@ public class UriUtilTest extends TestCase {
 		assertEquals( "value2", parameters.get( "attr2" ) );
 	}
 
+	@Test
 	public void testParseQueryWithString() {
 		assertNull( UriUtil.parseQuery( (String)null ) );
 

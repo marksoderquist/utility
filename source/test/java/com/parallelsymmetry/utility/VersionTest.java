@@ -1,12 +1,12 @@
 package com.parallelsymmetry.utility;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Locale;
 
-import com.parallelsymmetry.utility.Version;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
-
-public class VersionTest extends TestCase {
+public class VersionTest {
 
 	private static final String[] VERSIONS_QUALIFIER = { "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-m2", "1-m11", "1-rc", "1-cr2", "1-rc123", "1-SNAPSHOT", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-pom-1", "1-1-snapshot", "1-1", "1-2", "1-123" };
 
@@ -44,6 +44,7 @@ public class VersionTest extends TestCase {
 
 	private Version snapshot = new Version( "3.4.5-SNAPSHOT" );
 
+	@Test
 	public void testIsSnapshot() {
 		assertEquals( true, new Version( "1-alpha2snapshot" ).isSnapshot() );
 		assertEquals( false, new Version( "1-alpha2" ).isSnapshot() );
@@ -197,30 +198,33 @@ public class VersionTest extends TestCase {
 		assertEquals( false, new Version( "11m" ).hasQualifier( "beta" ) );
 	}
 
+	@Test
 	public void testCompareVersions() {
-		assertEquals( "Compare equal versions", 0, Version.compareVersions( version, version ) );
+		assertEquals( 0, Version.compareVersions( version, version ), "Compare equal versions" );
 
-		assertEquals( "Compare greater major", -1, Version.compareVersions( version, majorGreater ) );
-		assertEquals( "Compare lesser major", 1, Version.compareVersions( version, majorLesser ) );
+		assertEquals( -1, Version.compareVersions( version, majorGreater ), "Compare greater major" );
+		assertEquals( 1, Version.compareVersions( version, majorLesser ), "Compare lesser major" );
 
-		assertEquals( "Compare greater minor", -1, Version.compareVersions( version, minorGreater ) );
-		assertEquals( "Compare lesser minor", 1, Version.compareVersions( version, minorLesser ) );
+		assertEquals( -1, Version.compareVersions( version, minorGreater ), "Compare greater minor" );
+		assertEquals( 1, Version.compareVersions( version, minorLesser ), "Compare lesser minor" );
 
-		assertEquals( "Compare greater micro", -1, Version.compareVersions( version, microGreater ) );
-		assertEquals( "Compare lesser micro", 1, Version.compareVersions( version, microLesser ) );
+		assertEquals( -1, Version.compareVersions( version, microGreater ), "Compare greater micro" );
+		assertEquals( 1, Version.compareVersions( version, microLesser ), "Compare lesser micro" );
 
-		assertEquals( "Compare greater revision", -1, Version.compareVersions( version, revisionGreater ) );
-		assertEquals( "Compare lesser revision", 1, Version.compareVersions( version, revisionLesser ) );
+		assertEquals( -1, Version.compareVersions( version, revisionGreater ), "Compare greater revision" );
+		assertEquals( 1, Version.compareVersions( version, revisionLesser ), "Compare lesser revision" );
 
-		assertEquals( "Compare greater build", -1, Version.compareVersions( version, buildGreater ) );
-		assertEquals( "Compare lesser build", 1, Version.compareVersions( version, buildLesser ) );
+		assertEquals( -1, Version.compareVersions( version, buildGreater ), "Compare greater build" );
+		assertEquals( 1, Version.compareVersions( version, buildLesser ), "Compare lesser build" );
 	}
 
+	@Test
 	public void testCompareVersionWithSnapshot() {
-		assertEquals( "Compare snapshot versions", 1, Version.compareVersions( version, snapshot ) );
-		assertEquals( "Compare snapshot versions", -1, Version.compareVersions( snapshot, version ) );
+		assertEquals( 1, Version.compareVersions( version, snapshot ), "Compare snapshot versions" );
+		assertEquals( -1, Version.compareVersions( snapshot, version ), "Compare snapshot versions" );
 	}
 
+	@Test
 	public void testToString() {
 		assertEquals( "unknown", new Version( null ).toString() );
 
@@ -238,6 +242,7 @@ public class VersionTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testToHumanString() {
 		assertEquals( "2.0", new Version( "2.0" ).toHumanString() );
 		assertEquals( "2-1", new Version( "2-1" ).toHumanString() );
@@ -295,14 +300,17 @@ public class VersionTest extends TestCase {
 		assertEquals( "3.4.5 SNAPSHOT", snapshot.toHumanString() );
 	}
 
+	@Test
 	public void testVersionsQualifier() {
 		checkVersionsOrder( VERSIONS_QUALIFIER );
 	}
 
+	@Test
 	public void testVersionsNumber() {
 		checkVersionsOrder( VERSIONS_NUMBER );
 	}
 
+	@Test
 	public void testVersionsEqual() {
 		checkVersionsEqual( "1", "1" );
 		checkVersionsEqual( "1", "1.0" );
@@ -358,6 +366,7 @@ public class VersionTest extends TestCase {
 		checkVersionsEqual( "1m3", "1MILESTONE3" );
 	}
 
+	@Test
 	public void testVersionComparing() {
 		checkVersionsOrder( "1", "2" );
 		checkVersionsOrder( "1.5", "2" );
@@ -404,6 +413,7 @@ public class VersionTest extends TestCase {
 		checkVersionsOrder( "1.6.0_22", "1.7" );
 	}
 
+	@Test
 	public void testLocaleIndependent() {
 		Locale original = Locale.getDefault();
 		Locale[] locales = { Locale.ENGLISH, new Locale( "tr" ), Locale.getDefault() };
@@ -417,13 +427,14 @@ public class VersionTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testHashCode() {
 		Version a = new Version( "1" );
 		Version b = new Version( "1" );
 		Version c = new Version( "2" );
-		assertTrue( a.hashCode() == b.hashCode() );
-		assertFalse( a.hashCode() == c.hashCode() );
-		assertFalse( b.hashCode() == c.hashCode() );
+		assertEquals( a.hashCode(), b.hashCode() );
+		assertNotEquals( a.hashCode(), c.hashCode() );
+		assertNotEquals( b.hashCode(), c.hashCode() );
 	}
 
 	private Version newComparable( String version ) {
@@ -431,17 +442,17 @@ public class VersionTest extends TestCase {
 	}
 
 	private void checkVersionsOrder( String[] strings ) {
-		Version[] versions = new Version[strings.length];
+		Version[] versions = new Version[ strings.length ];
 		for( int index = 0; index < strings.length; index++ ) {
-			versions[index] = newComparable( strings[index] );
+			versions[ index ] = newComparable( strings[ index ] );
 		}
 
 		for( int lowIndex = 1; lowIndex < strings.length; lowIndex++ ) {
-			Version low = versions[lowIndex - 1];
+			Version low = versions[ lowIndex - 1 ];
 			for( int highIndex = lowIndex; highIndex < strings.length; highIndex++ ) {
-				Version high = versions[highIndex];
-				assertTrue( "expected " + low + " < " + high, low.compareTo( high ) < 0 );
-				assertTrue( "expected " + high + " > " + low, high.compareTo( low ) > 0 );
+				Version high = versions[ highIndex ];
+				assertTrue( low.compareTo( high ) < 0, "expected " + low + " < " + high );
+				assertTrue( high.compareTo( low ) > 0, "expected " + high + " > " + low );
 			}
 		}
 	}
@@ -449,18 +460,18 @@ public class VersionTest extends TestCase {
 	private void checkVersionsEqual( String string1, String string2 ) {
 		Version version1 = newComparable( string1 );
 		Version version2 = newComparable( string2 );
-		assertTrue( "expected " + string1 + " == " + string2, version1.compareTo( version2 ) == 0 );
-		assertTrue( "expected " + string2 + " == " + string1, version2.compareTo( version1 ) == 0 );
-		assertTrue( "expected same hashcode for " + string1 + " and " + string2, version1.hashCode() == version2.hashCode() );
-		assertTrue( "expected " + string1 + ".equals( " + string2 + " )", version1.equals( version2 ) );
-		assertTrue( "expected " + string2 + ".equals( " + string1 + " )", version2.equals( version1 ) );
+		assertEquals( 0, version1.compareTo( version2 ), "expected " + string1 + " == " + string2 );
+		assertEquals( 0, version2.compareTo( version1 ), "expected " + string2 + " == " + string1 );
+		assertEquals( version1.hashCode(), version2.hashCode(), "expected same hashcode for " + string1 + " and " + string2 );
+		assertEquals( version1, version2, "expected " + string1 + ".equals( " + string2 + " )" );
+		assertEquals( version2, version1, "expected " + string2 + ".equals( " + string1 + " )" );
 	}
 
 	private void checkVersionsOrder( String string1, String string2 ) {
 		Version version1 = newComparable( string1 );
 		Version version2 = newComparable( string2 );
-		assertTrue( "expected " + string1 + " < " + string2, version1.compareTo( version2 ) < 0 );
-		assertTrue( "expected " + string2 + " > " + string1, version2.compareTo( version1 ) > 0 );
+		assertTrue( version1.compareTo( version2 ) < 0, "expected " + string1 + " < " + string2 );
+		assertTrue( version2.compareTo( version1 ) > 0, "expected " + string2 + " > " + string1 );
 	}
 
 }

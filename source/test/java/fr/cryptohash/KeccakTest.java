@@ -1,12 +1,16 @@
 package fr.cryptohash;
 
-import junit.framework.TestCase;
 
-public class KeccakTest extends TestCase {
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class KeccakTest {
 
 	/**
 	 * Test Keccak-128 implementation.
 	 */
+	@Test
 	public void testKeccak128() {
 		testKatHex( new Keccak128(), "", "bcf56ac882ad981cd0fa74f0f397572c" );
 		testKatHex( new Keccak128(), "cc", "30b4b88428445e62d65175ed5531244e" );
@@ -15,6 +19,7 @@ public class KeccakTest extends TestCase {
 	/**
 	 * Test Keccak-224 implementation.
 	 */
+	@Test
 	public void testKeccak224() {
 		testKatHex( new Keccak224(), "", "f71837502ba8e10837bdd8d365adb85591895602fc552b48b7390abd" );
 		testKatHex( new Keccak224(), "cc", "a9cab59eb40a10b246290f2d6086e32e3689faf1d26b470c899f2802" );
@@ -277,6 +282,7 @@ public class KeccakTest extends TestCase {
 	/**
 	 * Test Keccak-256 implementation.
 	 */
+	@Test
 	public void testKeccak256() {
 		testKatHex( new Keccak256(), "", "c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470" );
 		testKatHex( new Keccak256(), "cc", "eead6dbfc7340a56caedc044696a168870549a6a7f6f56961e84a54bd9970b8a" );
@@ -539,6 +545,7 @@ public class KeccakTest extends TestCase {
 	/**
 	 * Test Keccak-384 implementation.
 	 */
+	@Test
 	public void testKeccak384() {
 		testKatHex( new Keccak384(), "", "2c23146a63a29acf99e73b88f8c24eaa7dc60aa771780ccc006afbfa8fe2479b2dd2b21362337441ac12b515911957ff" );
 		testKatHex( new Keccak384(), "cc", "1b84e62a46e5a201861754af5dc95c4a1a69caf4a796ae405680161e29572641f5fa1e8641d7958336ee7b11c58f73e9" );
@@ -801,6 +808,7 @@ public class KeccakTest extends TestCase {
 	/**
 	 * Test Keccak-512 implementation.
 	 */
+	@Test
 	public void testKeccak512() {
 		testKatHex( new Keccak512(), "", "0eab42de4c3ceb9235fc91acffe746b29c29a8c366b7c60e4e67c466f36a4304c00fa9caf9d87976ba469bcbe06713b435f091ef2769fb160cdab33d3670680e" );
 		testKatHex( new Keccak512(), "cc", "8630c13cbd066ea74bbe7fe468fec1dee10edc1254fb4c1b7c5fd69b646e44160b8ce01d05a0908ca790dfb080f4b513bc3b6225ece7a810371441a5ac666eb9" );
@@ -1107,8 +1115,7 @@ public class KeccakTest extends TestCase {
 		/*
 		 * Now the update() API; this also exercises auto-reset.
 		 */
-		for( int i = 0; i < buf.length; i++ )
-			dig.update( buf[i] );
+        for (byte b : buf) dig.update(b);
 		assertEquals( dig.digest(), exp );
 
 		/*
