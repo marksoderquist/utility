@@ -45,7 +45,6 @@ public class ServerAgentTest extends BaseTestCase {
 		assertFalse( server.isRunning(), "Server is not stopped." );
 	}
 
-	@Disabled
 	@Test
 	public void testConnect() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
