@@ -2,21 +2,20 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
   workflow_dispatch:
 
 env:
-#  AVN_PRODUCT: "utility"
-#  # The default release, should be overridden in config.sh
-#  AVN_RELEASE: "latest"
-#  # The default platform, should be overridden in the platform binaries jobs below
-#  AVN_PLATFORM: "linux"
+  #  MVS_PRODUCT: "utility"
+  #  # The default release, should be overridden in config.sh
+  #  MVS_RELEASE: "latest"
+  #  # The default platform, should be overridden in the platform binaries jobs below
+  #  MVS_PLATFORM: "linux"
 
-#  AVN_GPG_PASSWORD: ${{ secrets.AVN_GPG_PASSWORD }}
-#  AVN_KEYSTORE_PASSWORD: ${{ secrets.AVN_KEYSTORE_PASSWORD }}
-#  AVN_REPO_USERNAME: ${{ secrets.AVN_REPO_USERNAME }}
-#  AVN_REPO_PASSWORD: ${{ secrets.AVN_REPO_PASSWORD }}
+  MVS_GPG_PASSWORD: ${{ secrets.MVS_GPG_PASSWORD }}
+  MVS_REPO_USERNAME: ${{ secrets.MVS_REPO_USERNAME }}
+  MVS_REPO_PASSWORD: ${{ secrets.MVS_REPO_PASSWORD }}
 
   DISPLAY: ":99"
   GITHUB_REF: ${{ github.ref }}
@@ -24,8 +23,7 @@ env:
   JAVA_VERSION: "17"
   JAVA_DISTRO: "adopt"
   JAVA_PACKAGE: "jdk"
-#  MAVEN_PARMS: "-B -U -V --settings .github/settings.xml --file pom.xml"
-  MAVEN_PARMS: "-B -U -V --file pom.xml"
+  MAVEN_PARMS: "-B -U -V --settings .github/settings.xml --file pom.xml"
   XVFB_PARMS: "-screen 0 1920x1080x24 -nolisten unix"
 
 jobs:
@@ -37,26 +35,26 @@ jobs:
       - name: Fetch sources
         uses: actions/checkout@v4
 
-#      - name: Fetch CI/CD resources
-#        uses: actions/checkout@v4
-#        with:
-#          repository: avereon/canoe
-#          path: .github
-#
-#      - name: Configuration
-#        shell: bash
-#        run: |
-#          source .github/config.sh
-#
-#      # Required to render the product icon
-#      - name: Set up Virtual Display
-#        run: |
-#          Xvfb ${{env.DISPLAY}} ${{env.XVFB_PARMS}} &
+      - name: Fetch CI/CD resources
+        uses: actions/checkout@v4
+        with:
+          repository: marksoderquist/cicd
+          path: .github
+
+      - name: Configuration
+        shell: bash
+        run: |
+          source .github/config.sh
+
+      #      # Required to render the product icon
+      #      - name: Set up Virtual Display
+      #        run: |
+      #          Xvfb ${{env.DISPLAY}} ${{env.XVFB_PARMS}} &
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: ${{env.JAVA_DISTRO}}
+          distribution: temurin
           java-version: ${{env.JAVA_VERSION}}
 
       - name: Maven Repository Cache
@@ -89,14 +87,14 @@ jobs:
 
 #      - name: Trigger Dependent Builds
 #        run: |
-#          curl -XPOST -u "${{secrets.AVN_CI_USERNAME}}:${{secrets.AVN_CI_PASSWORD}}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/avereon/zarra/actions/workflows/ci.yml/dispatches --data '{"ref": "main"}'
-#          curl -XPOST -u "${{secrets.AVN_CI_USERNAME}}:${{secrets.AVN_CI_PASSWORD}}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/avereon/xenon-junit5/actions/workflows/ci.yml/dispatches --data '{"ref": "main"}'
+#          curl -XPOST -u "${{secrets.MVS_CI_USERNAME}}:${{secrets.MVS_CI_PASSWORD}}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/marksoderquist/zarra/actions/workflows/ci.yml/dispatches --data '{"ref": "main"}'
+#          curl -XPOST -u "${{secrets.MVS_CI_USERNAME}}:${{secrets.MVS_CI_PASSWORD}}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/marksoderquist/xenon-junit5/actions/workflows/ci.yml/dispatches --data '{"ref": "main"}'
 #
 #      - name: Deploy JavaDoc
 #        run: |
-#          ssh -t ${{env.AVN_REPO_USERNAME}}@avereon.com "mkdir -p ${{env.JAVADOC_DEPLOY_PATH}};"
+#          ssh -t ${{env.MVS_REPO_USERNAME}}@avereon.com "mkdir -p ${{env.JAVADOC_DEPLOY_PATH}};"
 #          if [ $? -ne 0 ]; then exit 1; fi
-#          scp -B target/${AVN_PRODUCT}-*-javadoc.jar ${{env.AVN_REPO_USERNAME}}@avereon.com:${{env.JAVADOC_DEPLOY_PATH}}/javadoc.jar 2>&1
+#          scp -B target/${MVS_PRODUCT}-*-javadoc.jar ${{env.MVS_REPO_USERNAME}}@avereon.com:${{env.JAVADOC_DEPLOY_PATH}}/javadoc.jar 2>&1
 #          if [ $? -ne 0 ]; then exit 1; fi
-#          ssh -t ${{env.AVN_REPO_USERNAME}}@avereon.com "mkdir -p ${{env.JAVADOC_TARGET_PATH}};rm -rf ${{env.JAVADOC_TARGET_PATH}}/*;unzip -o ${{env.JAVADOC_DEPLOY_PATH}}/javadoc.jar -d ${{env.JAVADOC_TARGET_PATH}}"
+#          ssh -t ${{env.MVS_REPO_USERNAME}}@avereon.com "mkdir -p ${{env.JAVADOC_TARGET_PATH}};rm -rf ${{env.JAVADOC_TARGET_PATH}}/*;unzip -o ${{env.JAVADOC_DEPLOY_PATH}}/javadoc.jar -d ${{env.JAVADOC_TARGET_PATH}}"
 #          if [ $? -ne 0 ]; then exit 1; fi
