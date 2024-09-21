@@ -6,15 +6,17 @@ import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.MockDataList;
 import com.parallelsymmetry.utility.mock.MockDataNode;
 import lombok.Getter;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransactionTest extends DataTestCase {
 
+	@AfterEach
 	@Override
-	public void tearDown() {
-		super.tearDown();
+	public void teardown() throws Exception {
+		super.teardown();
 		Transaction.reset();
 	}
 

@@ -17,7 +17,7 @@ public class EnumerationIteratorTest extends BaseTestCase {
 
 	@BeforeEach
 	@Override
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		list = new Vector<>();
 		list.add( "This" );
@@ -25,7 +25,7 @@ public class EnumerationIteratorTest extends BaseTestCase {
 		list.add( "a" );
 		list.add( "test." );
 
-		iterator = new EnumerationIterator<String>( list.elements() );
+		iterator = new EnumerationIterator<>( list.elements() );
 	}
 
 	@Test

@@ -30,7 +30,7 @@ public class FileUtilTest extends BaseTestCase {
 
 	@AfterEach
 	@Override
-	public void teardown() {
+	public void teardown() throws Exception {
 		File tmp = new File( System.getProperty( "java.io.tmpdir" ) );
 		for( File file : Objects.requireNonNull( tmp.listFiles( TEST_FILE_FILTER ) ) ) {
 			FileUtil.delete( file );
@@ -69,21 +69,21 @@ public class FileUtilTest extends BaseTestCase {
 	}
 
 	@Test
-	public void testGetExtensionWithFile() throws Exception {
-		assertEquals( "Incorrect extension.", null, FileUtil.getExtension( (File)null ) );
-		assertEquals( "Incorrect extension.", "", FileUtil.getExtension( new File( "test" ) ) );
-		assertEquals( "Incorrect extension.", "txt", FileUtil.getExtension( new File( "test.txt" ) ) );
+	public void testGetExtensionWithFile() {
+		assertEquals(  null, FileUtil.getExtension( (File)null ) );
+		assertEquals(  "", FileUtil.getExtension( new File( "test" ) ) );
+		assertEquals(  "txt", FileUtil.getExtension( new File( "test.txt" ) ) );
 	}
 
 	@Test
-	public void testGetExtensionWithName() throws Exception {
-		assertEquals( "Incorrect extension.", null, FileUtil.getExtension( (String)null ) );
-		assertEquals( "Incorrect extension.", "", FileUtil.getExtension( "test" ) );
-		assertEquals( "Incorrect extension.", "txt", FileUtil.getExtension( "test.txt" ) );
+	public void testGetExtensionWithName() {
+		assertEquals(  null, FileUtil.getExtension( (String)null ) );
+		assertEquals(  "", FileUtil.getExtension( "test" ) );
+		assertEquals(  "txt", FileUtil.getExtension( "test.txt" ) );
 	}
 
 	@Test
-	public void testGetHumanSize() throws Exception {
+	public void testGetHumanSize() {
 		assertEquals( "0B", FileUtil.getHumanSize( 0 ) );
 		assertEquals( "1B", FileUtil.getHumanSize( 1 ) );
 		assertEquals( "12B", FileUtil.getHumanSize( 12 ) );
@@ -115,7 +115,7 @@ public class FileUtilTest extends BaseTestCase {
 	}
 
 	@Test
-	public void testGetHumanBinSize() throws Exception {
+	public void testGetHumanBinSize() {
 		assertEquals( "0B", FileUtil.getHumanBinSize( 0 ) );
 		assertEquals( "1B", FileUtil.getHumanBinSize( 1 ) );
 		assertEquals( "12B", FileUtil.getHumanBinSize( 12 ) );
@@ -147,17 +147,17 @@ public class FileUtilTest extends BaseTestCase {
 	}
 
 	@Test
-	public void testRemoveExtensionWithFile() throws Exception {
+	public void testRemoveExtensionWithFile() {
 		assertEquals( null, FileUtil.removeExtension( (File)null ) );
 		assertEquals( new File( "test" ), FileUtil.removeExtension( new File( "test" ) ) );
 		assertEquals( new File( "test" ), FileUtil.removeExtension( new File( "test.txt" ) ) );
 	}
 
 	@Test
-	public void testRemoveExtensionWithName() throws Exception {
-		assertEquals( "Incorrect file name.", null, FileUtil.removeExtension( (String)null ) );
-		assertEquals( "Incorrect file name.", "test", FileUtil.removeExtension( "test" ) );
-		assertEquals( "Incorrect file name.", "test", FileUtil.removeExtension( "test.txt" ) );
+	public void testRemoveExtensionWithName() {
+		assertEquals(  null, FileUtil.removeExtension( (String)null ) );
+		assertEquals(  "test", FileUtil.removeExtension( "test" ) );
+		assertEquals(  "test", FileUtil.removeExtension( "test.txt" ) );
 	}
 
 	@Test

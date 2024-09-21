@@ -18,7 +18,7 @@ public class TaskManagerTest extends BaseTestCase {
 
 	@BeforeEach
 	@Override
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		manager = new TaskManager();
 	}

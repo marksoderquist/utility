@@ -1,22 +1,18 @@
 package com.parallelsymmetry.utility.agent;
 
+import com.parallelsymmetry.utility.BaseTestCase;
+import com.parallelsymmetry.utility.ThreadUtil;
+import lombok.Getter;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-import com.parallelsymmetry.utility.ThreadUtil;
-import com.parallelsymmetry.utility.agent.Worker;
-import com.parallelsymmetry.utility.log.Log;
+public class WorkerTest extends BaseTestCase {
 
-public class WorkerTest extends TestCase {
-
-	@Override
-	public void setUp() {
-		Log.setLevel( Log.NONE );
-		Log.write();
-	}
-
+	@Test
 	public void testStartStopCount() throws Exception {
 		CountingWorker worker = new CountingWorker();
 		assertFalse( worker.isWorking() );
@@ -28,6 +24,7 @@ public class WorkerTest extends TestCase {
 		assertEquals( 1, worker.getStopCount() );
 	}
 
+	@Test
 	public void testStartAndStop() throws Exception {
 		Worker worker = new BlockingIOWorker();
 		assertFalse( worker.isWorking() );
@@ -37,17 +34,19 @@ public class WorkerTest extends TestCase {
 		assertFalse( worker.isWorking() );
 	}
 
+	@Test
 	public void testRestart() throws Exception {
 		Worker worker = new BlockingIOWorker();
 		assertFalse( worker.isWorking() );
 		worker.startAndWait();
-		assertTrue( "Worker not working after start.", worker.isWorking() );
+		assertTrue( worker.isWorking(), "Worker not working after start." );
 		worker.restart();
-		assertTrue( "Worker not working after restart.", worker.isWorking() );
+		assertTrue( worker.isWorking(), "Worker not working after restart." );
 		worker.stopAndWait();
 		assertFalse( worker.isWorking() );
 	}
 
+	@Test
 	public void testFastRestarts() throws Exception {
 		Worker worker = new BlockingIOWorker();
 		assertFalse( worker.isWorking() );
@@ -63,19 +62,12 @@ public class WorkerTest extends TestCase {
 		assertFalse( worker.isWorking() );
 	}
 
+	@Getter
 	private static class CountingWorker extends Worker {
 
 		private int startCount;
 
 		private int stopCount;
-
-		public int getStartCount() {
-			return startCount;
-		}
-
-		public int getStopCount() {
-			return stopCount;
-		}
 
 		@Override
 		public void startWorker() {
@@ -97,6 +89,7 @@ public class WorkerTest extends TestCase {
 	}
 
 	private static class BlockingIOWorker extends Worker {
+
 		InputStream input;
 
 		@Override
@@ -117,6 +110,7 @@ public class WorkerTest extends TestCase {
 		protected void stopWorker() throws Exception {
 			input.close();
 		}
+
 	}
 
 	private static class TestInputStream extends InputStream {

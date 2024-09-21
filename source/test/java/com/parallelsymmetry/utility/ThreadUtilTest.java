@@ -28,14 +28,14 @@ public class ThreadUtilTest extends BaseTestCase {
 	public void testAppendStackTraceWithNullSource() {
 		Throwable target = new Throwable();
 		StackTraceElement[] trace = target.getStackTrace();
-		assertEquals( trace, ThreadUtil.appendStackTrace( (Throwable)null, target ).getStackTrace() );
+		assertArrayEquals( trace, ThreadUtil.appendStackTrace( (Throwable)null, target ).getStackTrace() );
 	}
 
 	@Test
 	public void testAppendStackTraceWithNullTarget() {
 		Throwable source = new Throwable();
 		StackTraceElement[] trace = source.getStackTrace();
-		assertEquals( trace, ThreadUtil.appendStackTrace( source, null ).getStackTrace() );
+		assertArrayEquals( trace, ThreadUtil.appendStackTrace( source, null ).getStackTrace() );
 	}
 
 	@Test
@@ -50,7 +50,7 @@ public class ThreadUtilTest extends BaseTestCase {
 		System.arraycopy( targetTrace, 0, elements, 0, targetTrace.length );
 		System.arraycopy( sourceTrace, 0, elements, targetTrace.length, sourceTrace.length );
 
-		assertEquals( elements, ThreadUtil.appendStackTrace( source, target ).getStackTrace() );
+		assertArrayEquals( elements, ThreadUtil.appendStackTrace( source, target ).getStackTrace() );
 	}
 
 	@Test

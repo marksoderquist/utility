@@ -32,9 +32,8 @@ public class LogTest extends BaseTestCase {
 
 	@AfterEach
 	@Override
-	public void teardown() {
+	public void teardown() throws Exception {
 		Log.removeHandler( handler );
-		Log.setLevel( null );
 		super.teardown();
 	}
 
@@ -182,7 +181,7 @@ public class LogTest extends BaseTestCase {
 		record = handler.getLogRecord();
 		assertNotNull( record );
 		assertEquals( Log.ERROR, record.getLevel() );
-		assertEquals( "Incorrect log message.", "Test", record.getMessage() );
+		assertEquals( "Test", record.getMessage() );
 		assertEquals( throwable, record.getThrown() );
 	}
 
@@ -209,7 +208,7 @@ public class LogTest extends BaseTestCase {
 		LogRecord record = handler.getLogRecord();
 		assertNotNull( record );
 		assertEquals( Log.INFO, record.getLevel() );
-		assertEquals( "Incorrect log message.", "", record.getMessage() );
+		assertEquals( "", record.getMessage() );
 	}
 
 	@Test
@@ -226,7 +225,7 @@ public class LogTest extends BaseTestCase {
 
 		LogRecord record = handler.getLogRecord();
 		assertNotNull( record );
-		assertEquals( "Incorrect log message.", "2", record.getMessage() );
+		assertEquals( "2", record.getMessage() );
 		assertEquals( Log.TRACE, record.getLevel() );
 	}
 

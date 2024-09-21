@@ -1,9 +1,13 @@
 package com.parallelsymmetry.utility.agent;
 
 import com.parallelsymmetry.utility.BaseTestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ExceptionAgentTest extends BaseTestCase {
 
+	@Test
 	public void testStartFailure() throws Exception {
 		//Log.write( "testStartFailure()..." );
 		ExceptionCountingAgent agent = new ExceptionCountingAgent( true, false );
@@ -14,10 +18,11 @@ public class ExceptionAgentTest extends BaseTestCase {
 		agent.waitForStartup();
 		assertFalse( agent.isRunning() );
 		assertEquals( Agent.State.STOPPED, agent.getState() );
-		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
-		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
+		assertEquals( 1, agent.getStartAgentCount(), "Wrong start call count." );
+		assertEquals( 1, agent.getStopAgentCount(), "Wrong stop call count." );
 	}
 
+	@Test
 	public void testStopFailure() throws Exception {
 		//Log.write( "testStopFailure()..." );
 		ExceptionCountingAgent agent = new ExceptionCountingAgent( false, true );
@@ -28,15 +33,15 @@ public class ExceptionAgentTest extends BaseTestCase {
 		agent.waitForStartup();
 		assertTrue( agent.isRunning() );
 		assertEquals( Agent.State.STARTED, agent.getState() );
-		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
-		assertEquals( "Wrong stop call count.", 0, agent.getStopAgentCount() );
+		assertEquals( 1, agent.getStartAgentCount(), "Wrong start call count." );
+		assertEquals( 0, agent.getStopAgentCount(), "Wrong stop call count." );
 
 		agent.stop();
 		agent.waitForShutdown();
 		assertTrue( agent.isRunning() );
 		assertEquals( Agent.State.STARTED, agent.getState() );
-		assertEquals( "Wrong start call count.", 1, agent.getStartAgentCount() );
-		assertEquals( "Wrong stop call count.", 1, agent.getStopAgentCount() );
+		assertEquals( 1, agent.getStartAgentCount(), "Wrong start call count." );
+		assertEquals( 1, agent.getStopAgentCount(), "Wrong stop call count." );
 	}
 
 }

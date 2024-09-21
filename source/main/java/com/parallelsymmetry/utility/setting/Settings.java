@@ -43,7 +43,7 @@ import com.parallelsymmetry.utility.ui.Colors;
  * nodes have absolute paths of <i>&lt;parent's absolute path&gt;</i>
  * <tt> + "/" + </tt><i>&lt;node name&gt;</i>. Note that all absolute paths
  * begin with the slash character.
- * 
+ *
  * @author Mark Soderquist
  */
 public class Settings {
@@ -151,7 +151,7 @@ public class Settings {
 	/**
 	 * Set the default provider for the settings root. There is only on default
 	 * provider per settings root.
-	 * 
+	 *
 	 * @param provider
 	 */
 	public void setDefaultProvider( SettingsProvider provider ) {
@@ -370,7 +370,7 @@ public class Settings {
 
 	/**
 	 * Copy the values from this settings object to the specified settings object.
-	 * 
+	 *
 	 * @param settings
 	 */
 	public void copyTo( Settings settings ) {
@@ -382,7 +382,7 @@ public class Settings {
 	/**
 	 * Deep copy the values from this settings object to the specified settings
 	 * object.
-	 * 
+	 *
 	 * @param settings
 	 */
 	public void copyDeepTo( Settings settings ) {
@@ -395,7 +395,7 @@ public class Settings {
 
 	/**
 	 * Copy the values from this settings object to the specified settings object.
-	 * 
+	 *
 	 * @param settings
 	 */
 	public void copyFrom( Settings settings ) {
@@ -407,7 +407,7 @@ public class Settings {
 	/**
 	 * Deep copy the values from this settings object to the specified settings
 	 * object.
-	 * 
+	 *
 	 * @param settings
 	 */
 	public void copyDeepFrom( Settings settings ) {
@@ -421,7 +421,7 @@ public class Settings {
 	/**
 	 * Get a value. If the value is not defined in the settings return the
 	 * specified default value.
-	 * 
+	 *
 	 * @param path
 	 * @param defaultValue
 	 * @return
@@ -456,7 +456,7 @@ public class Settings {
 
 	/**
 	 * Set a value. To remove a value set it to null.
-	 * 
+	 *
 	 * @param path
 	 * @param value
 	 */
@@ -844,7 +844,7 @@ public class Settings {
 
 	/**
 	 * Add a SettingListener for changes to a specific path.
-	 * 
+	 *
 	 * @param path
 	 * @param listener
 	 */
@@ -862,7 +862,7 @@ public class Settings {
 
 	/**
 	 * Remove a SettingListener for changes to a specific path.
-	 * 
+	 *
 	 * @param path
 	 * @param listener
 	 */
@@ -896,10 +896,10 @@ public class Settings {
 		printAsPaths( this, stream );
 	}
 
-	@Deprecated
-	public void printAsXml( PrintStream stream ) {
-		printAsXml( this, stream );
-	}
+//	@Deprecated
+//	public void printAsXml( PrintStream stream ) {
+//		printAsXml( this, stream );
+//	}
 
 	/**
 	 * Get a settings safe UUID. A settings safe UUID does not start with a number
@@ -955,11 +955,13 @@ public class Settings {
 	@Deprecated
 	private static void printAsXml( Settings settings, PrintStream stream, int level ) {
 		String name = settings.getName();
-		Set<String> keys = settings.getKeys();
+		List<String> keys = new ArrayList<>( settings.getKeys() );
 		Set<Settings> children = settings.getChildNodes();
 		String indent = TextUtil.pad( 2 * level );
 		String valueIndent = TextUtil.pad( 2 * ( level + 1 ) );
 		int valueCount = keys.size() + children.size();
+
+		Collections.sort( keys );
 
 		stream.append( indent );
 		stream.append( "<" );
@@ -1044,7 +1046,7 @@ public class Settings {
 	 * <td>null</td>
 	 * </tr>
 	 * </table>
-	 * 
+	 *
 	 * @param path
 	 * @return
 	 */

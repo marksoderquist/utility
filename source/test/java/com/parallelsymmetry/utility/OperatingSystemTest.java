@@ -13,7 +13,7 @@ public class OperatingSystemTest extends BaseTestCase {
 
 	@BeforeEach
 	@Override
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		System.clearProperty( OperatingSystem.ELEVATED_PRIVILEGE_KEY );
 	}

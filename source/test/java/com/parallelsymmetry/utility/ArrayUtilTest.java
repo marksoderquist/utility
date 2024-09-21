@@ -8,33 +8,33 @@ public class ArrayUtilTest extends BaseTestCase {
 
 	@Test
 	public void testPush() {
-		assertEquals( null, ArrayUtil.push( null, "a" ) );
-		assertEquals( new String[]{ "a" }, ArrayUtil.push( new String[]{ "a" }, null ) );
+		assertArrayEquals( null, ArrayUtil.push( null, "a" ) );
+		assertArrayEquals( new String[]{ "a" }, ArrayUtil.push( new String[]{ "a" }, null ) );
 
-		assertEquals( new String[]{ "a" }, ArrayUtil.push( new String[]{}, "a" ) );
-		assertEquals( new String[]{ "a", "b" }, ArrayUtil.push( new String[]{ "a" }, "b" ) );
-		assertEquals( new String[]{ "a", "b", "c" }, ArrayUtil.push( new String[]{ "a", "b" }, "c" ) );
+		assertArrayEquals( new String[]{ "a" }, ArrayUtil.push( new String[]{}, "a" ) );
+		assertArrayEquals( new String[]{ "a", "b" }, ArrayUtil.push( new String[]{ "a" }, "b" ) );
+		assertArrayEquals( new String[]{ "a", "b", "c" }, ArrayUtil.push( new String[]{ "a", "b" }, "c" ) );
 	}
 
 	@Test
 	public void testPop() {
-		assertEquals( null, ArrayUtil.pop( null ) );
-		assertEquals( new String[]{}, ArrayUtil.pop( new String[]{} ) );
+		assertArrayEquals( null, ArrayUtil.pop( null ) );
+		assertArrayEquals( new String[]{}, ArrayUtil.pop( new String[]{} ) );
 
-		assertEquals( new String[]{ "a", "b" }, ArrayUtil.pop( new String[]{ "a", "b", "c" } ) );
-		assertEquals( new String[]{ "a" }, ArrayUtil.pop( new String[]{ "a", "b" } ) );
-		assertEquals( new String[]{}, ArrayUtil.pop( new String[]{ "a" } ) );
+		assertArrayEquals( new String[]{ "a", "b" }, ArrayUtil.pop( new String[]{ "a", "b", "c" } ) );
+		assertArrayEquals( new String[]{ "a" }, ArrayUtil.pop( new String[]{ "a", "b" } ) );
+		assertArrayEquals( new String[]{}, ArrayUtil.pop( new String[]{ "a" } ) );
 	}
 
 	@Test
 	public void testCombine() {
-		assertEquals( null, ArrayUtil.combine( null, null ) );
+		assertArrayEquals( null, ArrayUtil.combine( null, null ) );
 
-		assertEquals( new String[]{ "a" }, ArrayUtil.combine( new String[]{ "a" }, null ) );
-		assertEquals( new String[]{ "b" }, ArrayUtil.combine( null, new String[]{ "b" } ) );
+		assertArrayEquals( new String[]{ "a" }, ArrayUtil.combine( new String[]{ "a" }, null ) );
+		assertArrayEquals( new String[]{ "b" }, ArrayUtil.combine( null, new String[]{ "b" } ) );
 
-		assertEquals( new String[]{ "a", "b" }, ArrayUtil.combine( new String[]{ "a" }, new String[]{ "b" } ) );
-		assertEquals( new String[]{ "a", "b", "c", "d" }, ArrayUtil.combine( new String[]{ "a", "b" }, new String[]{ "c", "d" } ) );
+		assertArrayEquals( new String[]{ "a", "b" }, ArrayUtil.combine( new String[]{ "a" }, new String[]{ "b" } ) );
+		assertArrayEquals( new String[]{ "a", "b", "c", "d" }, ArrayUtil.combine( new String[]{ "a", "b" }, new String[]{ "c", "d" } ) );
 	}
 
 	@Test
@@ -63,7 +63,7 @@ public class ArrayUtilTest extends BaseTestCase {
 
 	@Test
 	public void testDecodeIntArray() {
-		assertEquals( new int[]{ 4, 5, 6, 7 }, ArrayUtil.decodeIntArray( "4,5,6,7" ) );
+		assertArrayEquals( new int[]{ 4, 5, 6, 7 }, ArrayUtil.decodeIntArray( "4,5,6,7" ) );
 	}
 
 	//	private <T> void assertEquals( T[] a, T[] b ) {
@@ -79,7 +79,7 @@ public class ArrayUtilTest extends BaseTestCase {
 	//		}
 	//	}
 
-	//	private void assertEquals( int[] a, int[] b ) {
+	//	private void assertIntArrayEquals( int[] a, int[] b ) {
 	//		if( a == null ) assertNull( b );
 	//		if( b == null ) assertNull( a );
 	//		if( a == null && b == null ) return;

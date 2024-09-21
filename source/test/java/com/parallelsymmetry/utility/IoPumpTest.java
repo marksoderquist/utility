@@ -21,7 +21,7 @@ public class IoPumpTest extends BaseTestCase {
 
 	@BeforeEach
 	@Override
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		Log.setLevel( Log.NONE );
 	}
@@ -215,7 +215,7 @@ public class IoPumpTest extends BaseTestCase {
 		IoPump pump = new IoPump( input, writer, charset );
 		pump.startAndWait();
 		pump.waitFor();
-		assertEquals( "charset: " + charset, string, new String( writer.toCharArray() ) );
+		assertEquals( string, new String( writer.toCharArray() ), "charset: " + charset );
 	}
 
 	private void testReaderToOutput( String string, Charset charset, int bufferSize ) throws Exception {
@@ -230,7 +230,7 @@ public class IoPumpTest extends BaseTestCase {
 		IoPump pump = new IoPump( reader, output, charset );
 		pump.startAndWait();
 		pump.waitFor();
-		assertEquals( "charset: " + charset, string, output.toString( charset ) );
+		assertEquals( string, output.toString( charset ), "charset: " + charset );
 	}
 
 	private void testReaderToWriter( String string, int bufferSize ) throws Exception {
@@ -267,7 +267,7 @@ public class IoPumpTest extends BaseTestCase {
 		builder.append( "[T] Test IOPump started.\n" );
 		builder.append( "[T] Test: abcd\n" );
 		builder.append( "[T] Test IOPump finished.\n" );
-		assertEquals( builder.toString(), new String( logOutput.toByteArray() ) );
+		assertEquals( builder.toString(), logOutput.toString() );
 	}
 
 	@Test

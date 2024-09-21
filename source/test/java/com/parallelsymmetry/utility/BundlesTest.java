@@ -22,36 +22,36 @@ public class BundlesTest extends BaseTestCase {
 
 	@BeforeEach
 	@Override
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		locale = Locale.getDefault();
 	}
 
 	@AfterEach
 	@Override
-	public void teardown() {
+	public void teardown() throws Exception {
 		Locale.setDefault( locale );
 		super.teardown();
 	}
 
 	@Test
-	public void testGetString() throws Exception {
+	public void testGetString() {
 		assertEquals( "Exit_en", Bundles.getString( TEST_BUNDLE, "exit", null ) );
 		Locale.setDefault( new Locale( SPANISH ) );
 		assertEquals( "Exit_es", Bundles.getString( TEST_BUNDLE, "exit", null ) );
 	}
 
 	@Test
-	public void testGetStringShowingKey() throws Exception {
-		assertEquals( "String should be the key.", "[" + TEST_BUNDLE + ":]", Bundles.getString( TEST_BUNDLE, "", null ) );
-		assertEquals( "String should be the key.", "[" + TEST_BUNDLE + ":test.property.name]", Bundles.getString( TEST_BUNDLE, "test.property.name", null ) );
+	public void testGetStringShowingKey() {
+		assertEquals(  "[" + TEST_BUNDLE + ":]", Bundles.getString( TEST_BUNDLE, "", null ) );
+		assertEquals(  "[" + TEST_BUNDLE + ":test.property.name]", Bundles.getString( TEST_BUNDLE, "test.property.name", null ) );
 		Locale.setDefault( new Locale( SPANISH ) );
-		assertEquals( "String should be the key.", "[" + TEST_BUNDLE + ":]", Bundles.getString( TEST_BUNDLE, "", null ) );
-		assertEquals( "String should be the key.", "[" + TEST_BUNDLE + ":test.property.name]", Bundles.getString( TEST_BUNDLE, "test.property.name", null ) );
+		assertEquals(  "[" + TEST_BUNDLE + ":]", Bundles.getString( TEST_BUNDLE, "", null ) );
+		assertEquals(  "[" + TEST_BUNDLE + ":test.property.name]", Bundles.getString( TEST_BUNDLE, "test.property.name", null ) );
 	}
 
 	@Test
-	public void testGetStringNotShowingKey() throws Exception {
+	public void testGetStringNotShowingKey() {
 		assertEquals( null, Bundles.getString( TEST_BUNDLE, "", null, false ) );
 		assertEquals( "Exit_en", Bundles.getString( TEST_BUNDLE, "exit", null, false ) );
 		Locale.setDefault( new Locale( SPANISH ) );

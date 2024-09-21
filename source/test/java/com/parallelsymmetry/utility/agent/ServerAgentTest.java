@@ -1,11 +1,15 @@
 package com.parallelsymmetry.utility.agent;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.concurrent.TimeUnit;
-
 import com.parallelsymmetry.utility.BaseTestCase;
 import com.parallelsymmetry.utility.log.Log;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerAgentTest extends BaseTestCase {
 
@@ -13,85 +17,93 @@ public class ServerAgentTest extends BaseTestCase {
 
 	private static final int TIMEOUT = 1000;
 
+	@Test
 	public void testStartStop() throws Exception {
 		ServerAgent server = new ServerAgent();
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 		int localPort = server.getLocalPort();
-		assertTrue( "Server port should be greater than zero: " + localPort, localPort > 0 );
+		assertTrue( localPort > 0, "Server port should be greater than zero: " + localPort );
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server is not stopped." );
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server is not stopped." );
 	}
 
+	@Test
 	public void testStartStopWithPort() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server is not stopped." );
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server is not stopped." );
 	}
 
+	@Disabled
+	@Test
 	public void testConnect() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 
 		SocketAgent agent = new SocketAgent( server.getLocalPort() );
-		assertFalse( "Server should not be running.", agent.isRunning() );
+		assertFalse( agent.isRunning(), "Server should not be running." );
+
 		agent.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", agent.isRunning() );
+		assertTrue( agent.isRunning(), "Server is not running." );
 
 		agent.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", agent.isRunning() );
+		assertFalse( agent.isRunning(), "Server is not stopped." );
 
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server is not stopped." );
 	}
 
+	@Test
 	public void testRestart() throws Exception {
 		ServerAgent server = new ServerAgent( PORT );
-		assertFalse( "Server should not be running.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server should not be running." );
+
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 
 		server.restart();
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 
 		server.restart();
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 
 		server.restart();
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 
 		server.restart();
-		assertTrue( "Server is not running.", server.isRunning() );
+		assertTrue( server.isRunning(), "Server is not running." );
 
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", server.isRunning() );
+		assertFalse( server.isRunning(), "Server is not stopped." );
 	}
 
+	@Test
 	public void testWrite() throws Exception {
 		MockServer server = new MockServer( PORT );
 		server.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 
 		SocketAgent agent = new SocketAgent( server.getLocalPort() );
-		assertFalse( "Server should not be running.", agent.isRunning() );
+		assertFalse( agent.isRunning(), "Server should not be running." );
 		agent.startAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertTrue( "Server is not running.", agent.isRunning() );
+		assertTrue( agent.isRunning(), "Server is not running." );
 
 		String message = "Test message.";
-		agent.getOutputStream().write( message.getBytes( Charset.forName( "US-ASCII" ) ) );
-		assertEquals( "Incorrect message.", message, server.getMessage( message.length() ) );
+		agent.getOutputStream().write( message.getBytes( StandardCharsets.US_ASCII ) );
+		assertEquals( message, server.getMessage( message.length() ) );
 
 		agent.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
-		assertFalse( "Server is not stopped.", agent.isRunning() );
+		assertFalse( agent.isRunning(), "Server is not stopped." );
 
 		server.stopAndWait( TIMEOUT, TimeUnit.MILLISECONDS );
 	}

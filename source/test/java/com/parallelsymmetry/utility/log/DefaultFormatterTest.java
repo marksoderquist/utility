@@ -15,7 +15,7 @@ public class DefaultFormatterTest extends BaseTestCase {
 
 	@AfterEach
 	@Override
-	public void teardown() {
+	public void teardown() throws Exception {
 		Log.setShowDate( false );
 		Log.setShowColor( false );
 		Log.setShowPrefix( false );

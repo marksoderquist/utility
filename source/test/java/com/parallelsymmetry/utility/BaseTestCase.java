@@ -14,7 +14,7 @@ public abstract class BaseTestCase {
 	}
 
 	@AfterEach
-	public void teardown() {
+	public void teardown() throws Exception {
 		Log.setLevel( Log.NONE );
 	}
 

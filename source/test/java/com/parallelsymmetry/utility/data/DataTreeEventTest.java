@@ -2,6 +2,7 @@ package com.parallelsymmetry.utility.data;
 
 import com.parallelsymmetry.utility.mock.DataEventWatcher;
 import com.parallelsymmetry.utility.mock.WatchedMockData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,6 +22,7 @@ public abstract class DataTreeEventTest extends DataTestCase {
 
 	protected DataEventWatcher childWatcher;
 
+	@BeforeEach
 	@Override
 	public void setup() throws Exception {
 		super.setup();

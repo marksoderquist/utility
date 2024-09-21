@@ -1,13 +1,14 @@
 package com.parallelsymmetry.utility.agent;
 
 import com.parallelsymmetry.utility.ThreadUtil;
-import com.parallelsymmetry.utility.agent.Agent;
+import lombok.Getter;
 
+@Getter
 public class CountingAgent extends Agent {
 
-	private int startupPause;
+	private final int startupPause;
 
-	private int shutdownPause;
+	private final int shutdownPause;
 
 	private int startAgentCount;
 
@@ -33,22 +34,6 @@ public class CountingAgent extends Agent {
 	public void resetCounts() {
 		startAgentCount = 0;
 		stopAgentCount = 0;
-	}
-
-	public int getStartupPause() {
-		return startupPause;
-	}
-
-	public int getShutdownPause() {
-		return shutdownPause;
-	}
-
-	public int getStartAgentCount() {
-		return startAgentCount;
-	}
-
-	public int getStopAgentCount() {
-		return stopAgentCount;
 	}
 
 }

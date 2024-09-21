@@ -1,6 +1,7 @@
 package com.parallelsymmetry.utility.setting;
 
 import com.parallelsymmetry.utility.BaseTestCase;
+import com.parallelsymmetry.utility.Version;
 import com.parallelsymmetry.utility.mock.MockSettingsProvider;
 import com.parallelsymmetry.utility.mock.MockWritableSettingsProvider;
 import lombok.Getter;
@@ -737,7 +738,7 @@ public class SettingsTest extends BaseTestCase {
 	public void testGetMap() {
 		int count = 5;
 		String path = "/test/maps/map1";
-		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
+		Map<String, MockPersistent> sourceMap = new HashMap<>();
 
 		for( int index = 0; index < count; index++ ) {
 			String name = String.valueOf( (char)(65 + index) );
@@ -745,7 +746,7 @@ public class SettingsTest extends BaseTestCase {
 		}
 
 		// Create a check list of the settings objects.
-		Map<String, Settings> checkMap = new HashMap<String, Settings>();
+		Map<String, Settings> checkMap = new HashMap<>();
 		for( String name : sourceMap.keySet() ) {
 			Settings settings = new Settings();
 			settings.addProvider( new MapSettingsProvider() );
@@ -774,7 +775,7 @@ public class SettingsTest extends BaseTestCase {
 		Map<String, Settings> map = settings.getNodeMap( path, null );
 		assertNull( map );
 
-		Map<String, MockPersistent> defaultMap = new HashMap<String, MockPersistent>();
+		Map<String, MockPersistent> defaultMap = new HashMap<>();
 		defaultMap.put( "0", new MockPersistent() );
 		map = settings.getNodeMap( path, defaultMap );
 
@@ -786,7 +787,7 @@ public class SettingsTest extends BaseTestCase {
 	@Test
 	public void testPutEmptyMap() {
 		String path = "/test/maps/map0";
-		Map<String, MockPersistent> map = new HashMap<String, MockPersistent>();
+		Map<String, MockPersistent> map = new HashMap<>();
 		settings.putNodeMap( path, map );
 		assertEquals( 0, settings.getNodeSet( path, null ).size() );
 	}
@@ -795,15 +796,15 @@ public class SettingsTest extends BaseTestCase {
 	public void testRemoveMap() {
 		int count = 5;
 		String path = "/test/maps/map2";
-		Map<String, MockPersistent> sourceMap = new HashMap<String, MockPersistent>();
+		Map<String, MockPersistent> sourceMap = new HashMap<>();
 
 		for( int index = 0; index < count; index++ ) {
 			String name = String.valueOf( (char)(65 + index) );
 			sourceMap.put( name, new MockPersistent( name ) );
 		}
 
-		// Create a check list of the settings objects.
-		Map<String, Settings> checkMap = new HashMap<String, Settings>();
+		// Create a checklist of the settings objects.
+		Map<String, Settings> checkMap = new HashMap<>();
 		for( String name : sourceMap.keySet() ) {
 			Settings settings = new Settings();
 			settings.addProvider( new MapSettingsProvider() );
@@ -896,6 +897,11 @@ public class SettingsTest extends BaseTestCase {
 		assertEquals( expected, settings.toStringPaths() );
 	}
 
+	private static boolean isJava8OrLater() {
+		Version version = new Version( System.getProperty( "java.version" ) );
+		return  version.compareTo( new Version( "1.8" ) ) >= 0;
+	}
+
 	@Test
 	public void testToStringXml() {
 		providerD.set( "/a", "A" );
@@ -906,9 +912,13 @@ public class SettingsTest extends BaseTestCase {
 		providerD.set( "/y/b", "B" );
 		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <y>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </y>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
-		if( System.getProperty( "java.version" ).startsWith( "1.8" ) ) {
+		if( isJava8OrLater() ) {
 			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <y>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </y>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
 		}
+
+//		if( isJava8OrLater() ) {
+//			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <y>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </y>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
+//		}
 		assertEquals( expected, settings.toStringXml() );
 	}
 
@@ -954,13 +964,13 @@ public class SettingsTest extends BaseTestCase {
 		providerD.set( "/z/b", "B" );
 		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
-		if( System.getProperty( "java.version" ).startsWith( "1.8" ) ) {
+		if( isJava8OrLater() ) {
 			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
 		}
 
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		PrintStream stream = new PrintStream( buffer );
-		settings.printAsXml( stream );
+		settings.printAsXml( settings, stream );
 
 		assertEquals( expected, buffer.toString() );
 	}
@@ -973,7 +983,7 @@ public class SettingsTest extends BaseTestCase {
 		providerD.set( "/z/b", "B" );
 		String expected = "<settings>\n" + "  <b>B</b>\n" + "  <a>A</a>\n" + "  <z>\n" + "    <b>B</b>\n" + "    <a>A</a>\n" + "  </z>\n" + "</settings>\n";
 
-		if( System.getProperty( "java.version" ).startsWith( "1.8" ) ) {
+		if( isJava8OrLater() ) {
 			expected = "<settings>\n" + "  <a>A</a>\n" + "  <b>B</b>\n" + "  <z>\n" + "    <a>A</a>\n" + "    <b>B</b>\n" + "  </z>\n" + "</settings>\n";
 		}
 
@@ -1025,7 +1035,7 @@ public class SettingsTest extends BaseTestCase {
 
 		Set<String> expectedKeys = expected.getKeys();
 		for( String name : expectedKeys ) {
-			assertEquals( name, expected.get( name, null ), actual.get( name, null ) );
+			assertEquals( expected.get( name, null ), actual.get( name, null ) );
 		}
 	}
 
@@ -1081,8 +1091,7 @@ public class SettingsTest extends BaseTestCase {
 
 		@Override
 		public boolean equals( Object object ) {
-			if( !(object instanceof MockPersistent) ) return false;
-			MockPersistent that = (MockPersistent)object;
+			if( !(object instanceof MockPersistent that) ) return false;
 			return value == null ? this.index == that.index : this.value.equals( that.value );
 		}
 

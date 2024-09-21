@@ -2,9 +2,9 @@ package com.parallelsymmetry.utility.agent;
 
 public class ExceptionCountingAgent extends CountingAgent {
 
-	private boolean failStart;
+	private final boolean failStart;
 
-	private boolean failStop;
+	private final boolean failStop;
 
 	public ExceptionCountingAgent( boolean failStart, boolean failStop ) {
 		super( 0, 0 );

@@ -26,7 +26,7 @@ public class IconLibraryTest extends BaseTestCase {
 
 	@BeforeEach
 	@Override
-	public void setup() {
+	public void setup() throws Exception {
 		super.setup();
 		library = new IconLibrary();
 		library.setCachePath( cachePath );

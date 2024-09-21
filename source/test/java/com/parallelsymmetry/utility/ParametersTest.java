@@ -131,7 +131,7 @@ public class ParametersTest extends BaseTestCase {
 		String[] args = new String[]{ "-" + key, value };
 		Parameters parameters = Parameters.parse( args );
 		assertFalse( parameters.isTrue( notakey ) );
-		assertEquals( "Value not set.", value, parameters.get( key ) );
+		assertEquals(  value, parameters.get( key ) );
 	}
 
 	@Test
@@ -155,7 +155,7 @@ public class ParametersTest extends BaseTestCase {
 		assertFalse( parameters.isSet( notakey ) );
 		assertFalse( parameters.isTrue( notakey ) );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( "Value not set.", values.get( index ), parameters.get( keys.get( index ) ) );
+			assertEquals( values.get( index ), parameters.get( keys.get( index ) ) );
 		}
 	}
 
@@ -175,7 +175,7 @@ public class ParametersTest extends BaseTestCase {
 		String[] args = new String[]{ "-flag1", "-key", "value", "-flag2" };
 		Parameters parameters = Parameters.parse( args );
 		assertTrue( parameters.isTrue( "flag1" ) );
-		assertEquals( "Value not set.", "value", parameters.get( "key" ) );
+		assertEquals(  "value", parameters.get( "key" ) );
 		assertTrue( parameters.isTrue( "flag2" ) );
 	}
 
@@ -183,9 +183,9 @@ public class ParametersTest extends BaseTestCase {
 	public void testParseValuesWithFlag() {
 		String[] args = new String[]{ "-key1", "value1", "-flag", "-key2", "value2" };
 		Parameters parameters = Parameters.parse( args );
-		assertEquals( "Value 1 not set.", "value1", parameters.get( "key1" ) );
+		assertEquals( "value1", parameters.get( "key1" ) );
 		assertTrue( parameters.isTrue( "flag" ) );
-		assertEquals( "Value 2 not set.", "value2", parameters.get( "key2" ) );
+		assertEquals(  "value2", parameters.get( "key2" ) );
 	}
 
 	@Test
@@ -195,7 +195,7 @@ public class ParametersTest extends BaseTestCase {
 		Parameters parameters = Parameters.parse( args );
 		List<String> uris = parameters.getUris();
 		assertEquals( 1, uris.size() );
-		assertEquals( "URI incorrect.", UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
+		assertEquals( UriUtil.resolve( filename ).toString(), uris.get( 0 ) );
 	}
 
 	@Test
@@ -213,7 +213,7 @@ public class ParametersTest extends BaseTestCase {
 		List<String> uris = parameters.getUris();
 		assertEquals( count, uris.size() );
 		for( int index = 0; index < count; index++ ) {
-			assertEquals( "URI incorrect.", UriUtil.resolve( "test" + index + ".file" ).toString(), uris.get( index ) );
+			assertEquals( UriUtil.resolve( "test" + index + ".file" ).toString(), uris.get( index ) );
 		}
 	}
 

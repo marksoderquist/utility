@@ -293,53 +293,53 @@ public class TextUtilTest extends BaseTestCase {
 
 	@Test
 	public void testJustify() {
-		assertEquals( "Incorrect format.", "        ", TextUtil.justify( TextUtil.LEFT, "", 8 ) );
-		assertEquals( "Incorrect format.", "X       ", TextUtil.justify( TextUtil.LEFT, "X", 8 ) );
-		assertEquals( "Incorrect format.", "        ", TextUtil.justify( TextUtil.CENTER, "", 8 ) );
-		assertEquals( "Incorrect format.", "   X    ", TextUtil.justify( TextUtil.CENTER, "X", 8 ) );
-		assertEquals( "Incorrect format.", "   XX   ", TextUtil.justify( TextUtil.CENTER, "XX", 8 ) );
-		assertEquals( "Incorrect format.", "        ", TextUtil.justify( TextUtil.RIGHT, "", 8 ) );
-		assertEquals( "Incorrect format.", "       X", TextUtil.justify( TextUtil.RIGHT, "X", 8 ) );
+		assertEquals( "        ", TextUtil.justify( TextUtil.LEFT, "", 8 ) );
+		assertEquals( "X       ", TextUtil.justify( TextUtil.LEFT, "X", 8 ) );
+		assertEquals( "        ", TextUtil.justify( TextUtil.CENTER, "", 8 ) );
+		assertEquals( "   X    ", TextUtil.justify( TextUtil.CENTER, "X", 8 ) );
+		assertEquals( "   XX   ", TextUtil.justify( TextUtil.CENTER, "XX", 8 ) );
+		assertEquals( "        ", TextUtil.justify( TextUtil.RIGHT, "", 8 ) );
+		assertEquals( "       X", TextUtil.justify( TextUtil.RIGHT, "X", 8 ) );
 	}
 
 	@Test
 	public void testJustifyWithChar() {
-		assertEquals( "Incorrect format.", "........", TextUtil.justify( TextUtil.LEFT, "", 8, '.' ) );
-		assertEquals( "Incorrect format.", "X.......", TextUtil.justify( TextUtil.LEFT, "X", 8, '.' ) );
-		assertEquals( "Incorrect format.", "........", TextUtil.justify( TextUtil.CENTER, "", 8, '.' ) );
-		assertEquals( "Incorrect format.", "...X....", TextUtil.justify( TextUtil.CENTER, "X", 8, '.' ) );
-		assertEquals( "Incorrect format.", "...XX...", TextUtil.justify( TextUtil.CENTER, "XX", 8, '.' ) );
-		assertEquals( "Incorrect format.", "........", TextUtil.justify( TextUtil.RIGHT, "", 8, '.' ) );
-		assertEquals( "Incorrect format.", ".......X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.' ) );
+		assertEquals( "........", TextUtil.justify( TextUtil.LEFT, "", 8, '.' ) );
+		assertEquals( "X.......", TextUtil.justify( TextUtil.LEFT, "X", 8, '.' ) );
+		assertEquals( "........", TextUtil.justify( TextUtil.CENTER, "", 8, '.' ) );
+		assertEquals( "...X....", TextUtil.justify( TextUtil.CENTER, "X", 8, '.' ) );
+		assertEquals( "...XX...", TextUtil.justify( TextUtil.CENTER, "XX", 8, '.' ) );
+		assertEquals( "........", TextUtil.justify( TextUtil.RIGHT, "", 8, '.' ) );
+		assertEquals( ".......X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.' ) );
 	}
 
 	@Test
 	public void testJustifyWithCharAndPad() {
-		assertEquals( "Incorrect format.", "  ......", TextUtil.justify( TextUtil.LEFT, "", 8, '.', 2 ) );
-		assertEquals( "Incorrect format.", "X  .....", TextUtil.justify( TextUtil.LEFT, "X", 8, '.', 2 ) );
-		assertEquals( "Incorrect format.", "..    ..", TextUtil.justify( TextUtil.CENTER, "", 8, '.', 2 ) );
-		assertEquals( "Incorrect format.", ".  X  ..", TextUtil.justify( TextUtil.CENTER, "X", 8, '.', 2 ) );
-		assertEquals( "Incorrect format.", ".  XX  .", TextUtil.justify( TextUtil.CENTER, "XX", 8, '.', 2 ) );
-		assertEquals( "Incorrect format.", "......  ", TextUtil.justify( TextUtil.RIGHT, "", 8, '.', 2 ) );
-		assertEquals( "Incorrect format.", ".....  X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.', 2 ) );
+		assertEquals( "  ......", TextUtil.justify( TextUtil.LEFT, "", 8, '.', 2 ) );
+		assertEquals( "X  .....", TextUtil.justify( TextUtil.LEFT, "X", 8, '.', 2 ) );
+		assertEquals( "..    ..", TextUtil.justify( TextUtil.CENTER, "", 8, '.', 2 ) );
+		assertEquals( ".  X  ..", TextUtil.justify( TextUtil.CENTER, "X", 8, '.', 2 ) );
+		assertEquals( ".  XX  .", TextUtil.justify( TextUtil.CENTER, "XX", 8, '.', 2 ) );
+		assertEquals( "......  ", TextUtil.justify( TextUtil.RIGHT, "", 8, '.', 2 ) );
+		assertEquals( ".....  X", TextUtil.justify( TextUtil.RIGHT, "X", 8, '.', 2 ) );
 	}
 
 	@Test
 	public void testPad() {
-		assertEquals( "Incorrect pad.", "", TextUtil.pad( -1 ) );
-		assertEquals( "Incorrect pad.", "", TextUtil.pad( 0 ) );
-		assertEquals( "Incorrect pad.", " ", TextUtil.pad( 1 ) );
-		assertEquals( "Incorrect pad.", "     ", TextUtil.pad( 5 ) );
-		assertEquals( "Incorrect pad.", "        ", TextUtil.pad( 8 ) );
+		assertEquals( "", TextUtil.pad( -1 ) );
+		assertEquals( "", TextUtil.pad( 0 ) );
+		assertEquals( " ", TextUtil.pad( 1 ) );
+		assertEquals( "     ", TextUtil.pad( 5 ) );
+		assertEquals( "        ", TextUtil.pad( 8 ) );
 	}
 
 	@Test
 	public void testPadWithChar() {
-		assertEquals( "Incorrect pad.", "", TextUtil.pad( -1, '.' ) );
-		assertEquals( "Incorrect pad.", "", TextUtil.pad( 0, '.' ) );
-		assertEquals( "Incorrect pad.", "x", TextUtil.pad( 1, 'x' ) );
-		assertEquals( "Incorrect pad.", ",,,,,", TextUtil.pad( 5, ',' ) );
-		assertEquals( "Incorrect pad.", "--------", TextUtil.pad( 8, '-' ) );
+		assertEquals( "", TextUtil.pad( -1, '.' ) );
+		assertEquals( "", TextUtil.pad( 0, '.' ) );
+		assertEquals( "x", TextUtil.pad( 1, 'x' ) );
+		assertEquals( ",,,,,", TextUtil.pad( 5, ',' ) );
+		assertEquals( "--------", TextUtil.pad( 8, '-' ) );
 	}
 
 	@Test
