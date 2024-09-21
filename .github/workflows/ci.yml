@@ -6,7 +6,7 @@ on:
   pull_request:
   workflow_dispatch:
 
-#env:
+env:
 #  AVN_PRODUCT: "utility"
 #  # The default release, should be overridden in config.sh
 #  AVN_RELEASE: "latest"
