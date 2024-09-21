@@ -19,7 +19,7 @@
 	<repositories>
 		<repository>
 			<id>avn</id>
-			<url>https://repo.avereon.com/repo/avn</url>
+			<url>https://repo.avereon.com/avn</url>
 		</repository>
 	</repositories>
 
