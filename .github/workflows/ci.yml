@@ -46,7 +46,7 @@ jobs:
         run: |
           source .github/config.sh
 
-      # Required to render the product icon
+      # Required for tests
       - name: Set up Virtual Display
         run: |
           Xvfb ${{env.DISPLAY}} ${{env.XVFB_PARMS}} &
