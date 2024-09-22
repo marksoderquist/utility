@@ -17,15 +17,19 @@ public class MapSettingsProvider implements WritableSettingsProvider {
 	}
 
 	public MapSettingsProvider( InputStream input ) {
-		try {
-			this.store = new ConcurrentHashMap<>( IoUtil.loadAsMap( input ) );
-		} catch( IOException exception ) {
-			Log.write( exception );
-		} finally {
+		if( input == null ) {
+			this.store = new ConcurrentHashMap<>();
+		} else {
 			try {
-				if( input != null ) input.close();
+				this.store = new ConcurrentHashMap<>( IoUtil.loadAsMap( input ) );
 			} catch( IOException exception ) {
 				Log.write( exception );
+			} finally {
+				try {
+					input.close();
+				} catch( IOException exception ) {
+					Log.write( exception );
+				}
 			}
 		}
 	}
