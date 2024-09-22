@@ -1,36 +1,29 @@
 package com.parallelsymmetry.utility.setting;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.parallelsymmetry.utility.IoUtil;
 import com.parallelsymmetry.utility.log.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MapSettingsProvider implements WritableSettingsProvider {
 
 	protected Map<String, String> store;
 
 	public MapSettingsProvider() {
-		this( new ConcurrentHashMap<String, String>() );
+		this( new ConcurrentHashMap<>() );
 	}
 
 	public MapSettingsProvider( InputStream input ) {
 		try {
-			this.store = new ConcurrentHashMap<String, String>( IoUtil.loadAsMap( input ) );
+			this.store = new ConcurrentHashMap<>( IoUtil.loadAsMap( input ) );
 		} catch( IOException exception ) {
 			Log.write( exception );
 		} finally {
 			try {
-				input.close();
+				if( input != null ) input.close();
 			} catch( IOException exception ) {
 				Log.write( exception );
 			}
@@ -38,7 +31,7 @@ public class MapSettingsProvider implements WritableSettingsProvider {
 	}
 
 	public MapSettingsProvider( Map<String, String> store ) {
-		this.store = new ConcurrentHashMap<String, String>();
+		this.store = new ConcurrentHashMap<>();
 		this.store.putAll( store );
 	}
 
@@ -51,7 +44,7 @@ public class MapSettingsProvider implements WritableSettingsProvider {
 	public Set<String> getKeys( String path ) {
 		path = nodePath( path );
 
-		Set<String> keys = new HashSet<String>();
+		Set<String> keys = new HashSet<>();
 		if( !nodeExists( path ) ) return keys;
 
 		for( String key : getInternalStore().keySet() ) {
@@ -67,7 +60,7 @@ public class MapSettingsProvider implements WritableSettingsProvider {
 	public Set<String> getChildNames( String path ) {
 		path = nodePath( path );
 
-		Set<String> names = new HashSet<String>();
+		Set<String> names = new HashSet<>();
 		if( !nodeExists( path ) ) return names;
 
 		for( String key : getInternalStore().keySet() ) {
@@ -105,10 +98,8 @@ public class MapSettingsProvider implements WritableSettingsProvider {
 	@Override
 	public void removeNode( String path ) {
 		path = nodePath( path );
-		Iterator<String> iterator = getInternalStore().keySet().iterator();
 
-		while( iterator.hasNext() ) {
-			String key = iterator.next();
+		for( String key : getInternalStore().keySet() ) {
 			if( key.startsWith( path ) ) getInternalStore().remove( key );
 		}
 	}
