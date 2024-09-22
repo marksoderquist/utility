@@ -18,7 +18,7 @@ import com.parallelsymmetry.utility.task.TaskEvent.Type;
  * WARNING! Do not create a waitFor() method to wait for the task to complete.
  * The correct way to wait for the result is to obtain the Future object when
  * calling the submit( Task ) method and then call future.get().
- * 
+ *
  * @author Mark Soderquist
  * @param <V> The return type of the task.
  */
@@ -239,7 +239,7 @@ public abstract class Task<V> implements Callable<V>, Future<V> {
 			} catch( ExecutionException exception ) {
 				task.result = Result.FAILED;
 			} finally {
-				task.setState( State.DONE );
+				task.setState( Task.State.DONE );
 				task.setProgress( task.maximum );
 				task.fireTaskEvent( TaskEvent.Type.TASK_FINISH );
 				task.manager.completed( task );

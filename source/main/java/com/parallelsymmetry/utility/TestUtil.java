@@ -11,7 +11,8 @@ public class TestUtil {
 	private static Boolean test;
 
 	static {
-		runners = new HashSet<String>();
+		runners = new HashSet<>();
+		runners.add( "org.junit.jupiter.engine.execution.InterceptingExecutableInvoker");
 		runners.add( "org.junit.runners.ParentRunner");
 		runners.add( "org.junit.runner.JUnitCore" );
 		runners.add( "junit.framework.TestSuite" );
@@ -19,7 +20,7 @@ public class TestUtil {
 	}
 
 	/**
-	 * Check if the any thread is running in the JUnit test framework. This is
+	 * Check if any thread is running in the JUnit test framework. This is
 	 * done by searching the thread stack for the class junit.framework.TestSuite
 	 * and caching the result. If the TestSuite class is found the method will
 	 * return true.
@@ -35,6 +36,7 @@ public class TestUtil {
 			if( thread.getId() == 1 ) {
 				StackTraceElement[] elements = stacks.get( thread );
 				for( StackTraceElement element : elements ) {
+					System.out.println( element.getClassName() );
 					if( runners.contains( element.getClassName() ) ) {
 						result = true;
 						break;
