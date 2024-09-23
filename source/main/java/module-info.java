@@ -1,12 +1,12 @@
 module com.parallelsymmetry.utility {
 	// Compile time only
 	requires static lombok;
+	requires static servlet.api;
 
 	// Compile and runtime
 	requires java.logging;
 	requires java.desktop;
 	requires java.prefs;
-	requires servlet.api;
 	requires jdk.management;
 
 	exports com.parallelsymmetry.utility;
