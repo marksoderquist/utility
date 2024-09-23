@@ -1,26 +1,16 @@
 package com.parallelsymmetry.utility;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import com.parallelsymmetry.utility.log.Log;
 
-import fr.cryptohash.DigestEngine;
-import fr.cryptohash.Keccak256;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class HashUtil {
 
 	public static final HashStrategy SHA1 = new DigestStrategy( new MessageDigestWrapper( "SHA-1" ) );
 
 	public static final HashStrategy MD5 = new DigestStrategy( new MessageDigestWrapper( "MD5" ) );
-
-	public static final HashStrategy KECCAK = new DigestStrategy( new KeccakDigestWrapper( new Keccak256() ) );
 
 	public static final HashStrategy DEFAULT_STRATEGY = SHA1;
 
@@ -131,31 +121,6 @@ public class HashUtil {
 			} catch( NoSuchAlgorithmException exception ) {
 				Log.write( exception );
 			}
-			this.digest = digest;
-		}
-
-		@Override
-		public void reset() {
-			digest.reset();
-		}
-
-		@Override
-		public void update( byte[] input, int offset, int length ) {
-			digest.update( input, offset, length );
-		}
-
-		@Override
-		public byte[] digest() {
-			return digest.digest();
-		}
-
-	}
-
-	private static final class KeccakDigestWrapper implements DigestWrapper {
-
-		private DigestEngine digest;
-
-		public KeccakDigestWrapper( DigestEngine digest ) {
 			this.digest = digest;
 		}
 
