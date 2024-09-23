@@ -62,7 +62,7 @@ public class BundlesTest extends BaseTestCase {
 	@Test
 	public void testMultiStreamHandling() {
 		assertEquals( "[bundles/utility:source]", Bundles.getString( "bundles/utility", "source" ) );
-		assertEquals( "test", Bundles.getString( "bundles/utility", "target" ) );
+		assertEquals( "[bundles/utility:target]", Bundles.getString( "bundles/utility", "target" ) );
 	}
 
 	@Test
