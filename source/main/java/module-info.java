@@ -12,4 +12,6 @@ module com.parallelsymmetry.utility {
 	exports com.parallelsymmetry.utility;
 	exports com.parallelsymmetry.utility.agent;
 	exports com.parallelsymmetry.utility.log;
+	exports com.parallelsymmetry.utility.product;
+	exports com.parallelsymmetry.utility.ui;
 }
